@@ -1,4 +1,5 @@
 <?php
+header("Access-Control-Allow-Origin: *");
 
 $code = $_POST['code'];
 $randomKey = $_POST['randomKey'];
