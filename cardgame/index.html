@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+<style>
+    .row {
+        display: flex;
+    }
+    .card {
+        position: relative;
+        width: 100px;
+        top: 0px;
+        left: 0px;
+        height: 150px;
+        transform-style: preserve-3d;
+        position: relative;
+        margin: 5px;
+    }
+    img {
+        border-radius: 10px;
+    }
+    body {
+        background: url(images/cr/grass.png);
+    }
+    .front {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100px;
+        height: 150px;
+        border-radius: 10px;
+        backface-visibility: hidden;
+        border: 1px solid black;
+        border-radius: 10px;
+        transform: rotateY(180deg);
+    }
+    .back {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100px;
+        height: 150px;
+        border-radius: 10px;
+        backface-visibility: hidden;
+        border: 1px solid black;
+        border-radius: 10px;
+    }
+    .open {
+        animation: open 0.5s linear forwards;
+    }
+    .close {
+        animation: close 0.5s linear;
+    }
+    .matchCards {
+        animation: matchCards 0.5s linear forwards;
+    }
+    lockScroll {
+        overflow: hidden;
+    }
+    #gameEnd {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        left: 0px;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        font-size: 50px;
+        text-align: center;
+        /*line-height: 500px;*/
+        
+   }
+    .text {
+        top: 30%;
+        position: relative;
+    }
+    .buttons {
+        width: 200px;
+        height: 50px;
+        padding: 1px;
+        font-size: 30px;
+        border-radius: 10px;
+        background: #00b843;
+        border-color: #00b843;
+        color: #FFFFFF;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    @keyframes open {
+        0% {
+            transform: rotateY(0deg);
+        }
+        100%{
+            transform: rotateY(180deg);
+        }
+    }
+    @keyframes close {
+        0% {
+            transform: rotateY(180deg);
+        }
+        100%{
+            transform: rotateY(0deg);
+        }
+    }
+    @keyframes matchCards {
+        0% {
+            transform: rotateY(180deg);
+            opacity: 1;
+        }
+        100%{
+            transform: rotateY(0deg);
+            opacity: 0;
+        }
+    }
+    #table {
+        width: 650px;
+position: relative;
+      margin-left:auto;
+      margin-right:auto;
+    }
+    .hud {
+position: relative;
+      margin-left:auto;
+      margin-right:auto;
+        width: 635px;
+        padding-left: 5px;
+        padding-right: 5px;
+        background: #cccccc;
+        display: flex;
+        justify-content: space-between;
+        border-radius: 5px;
+        border: 1px solid black;
+    }
+    #difficulty {
+        border: none;
+        font-size: 16px;
+        background: #bbbbbb;
+        
+    }
+    .difficultySettings {
+     
+position: relative;
+      margin-left:auto;
+      margin-right:auto;
+        width: 635px;
+        padding-left: 5px;
+        padding-right: 5px;
+        background: #cccccc;
+        border-radius: 5px;
+        border: 1px solid black;
+    }
+    /*Place CSS code here*/
+</style>
+</head>
+<body>
+    <div id="gameEnd">
+        <div class="text">
+            <p id="endType">Вы нашли все пары карт!</p>
+            <div><button class="buttons" id="restart">Играть снова</button></div>
+        </div>
+    </div>
+    
+   <div class="difficultySettings">
+    Сложность:
+    <select id="difficulty">
+        <option value="novice">Новичок</option>
+        <option value="expirienced">Опытный</option>
+        <option value="expert">Эксперт</option>
+    </select>
+       </div>
+    <div class="hud">
+        <div id="time">Время: 70 секунд</div>
+        <div id="flips">Поворотов осталось: 70</div>
+    </div>
+    
+    <div id="table">
+        <div class="row" id="row1">
+            <div uid="1" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="2" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="3" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="4" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="5" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="6" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+        </div>
+        <div class="row" id="row2">
+            <div uid="7"  class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="8" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="9" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="10" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="11" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="12" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+        </div>
+        <div class="row" id="row3">
+            <div uid="13" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="14" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="15" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="16" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="17" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+            <div uid="18" class="card">
+                <div class="front"></div>
+                <div class="back"><img src="images/cr/back-side.jpg"></div>
+            </div>
+        </div>
+    </div>
+    <!--Place HTML code here-->
+<script>
+    function word (num, word1, word2, word5) {
+        num = Math.abs(num) % 100;
+        numX = num % 10;
+        if (num > 10 && num <20)
+            return word5;
+        if (numX > 1 && numX < 5)
+            return word2;
+        if (numX === 1)
+            return word1;
+        return word5;
+    }
+    
+    function rand(min, max) {
+        var rand = min + Math.random() * (max + 1 - min);
+        rand = Math.floor(rand);
+        return rand;
+    }
+    function shuffle(arr){
+        let j, temp;
+        for(var i = arr.length - 1; i > 0; i--){
+            j = Math.floor(Math.random()*(i + 1));
+            temp = arr[j];
+            arr[j] = arr[i];
+            arr[i] = temp;
+        }
+        return arr;
+    }
+    
+    var root = "images/cr/";
+    var pictures = [
+        "archers", "arrows", "baby-dragon", "balloon", "bandit", "barbarian-barrel", "barbarian-hut",
+        "barbarians", "bats", "battle-ram", "bomb-tower", "bomber", "bowler", "cannon-cart",
+        "cannon", "clone", "dark-prince", "dart-goblin", "electro-dragon", "electro-wizard",
+        "elite-barbarians", "elixir-collector", "executioner", "fire-spirits", "fireball",
+        "flying-machine", "freeze", "furnace", "giant-skeleton", "giant-snowball", "giant",
+        "goblin-barrel", "goblin-gang", "goblin-giant", "goblin-hut", "goblins", "golem",
+        "graveyard", "guards", "heal", "hog-rider", "hunter", "ice-golem", "ice-spirit",
+        "ice-wizard", "inferno-dragon", "inferno-tower", "knight", "lava-hound", "lightning",
+        "lumberjack", "magic-archer", "mega-knight", "mega-minion", "miner", "mini-pekka",
+        "minion-horde", "minions", "mirror", "mortar", "musketeer", "night-witch", "pekka", "poison",
+        "prince", "princess", "rage", "ram-rider", "rascals", "rocket", "royal-ghost", "royal-giant", 
+        "royal-hogs", "royal-recruits", "skeleton-army", "skeleton-barrel", "skeletons", "sparky",
+        "spear-goblins", "tesla", "the-log", "three-musketeers", "tombstone", "tornado", "valkyrie", 
+        "witch", "wizard", "x-bow", "zap", "zappies"
+    ];
+    var gameOver = true;
+    var timerCounter = 70;
+    var flips = 70;
+    var setTime = 70;
+    var setFlips = 70;
+    var clicks = 0;
+    var timeSpend = 0;
+    var timer;
+    var card1, card2;
+    var lockTable = false;
+    var uid, currentCard;
+    var victory = 0;
+    var previousCard;
+    var field = [];
+    var move = 0;
+    var front = document.getElementsByClassName("front");
+    var cards = document.getElementsByClassName("card");
+    
+    function newGame() {
+        //создаём рандомные пары карт
+        for (var i = 0; i < 17; i+=2) {
+            let randomCard = pictures[ rand(0, (pictures.length-1) ) ];
+            field[i] = randomCard;
+            field[i+1] = randomCard;
+        }
+        //перемешиваем пары
+        shuffle(field);
+    
+        //присваиваем рандомные пары к картам на столе
+        for (var i = 0; i < front.length; i++) {
+            front[i].innerHTML = "<img src=\"" + root + field[i] + ".jpg\">";
+        }
+    }
+    newGame();
+    difficulty.addEventListener("change", function(e) {
+        if (gameOver) {
+            switch(e.target.value) {
+                    case "novice":
+                    setTime = 70;
+                    setFlips = 70;
+                    document.getElementById("time").innerHTML = "Время: 70 секунд";
+                    document.getElementById("flips").innerHTML = "Поворотов осталось: 70";
+                    break;
+                    case "expirienced":
+                    setTime = 45;
+                    setFlips = 38;
+                    document.getElementById("time").innerHTML = "Время: 45 секунд";
+                    document.getElementById("flips").innerHTML = "Поворотов осталось: 38";
+                    break;
+                    case "expert":
+                    setTime = 36;
+                    setFlips = 32
+                    document.getElementById("time").innerHTML = "Время: 36 секунд";
+                    document.getElementById("flips").innerHTML = "Поворотов осталось: 32";
+            }
+        }
+        
+    });
+    //обработка кликов
+    restart.addEventListener("click", function(e) {
+        victory = 0;
+        document.body.classList.remove("lockScroll");
+        document.getElementById("gameEnd").style.display = "none";
+        document.getElementById("time").innerHTML = "Время: " + setTime + " секунд";
+        document.getElementById("flips").innerHTML = "Поворотов осталось: " + setFlips;
+        newGame();
+        for (var i = 0; i < cards.length; i++) {
+            cards[i].style.animation = "";
+        }
+        
+    });
+    
+    for (var i = 0; i < cards.length; i++) {
+        cards[i].addEventListener("click", function(e) {
+           if (clicks === 0) {
+               timerCounter = setTime;
+               flips = setFlips;
+               gameOver = false;
+                timer = setInterval(function() {
+                    timerCounter--;
+                    timeSpend++;
+                    if (timerCounter > 10)
+                        document.getElementById("time").innerHTML = "Время: " + timerCounter + word(timerCounter, " секунда", " секунды", " секунд");
+                    else
+                        document.getElementById("time").innerHTML = "Время: <font color=\"#cc0030\">" + timerCounter + "</font> секунд";
+                    if (timerCounter === 0) {
+                        gameOver = true;
+                        document.getElementById("endType").innerHTML = "Время вышло!";
+                        document.getElementById("gameEnd").style.display = "block";
+                        document.body.classList.add("lockScroll");
+                        clearInterval(timer);
+                        clicks = 0;
+                        flips = setFlips;
+                        timerCounter = setTime;
+                    }
+                }, 1000);
+            }
+            
+            currentCard = e.target.closest(".card");
+            if (move < 2 && !lockTable && previousCard !== currentCard && currentCard.style.animation !== "matchCards 0.5s ease 0s 1 normal forwards running" && !gameOver) {
+                move++;
+                clicks++;
+                flips--;
+                document.getElementById("flips").innerHTML = "Поворотов осталось: " + flips;
+            }
+            if (flips === 0) {
+                        gameOver = true;
+                        document.getElementById("endType").innerHTML = "Лимит поворотов!";
+                        document.getElementById("gameEnd").style.display = "block";
+                        document.body.classList.add("lockScroll");
+                        clearInterval(timer);
+                        clicks = 0;
+                        flips = setFlips;
+                        timerCounter = setTime;
+                    }
+            
+            if (move === 1 && !lockTable && previousCard !== currentCard && !gameOver) {
+                lockTable = true;
+                card1 = currentCard;
+                previousCard = card1;
+                //card1.style.transform = "rotateY(180deg)";
+                card1.style.animation = "open 0.5s forwards";
+                lockTable = false;
+            }
+            else if (move === 2 && !lockTable && previousCard !== currentCard && !gameOver) {
+                lockTable = true;
+                card2 = currentCard;
+                previousCard = card2;
+                //card2.style.transform = "rotateY(180deg)";
+                card2.style.animation = "open 0.5s forwards";
+                compare();
+                move = 0;
+            }
+        });
+    }
+    function compare() {
+        //карты совпали
+        if (card1.innerHTML === card2.innerHTML) {
+            victory++;
+            if (victory === 9) {
+                gameOver = true;
+                clearInterval(timer);
+                clicks = 0;
+                flips = setFlips;
+                timerCounter = setTime;
+                document.getElementById("endType").innerHTML = "Вы нашли все пары карт за " + timeSpend + word(timeSpend, " секунда", " секунды", " секунд");
+                timeSpend = 0;
+                document.getElementById("gameEnd").style.display = "block";
+                document.body.classList.add("lockScroll");
+            }
+            setTimeout(function() {
+                card1.style.animation = "matchCards 0.5s forwards";
+                card2.style.animation = "matchCards 0.5s forwards";
+                card1 = undefined;
+                card2 = undefined;
+                previousCard = undefined;
+                lockTable = false;
+            }, 500);
+            
+        }
+        //карты не совпали
+        else {
+            setTimeout(function() {
+                //card1.style.transform = "rotateY(0deg)";
+                //card2.style.transform = "rotateY(0deg)";
+                card1.style.animation = "close 0.5s forwards";
+                card2.style.animation = "close 0.5s forwards";
+                card1 = undefined;
+                card2 = undefined;
+                previousCard = undefined;
+                lockTable = false;
+            } ,500);
+        }
+    }
+    /*
+    setInterval(function () {
+        document.getElementById("debug").innerHTML = gameOver;
+    }, 1);
+    */
+    //Place JS code here
+</script>
+</body>
+</html>
