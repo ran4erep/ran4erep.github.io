@@ -361,9 +361,11 @@
     //обработка кликов
     restart.addEventListener("click", function(e) {
         victory = 0;
+        move = 0;
         card1 = undefined;
         card2 = undefined;
         currentCard = undefined;
+        previousCard = undefined;
         document.body.classList.remove("lockScroll");
         document.getElementById("gameEnd").style.display = "none";
         document.getElementById("time").innerHTML = "Время: " + setTime + " секунд";
@@ -449,6 +451,7 @@
                 gameOver = true;
                 clearInterval(timer);
                 clicks = 0;
+                move = 0;
                 flips = setFlips;
                 timerCounter = setTime;
                 document.getElementById("endType").innerHTML = "Вы нашли все пары карт за " + timeSpend + word(timeSpend, " секунду", " секунды", " секунд");
