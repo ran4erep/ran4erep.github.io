@@ -318,6 +318,26 @@
     var front = document.getElementsByClassName("front");
     var cards = document.getElementsByClassName("card");
     
+    var allPics = 0;
+    var loadedPics = 0;
+    var image;
+    var picLoad = function() {
+        for (let i = 0; i < pictures.length; i++) {
+            allPics++;
+            image = document.createElement("img");
+            image.onload = function() {
+                loadedPics++;
+                document.getElementById("loadingText").innerHTML = "Загрузка<br><progress id=\"loading\" value=\"" + (loadedPics / allPics * 100) + "\" max=\"100\"></progress><br>" + Math.floor((loadedPics / allPics * 100)) + "%";
+                if (allPics === loadedPics) {
+                    document.getElementById("bgFade").style.display = "none";
+                }
+            }
+            image.src = root + pictures[i] + ".jpg";
+        }
+    }
+    picLoad();
+    
+    
     function newGame() {
         //создаём рандомные пары карт
         for (var i = 0; i < 17; i+=2) {
