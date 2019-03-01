@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+<style>
+    /*Place CSS code here*/
+</style>
+</head>
+<body>
+    <p align="center">
+    Нажмите любую клавишу чтобы узнать её скан-код
+</p>
+	Если реакции на нажатие клавиш нет, то кликните мышью в любое свободное место на странице
+	<br>
+<div id="checker" align="center"></div>
+<br>
+<p align="center">
+    История нажатий
+</p>
+<div id="history" align="left"></div>
+<script>
+    //инициализация
+var historyOfInputs = [];
+var historyCounter = 0;
+var keyName;
+
+document.getElementById("checker").innerHTML = "Вы пока не нажали ни одной клавиши";
+
+if (historyCounter === 0)
+document.getElementById("history").innerHTML = "Пока что история нажатий пуста :(";
+
+//основная работа скрипта
+document.addEventListener ('keydown', function(e) {
+	//если был нажат пробел, то меняем его имя с пустоты на Space
+	if (e.key === " ")
+		keyName = "Space";
+	else
+		keyName = e.key;
+	//говорим пользователю какую клавишу он нажал и её скан-код
+	document.getElementById("checker").innerHTML = "<font size=\"12\">" + e.keyCode + " " + "«" + keyName + "»</font>";
+	//обнуляем строку истории для перезаписи текста
+	document.getElementById("history").innerHTML = " ";
+	//записываем скан-код в массив истории
+	historyOfInputs[historyCounter] = "<font size=\"3\">" + e.keyCode + " " + "«" + keyName + "»</font>";
+		//инкрементируем счётчик массива
+	historyCounter++;
+	//склеиваем все элементы массива в одну строку для вывода
+	document.getElementById("history").innerHTML = historyOfInputs.join(', ');
+});
+
+    </script>
+    <!--Place HTML code here-->
+<script>
+    //Place JS code here
+</script>
+</body>
+</html>
