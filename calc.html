@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+<style>
+    .buttons {
+	width: 50px;
+	height: 50px;
+	border-radius: 10px;
+	margin: 1px;
+	font-size: 20px;
+	background-color: #E6E6E6;
+	color: #707070;
+
+}
+
+.grayButtons {
+	width: 50px;
+	height: 50px;
+	border-radius: 10px;
+	margin: 1px;
+	font-size: 20px;
+	background-color: #9A9B9D;
+	color: #DBDFE0;
+}
+
+#button0 {
+	width: 104px;
+}
+
+#buttonEqual {
+	height: 100px;
+	position: absolute;
+	background-color: #D77931;
+	color: #FFFFFF;
+	/*right: 799px;*/
+}
+
+#calculator {
+	position: relative;
+	background-color: #E9E9E9;
+	width: 230px;
+
+}
+
+#display {
+	background-color: #B9C5C5;
+	color: #000000;
+}
+
+textarea {
+	text-align: right;
+}
+
+.bg {
+	background-image: url(bg.jpg);
+}
+
+#hash {
+	position: relative;
+	left: -27px;
+}
+
+#buttonRandom {
+	width: 104px;
+}
+    /*Place CSS code here*/
+</style>
+</head>
+<body>
+    <div class="phdr" align="center">
+		Калькулятор
+	</div>
+
+	<div align="center" class="bg">
+    <div id="calculator">
+
+    <div align="right" id="displayArea">
+    <textarea readonly id="display"></textarea>
+</div>
+
+<div id="buttonsBlock">
+
+    <div id="row1">
+        <button class="grayButtons" id="buttonC"><strong>C</strong></button>
+        <button class="grayButtons" id="buttonDel"><strong>DEL</strong></button>
+        <button class="grayButtons" id="buttonDivide"><strong>&#247;</strong></button>
+        <button class="grayButtons" id="buttonMultiply"><strong>&#215;</strong></button>
+    </div>
+
+
+
+    <div id="row2">
+        <button class="buttons" id="button7"><strong>7</strong></button>
+        <button class="buttons" id="button8"><strong>8</strong></button>
+        <button class="buttons" id="button9"><strong>9</strong></button>
+        <button class="grayButtons" id="buttonMinus"><strong>&minus;</strong></button>
+</div>
+
+<div id="row3">
+        <button class="buttons" id="button4"><strong>4</strong></button>
+        <button class="buttons" id="button5"><strong>5</strong></button>
+        <button class="buttons" id="button6"><strong>6</strong></button>
+        <button class="grayButtons" id="buttonPlus"><strong>&plus;</strong></button>
+</div>
+
+<div id="hash">
+
+<div id="row4">
+        <button class="buttons" id="button1"><strong>1</strong></button>
+        <button class="buttons" id="button2"><strong>2</strong></button>
+        <button class="buttons" id="button3"><strong>3</strong></button>
+        <button class="buttons" id="buttonEqual"><strong>=</strong></button>
+    </div>
+    <div id="row5">
+        <button class="buttons" id="button0"><strong>0</strong></button>
+        <button class="buttons" id="buttonDot"><strong>.</strong></button>
+    </div>
+
+    </div>
+
+<div id="row6">
+	<button class="buttons" id="buttonBracketOpen"><strong>(</strong></button>
+	<button class="buttons" id="buttonBracketClose"><strong>)</strong></button>
+	<button class="buttons" id="buttonRandom"><strong>RND</strong></button>
+</div>
+
+
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+    let display = document.getElementById("display");
+var expression = [];
+var width = 24;
+var maxDisplayWidth = 0;
+var operation;
+var formula;
+
+//   /(\d+)|\+|-|×|÷/g
+//   /[(×)(÷)]/g
+
+function displayDraw(pressedButton) {
+	if (maxDisplayWidth !== width || maxDisplayWidth < 0) {
+		expression[maxDisplayWidth] = pressedButton;
+		maxDisplayWidth++;
+		display.value = "\n" + expression.join("");
+		formula = expression.join("");
+	}
+}
+
+function evaluation(expressionForEvaluation) {
+	var replacingSheet = {
+		"×": "*",
+		"÷": "/",
+		"(": "(",
+		")": ")"
+	};
+	expressionForEvaluation = expressionForEvaluation.replace(/[(×)(÷)]/g, function (m) { return replacingSheet[m]; });
+	console.log(expressionForEvaluation);
+	var result = eval(expressionForEvaluation);
+	if (result === Infinity)
+		return "Бесконечность ∞";
+	else
+		return result;
+}
+/*
+for (var i = 0; i < width; i++) {
+	expression[i] = " ";
+}
+*/
+display.value = "\n0"
+
+button1.addEventListener("click", function(e) {
+	displayDraw(1);
+});
+
+button2.addEventListener("click", function(e) {
+	displayDraw(2);
+});
+
+button3.addEventListener("click", function(e) {
+	displayDraw(3);
+});
+
+button4.addEventListener("click", function(e) {
+	displayDraw(4);
+});
+
+button5.addEventListener("click", function(e) {
+	displayDraw(5);
+});
+
+button6.addEventListener("click", function(e) {
+	displayDraw(6);
+});
+
+button7.addEventListener("click", function(e) {
+	displayDraw(7);
+});
+
+button8.addEventListener("click", function(e) {
+	displayDraw(8);
+});
+
+button9.addEventListener("click", function(e) {
+	displayDraw(9);
+});
+
+button0.addEventListener("click", function(e) {
+	displayDraw(0);
+});
+
+buttonDot.addEventListener("click", function(e) {
+	if (maxDisplayWidth === 0)
+		displayDraw("0.");
+	else
+		displayDraw(".");
+});
+
+buttonC.addEventListener("click", function(e) {
+	for (var i = 0; i < width; i++) {
+		delete expression[i];
+	}
+	maxDisplayWidth = 0;
+	display.value = "\n0";
+});
+
+buttonDel.addEventListener("click", function(e) {
+	if (maxDisplayWidth > 0) {
+		delete expression[maxDisplayWidth-1];
+		maxDisplayWidth--;
+	}
+
+	if (maxDisplayWidth === 0)
+		display.value = "\n0";
+	else
+		display.value = "\n" + expression.join("");
+});
+
+buttonDivide.addEventListener("click", function(e) {
+	operation = "divide";
+	displayDraw("÷");
+});
+
+buttonMultiply.addEventListener("click", function(e) {
+	operation = "multiply";
+	displayDraw("×");
+});
+
+buttonPlus.addEventListener("click", function(e) {
+		operation = "plus";
+		displayDraw("+");
+});
+
+buttonMinus.addEventListener("click", function(e) {
+	operation = "minus";
+	displayDraw("-");
+});
+
+buttonEqual.addEventListener("click", function(e) {
+	display.value = formula + "=\n" + evaluation(formula);
+});
+
+buttonBracketOpen.addEventListener("click", function(e) {
+	displayDraw("\(");
+});
+
+buttonBracketClose.addEventListener("click", function(e) {
+	displayDraw("\)");
+});
+
+buttonRandom.addEventListener("click", function(e) {
+	function rand(min, max) {
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+	if (formula.match(/[\d]+[-][\d]+/)) {
+		randResult = formula.split("-");
+		display.value = formula + "=\nСлучайное число: " + rand(parseInt(randResult[0]), parseInt(randResult[1]));
+	}
+	else
+		alert("Неверный формат. Для определния случайного числа укажите диапазон в формате «минимальноеЧисло-максимальноеЧисло»");
+});
+    </script>
+    <!--Place HTML code here-->
+<script>
+    //Place JS code here
+</script>
+</body>
+</html>
