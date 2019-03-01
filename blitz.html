@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+<style>
+    /*Place CSS code here*/
+</style>
+</head>
+<body>
+    <input placeholder="Поиск танкиста" id="nick">
+    <button id="goSearch">Найти</button>
+    <div id="resultWG"></div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!--Place HTML code here-->
+<script>
+    var nickname;
+    var account_id;
+    var battles;
+    var wins;
+    var losses;
+    var winrate;
+    var damage_dealt;
+    var damagerate;
+    var winrateColor = "#000000";
+    var nicksArray = [];
+    var regDate;
+    var created_at;
+    var last_battle_time;
+    var lastBattleDate;
+    goSearch.addEventListener("click", function(e) {
+        var dateOptions = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'long',
+            timezone: 'UTC',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric'
+        };
+        if (document.getElementById("nick").value !== "") {
+            var replace = "^" + document.getElementById("nick").value + "$";
+            var re = new RegExp(replace,"ig");
+            var nickname = "https://api.wotblitz.ru/wotb/account/list/?application_id=e90f31bcaf9dd2549075a26c243e12c3&search=" + document.getElementById("nick").value;
+            
+            $.get(nickname, function(data) {
+                if ( data.meta.count === 0 )
+                   document.getElementById("resultWG").innerHTML = "Этот танкист не найден";
+             
+                if ( data.data[0].nickname.match(re) ) {
+                    account_id = data.data[0].account_id;
+                    nickname = data.data[0].nickname;
+                    $.get("https://api.wotblitz.ru/wotb/account/info/?application_id=e90f31bcaf9dd2549075a26c243e12c3&account_id=" + account_id, function(data) {
+                        created_at = data.data[account_id].created_at;
+                        last_battle_time = data.data[account_id].last_battle_time;
+                        regDate = new Date(created_at * 1000);
+                        lastBattleDate = new Date(last_battle_time * 1000);
+                        battles = data.data[account_id].statistics.all.battles;
+                        wins = data.data[account_id].statistics.all.wins;
+                        losses = data.data[account_id].statistics.all.losses;
+                        damage_dealt = data.data[account_id].statistics.all.damage_dealt;
+                        winrate = (wins*100/battles).toFixed(2);
+                        damagerate = Math.round ( damage_dealt/battles );
+                        
+                        if (winrate > 49.00 && winrate < 60.00) //50—59
+                            winrateColor = "#00DD00";
+                        else if (winrate > 39.00 && winrate < 50.00) //40—49
+                            winrateColor = "#DD7700";
+                        else if (winrate > 0.00 && winrate < 40.00) //0—39
+                            winrateColor = "#DD0000";
+                        else if (winrate > 59.00 && winrate < 70.00) //60—69
+                            winrateColor = "#002BDD";
+                        else if (winrate > 69.00 && winrate < 101.00) //70—100
+                            winrateColor = "#9400D3";
+                        
+                        document.getElementById("resultWG").innerHTML = "Танкист " + nickname + "</b> найден. Вот его статка:<br>Боёв откатал: " + battles + "<br>Боёв затащил: " + wins + "<br>Боёв слил: " + losses + "<br>Процент побед: <font color=\"" + winrateColor + "\">" + winrate + "</font>%<br>В среднем за бой наносит " + damagerate + " дамажки<br>Зарегистрировался: " + regDate.toLocaleString("ru", dateOptions) + "<br>Последний раз катал: " + lastBattleDate.toLocaleString("ru", dateOptions);
+                    }, "json");
+                } else {
+                  for (var i = 0; i < data.data.length; i++) {
+                      nicksArray[i] = data.data[i].nickname;
+                  }
+                  document.getElementById("resultWG").innerHTML = "Танкист не найден, но вот список похожих:<br>" + nicksArray.join("<br>");
+                }
+            }, "json" );
+        } else {
+            document.getElementById("resultWG").innerHTML = "Ничего не введено";
+        }
+    });
+    //Place JS code here
+</script>
+</body>
+</html>
