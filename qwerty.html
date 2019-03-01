@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+<style>
+    /*Place CSS code here*/
+</style>
+</head>
+<body>
+    <div class="phdr">
+Введите русский текст написанный на английской расладке клавиатуры:
+</div>
+<br>
+<textarea id="textString"></textarea>
+<br>
+<input type="submit" id="doItPlease" value="Перевести">
+<br>
+<div class="phdr">
+Ваш перевод:
+</div>
+<br>
+<textarea id="translated" value=""></textarea>
+
+<script>
+    //создаём всякие переменные и массивы для работы скрипта
+var textString = document.getElementById("textString");
+var doItPlease = document.getElementById("doItPlease");
+var translated = document.getElementById("translated");
+var userInputData = [];
+var translatingResult = [];
+//создаём объект, который содержит нужные значения по определённым ключам
+var fromTo = {
+	//символы
+	" ":" ", "/":".", "?":",", "!":"!", "&":"?",
+	//буквы
+	q:"й", w:"ц", e:"у", r:"к", t:"е", y:"н", u:"г", i:"ш", o:"щ", p:"з", "[":"х", "]":"ъ",
+	  a:"ф", s:"ы", d:"в", f:"а", g:"п", h:"р", j:"о", k:"л", l:"д", ";":"ж", "'":"э", 
+	    z:"я", x:"ч", c:"с", v:"м", b:"и", n:"т", m:"ь", ",":"б", ".":"ю", "`":"ё",
+	    //Исключения для MAC
+	    "\\":"ё", "|":"ё",
+	    //CAPS LOCK варианты
+	    "~":"Ё", "{":"Х", "}":"Ъ", ":":"Ж", "\"":"Э", "<":"Б", ">":"Ю",
+
+	Q:"Й", W:"Ц", E:"У", R:"К", T:"Е", Y:"Н", U:"Г", I:"Ш", O:"Щ", P:"З",
+	  A:"Ф", S:"Ы", D:"В", F:"А", G:"П", H:"Р", J:"О", K:"Л", L:"Д",
+	    Z:"Я", X:"Ч", C:"С", V:"М", B:"И", N:"Т", M:"Ь"
+}
+
+//скрипт начинвет свою работу
+doItPlease.addEventListener("click", function(e) {
+	//проверяем регулярным вырвжением не были ли введены русские символы
+		if (/[а-я]/ig.test(textString.value) === false) {
+			//разбиваем строку введённую пользователем на массив из отдельных знаков
+			userInputData = textString.value.split("");
+			//циклом до длины строки переписываем все знаки на нужные
+			for (var i = 0; i < textString.value.length; i++) {
+				translatingResult[i] = fromTo[userInputData[i]];
+			}
+			//склеиваемый массив обратно в строку и выдаём результат в нижнем поле
+			translated.value = translatingResult.join("");
+			//обнуляем содержимое массива
+			for (var i = 0; i < textString.value.length; i++) {
+				translatingResult[i] = "";
+			}
+		}
+		else { //если пользователь ввёл русские буквы, то говорим ему что он не прав
+			alert("Русские символы не допустимы для ввода");
+		}
+	});
+    </script>
+    <!--Place HTML code here-->
+<script>
+    //Place JS code here
+</script>
+</body>
+</html>
