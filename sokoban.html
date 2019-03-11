@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+<style>
+    @font-face {
+        font-family: "Decayed";
+        src: url("fonts/decayed.ttf") format("truetype");
+    }
+    #overlay {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        left: 0px;
+        
+        text-align: center;
+        font-size: 50px;
+        background-color: rgba(100,100,100,0.9);
+    }
+    body {
+        font-size: 30px;
+        font-family: "Decayed";
+    }
+    #canvas {
+        image-rendering: pixelated;
+        width: 420px;
+        height: 420px;
+    }
+    #main {
+        display: flex;
+    }
+    .buttons {
+        width: 80px;
+        height: 80px;
+        padding: 0px;
+        font-size: 30px;
+        border-radius: 10px;
+        outline: none;
+        font-weight: bold;
+    }
+    #restart {
+        width: 80px;
+        height: 50px;
+        margin-right: 5px;
+        font-weight: bold;
+        font-size: 20px;
+        border-radius: 10px;
+        outline: none;
+    }
+    #overlayText {
+        position: relative;
+        top: 40%;
+    }
+    .buttonPosition {
+        position: relative;
+        top: 50%;
+    }
+    .buttonsUI {
+        width: 250px;
+        height: 60px;
+        font-weight: bold;
+        font-size: 24px;
+        padding: 0px;
+        background-color: #00aa00;
+        border-radius: 10px;
+        border-color: #00cc00;
+        color: white;
+        box-shadow: 0 0 10px rgb(0,0,0);
+    }
+    .buttonsMenu {
+        width: 250px;
+        height: 60px;
+        font-weight: bold;
+        font-size: 24px;
+        padding: 0px;
+        background-color: #00aa00;
+        border-radius: 10px;
+        border-color: #00cc00;
+        color: white;
+        box-shadow: 0 0 10px rgb(0,0,0);
+       
+    }
+    #buttonsBlock {
+        position: relative;
+        top: 60px;
+        height: 240px;
+    }
+    .centered {
+        position: relative;
+        left: 72px;
+    }
+    #left {
+        margin-right: 30px;
+    }
+    #right {
+        margin-left: 30px;
+    }
+    #game {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    body, html {
+        background: linear-gradient(to top, #b1aeff, #d1cfff, #e4e3ff);
+        height: 100%;
+    }
+    #levelInfo {
+        color: white;
+    }
+    #mainMenu {
+        display: block;
+        background: linear-gradient(to top, #b1aeff, #d1cfff, #e4e3ff);
+        z-index: 1000;
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+    }
+    #logo {
+        position: relative;
+        width: 320px;
+        height: 150px;
+        image-rendering: pixelated;
+        left: 35%;
+        top: 50px;
+    }
+    #menuButtons {
+        position: relative;
+        left: 35%;
+        top: 20%;
+    }
+    #copyright {
+        position: relative;
+        left: 75%;
+        top: 25%;
+    }
+    #settingsBlock {
+        display: none;
+        background: linear-gradient( #cfcfcf, #a1a1a1, #737373);
+        z-index: 2000;
+        position: fixed;
+        top: 35%;
+        left: 30%;
+        width: 370px;
+        height: 220px;
+        border-radius: 10px;
+    }
+    #settingsIcons {
+        position: relative;
+        left: 12px;
+    }
+    .settingsButton {
+        width: 170px;
+        height: 170px;
+        border-radius: 10px;
+        outline: none;
+        margin-top: 4px;
+    }
+    /*Place CSS code here*/
+</style>
+</head>
+<body>
+    <div id="settingsBlock">
+        <div id="settingsIcons">
+            <button id="soundToggle" class="settingsButton"><img class="settingIcon" width="150" height="150" src="images/soko/sound_on.png"></button>
+            <button id="vibroToggle" class="settingsButton"><img class="settingIcon" width="150" height="150" src="images/soko/vibro.png"></button>
+        </div>
+        <button id="closeSettings" style="border-radius: 10px; margin: 4px;"><img src="images/soko/back.png"></button>
+    </div>
+    <div id="mainMenu">
+        <img id="logo" src="img/logo.png">
+        <div id="menuButtons">
+            <button class="buttonsMenu" id="newGame">Новая игра</button><br>
+            <button class="buttonsMenu" id="continueButton">Продолжить</button><br>
+            <button class="buttonsMenu" id="settings">Настройки</button>
+    </div>
+        <div id="copyright">[&real;]an4erep, 2019</div>
+        </div>
+    <div id="overlay">
+        <div id="overlayText">
+            Вы справились за 0 секунд!
+        </div>
+        <div class="buttonPosition"><button class="buttonsUI" id="nextLevelButton">Следующий уровень</button></div>
+    </div>
+     
+    <div id="levelInfo"></div>
+    <div id="main">
+        <div id="buttonsBlock">
+            <div class="centered"><button class="buttons" id="up">&uarr;</button></div>
+            <button class="buttons" id="left">&larr;</button>
+            <button class="buttons" id="right">&rarr;</button>
+            <div class="centered"><button class="buttons" id="down">&darr;</button></div>
+        </div>
+        <div><button id="restart">Сброс</button></div>
+        <div id="game">
+        <canvas id="canvas"></canvas>
+        </div>
+    </div>
+    <audio autoplay loop src="music/theme.mp3"></audio>
+    
+    <!--Place HTML code here-->
+<script>
+    function rand(min, max) {
+        var rand = min + Math.random() * (max + 1 - min);
+        rand = Math.floor(rand);
+        return rand;
+    }
+    var root = "images/soko/";
+    var wall = new Image();
+    wall.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAPElEQVQoU2NcHWT2nwEItrBKMvj8fg5iorAZ48P9wQpwAUaQCbh0gzQRZwLMeGwmETYB5EiY69F9QJQbAD3hJ+G/cPm2AAAAAElFTkSuQmCC";
+    var worker = new Image();
+    worker.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAcElEQVQoU2NsLpvznwEKasq6YUyGlq5SMJsRpgBZEqYKpAhFAaPITYb/Z1YxMJqEMQA1Ikyw99VmsOV8DDcexDj8XZbh4OarEBNqwvgY5OJXoih4tDCcoWXVJyIVgLTeebgZxQQVeV9UX4AUwASR2QDHqjyptPtNOgAAAABJRU5ErkJggg==";
+    worker.style.imageRendering = "pixelated";
+    var box = new Image();
+    box.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAPElEQVQoU2NcHWT2nwEPYIQpCAk8haJszXozMB+sACQJEoApgrFBNFwBSDVMF7JC4hXgtQJkPF5H4vMmAFuQNZlt3kmwAAAAAElFTkSuQmCC";
+    var dock = new Image();
+    dock.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAMUlEQVQoU2NsLpvznwEPYCRJwayt28FmpXl7ws2EmwCShEkgs4lXADITrxW4PELQFwABfyapxvzLpAAAAABJRU5ErkJggg==";
+    var boxDocked = new Image();
+    boxDocked.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAPElEQVQoU2OMD/f/z4AHMMIUJOdUoCibO6UDzAcrAEmCBGCKYGwQDVcAUg3ThayQeAV4rQAZj9eR+LwJAHbBNCkT9bQxAAAAAElFTkSuQmCC";
+    var floor = new Image();
+    floor.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAE0lEQVQoU2NsLpvznwEPYBwZCgDDKRSp1YkP2gAAAABJRU5ErkJggg==";
+    
+    var canvas = document.getElementById("canvas");
+    var c = canvas.getContext("2d");
+    canvas.width = 80//window.innerWidth - 100;
+    canvas.height = 80//window.innerHeight - 100;
+    /*
+        level template:
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        "nickname"
+    */
+    var levels = [
+        //level 1
+        [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 2, 0, 0, 0, 2, 0, 0, 0, 1],
+            [1, 0, 0, 0, 1, 1, 1, 0, 1, 1],
+            [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+            [1, 3, 0, 2, 0, 1, 0, 0, 0, 1],
+            [1, 0, 0, 1, 1, 1, 1, 0, 1, 1],
+            [1, 0, 0, 3, 0, 3, 0, 0, 0, 1],
+            [1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            "ran4erep"
+        ], //level 2
+        [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 1, 0, 0, 0, 0, 0, 3, 1],
+            [1, 0, 1, 0, 0, 2, 1, 1, 0, 1],
+            [1, 0, 0, 2, 0, 2, 0, 1, 0, 1],
+            [1, 0, 1, 0, 1, 1, 0, 1, 2, 1],
+            [1, 0, 1, 0, 1, 1, 0, 1, 0, 1],
+            [1, 0, 0, 2, 0, 0, 0, 1, 0, 1],
+            [1, 1, 0, 0, 0, 1, 1, 1, 3, 1],
+            [1, 1, 0, 0, 0, 0, 3, 3, 3, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            "ran4erep"
+        ],//level 3
+        [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 2, 0, 0, 0, 0, 3, 1],
+            [1, 3, 1, 1, 0, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 2, 0, 3, 0, 0, 1],
+            [1, 3, 0, 2, 2, 2, 0, 1, 0, 1],
+            [1, 0, 1, 0, 2, 0, 0, 1, 0, 1],
+            [1, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+            [1, 3, 1, 0, 0, 0, 0, 1, 3, 1],
+            [1, 1, 1, 1, 0, 1, 1, 1, 1, 1],
+            "ran4erep"
+        ],//level 4
+        [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 1, 1, 0, 0, 0, 0, 1, 1],
+            [1, 0, 0, 1, 2, 2, 2, 0, 1, 1],
+            [1, 0, 0, 0, 2, 3, 3, 0, 1, 1],
+            [1, 0, 0, 2, 3, 3, 3, 1, 1, 1],
+            [1, 0, 0, 1, 1, 0, 0, 1, 0, 1],
+            [1, 0, 0, 0, 1, 1, 1, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            "ran4erep"
+        ], //level 5
+        [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 1, 1, 1, 1, 1, 1],
+            [1, 0, 1, 1, 1, 0, 0, 0, 1, 1],
+            [1, 0, 0, 3, 0, 2, 0, 0, 1, 1],
+            [1, 0, 1, 1, 1, 0, 2, 3, 1, 1],
+            [1, 0, 1, 3, 1, 1, 2, 0, 1, 1],
+            [1, 0, 1, 0, 1, 0, 3, 0, 1, 1],
+            [1, 0, 1, 2, 0, 4, 2, 2, 3, 1],
+            [1, 0, 1, 0, 0, 0, 3, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        "Wikipedia"
+        ]
+    ];
+    var level = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ];
+    var timer = 0;
+    var watermark;
+    var timeSpend = setInterval(function() {
+        timer++;
+    }, 1000);
+    var currentLevel = 0;
+    var levelWidth = 10;
+    var levelHeight = 10;
+    var blockSize = canvas.width / levelWidth;
+    var x = 1, y = 1;
+    var direction = "none";
+    //builds a level
+    function buildLevel(currentLevel) {
+        for (var i = 0; i < levelWidth; i++) {
+            for (var j = 0; j < levelHeight; j++) {
+                level[i][j] = currentLevel[i][j];
+            }
+        }
+    }
+    buildLevel(levels[currentLevel]);
+    //counts how many boxes on the level
+    function countBoxes(currentLevel) {
+        let boxes = 0;
+        for (var i = 0; i < levelWidth; i++) {
+            for (var j = 0; j < levelHeight; j++) {
+                if (currentLevel[i][j] === 2)
+                    boxes ++;
+            }
+        }
+        return boxes;
+    }
+    newGame.addEventListener("click", function(e) {
+        document.getElementById("mainMenu").style.display = "none";
+        currentLevel = 0;
+        localStorage.setItem("level", 0);
+        reset();
+    });
+    continueButton.addEventListener("click", function(e) {
+        if (!localStorage.getItem("currentLevel")) {
+            document.getElementById("mainMenu").style.display = "none";
+            currentLevel = parseInt( localStorage.getItem("level") );
+            document.getElementById("levelInfo").innerHTML = "Уровень: " + (currentLevel + 1) + " / " + levels.length;
+            reset();
+        }
+    });
+    settings.addEventListener("click", function(e) {
+        document.getElementById("settingsBlock").style.display = "block";
+    });
+    closeSettings.addEventListener("click", function(e) {
+        document.getElementById("settingsBlock").style.display = "none";
+    });
+    document.addEventListener("keydown", function(e) {
+        switch(e.keyCode) {
+                case 38:
+                e.preventDefault();
+                direction = "up";
+                break;
+                case 40:
+                e.preventDefault();
+                direction = "down";
+                break;
+                case 37:
+                e.preventDefault();
+                direction = "left";
+                break;
+                case 39:
+                e.preventDefault();
+                direction = "right";
+                break;
+        }
+    });
+    
+    up.addEventListener("click", function(e) {
+        e.preventDefault();
+        direction = "up";
+        window.navigator.vibrate(50);
+    });
+    down.addEventListener("click", function(e) {
+        e.preventDefault();
+        direction = "down";
+        window.navigator.vibrate(50);
+    });
+    left.addEventListener("click", function(e) {
+        e.preventDefault();
+        direction = "left";
+        window.navigator.vibrate(50);
+    });
+    right.addEventListener("click", function(e) {
+        e.preventDefault();
+        direction = "right";
+        window.navigator.vibrate(50);
+    });
+    nextLevelButton.addEventListener("click", function(e) {
+        document.getElementById("levelInfo").innerHTML = "Уровень: " + (currentLevel + 1) + " / " + levels.length;
+        document.getElementById("overlay").style.display = "none";
+        timer = 0;
+    });
+    function reset() {
+        buildLevel(levels[currentLevel]);
+        x = 1;
+        y = 1;
+        timer = 0;
+    }
+    restart.addEventListener("click", function(e) {
+        reset();
+        window.navigator.vibrate(200);
+    });
+    
+    document.getElementById("levelInfo").innerHTML = "Уровень: " + (currentLevel + 1) + " / " + levels.length;
+    
+    function logic() {
+        //box moving inside goal place
+        if (direction === "down" && level[x+1][y] === 4 && level[x+2][y] === 3) {
+            level[x+1][y] = 3;
+            level[x+2][y] = 4;
+            x--;
+            window.navigator.vibrate(200);
+        }
+        if (direction === "up" && level[x-1][y] === 4 && level[x-2][y] === 3) {
+            level[x-1][y] = 3;
+            level[x-2][y] = 4;
+            x++;
+            window.navigator.vibrate(200);
+        }
+        if (direction === "left" && level[x][y-1] === 4 && level[x][y-2] === 3) {
+            level[x][y-1] = 3;
+            level[x][y-2] = 4;
+            y++;
+            window.navigator.vibrate(200);
+        }
+        if (direction === "right" && level[x][y+1] === 4 && level[x][y+2] === 3) {
+            level[x][y+1] = 3;
+            level[x][y+2] = 4;
+            y--;
+            window.navigator.vibrate(200);
+        }
+        //box moving from goal place to floor
+        if (direction === "down" && level[x+1][y] === 4 && level[x+2][y] === 0) {
+            level[x+1][y] = 3;
+            level[x+2][y] = 2;
+            x--;
+            window.navigator.vibrate(200);
+        }
+        if (direction === "up" && level[x-1][y] === 4 && level[x-2][y] === 0) {
+            level[x-1][y] = 3;
+            level[x-2][y] = 2;
+            x++;
+            window.navigator.vibrate(200);
+        }
+        if (direction === "left" && level[x][y-1] === 4 && level[x][y-2] === 0) {
+            level[x][y-1] = 3;
+            level[x][y-2] = 2;
+            y++;
+            window.navigator.vibrate(200);
+        }
+        if (direction === "right" && level[x][y+1] === 4 && level[x][y+2] === 0) {
+            level[x][y+1] = 3;
+            level[x][y+2] = 2;
+            y--;
+            window.navigator.vibrate(200);
+        }
+        //box in goal place
+        if (direction === "up" && level[x-1][y] === 2 && level[x-2][y] === 3 ) {
+            level[x-1][y] = 0;
+            level[x-2][y] = 4;
+            window.navigator.vibrate(200);
+            if ( countBoxes(level) === 0) {
+                document.getElementById("overlay").style.display = "block";     
+                document.getElementById("overlayText").innerHTML = "Вы справились за " + timer + " секунд!";
+                currentLevel++;
+                localStorage.setItem("level", currentLevel);
+                if (currentLevel+1 > levels.length)
+                    currentLevel = 0;
+                reset();
+            }
+            direction = "none";
+        }
+        if (direction === "down" && level[x+1][y] === 2 && level[x+2][y] === 3) {
+            level[x+1][y] = 0;
+            level[x+2][y] = 4;
+            window.navigator.vibrate(200);
+            if ( countBoxes(level) === 0) {
+                document.getElementById("overlay").style.display = "block";
+                document.getElementById("overlayText").innerHTML = "Вы справились за " + timer + " секунд!";
+                currentLevel++;
+                localStorage.setItem("level", currentLevel);
+                if (currentLevel+1 > levels.length)
+                    currentLevel = 0;
+                reset();
+            }
+            direction = "none";
+        } 
+        if (direction === "left" && level[x][y-1] === 2 && level[x][y-2] === 3 ) {
+            level[x][y-1] = 0;
+            level[x][y-2] = 4;
+            window.navigator.vibrate(200);
+            if ( countBoxes(level) === 0) {
+                document.getElementById("overlay").style.display = "block";
+                document.getElementById("overlayText").innerHTML = "Вы справились за " + timer + " секунд!";
+                currentLevel++;
+                localStorage.setItem("level", currentLevel);
+                if (currentLevel+1 > levels.length)
+                    currentLevel = 0;
+                reset();
+            }
+            direction = "none";
+        }
+        if (direction === "right" && level[x][y+1] === 2 && level[x][y+2] === 3 ) {
+            level[x][y+1] = 0;
+            level[x][y+2] = 4;
+            window.navigator.vibrate(200);
+            if ( countBoxes(level) === 0) {
+                document.getElementById("overlay").style.display = "block";
+                document.getElementById("overlayText").innerHTML = "Вы справились за " + timer + " секунд!";
+                currentLevel++;
+                localStorage.setItem("level", currentLevel);
+                if (currentLevel+1 > levels.length)
+                    currentLevel = 0;
+                reset();
+            }
+            direction = "none";
+        }
+        //box moving
+        if (direction === "up" && level[x-1][y] === 2 && level[x-2][y] !== 1 && level[x-2][y] !== 2 && level[x-2][y] !== 4) {
+            level[x-1][y] = 0;
+            level[x-2][y] = 2;
+            direction = "none";
+            window.navigator.vibrate(200);
+        }
+        if (direction === "down" && level[x+1][y] === 2 && level[x+2][y] !== 1 && level[x+2][y] !== 2 && level[x+2][y] !== 4) {
+            level[x+1][y] = 0;
+            level[x+2][y] = 2;
+            direction = "none";
+            window.navigator.vibrate(200);
+        }
+        if (direction === "left" && level[x][y-1] === 2 && level[x][y-2] !== 1 && level[x][y-2] !== 2 && level[x][y-2] !== 4) {
+            level[x][y-1] = 0;
+            level[x][y-2] = 2;
+            direction = "none";
+            window.navigator.vibrate(200);
+        }
+        if (direction === "right" && level[x][y+1] === 2 && level[x][y+2] !== 1 && level[x][y+2] !== 2 && level[x][y+2] !== 4) {
+            level[x][y+1] = 0;
+            level[x][y+2] = 2;
+            direction = "none";
+            window.navigator.vibrate(200);
+        }
+        //character moving
+        if (direction === "left" && level[x][y-1] !== 1 && level[x][y-1] !== 4 && y > 0) {
+            y -= 1;
+            if (level[x][y] === 2)
+                y += 1;
+            direction = "none";
+        }
+        if (direction === "right" && level[x][y+1] !== 1 && level[x][y+1] !== 4) {
+            y += 1;
+            if (level[x][y] === 2)
+                y -= 1;
+            direction = "none";
+        }
+        if (direction === "up" && level[x-1][y] !== 1 && level[x-1][y] !== 4 && x > 0) {
+            x -= 1;
+            if (level[x][y] === 2)
+                x += 1;
+            direction = "none";
+        }
+        if (direction === "down" && level[x+1][y] !== 1 && level[x+1][y] !== 4) {
+            x += 1;
+            if (level[x][y] === 2)
+                x-=1;
+            direction = "none";
+        }
+        
+    }
+    function render() {
+        c.clearRect(0, 0, canvas.width, canvas.height);
+        //map rendering
+        for (var i = 0; i < levelWidth; i++) {
+            for (var j = 0; j < levelHeight; j++) {
+                if (level[i][j] === 0) {
+                    c.fillStyle = "#000000";
+                    c.drawImage(floor, j*blockSize, i*blockSize, blockSize, blockSize);
+                }
+                if (level[i][j] === 1) {
+                    c.fillStyle = "#000000";
+                    c.drawImage(wall, j*blockSize, i*blockSize, blockSize, blockSize);
+                }
+                if (level[i][j] === 2) {
+                    c.fillStyle = "#b56700";
+                    c.drawImage(box, j*blockSize, i*blockSize, blockSize, blockSize);
+                }
+                if (level[i][j] === 3) {
+                    c.fillStyle = "#0000aa";
+                    c.drawImage(dock, j*blockSize, i*blockSize, blockSize, blockSize);
+                }
+                if (level[i][j] === 4) {
+                    c.fillStyle = "#b59367";
+                    c.drawImage(boxDocked, j*blockSize, i*blockSize, blockSize, blockSize);
+                }
+            }
+        }
+        //character rendering
+        c.fillStyle = "#FFFF00";
+        c.drawImage(worker, y*blockSize, x*blockSize, blockSize, blockSize);
+        //level creator's watermark
+        /*
+        c.fillStyle = "#ffffff";
+        c.font = "7px Arial";
+        watermark = "Уровень сделал " + levels[currentLevel][10];
+        if (levels[currentLevel][10] === undefined)
+        watermark = "Уровень сделал аноним";
+        c.fillText(watermark, 0, canvas.height);
+        */
+        }
+    function main() {
+        logic();
+        render();
+        requestAnimationFrame(main);
+    }
+    requestAnimationFrame(main);
+    //Place JS code here
+    
+</script>
+      </body>
+</html>
