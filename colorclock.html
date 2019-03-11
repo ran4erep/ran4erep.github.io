@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Color clock</title>
+        <style>
+            body {
+            font-family: "Open Sans";
+            color: #FFFFFF;
+            }
+            #clock {
+            font-size: 70px;
+            }
+            #color {
+            font-size: 40px;
+            }
+        </style>
+    </head>
+    <body>
+    <div align="center" id="clock">
+        00:00:00
+    </div>
+    <div align="center" id="color">
+        #000000
+    </div>
+    <script>
+        var clock = document.getElementById("clock");
+        var color = document.getElementById("color");
+        function colorClock() {
+            var time = new Date;
+            var h1 = 255 / 24 * time.getHours();
+            var m1 = 255 / 60 * time.getMinutes();
+            var s1 = 255 / 60 * time.getSeconds();
+            if (h1 === Infinity)
+                h1 = 00;
+            if (m1 === Infinity)
+                m1 = 00;
+            if (s1 === Infinity)
+                s1 = 00;
+            h1 = Math.round(h1).toString(16);
+            m1 = Math.round(m1).toString(16);
+            s1 = Math.round(s1).toString(16);
+            if (h1.length < 2)
+                h1 = h1 + "0";
+            if (m1.length < 2)
+                m1 = m1 + "0";
+            if (s1.length < 2)
+                s1 = s1 + "0";
+            
+            h = time.getHours().toString();
+            m = time.getMinutes().toString();
+            s = time.getSeconds().toString();
+            if (h.length < 2)
+                h = "0" + h;
+            if(m.length < 2)
+                m = "0" + m;
+            if (s.length < 2)
+                s = "0" + s;
+            clock.innerHTML = "<h3>" + h + ":" + m + ":" + s + "</h3>";
+            color.innerHTML = "#" + h1 + m1 + s1;
+            var arr = document.getElementsByTagName("body");
+            arr[0].style.background = "#" + h1 + m1 + s1;
+        }
+        colorClock();
+        setInterval(colorClock, 1000);
+    </script>
+    </body>
+</html>
