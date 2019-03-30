@@ -388,7 +388,8 @@
        <center><b>HTML:</b></center>
       <span><b>&lt;/@@@</b> ― закрыть открытый тег</span><br>
        <span><b>div#</b> ― создать блок</span><br>
-       <span><b>jquery#</b> ― подключить библиотеку JQuery</span>
+       <span><b>jquery#</b> ― подключить библиотеку JQuery</span><br>
+       <span><b>fa#</b> ― подключить шрифты Font Awesome</span>
 </div>
 </div>
 
@@ -788,14 +789,14 @@ buttonNewFile.addEventListener("click", function(e) {
 
              if ( codeName.match(/^[\sa-z0-9_]+$/i) ) {
 
-        	$.post("share.php", {code: editor.getValue(), randomKey: randomKey.join(""), codeName: codeName}, function(data) {
+        	$.post("http://ran4.000webhostapp.com/ide/share.php", {code: editor.getValue(), randomKey: randomKey.join(""), codeName: codeName}, function(data) {
         		modal("Ссылка была успешно создана. Вы можете скопировать её чтобы поделиться с другом либо скачать по ней Ваш код");
                     document.getElementById("loader").classList.remove("loader");
         	});
              codeName = codeName.replace(/\s/, "%20");
-        	document.getElementById("codeLink").value = "https://ran4erep.github.io/ide/code_" + codeName + "_" + randomKey.join("") + ".html";
-        	document.getElementById("codeDownload").href = "https://ran4erep.github.io/ide/code_" + codeName + "_" + randomKey.join("") + ".html";
-             document.getElementById("codeGoTo").href = "https://ran4erep.github.io/ide/code_" + codeName + "_" + randomKey.join("") + ".html";
+        	document.getElementById("codeLink").value = "http://ran4.000webhostapp.com/ide/code_" + codeName + "_" + randomKey.join("") + ".html";
+        	document.getElementById("codeDownload").href = "http://ran4.000webhostapp.com/ide/code_" + codeName + "_" + randomKey.join("") + ".html";
+             document.getElementById("codeGoTo").href = "http://ran4.000webhostapp.com/ide/code_" + codeName + "_" + randomKey.join("") + ".html";
 
                } else {
        modal("Только латинские буквы, цифры, пробелы и символ _");
@@ -834,6 +835,11 @@ buttonNewFile.addEventListener("click", function(e) {
               if ( editor.getValue().match(/jquery#/igm) ) {
                 cursorPosition = editor.getCursor();
                 editor.setValue( editor.getValue().replace(/jquery#/igm, "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js\"><\/script>") );
+                 editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
+                   }
+		if ( editor.getValue().match(/fa#/igm) ) {
+                cursorPosition = editor.getCursor();
+                editor.setValue( editor.getValue().replace(/fa#/igm, "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">") );
                  editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
                    }
              if ( editor.getValue().match(/gameLoop#/igm) ) {
