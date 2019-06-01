@@ -391,9 +391,9 @@ for (var i=0; i<height; i++) {
 
 //âûâîä î÷êîâ â HTML äîêóìåíò
 if (score > 0)
-	document.getElementById("score").innerHTML = "Âàø ðåçóëüòàò: " + score + " " + trueWordForm(score, "î÷êî", "î÷êà", "î÷êîâ");
+	document.getElementById("score").innerHTML = "Ваш результат: " + score + " " + trueWordForm(score, "очко", "очка", "очков");
 else
-	document.getElementById("score").innerHTML = "Ïîêà íå íàáðàíî íè îäíîãî î÷êà";
+	document.getElementById("score").innerHTML = "Пока не набрано ни одного очка";
 
 
 //äîáàâëÿåì ñîáûòèÿ, êîòîðûå áåðóò çíà÷åíèÿ ó ðàñêðûâàþùèõñÿ ñïèñêîâ â HTML äîêóìåíòå
@@ -427,7 +427,7 @@ else
 		display.drawText(rand(0, 11), rand(0,19), "%b{red}%c{white}GAME OVER");
 		direction = 0;
 		gameSpeed = 1000;
-		document.getElementById("score").innerHTML = "Âû çàêîí÷èëè èãðó ñ ðåçóëüòàòîì â " + score + " " + trueWordForm(score, "î÷êî", "î÷êà", "î÷êîâ");
+		document.getElementById("score").innerHTML = "Вы закончили игру с результатом в " + score + " " + trueWordForm(score, "очко", "очка", "очков");
 			//cancelAmimationRequest(update);
 }
 
@@ -440,7 +440,7 @@ if (tail === width*height && score === width*height) {
 	direction = 0;
 	gameOver = true;
 	gameSpeed = 1000;
-	document.getElementById("score").innerHTML = "Âû çàêîí÷èëè èãðó ñ ðåçóëüòàòîì â " + score + " " + trueWordForm(score, "î÷êî", "î÷êà", "î÷êîâ");
+	document.getElementById("score").innerHTML = "Вы закончили игру с результатом в " + score + " " + trueWordForm(score, "очко", "очка", "очков");
 }
 }
 
@@ -453,7 +453,7 @@ if (optionsWall === 1 ) {
 	direction = 0;
 	gameOver = true;
 	gameSpeed = 1000;
-	document.getElementById("score").innerHTML = "Âû çàêîí÷èëè èãðó ñ ðåçóëüòàòîì â " + score + " " + trueWordForm(score, "î÷êî", "î÷êà", "î÷êîâ");
+	document.getElementById("score").innerHTML = "Вы закончили игру с результатом в " + score + " " + trueWordForm(score, "очко", "очка", "очков");
 }
 }
 
