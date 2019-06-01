@@ -2,12 +2,12 @@ function SHOW(node) {
     var mountNodeId = 'snake';
     document.getElementById(mountNodeId).appendChild(node);
 }
-//функция святого рандомчика
+//ГґГіГ­ГЄГ¶ГЁГї Г±ГўГїГІГ®ГЈГ® Г°Г Г­Г¤Г®Г¬Г·ГЁГЄГ 
 function rand(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-//функция очистки для ROT
+//ГґГіГ­ГЄГ¶ГЁГї Г®Г·ГЁГ±ГІГЄГЁ Г¤Г«Гї ROT
 function cls() {
 	for (var i=0; i<=width; i++) {
 		for (var j=0; j<=height; j++) {
@@ -23,7 +23,7 @@ function cls() {
 		}
 	}
 }
-//функция русского склонения слов для цифр
+//ГґГіГ­ГЄГ¶ГЁГї Г°ГіГ±Г±ГЄГ®ГЈГ® Г±ГЄГ«Г®Г­ГҐГ­ГЁГї Г±Г«Г®Гў Г¤Г«Гї Г¶ГЁГґГ°
 function trueWordForm (num, word1, word2, word5) {
 	num = Math.abs(num) % 100;
 	numX = num % 10;
@@ -38,9 +38,9 @@ function trueWordForm (num, word1, word2, word5) {
 
 
 
-//управление игрой
+//ГіГЇГ°Г ГўГ«ГҐГ­ГЁГҐ ГЁГЈГ°Г®Г©
 function input() {
-	//управление с клавиатуры
+	//ГіГЇГ°Г ГўГ«ГҐГ­ГЁГҐ Г± ГЄГ«Г ГўГЁГ ГІГіГ°Г»
 	document.addEventListener('keydown', function(e) {
 		switch (e.keyCode) {
 			case 68 :
@@ -65,7 +65,7 @@ function input() {
 
 		}
 	})
-	//управление при помощи тачскрина/мыши
+	//ГіГЇГ°Г ГўГ«ГҐГ­ГЁГҐ ГЇГ°ГЁ ГЇГ®Г¬Г®Г№ГЁ ГІГ Г·Г±ГЄГ°ГЁГ­Г /Г¬Г»ГёГЁ
 buttonRight.addEventListener('click', function(e) {
 	direction=1;
 });
@@ -80,9 +80,9 @@ buttonDown.addEventListener('click', function(e) {
 });
 }
 
-//логика
+//Г«Г®ГЈГЁГЄГ 
 function logic() {
-//логика создания хвоста
+//Г«Г®ГЈГЁГЄГ  Г±Г®Г§Г¤Г Г­ГЁГї ГµГўГ®Г±ГІГ 
 	var prevX = tailX[0];
 	var prevY = tailY[0];
 	var prev2X, prev2Y;
@@ -96,7 +96,7 @@ function logic() {
 		prevX=prev2X;
 		prevY=prev2Y;
 	}
-//что делать при движении в выбранном направлении
+//Г·ГІГ® Г¤ГҐГ«Г ГІГј ГЇГ°ГЁ Г¤ГўГЁГ¦ГҐГ­ГЁГЁ Гў ГўГ»ГЎГ°Г Г­Г­Г®Г¬ Г­Г ГЇГ°Г ГўГ«ГҐГ­ГЁГЁ
 if (!gameOver) {
 
 	switch (direction) {
@@ -133,7 +133,7 @@ if (!gameOver) {
 	break;
 
 }
-//не даём змейке двигаться в обратном направлении
+//Г­ГҐ Г¤Г ВёГ¬ Г§Г¬ГҐГ©ГЄГҐ Г¤ГўГЁГЈГ ГІГјГ±Гї Гў Г®ГЎГ°Г ГІГ­Г®Г¬ Г­Г ГЇГ°Г ГўГ«ГҐГ­ГЁГЁ
 if (direction === 4 && moveState === "up")
 	y--;
 if (direction === 3 && moveState === "down")
@@ -145,7 +145,7 @@ if (direction === 2 && moveState === "right")
 }
 
 
-//змейка выходит с другого конца карты
+//Г§Г¬ГҐГ©ГЄГ  ГўГ»ГµГ®Г¤ГЁГІ Г± Г¤Г°ГіГЈГ®ГЈГ® ГЄГ®Г­Г¶Г  ГЄГ Г°ГІГ»
 if (optionsWall === 0) {
 	if (y>19)
 		y=0;
@@ -156,7 +156,7 @@ if (optionsWall === 0) {
 	if (x<0)
 		x=19;
 }
-//если включены стены, то уже не выходит, вместо этого игра окончена
+//ГҐГ±Г«ГЁ ГўГЄГ«ГѕГ·ГҐГ­Г» Г±ГІГҐГ­Г», ГІГ® ГіГ¦ГҐ Г­ГҐ ГўГ»ГµГ®Г¤ГЁГІ, ГўГ¬ГҐГ±ГІГ® ГЅГІГ®ГЈГ® ГЁГЈГ°Г  Г®ГЄГ®Г­Г·ГҐГ­Г 
 else {
 	if (y>18)
 		gameOver = true;
@@ -168,7 +168,7 @@ else {
 		gameOver = true;
 }
 
-//что делать когда игра закончилась (змея укусила свой хвост)
+//Г·ГІГ® Г¤ГҐГ«Г ГІГј ГЄГ®ГЈГ¤Г  ГЁГЈГ°Г  Г§Г ГЄГ®Г­Г·ГЁГ«Г Г±Гј (Г§Г¬ГҐГї ГіГЄГіГ±ГЁГ«Г  Г±ГўГ®Г© ГµГўГ®Г±ГІ)
 for (var i=0; i<tail; i++) {
 		if (tailX[i] == x && tailY[i] == y) {
 			gameOver = true;
@@ -176,7 +176,7 @@ for (var i=0; i<tail; i++) {
 	}
 
 
-//сбор фруктов
+//Г±ГЎГ®Г° ГґГ°ГіГЄГІГ®Гў
 if (x === fruitX && y === fruitY) {
 	if (optionsWall === 1) {
 		fruitX = rand(1, 18);
@@ -195,7 +195,7 @@ if (x === fruitX && y === fruitY) {
 }
 }
 
-//запрещаем еде спавниться на теле змейки
+//Г§Г ГЇГ°ГҐГ№Г ГҐГ¬ ГҐГ¤ГҐ Г±ГЇГ ГўГ­ГЁГІГјГ±Гї Г­Г  ГІГҐГ«ГҐ Г§Г¬ГҐГ©ГЄГЁ
 for (var i=0; i<tail; i++) {
 	while (fruitX === tailX[i] && fruitY === tailY[i]) {
 			if (optionsWall === 1) {
@@ -211,7 +211,7 @@ for (var i=0; i<tail; i++) {
 }
 	}
 }
-//запрещаем еде спавниться на голове змейки
+//Г§Г ГЇГ°ГҐГ№Г ГҐГ¬ ГҐГ¤ГҐ Г±ГЇГ ГўГ­ГЁГІГјГ±Гї Г­Г  ГЈГ®Г«Г®ГўГҐ Г§Г¬ГҐГ©ГЄГЁ
 while (fruitX === x && fruitY === y) {
 	if (optionsWall === 1) {
 		fruitX = rand(1, 18)
@@ -225,7 +225,7 @@ while (fruitX === x && fruitY === y) {
 		break;
 }
 }
-			//установка скорости игры
+			//ГіГ±ГІГ Г­Г®ГўГЄГ  Г±ГЄГ®Г°Г®Г±ГІГЁ ГЁГЈГ°Г»
 	switch (optionsSpeed) {
 		case "slow" :
 		gameSpeed = 300;
@@ -251,7 +251,7 @@ while (fruitX === x && fruitY === y) {
 
 
 
-//инициализация
+//ГЁГ­ГЁГ¶ГЁГ Г«ГЁГ§Г Г¶ГЁГї
 var display;
 var optionsBG = document.getElementById("chooseBG");
 var optionsWall = document.getElementById("chooseWall");
@@ -277,7 +277,7 @@ var optionsStyle = "ASCII";
 var eat = new Audio("eat.mp3");
 var music = new Audio("music.mp3");
 
-//рендеринг консоли
+//Г°ГҐГ­Г¤ГҐГ°ГЁГ­ГЈ ГЄГ®Г­Г±Г®Г«ГЁ
 if (optionsStyle === "ASCII") {
 	display = new ROT.Display({width:width, height:height, spacing: 0.8, forceSquareRatio:true, bg:"#D8D8D3"});
 }
@@ -303,8 +303,9 @@ if (optionsStyle === "brickGame") {
 	}
 	display = new ROT.Display(options);
 }
+//commit
 SHOW(display.getContainer());
-//первоначальная настройка
+//ГЇГҐГ°ГўГ®Г­Г Г·Г Г«ГјГ­Г Гї Г­Г Г±ГІГ°Г®Г©ГЄГ 
 gameOver = false;
 gameSpeed = 300;
 x = width/2;
@@ -318,23 +319,23 @@ optionsSpeed = "slow";
 optionsColor = "anyColor";
 optionsSound = 1;
 isSent = false;
-//главная функция
+//ГЈГ«Г ГўГ­Г Гї ГґГіГ­ГЄГ¶ГЁГї
 function update(timestamp){
 	if (gameOver === false && optionsSound === 1)
 		music.play();
 	if (optionsSound === 0)
 		music.pause();
-	//игровой таймер, который регулирует скорость игры
+	//ГЁГЈГ°Г®ГўГ®Г© ГІГ Г©Г¬ГҐГ°, ГЄГ®ГІГ®Г°Г»Г© Г°ГҐГЈГіГ«ГЁГ°ГіГҐГІ Г±ГЄГ®Г°Г®Г±ГІГј ГЁГЈГ°Г»
 	if (timestamp - timeStart >= gameSpeed) {
 		logic();
 for (var i=0; i<height; i++) {
 	for(var j=0; j<width; j++) {
-		//опциональные стены
+		//Г®ГЇГ¶ГЁГ®Г­Г Г«ГјГ­Г»ГҐ Г±ГІГҐГ­Г»
 		if (optionsWall === 1) {
 		display.draw(0, i, "#", "#000000");
 		display.draw(j, 0, "#", "#000000");
 	}
-		//рендеринг головы змеи и фруктов
+		//Г°ГҐГ­Г¤ГҐГ°ГЁГ­ГЈ ГЈГ®Г«Г®ГўГ» Г§Г¬ГҐГЁ ГЁ ГґГ°ГіГЄГІГ®Гў
 		if (i==y && j==x) {
 			if (optionsColor === "black")
 				display.draw(j, i, "O", "#000000");
@@ -344,7 +345,7 @@ for (var i=0; i<height; i++) {
 		else if (i==fruitY && j==fruitX) {
 			display.draw(j, i, "@", "#DE3163");
 		}
-		//рендеринг хвоста
+		//Г°ГҐГ­Г¤ГҐГ°ГЁГ­ГЈ ГµГўГ®Г±ГІГ 
 		else {
 			tailDraw = false;
 			for (var k=0; k<tail; k++) {
@@ -373,14 +374,14 @@ for (var i=0; i<height; i++) {
 				display.draw(j, i, " ", "#000000");
 				break;
 			}
-			//опциональные стены
+			//Г®ГЇГ¶ГЁГ®Г­Г Г«ГјГ­Г»ГҐ Г±ГІГҐГ­Г»
 			if (optionsWall === 1) {
 		display.draw(width-1, i, "#", "#000000");
 		display.draw(j, height-1, "#", "#000000");
 	}
 			}
 		}
-		//вывод дебаговой информации
+		//ГўГ»ГўГ®Г¤ Г¤ГҐГЎГ ГЈГ®ГўГ®Г© ГЁГ­ГґГ®Г°Г¬Г Г¶ГЁГЁ
 		//display.drawText(0, 0, `%c{red}${fruitX}`, "#000000");
 		//display.drawText(0, 1, `%c{red}${fruitY}`, "#000000");
 	}
@@ -388,14 +389,14 @@ for (var i=0; i<height; i++) {
 
 
 
-//вывод очков в HTML документ
+//ГўГ»ГўГ®Г¤ Г®Г·ГЄГ®Гў Гў HTML Г¤Г®ГЄГіГ¬ГҐГ­ГІ
 if (score > 0)
-	document.getElementById("score").innerHTML = "Ваш результат: " + score + " " + trueWordForm(score, "очко", "очка", "очков");
+	document.getElementById("score").innerHTML = "Г‚Г Гё Г°ГҐГ§ГіГ«ГјГІГ ГІ: " + score + " " + trueWordForm(score, "Г®Г·ГЄГ®", "Г®Г·ГЄГ ", "Г®Г·ГЄГ®Гў");
 else
-	document.getElementById("score").innerHTML = "Пока не набрано ни одного очка";
+	document.getElementById("score").innerHTML = "ГЏГ®ГЄГ  Г­ГҐ Г­Г ГЎГ°Г Г­Г® Г­ГЁ Г®Г¤Г­Г®ГЈГ® Г®Г·ГЄГ ";
 
 
-//добавляем события, которые берут значения у раскрывающихся списков в HTML документе
+//Г¤Г®ГЎГ ГўГ«ГїГҐГ¬ Г±Г®ГЎГ»ГІГЁГї, ГЄГ®ГІГ®Г°Г»ГҐ ГЎГҐГ°ГіГІ Г§Г­Г Г·ГҐГ­ГЁГї Гі Г°Г Г±ГЄГ°Г»ГўГ ГѕГ№ГЁГµГ±Гї Г±ГЇГЁГ±ГЄГ®Гў Гў HTML Г¤Г®ГЄГіГ¬ГҐГ­ГІГҐ
 	chooseBG.addEventListener('change', function(e) {
 	optionsBG = parseInt(e.target.value);
 });
@@ -418,7 +419,7 @@ else
 
 
 	
-	//что делать при проигрыше
+	//Г·ГІГ® Г¤ГҐГ«Г ГІГј ГЇГ°ГЁ ГЇГ°Г®ГЁГЈГ°Г»ГёГҐ
 
 	if (gameOver === true) {
 		optionsSound = 0;
@@ -426,11 +427,11 @@ else
 		display.drawText(rand(0, 11), rand(0,19), "%b{red}%c{white}GAME OVER");
 		direction = 0;
 		gameSpeed = 1000;
-		document.getElementById("score").innerHTML = "Вы закончили игру с результатом в " + score + " " + trueWordForm(score, "очко", "очка", "очков");
+		document.getElementById("score").innerHTML = "Г‚Г» Г§Г ГЄГ®Г­Г·ГЁГ«ГЁ ГЁГЈГ°Гі Г± Г°ГҐГ§ГіГ«ГјГІГ ГІГ®Г¬ Гў " + score + " " + trueWordForm(score, "Г®Г·ГЄГ®", "Г®Г·ГЄГ ", "Г®Г·ГЄГ®Гў");
 			//cancelAmimationRequest(update);
 }
 
-//что делать при сборе 400 фруктов (на экране нет свободного места)
+//Г·ГІГ® Г¤ГҐГ«Г ГІГј ГЇГ°ГЁ Г±ГЎГ®Г°ГҐ 400 ГґГ°ГіГЄГІГ®Гў (Г­Г  ГЅГЄГ°Г Г­ГҐ Г­ГҐГІ Г±ГўГ®ГЎГ®Г¤Г­Г®ГЈГ® Г¬ГҐГ±ГІГ )
 if (optionsWall === 0) {
 if (tail === width*height && score === width*height) {
 	optionsSound = 0;
@@ -439,11 +440,11 @@ if (tail === width*height && score === width*height) {
 	direction = 0;
 	gameOver = true;
 	gameSpeed = 1000;
-	document.getElementById("score").innerHTML = "Вы закончили игру с результатом в " + score + " " + trueWordForm(score, "очко", "очка", "очков");
+	document.getElementById("score").innerHTML = "Г‚Г» Г§Г ГЄГ®Г­Г·ГЁГ«ГЁ ГЁГЈГ°Гі Г± Г°ГҐГ§ГіГ«ГјГІГ ГІГ®Г¬ Гў " + score + " " + trueWordForm(score, "Г®Г·ГЄГ®", "Г®Г·ГЄГ ", "Г®Г·ГЄГ®Гў");
 }
 }
 
-//собрано 324 фруктов (когда включена стена, места становится меньше на 76 точек)
+//Г±Г®ГЎГ°Г Г­Г® 324 ГґГ°ГіГЄГІГ®Гў (ГЄГ®ГЈГ¤Г  ГўГЄГ«ГѕГ·ГҐГ­Г  Г±ГІГҐГ­Г , Г¬ГҐГ±ГІГ  Г±ГІГ Г­Г®ГўГЁГІГ±Гї Г¬ГҐГ­ГјГёГҐ Г­Г  76 ГІГ®Г·ГҐГЄ)
 if (optionsWall === 1 ) {
 	if (tail === (width*height)- 76 && score === (width*height)- 76) {
 		optionsSound = 0;
@@ -452,7 +453,7 @@ if (optionsWall === 1 ) {
 	direction = 0;
 	gameOver = true;
 	gameSpeed = 1000;
-	document.getElementById("score").innerHTML = "Вы закончили игру с результатом в " + score + " " + trueWordForm(score, "очко", "очка", "очков");
+	document.getElementById("score").innerHTML = "Г‚Г» Г§Г ГЄГ®Г­Г·ГЁГ«ГЁ ГЁГЈГ°Гі Г± Г°ГҐГ§ГіГ«ГјГІГ ГІГ®Г¬ Гў " + score + " " + trueWordForm(score, "Г®Г·ГЄГ®", "Г®Г·ГЄГ ", "Г®Г·ГЄГ®Гў");
 }
 }
 
