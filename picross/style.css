@@ -1,0 +1,38 @@
+#canvas {
+	border: 1px solid black;
+	position: relative;
+}
+#leftBar {
+	background: #8fb7e2;
+	position: relative;
+	//border: 1px solid red;
+}
+#topBar {
+	display: flex;
+	justify-content: space-between;
+	position: relative;
+	//border: 1px solid green;
+	background: #8fb7e2;
+	height: auto;
+}
+#combineBarAndField {
+	display: flex;
+}
+.leftNumbers {
+	width: auto;
+	margin-top: 1px;
+	font-size: 14px;
+	font-family: Arial;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	letter-spacing: 4px;
+}
+.topNumbers {
+	height: auto;
+	font-size: 14px;
+	font-family: Arial;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
