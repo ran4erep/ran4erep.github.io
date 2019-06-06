@@ -43,37 +43,35 @@ let leftBar = document.getElementById("leftBar");
 let leftBarWidth = 0;
 let topBarHeight = 0;
 let mode = "drawDot";
+let isClicked = false;
 let cross = new Image();
 cross.src = "img/cross.png";
 
 canvas.addEventListener("mousedown", function(e) {
+	isClicked = true;
 	e.preventDefault();
 	let touchX = Math.floor(e.offsetX / blockSize);
 	let touchY = Math.floor(e.offsetY / blockSize);
-	if (mode === "drawDot" && userField[touchY][touchX] === 0)
+	if (mode === "drawDot")
 		userField[touchY][touchX] = 1;
-	if (mode === "drawCross" && userField[touchY][touchX] === 0)
+	else
 		userField[touchY][touchX] = 2;
-	if (mode === "drawDot" && userField[touchY][touchX] === 1)
-		userField[touchY][touchX] = 0;
-	if (mode === "drawCross" && userField[touchY][touchX] === 2)
+
+	if (userField[touchY][touchX] === 1 || userField[touchY][touchX] === 2)
 		userField[touchY][touchX] = 0;
 	draw();
 });
 canvas.addEventListener("mouseup", function(e) {
+	isClicked = false;
 	e.preventDefault();
 });
 canvas.addEventListener("mousemove", function(e) {
 	e.preventDefault();
 	let touchX = Math.floor(e.offsetX / blockSize);
 	let touchY = Math.floor(e.offsetY / blockSize);
-	if (mode === "drawDot" && userField[touchY][touchX] === 1)
-		userField[touchY][touchX] = 0;
-	if (mode === "drawCross" && userField[touchY][touchX] === 2)
-		userField[touchY][touchX] = 0;
-	if (mode === "drawDot" && userField[touchY][touchX] === 0)
+	if (mode === "drawDot" && isClicked)
 		userField[touchY][touchX] = 1;
-	if (mode === "drawCross" && userField[touchY][touchX] === 0)
+	else if (mode === "drawCross" && isClicked)
 		userField[touchY][touchX] = 2;
 	draw();
 });
@@ -88,13 +86,9 @@ canvas.addEventListener("touchstart", function(e) {
 		userField[touchY][touchX] = 1;
 	else
 		userField[touchY][touchX] = 2;
-	
+
 	if (userField[touchY][touchX] === 1 || userField[touchY][touchX] === 2)
 		userField[touchY][touchX] = 0;
-	/*if (mode === "drawCross")
-		userField[touchY][touchX] = 2;
-	else
-		userField[touchY][touchX] = 0;*/
 	draw();
 });
 canvas.addEventListener("touchend", function(e) {
