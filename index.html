@@ -259,7 +259,7 @@
             <button class="galleryButtons" id="galleryLeftButton">&larr;</button>
             <div id="galleryImageContainer">
                <div id="loader"></div>
-                <img id="galleryImage" src="img/gallery/abstraction.png"><div id="galleryDescription">1/13: Делал для челленджа на тему абстракции</div>
+               <img id="galleryImage" src="img/gallery/abstraction.png"><div id="galleryDescription">1/13: Делал для челленджа на тему абстракции</div>
             </div>
             <button class="galleryButtons" id="galleryRightButton">&rarr;</button>
         </div>
@@ -317,6 +317,7 @@
         {tag: "Dark Souls II, восславь Солнце!", fileName: "praise_the_sun.jpg"},
         {tag: "Тюльпан, который я нарисовал красками в New Art Academy", fileName: "HNI_0007.JPG"}
     ];
+    var galleryImageContainer = document.getElementById("galleryImageContainer").innerHTML = "<div id=\"loader\"></div><img id=\"galleryImage\" src=\"img/gallery/" + images[0].fileName + "\"><div id=\"galleryDescription\">1/" + images.length + ": " + images[0].tag + "</div>"
     
     var galleryRoot = "img/gallery/";
     var currentImage = 0;
