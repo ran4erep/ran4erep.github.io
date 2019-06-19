@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+<style>
+    /*Place CSS code here*/
+</style>
+</head>
+<body>
+    Показания прошлого месяца: <input id="lastMonth">
+    <br>
+    Показания текущего месяца: <input id="currentMonth">
+    <br>
+    <button id="go">Посчитать</button>
+    <div id="result"></div>
+    <!--Place HTML code here-->
+<script>
+    go.addEventListener("click", function(e) {
+        let lastMonth = document.getElementById("lastMonth").value;
+        let currentMonth = document.getElementById("currentMonth").value;
+        document.getElementById("result").innerHTML = "Нужно заплатить за свет " + calculatePaymentForElectricity(lastMonth, currentMonth) + "₴";
+    });
+    
+    function calculatePaymentForElectricity(counterOld, counterNew) {
+        //counterNew — текущие показания счётчика
+        //counterOld — показания счётчика за прошлый месяц
+        
+        //узнаём сколько накапало за текущий месяц
+        let electricityForCurrentMonth = counterNew - counterOld;
+        //цена за 100 киловатт
+        const hundredKV = 90;
+        //узнаём сколько накапало в текущем месяце больше ста киловатт
+        let moreThan100KV = electricityForCurrentMonth - 100;
+        //узнаём цену за больше ста киловатт
+        moreThan100KV = moreThan100KV * 1.68;
+        //округляем цену за больше ста киловатт до двух знаков после точки
+        moreThan100KV = Math.round(moreThan100KV * 100) / 100;
+        //узнаём конечную цену, прибавляя к цене за сто киловатт цену за больше ста киловатт
+        return moreThan100KV + hundredKV;
+    }
+    //Place JS code here
+</script>
+</body>
+</html>
