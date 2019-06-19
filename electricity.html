@@ -28,15 +28,17 @@
         //узнаём сколько накапало за текущий месяц
         let electricityForCurrentMonth = counterNew - counterOld;
         //цена за 100 киловатт
-        const hundredKV = 90;
+        const priceFor100KV = 90;
+        //цена за больше чем 100 киловатт
+        const priceForMoreThan100KV = 1.68;
         //узнаём сколько накапало в текущем месяце больше ста киловатт
         let moreThan100KV = electricityForCurrentMonth - 100;
         //узнаём цену за больше ста киловатт
-        moreThan100KV = moreThan100KV * 1.68;
+        moreThan100KV = moreThan100KV * priceForMoreThan100KV;
         //округляем цену за больше ста киловатт до двух знаков после точки
         moreThan100KV = Math.round(moreThan100KV * 100) / 100;
         //узнаём конечную цену, прибавляя к цене за сто киловатт цену за больше ста киловатт
-        return moreThan100KV + hundredKV;
+        return moreThan100KV + priceFor100KV;
     }
     //Place JS code here
 </script>
