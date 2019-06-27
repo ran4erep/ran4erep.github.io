@@ -1,0 +1,62 @@
+.row {
+	margin-top: 2px;
+}
+#numbContainer {
+	position: relative;
+	width: 100px;
+	height: 80px;
+}
+#numb {
+	position: absolute;
+	font-size: 70px;
+	background: #aeaeae;
+	width: 100px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 50%;
+}
+#hide {
+	position: absolute;
+	background-image: url(img/questions.jpg);
+	background-size: cover;
+	width: 100px;
+	height: 80px;
+	border-radius: 50%;
+}
+@keyframes open {
+        0% {
+            opacity: 1;
+        }
+        100%{
+            opacity: 0;
+        }
+    }
+    @keyframes close {
+        0% {
+            opacity: 0;
+        }
+        100%{
+            opacity: 1;
+        }
+    }
+    .anim {
+    	animation: open 2s linear forwards;
+    }
+    .animClose {
+    	animation: close 2s linear forwards;
+    }
+    .buttonNumber {
+    	width: 30px;
+    	height: 30px;
+    	border-radius: 7px;
+    }
+    #game {
+    	position: relative;
+    	display: flex;
+    	justify-content: center;
+    	align-items: center; 
+    }
+    #score {
+    	margin-left: 20px;
+    }
