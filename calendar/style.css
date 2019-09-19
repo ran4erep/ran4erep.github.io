@@ -1,0 +1,41 @@
+/*                                       ___                      \\
+// |     '       /  |                   /   |                     \\
+// /__      ___ (  /   _ __ __ _ _ __  / /| | ___ _ __ ___ _ __   \\
+// \\--`-'-|`---\\ |  | '__/ _` | '_ \/ /_| |/ _ \ '__/ _ \ '_ \  \\
+//  |' _/   ` __/ /   | | | (_| | | | \___  |  __/ | |  __/ |_) | \\
+//  '._  W    ,--'    |_|  \__,_|_| |_|   |_/\___|_|  \___| .__/  \\
+//     |_:_._/                                            | |     \\
+//                              https://ran4erep.github.io|_|     */
+.currentDay {
+	border-radius: 50%;
+	background-color: #7acd78;
+	color: #ffffff;
+	border: 2px solid #46b643;
+	text-align: center;
+}
+.regularDay {
+	text-align: center;	
+}
+.tr {
+	background-color: #cccccc;
+}
+/*#calendar {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-top: -125px;
+	margin-left: -100px;
+	width: 250px;
+	height: 180px;
+}*/
+body {
+	background-size: 100%;
+	background-repeat: no-repeat;
+}
+#calendar {
+	background-color: #a6bec6;
+	opacity: 0.6;
+	width: 250px;
+	height: 180px;
+	border-radius: 4px;
+}
