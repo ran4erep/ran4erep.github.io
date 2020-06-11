@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Тест наушников</title>
+    <style>
+        body {
+            font-family: Arial;
+        }
+        #lChannel, #rChannel {
+            font-size: 20px;
+        }
+        #powerSwitch {
+            border-radius: 10px;
+            outline: none;
+        }
+        #frequencyControl[type=range] {
+            width: 30%;
+        }
+        /*Place CSS code here*/
+    </style>
+</head>
+<body>
+    <span id="soundIndicator" style="font-size: 50px;"><span id="lChannel">🎵</span>🎧<span id="rChannel">🎵</span></span>
+    <br>
+    Регулировка канала: <input id="panControl" type="range" min="-1" max="1" step="0.1" value="0">
+    <span id="currentPanValue">0</span>
+    <br>
+    Регулировка частоты:
+    <input id="frequencyControl" type="range" min="32.70" max="7902" step="0.10" value="32.70">
+    <span id="currentFrequencyValue">32.70 Гц</span>
+    <br>
+    Тип волны: <select id="selectWave">
+        <option value="sine">Синусоидная</option>
+        <option value="square">Меандр</option>
+        <option value="triangle">Треугольная</option>
+        <option value="sawtooth">Пилообразная</option>
+    </select>
+    <br>
+    <button id="powerSwitch">Начать</button>
+    <!--Place HTML code here-->
+    <script>
+    //Прячем ноты возле наушников
+    let lChannel = document.getElementById("lChannel");
+    let rChannel = document.getElementById("rChannel");
+    lChannel.style.display = "none";
+    rChannel.style.display = "none";
+    let panValue = document.getElementById("panControl").value;
+    let frequency = 32.70;
+
+    function setChannelIndication(status) {
+        if (status === "none") {
+            lChannel.style.display = "none";
+            rChannel.style.display = "none";
+        }
+        if (status === "both") {
+            lChannel.style.display = "inline";
+            rChannel.style.display = "inline";
+        }
+        if (status === "left") {
+            lChannel.style.display = "inline";
+            rChannel.style.display = "none";
+        }
+        if (status === "right") {
+            lChannel.style.display = "none";
+            rChannel.style.display = "inline";
+        }
+    }
+
+    let context = new AudioContext();
+    let sound = context.createOscillator();
+    let panner = context.createStereoPanner();
+    let soundIsPlaying = 0;
+    panner.pan.value = 0;
+    sound.type = "sine";
+    sound = context.createOscillator();
+    soundForm = "sine";
+
+    powerSwitch.addEventListener("click", function(e) {
+        if (soundIsPlaying === 0) {
+            document.getElementById("powerSwitch").innerHTML = "Прекратить";
+            startOsc();
+        } else {
+            document.getElementById("powerSwitch").innerHTML = "Начать";
+            startOsc(false);
+        }
+    });
+
+    panControl.addEventListener("input", function(e) {
+        if (soundIsPlaying === 1) {
+            let panLevel = document.getElementById("panControl").value;
+            document.getElementById("currentPanValue").innerHTML = panLevel;
+            panner.pan.value = panLevel;
+            if (panLevel < 0)
+                setChannelIndication("left");
+            else if (panLevel > 0)
+                setChannelIndication("right");
+            else
+                setChannelIndication("both");
+        } else {
+        document.getElementById("currentPanValue").innerHTML = document.getElementById("panControl").value;
+        }
+    });
+
+    frequencyControl.addEventListener("input", function(e) {
+        frequency = document.getElementById("frequencyControl").value;
+        document.getElementById("currentFrequencyValue").innerHTML = frequency + " Гц";
+        sound.frequency.value = frequency;
+    });
+
+    function startOsc(bool) {
+            if(bool === undefined) bool = true;
+            if(bool === true) {
+                sound = context.createOscillator();
+                sound.frequency.value = frequency;
+                soundIsPlaying = 1;
+                document.getElementById("panControl").value = 0;
+                document.getElementById("currentPanValue").innerHTML = 0;
+                sound.connect(panner);
+                panner.connect(context.destination);
+                setChannelIndication("both");
+                sound.type = soundForm;
+                sound.start(context.currentTime);
+                sound.connect(context.destination);
+            } else {
+                sound.stop(context.currentTime);
+                sound.disconnect(context.destination);
+                sound = null;
+                soundIsPlaying = 0;
+                setChannelIndication("none");
+                document.getElementById("panControl").value = 0;
+                document.getElementById("currentPanValue").innerHTML = 0;
+            }
+        }
+
+        selectWave.addEventListener('change', function(e) {
+                soundForm = e.target.value;
+                if (soundIsPlaying === 1) {
+                    startOsc(false);
+                    startOsc();
+                }
+        });
+    //Place JS code here
+</script>
+</body>
+</html>
