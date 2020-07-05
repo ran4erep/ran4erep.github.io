@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+<style>
+    canvas {position: absolute; left: 0px; top: 0px;
+        border: 1px solid red;
+    }
+    /*Place CSS code here*/
+</style>
+</head>
+<body>
+    <img src="test.png" alt="" id="cat" style="display: none;" />
+    <!--Place HTML code here-->
+<script>
+    // Create canvas
+cat.addEventListener("load", () => {
+var canvas = document.createElement('canvas');
+var ctx = canvas.getContext('2d');
+canvas.width = 1024;
+canvas.height = 600;
+document.body.appendChild(canvas);
+
+// Draw background
+var img = document.getElementById("cat");
+ctx.drawImage(img, 0, 0);
+
+// Create shadow canvas
+var shadowCanvas = document.createElement('canvas');
+var shadowCtx = shadowCanvas.getContext('2d');
+shadowCanvas.width = canvas.width;
+shadowCanvas.height = canvas.height;
+document.body.appendChild(shadowCanvas);
+
+// Make it black
+shadowCtx.fillStyle = 'rgb(0,0,0,0)';
+shadowCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Turn canvas into mask
+shadowCtx.globalCompositeOperation = "destination-out";
+
+// RadialGradient as light source #1
+gradient = shadowCtx.createRadialGradient(500, 300, 0, 500, 300, 100);
+gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+gradient.addColorStop(0.8, "rgba(255, 255, 255, 0.8)");
+gradient.addColorStop(0.6, "rgba(255, 255, 255, 0.6)");
+gradient.addColorStop(0.4, "rgba(255, 255, 255, 0.4)");
+gradient.addColorStop(1, "rgba(255, 255, 255, .001)");
+shadowCtx.fillStyle = gradient;
+shadowCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+//shadowCtx.clearRect(0,0,shadowCanvas.width,shadowCanvas.height);
+shadowCanvas.width+=0;
+shadowCtx.fillStyle = 'rgb(0,0,0)';
+shadowCtx.fillRect(0, 0, canvas.width, canvas.height);
+shadowCtx.globalCompositeOperation = "destination-out";
+
+
+gradient = shadowCtx.createRadialGradient(700, 300, 0, 700, 300, 100);
+gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+gradient.addColorStop(0.8, "rgba(255, 255, 255, 0.8)");
+gradient.addColorStop(0.6, "rgba(255, 255, 255, 0.6)");
+gradient.addColorStop(0.4, "rgba(255, 255, 255, 0.4)");
+gradient.addColorStop(1, "rgba(255, 255, 255, .001)");
+shadowCtx.fillStyle = gradient;
+shadowCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+// RadialGradient as light source #2
+gradient = shadowCtx.createRadialGradient(220, 150, 0, 220, 150, 50);
+gradient.addColorStop(0, "rgba(255, 255, 255, 1.0)");
+gradient.addColorStop(1, "rgba(255, 255, 255, .1)");
+shadowCtx.fillStyle = gradient;
+shadowCtx.fillRect(0, 0, canvas.width, canvas.height);
+});
+
+</script>
+</body>
+</html>

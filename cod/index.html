@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+<style>
+    canvas {
+        image-rendering: pixelated;
+        border: 1px solid green;
+        width: 384px;
+        height: 384px;
+        //position: absolute;
+        left: 0px; top: 0px;
+    }
+    #container {
+        position: relative;
+    }
+    /*Place CSS code here*/
+</style>
+</head>
+<body>
+    <div id="container">
+        <div id="game">
+            <canvas id="canvas"></canvas>
+        </div>
+        <br>
+        <div id="buttons">
+            <div id="movement">
+                <button id="buttonUp">Вверх</button>
+                <button id="buttonLeft">Влево</button>
+                <button id="buttonRight">Вправо</button>
+                <button id="buttonDown">Вниз</button>
+            </div>
+            <br>
+            <button id="buttonStopEngine">Остановить движок</button>
+            <button id="buttonNight">Переключить ночь</button>
+            <button id="buttonBox">Нарисовать текстбокс</button>
+            <button id="buttonCredits">Погонять титры</button>
+            <button id="buttonBlood">Включить кровь</button>
+            <button id="buttonLoading">Тестовая загрузка</button>
+        </div>
+    </div>
+    <!--Place HTML code here-->
+<script src="script.js"></script>
+</body>
+</html>
