@@ -269,11 +269,11 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
     </style>
 </head>
 
 <body>
-
 <div id="modal">
         <div id="modalContent">
             <button id="closeBtn"><b>&times;</b></button>
@@ -369,6 +369,10 @@
     <input class="inputs" placeholder="  Добавить задачу" id="creatingTask"><button class="buttons" id="buttonAddTask">Ok</button>
     </div>
 
+    <div id="filesBlock">
+      Список локально сохранённых файлов:
+  <div id="showFiles"></div>
+</div>
         </div>
 
       <div id="infoBlock">
@@ -399,6 +403,11 @@
 <div claas="console" id="consoleOutput">
 <font color="#00AA00">Ошибок нет</font>
 </div>
+</div>
+
+<div id="filesBlock">
+  Сохранённые файлы:
+  <div id="showFiles"></div>
 </div>
 
 </div>
@@ -446,6 +455,7 @@
      Код целиком? <input type="checkbox" id="editorHeightSettings">
 </div>
 
+    
   <div id="icons" style="display: block;">
 
       <img src="html5.png">
@@ -734,6 +744,12 @@ buttonNewFile.addEventListener("click", function(e) {
             }
        });
       
+      let filesList = [];
+      for (let i=0; i <localStorage.length; i++) {
+        filesList[i] = `${localStorage.key(i)}.html`;
+      }
+      document.getElementById("showFiles").innerHTML = filesList.join("<br>");
+      
      buttonLoadFromStorage.addEventListener("click", function(e) {
         var  localCodeName = document.getElementById("codeName").value;
           if ( localCodeName.match(/^[\sa-z0-9_]+$/i) && localStorage.getItem(localCodeName) !== null ) {
@@ -789,14 +805,14 @@ buttonNewFile.addEventListener("click", function(e) {
 
              if ( codeName.match(/^[\sa-z0-9_]+$/i) ) {
 
-        	$.post("http://ran4.000webhostapp.com/ide/share.php", {code: editor.getValue(), randomKey: randomKey.join(""), codeName: codeName}, function(data) {
+        	$.post("http://1941r4.000webhostapp.com/share.php", {code: editor.getValue(), randomKey: randomKey.join(""), codeName: codeName}, function(data) {
         		modal("Ссылка была успешно создана. Вы можете скопировать её чтобы поделиться с другом либо скачать по ней Ваш код");
                     document.getElementById("loader").classList.remove("loader");
         	});
              codeName = codeName.replace(/\s/, "%20");
-        	document.getElementById("codeLink").value = "http://ran4.000webhostapp.com/ide/code_" + codeName + "_" + randomKey.join("") + ".html";
-        	document.getElementById("codeDownload").href = "http://ran4.000webhostapp.com/ide/code_" + codeName + "_" + randomKey.join("") + ".html";
-             document.getElementById("codeGoTo").href = "http://ran4.000webhostapp.com/ide/code_" + codeName + "_" + randomKey.join("") + ".html";
+        	document.getElementById("codeLink").value = "http://1941r4.000webhostapp.com/code_" + codeName + "_" + randomKey.join("") + ".html";
+        	document.getElementById("codeDownload").href = "http://1941r4.000webhostapp.com/code_" + codeName + "_" + randomKey.join("") + ".html";
+             document.getElementById("codeGoTo").href = "http://1941r4.000webhostapp.com/code_" + codeName + "_" + randomKey.join("") + ".html";
 
                } else {
        modal("Только латинские буквы, цифры, пробелы и символ _");
