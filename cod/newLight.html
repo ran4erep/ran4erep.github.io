@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<canvas id="can"></canvas>
+	<script>
+		let can = document.getElementById("can");
+		ctx = can.getContext("2d");
+		wid = can.width;
+		hei = can.height;
+		ang = -90 * Math.PI/180;
+		spn = 80 * Math.PI/180;
+		ctr = {x: 200, y: 200};
+		rad = 150;
+		rad2 = 100;
+		grd = ctx.createRadialGradient(ctr.x, ctr.y, 0, ctr.x, ctr.y, rad);
+		grd.addColorStop(0, "rgba(0,200,255,.25)");
+		grd.addColorStop(0.75, "rgba(0,0,0,0.25)");
+		grd.addColorStop(1, "rgba(0,0,0,0)");
+		ctx.fillStyle = grd;
+
+		cen = {x:0, y:0};
+		cen.x = ctr.x + Math.cos(45*Math.PI/180)*rad2;
+		cen.y = ctr.x + Math.sin(45*Math.PI/180)*rad2;
+
+		ctx.beginPath();
+		ctx.arc(cen.x, cen.y, rad2, 0, 2*Math.PI);
+		ctx.clip();
+		(function draw(){
+			ctx.fillStyle = "#000";
+			ctx.fillRect(0,0,wid,hei);
+
+			ctx.fillStyle = grd;
+			ang = Math.sin(new Date()/1000) * Math.PI/6 - Math.PI/3.75;
+			spn = (Math.abs(Math.sin(new Date()/1000/3)) *60+30) * Math.PI/180;
+
+			for (var i=2; i<10; i+=0.1) {
+				ctx.beginPath();
+				ctx.moveTo(ctr.x,ctr.y);
+				ctx.arc(ctx.x,ctr.y,rad,ang - spn/i, ang+spn/i, false);
+				ctx.closePath();
+				ctx.fill();
+			}
+			ctx.strokeStyle = "rgba(255,255,255,.05)";
+			ctx.lineWidth = 1;
+			for (var x=-1; x<wid; x+=3) {
+				ctx.beginPath();
+				ctx.moveTo(x+0.5,0);
+				ctx.lineTo(x+0.5,hei);
+				ctx.closePath();
+				ctx.fill();
+			}
+			requestAnimationFrame(draw);
+
+		}) ();
+	</script>
+</body>
+</html>
