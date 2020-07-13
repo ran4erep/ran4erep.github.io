@@ -56,6 +56,7 @@ let fps;
 var keysMap = {};
 
 document.onkeydown = (e) => {
+	e.preventDefault()
     keysMap[e.keyCode] = e.type == "keydown";
     if(keysMap[65] && keysMap[87]) player.move(-1,-1); //diagonal left-up
     if(keysMap[68] && keysMap[87]) player.move(1,-1); //diagonal right-up
@@ -66,6 +67,7 @@ document.onkeydown = (e) => {
 	if (e.keyCode === 87) player.move(0,-1); //move up
 	if (e.keyCode === 83) player.move(0,1); //move down
 }
+document.onkeyup = (e) => {}
 buttonRight.addEventListener("click", (e) => {
 	player.move();
 });

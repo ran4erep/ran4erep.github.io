@@ -57,7 +57,7 @@ let Blood = function() {
             	this.particles[i].x += this.particles[i].vx;
             	this.particles[i].alpha -= 0.01;
         	}
-        	if (this.particles[i].y+this.particles[i].h < 0 || this.particles[i].y > cy*spriteSize+spriteSize) {
+        	if (this.particles[i].y+this.particles[i].h < 0 || this.particles[i].y > cy+spriteSize) {
         		this.particles[i].x = this.particles[i].x;
             	this.particles[i].vy = 0;
             	this.particles[i].y = this.particles[i].y;
@@ -147,7 +147,7 @@ let player = new Character();
 		this.canvas.style.display = "none";
 	}
 	this.placeLight = (x,y,radius) => {
-		this.gradient = this.ctx.createRadialGradient(x*spriteSize, y*spriteSize, 20, x*spriteSize, y*spriteSize, 180);
+		this.gradient = this.ctx.createRadialGradient(x, y, 20, x, y, 180);
 		this.gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
 		this.gradient.addColorStop(0.8, "rgba(255, 255, 255, 0.8)");
 		this.gradient.addColorStop(0.6, "rgba(255, 255, 255, 0.6)");
