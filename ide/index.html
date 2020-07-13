@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <script src="jquery.js"></script>
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="codemirror/theme/monokai.css">
+    <link rel="stylesheet" href="codemirror/addon/hint/show-hint.css">
+    <script src="codemirror/lib/codemirror.js"></script>
+    <script src="codemirror/mode/xml/xml.js"></script>
+    <script src="codemirror/mode/javascript/javascript.js"></script>
+    <script src="codemirror/mode/css/css.js"></script>
+    <script src="codemirror/mode/htmlmixed/htmlmixed.js"></script>
+    <script src="codemirror/addon/edit/closetag.js"></script>
+    <script src="codemirror/addon/hint/show-hint.js"></script>
+    <script src="codemirror/addon/hint/xml-hint.js"></script>
+    <script src="codemirror/addon/hint/html-hint.js"></script>
+    <script src="codemirror/addon/hint/javascript-hint.js"></script>
+    <script src="codemirror/addon/hint/css-hint.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Web IDE (HTML, CSS, JS)</title>
+    <style>
+    body {
+    padding: 0px;
+    margin: 0px;
+    font-family: Arial;
+    font-size: 14px;
+}
+    .CodeMirror {
+       height: 295px;
+       font-size: 13px;
+    }
+    .modalHide {
+     overflow: hidden;
+}
+    #ide {
+    	background-color: #272822;
+    	color: #f8f8f2;
+    	margin: 1px;
+    }
+    .buttons {
+      margin: 2px;
+    	background-color: #5c88ce;
+    	color: #FFFFFF;
+    	border-radius: 10px;
+    }
+    .buttons:active {
+     background-color: #3a66ac;
+}
+    #editorArea {
+    	width: 95%;
+    	border: 1px solid #7f6af7;
+    	margin: 2px;
+    }
+    #viewer { 
+    	background-color: #FFFFFF;
+    	border: none;
+        margin: 10px;
+        border: 1px solid #7f6af7;
+    }
+    .console {	
+        border-radius: 4px;
+    	margin: 5px;
+    	padding: 2px;
+    	width: 46%;
+    	
+    	 background-color: #373832;
+    }
+    .settings {
+       display: flex;
+    	
+    	width: 95%;
+    	background-color: #373832;
+    	margin: 5px;
+    	border-radius: 4px;
+    }
+#settingsTitle {
+    	text-align: center;
+    	width: 95%;
+    	background-color: #373832;
+    	margin: 5px;
+    	border-radius: 4px;
+}
+    .optionTags {
+    	font-size: 15px;
+    	
+    }
+    .autocompleteHint {
+    	
+    	border-radius: 4px;
+    	margin: 5px;
+    	padding: 2px;
+    	width: 46%;
+    	
+      background-color: #373832;
+    }
+    #infoIcon {
+    	position: relative;
+    	bottom: -4px;
+    }
+    #autocompleteSpoiler { 
+      
+      width: 95%;
+    	display: none;
+    }
+    #sliderEditorOutput {
+    	color: #f92672;
+    }
+    #sliderOutputWidth {
+    	color: #f92672;
+    }
+    #sliderOutputHeight {
+    	color: #f92672;
+    }
+    #sliderOutputFontSize {
+    color: #f92672;
+    }
+    #dimensionSettings {
+    
+    	
+    }
+    #someSettings {
+      text-align: center;
+    	width: 25%;
+    	position: relative;	
+    }
+     #codeName {
+     background-color: #373832;
+     text-align: right;
+     color: #f8f8f2;
+     border-radius: 10px;
+    }
+     #localCodeName {
+     text-align: right;
+}
+    #codeLink {
+    	background-color: #373832;
+    	color: #f8f8f2;
+    	border-radius: 10px;
+    	border-color: #7f6af7;
+    	margin: 5px;
+    }
+    #codemirror {
+    	color: #97b757;
+    	padding: 3px;
+    }
+    #infoBlock {
+    width: 100%;
+    display: flex;
+}
+   #consoleOutput {
+   
+    display: none;
+}
+   #icons {
+   height: 32px;
+   margin-top: 3px;
+   position: relative;
+   right: -60px;
+}
+     .inputs {
+     margin: 3px;
+     border-radius: 10px;
+     background-color: #373832;
+     color: #f8f8f2;
+}
+     #calculator {
+     display: none;
+     position: fixed;
+     z-index: 9000;
+     width: 220px;
+     top: 5%;
+     left: 45%;
+}
+    #row4 {
+   position: relative;
+    right: -30px;
+}
+    #row5 {
+     position: relative;
+     right: -30px;
+}
+   #toolsBlock {
+    border: 1px solid #7f6af7;
+    display: flex;
+    width: 95%;
+    background-color: #373832;
+    
+    border-radius: 4px;
+    padding: 5px;
+    margin: 2px;
+}
+    #color {
+   
+   margin: 3px;
+}
+/*
+    #buttonCalculator {
+    position: relative;
+    bottom: -60px;
+    right: -30px;
+}
+*/
+    #colorPicker {
+
+    position: relative;
+   width: 100px;
+
+}
+    #toDoBlock {
+     margin-left: 10px;
+    width: 300px;
+}
+    #editorSettings {
+    
+}
+    #modal {
+        display: none;
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        z-index: 9000;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.7);
+       animation-name: animateModalOpen;
+        animation-duration: 0.7s;
+    }
+    #modalContent {
+        margin: 15% auto;
+        background-color: #BBBBBB;
+        width: 200px;
+        height: auto;
+        border: 1px solid blue;
+        border-radius: 10px;
+        padding: 5px;
+        animation-name: animateModalOpen;
+        animation-duration: 0.7s;
+    }
+    #closeBtn {
+        float: right;
+    }
+     .todoItems {
+     word-wrap: break-word;
+}
+    @keyframes animateModalOpen {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    #pageTitle {
+    border: 1px solid #272822;
+}
+.loader {
+  position: absolute;
+  left: 160px;
+  border: 5px solid #f3f3f3; /* Light grey */
+  border-top: 5px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  animation: spin 0.2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+    </style>
+</head>
+
+<body>
+<div id="modal">
+        <div id="modalContent">
+            <button id="closeBtn"><b>&times;</b></button>
+            <div id="message"></div>
+        </div>
+    </div>
+
+     <div id="ide">
+
+    <div id="pageTitle" align="center"><h2>Web IDE for HTML, CSS and JS</h2></div>
+
+    <div id="calcModal">
+   <div id="calculator">
+
+    <div align="right" id="displayArea">
+    <textarea readonly id="display"></textarea>
+</div>
+
+<div id="buttonsBlock">
+
+    <div id="row1">
+        <button class="grayButtons" id="buttonC"><strong>C</strong></button>
+        <button class="grayButtons" id="buttonDel"><strong>DEL</strong></button>
+        <button class="grayButtons" id="buttonDivide"><strong>&#247;</strong></button>
+        <button class="grayButtons" id="buttonMultiply"><strong>&#215;</strong></button>
+    </div>
+
+
+
+    <div id="row2">
+        <button class="buttonsCalc" id="button7"><strong>7</strong></button>
+        <button class="buttonsCalc" id="button8"><strong>8</strong></button>
+        <button class="buttonsCalc" id="button9"><strong>9</strong></button>
+        <button class="grayButtons" id="buttonMinus"><strong>&minus;</strong></button>
+</div>
+
+<div id="row3">
+        <button class="buttonsCalc" id="button4"><strong>4</strong></button>
+        <button class="buttonsCalc" id="button5"><strong>5</strong></button>
+        <button class="buttonsCalc" id="button6"><strong>6</strong></button>
+        <button class="grayButtons" id="buttonPlus"><strong>&plus;</strong></button>
+</div>
+
+<div id="hash">
+
+<div id="row4">
+        <button class="buttonsCalc" id="button1"><strong>1</strong></button>
+        <button class="buttonsCalc" id="button2"><strong>2</strong></button>
+        <button class="buttonsCalc" id="button3"><strong>3</strong></button>
+        <button class="buttonsCalc" id="buttonEqual"><strong>=</strong></button>
+    </div>
+    <div id="row5">
+        <button class="buttonsCalc" id="button0"><strong>0</strong></button>
+        <button class="buttonsCalc" id="buttonDot"><strong>.</strong></button>
+    </div>
+
+    </div>
+
+<div id="row6">
+	<button class="buttonsCalc" id="buttonBracketOpen"><strong>(</strong></button>
+	<button class="buttonsCalc" id="buttonBracketClose"><strong>)</strong></button>
+	<button class="buttonsCalc" id="buttonRandom"><strong>RND</strong></button>
+</div>
+
+<div align="center" id="buttonCalculator"><button class="buttons" id="closeCalc">+-&#215;&#247; Скрыть калькулятор</button></div>
+
+</div>
+
+</div>
+</div>
+	
+   
+      <div id="toolsBlock">
+
+       <div id="checkRegExp">
+      <p>Проверка регулярных выражений:</p>
+      <b>/</b><input placeholder="  Регулярное выражение" class="inputs" id="regExp" size="40"><b>/</b><input style="text-align: center;" class="inputs" size="2" id="flags" value = "ig">
+        <br>
+      <textarea placeholder="  Текст для проверки" class="inputs" id="regExpText" cols="48" rows="4"></textarea>
+      <pre><div id="regExpOutput">Текста нет<br>Совпадений нет</div></pre>
+        </div>
+
+      <div id="colorPicker">
+     <p align="center">Подбор цвета:</p>
+     <div align="center"> <input type="color" id="color" value="#FFFFFF"></div>
+    <div align="center"> <input class="inputs" id="colorPick" placeholder=" HEX color" size="6"></div>
+    <div id="buttonCalculator"><button class="buttons" id="showCalc">+-&#215;&#247; Показать калькулятор</button></div>
+     </div>
+        <div id="toDoBlock">
+<p>Список ToDo:</p>
+    <div id="toDoList">
+    </div>
+    <input class="inputs" placeholder="  Добавить задачу" id="creatingTask"><button class="buttons" id="buttonAddTask">Ok</button>
+    </div>
+
+    <div id="filesBlock">
+      Список локально сохранённых файлов:
+  <div id="showFiles"></div>
+</div>
+        </div>
+
+      <div id="infoBlock">
+
+	<div class="autocompleteHint" style="text-align: center;">
+		<img id="infoIcon" src="info.png">
+		<button class="buttons" id="showAutocompleteHint">Автодополнение</button>
+	
+<div class="autocompleteHint" id="autocompleteSpoiler">
+      <span><b>@@@</b> ― показать варианты</span><br>
+      <center><b>JavaScript:</b></center>
+	<span><b>for#</b> ― создать цикл for()</span><br>
+	<span><b>listener#</b> ― создать обработчик события</span><br>
+	<span><b>id#</b> ― обратиться к элементу по ID</span><br>
+	<span><b>func#</b> ― создать новую функцию</span><br>
+      <span><b>gameLoop#</b/> — создать игровой цикл</span><br>
+       <center><b>HTML:</b></center>
+      <span><b>&lt;/@@@</b> ― закрыть открытый тег</span><br>
+       <span><b>div#</b> ― создать блок</span><br>
+       <span><b>jquery#</b> ― подключить библиотеку JQuery</span><br>
+       <span><b>fa#</b> ― подключить шрифты Font Awesome</span>
+</div>
+</div>
+
+<div class="console" style="text-align: center;">
+<button class="buttons" id="showConsole">&lt;/&gt; Показать консоль</button>
+
+<div claas="console" id="consoleOutput">
+<font color="#00AA00">Ошибок нет</font>
+</div>
+</div>
+
+
+</div>
+
+</div>
+
+      <div id="settingsTitle" align="center">Настройки:</div>
+      <div class="settings">
+
+	<div id="dimensionSettings">
+
+        <div id="setEditorWidth">
+            <span class="optionTags">Ширина редактора:&nbsp;</span>
+            <span class="optionTags" id="sliderEditorOutput">9</span>/10
+            <input id="sliderEditorWidth" type="range" min="1" max="10" value="9" />
+    </div>
+
+        <div id="setViewportWidth">
+            <span class="optionTags">Ширина вьюпорта:&nbsp;</span>
+            <span class="optionTags" id="sliderOutputWidth">9</span>/15&nbsp;
+            <input id="sliderViewerWidth" type="range" min="0" max="15" value="7" />
+        </div>
+
+        <div id="setViewportHeight">
+            <span class="optionTags">Высота вьюпорта:&nbsp;</span>
+            <span class="optionTags" id="sliderOutputHeight">2</span>/15&nbsp;&nbsp;
+            <input id="sliderViewerHeight" type="range" min="0" max="15" value="2" />
+    </div>
+        <div id="setEditorFontSize">
+             <span class="optionTags">Размер шрифта:&nbsp;&nbsp;&nbsp;</span>
+            <span class="optionTags" id="sliderOutputFontSize">13</span>/25&nbsp;&nbsp;
+            <input id="sliderFontSize" type="range" min="1" max="25" value="13" />
+       </div>
+           </div>
+
+            <div id="someSettings">
+    	Имя файла: <br>
+      <input size="10" id="codeName">.html
+       <p>Частота автосохранения:</p>
+      <input style="text-align: center;" class="inputs" size="2" id="autoSaveTimeInput" value="30">&nbsp;с.
+      <button class="buttons" id="buttonAutoSaveTime">Применить</buttons>
+    </div>
+
+<div id="editorSettings">
+    <p>Настройки редактора:</p>
+     Перенос строки? <input type="checkbox" id="wrappingSettings" checked=""><br>
+     Код целиком? <input type="checkbox" id="editorHeightSettings">
+</div>
+
+    
+  <div id="icons" style="display: block;">
+
+      <img src="html5.png">
+     <img src="css3.png">
+     <img src="js.png">
+     <img src="jquery.png">
+
+    </div>
+
+</div>
+
+        <div id="editorArea">
+        <textarea id="editor">
+        </textarea>
+
+    </div>
+        
+        <div class="menu">
+        	<button class="buttons" id="buttonRefresh">Обновить вьюпорт</button>
+        	<button class="buttons" id="buttonEnableHint">Показать варианты</button>
+        	<button class="buttons" id="buttonChangeMode">Realtime режим (<font color="#00FF00">Включён</font>)</button>
+        	<button class="buttons" id="buttonSave">Поделиться кодом</button>
+              <button class="buttons" id="buttonCheckOnErrors">Проверить JS код на ошибки</button>
+             <button class="buttons" id="buttonSaveToStorage">Сохранить код</button>
+             <button class="buttons" id="buttonNewFile">Новый код</button>
+             <button class="buttons" id="buttonLoadFromStorage">Загрузить код</button>
+             <button class="buttons" id="buttonDeleteCode">Удалить код</button>
+              <button class="buttons" id="buttonClearCodes">Очистить хранилище</button>
+              <button class="buttons" id="buttonClearEditor">Очистить редактор</button>
+              <button class="buttons" id="buttonCopyToClipboard">Скопировать код в буфер обмена</button>
+    </div>
+    <hr>
+     
+    <div id="saving" align="center">
+    	
+    	<div id="loader"></div><input size="60" id="codeLink" value="  Ссылка на скачивание Вашего кода появится здесь"><a download="" id="codeDownload" href="#"><button class="buttons">Скачать</button></a><a target="_blank" id="codeGoTo" href="#"><button class="buttons">Перейти</button></a>
+    </div>
+        <div id="viewerBlock">
+        <iframe id="viewer" width="700" height="100"></iframe>
+    </div>
+    <div align="right">
+    	Powered by &copy;<a id="codemirror" href="https://codemirror.net/">CodeMirror</a>
+    </div>
+    <br><br>
+  
+</div>
+
+</div>
+
+    <script>
+
+function modal(text) {
+        document.body.classList.add("modalHide");
+        document.getElementById("message").innerHTML =  text;
+        document.getElementById("modal").style.display = "block";
+    }
+closeBtn.addEventListener("click", function(e) {
+        document.body.classList.remove("modalHide");
+        document.getElementById("modal").style.display = "none";
+    });
+
+
+var tasks = [];
+    var tasksText = [];
+    var tasksCounter = 0;
+    var currentCheck;
+    tasks = document.getElementsByClassName("todoItems");
+    
+    creatingTask.addEventListener("keydown", function(e) {
+        if (e.keyCode === 13) {
+            if ( document.getElementById("creatingTask").value.length > 0) {
+                var newList = document.createElement('p');
+                tasksText[tasksCounter] = document.getElementById("creatingTask").value;
+                newList.innerHTML = "<input type=\"checkbox\" class=\"checks\" id=\"task" + tasksCounter + "\">" + "<span class=\"todoItems\">" + tasksText[tasksCounter] + "</span>";
+                tasksCounter++;
+                toDoList.appendChild(newList);
+                document.getElementById("creatingTask").value = "";
+            } else {
+                modal("Пустая задача");
+            }
+        }
+    });
+    
+      buttonAddTask.addEventListener("click", function(e) {
+        if ( document.getElementById("creatingTask").value.length > 0) {
+            var newList = document.createElement('p');
+            tasksText[tasksCounter] = document.getElementById("creatingTask").value;
+            newList.innerHTML = "<input type=\"checkbox\" class=\"checks\" id=\"task" + tasksCounter + "\">" + "<span class=\"todoItems\">" + tasksText[tasksCounter] + "</span>";
+            tasksCounter++;
+            toDoList.appendChild(newList);
+            document.getElementById("creatingTask").value = "";
+        } else {
+            modal("Пустая задача");
+        }
+    });
+
+window.addEventListener("click", function(e) {
+    if ( e.target.type === "checkbox" && e.target.id.match(/^task\d+$/ig)) {
+            if (e.target.checked) {
+               currentCheck = e.target.id.split("task");
+               tasks[ parseInt(currentCheck[1]) ].innerHTML = "<s>" + tasks[ parseInt(currentCheck[1]) ].innerHTML + "</s>";
+            } else {
+                currentCheck = e.target.id.split("task");
+                tasks[ parseInt(currentCheck[1]) ].innerHTML = tasksText[ parseInt( currentCheck[1] ) ];
+            }
+        }
+
+    if ( e.target === document.getElementById("modal") ) {
+        document.body.classList.remove("modalHide");
+        document.getElementById("modal").style.display = "none";
+        }
+});
+
+       wrappingSettings.addEventListener("click", function(e) {
+        if ( document.getElementById("wrappingSettings").checked === true )
+        editor.setOption("lineWrapping", true);
+        else
+        editor.setOption("lineWrapping", false);
+});
+        color.addEventListener("change", function(e) {
+       document.getElementById("colorPick").value = document.getElementById("color").value;
+});
+      colorPick.addEventListener("input", function(e) {
+     document.getElementById("color").value = document.getElementById("colorPick").value;
+});
+         showCalc.addEventListener("click", function(e) {
+         if (calc === "hide") {
+        document.getElementById("calculator").style.display = "block";
+        document.getElementById("showCalc").innerHTML = "+-×÷ Скрыть калькулятор";
+         calc = "show";
+         } else {
+         document.getElementById("calculator").style.display = "none";
+         document.getElementById("showCalc").innerHTML = "+-×÷ Показать калькулятор";
+         calc = "hide";
+        }
+});
+     closeCalc.addEventListener("click", function(e) {
+      document.getElementById("calculator").style.display = "none";
+      document.getElementById("showCalc").innerHTML = "+-×÷ Показать калькулятор";
+      calc = "hide";
+});
+     var autoSaveTime = 30000;
+     var cursorPosition;
+     logArray = [];
+     var forCheck;
+    
+      window.onerror = function (msg, url, line) {
+       logArray.push("<b>" + (logArray.length + 1) + ":</b><font color=\"#FF0000\"> Error! " + msg + "</font>");
+      document.getElementById("consoleOutput").innerHTML= logArray.join("<hr>");
+}
+
+       flags.addEventListener("input", function(e) {
+      if ( document.getElementById("flags").value.match(/^[igm]+$/) || document.getElementById("flags").value === "") {
+      document.getElementById("flags").value = document.getElementById("flags").value;
+      } else {
+      document.getElementById("flags").value = "";
+      modal("Вы ввели некорректные флажки (i - учёт регистра, g - глобальный поиск, m - мультистроковый поиск)");
+      }
+});
+       regExpText.addEventListener("input", function(e) {
+       document.getElementById("regExpOutput").innerHTML = document.getElementById("regExpText").value + "  <br>Совпадений нет";
+      var text = document.getElementById("regExpText").value;
+      if ( document.getElementById("regExp").value !== "") {
+      var regExpResult;
+    	var re = new RegExp( document.getElementById("regExp").value, document.getElementById("flags").value );
+      regExpResult = text.replace(re, function(str, offset, s) {
+      matchesCounter++;
+      return "⇒<code><b><span style=\"background: #00FF00; color: #000000;\">" + str + "</span></b></code>⇐";
+      }); 
+    
+     document.getElementById("regExpOutput").innerHTML = regExpResult + " <br>Совпадений найдено: " + matchesCounter;
+     
+      matchesCounter = 0;
+      } else {
+       matchesCounter = 0;
+       document.getElementById("regExpOutput").innerHTML = text + " <br>Текста нет<br>Совпадений найдено: " + matchesCounter;
+}
+} );
+     
+      var matchesCounter = 0;
+regExp.addEventListener("input", function (e) {
+      var text = document.getElementById("regExpText").value;
+      if ( document.getElementById("regExp").value !== "") {
+      var regExpResult;
+    	var re = new RegExp( document.getElementById("regExp").value, document.getElementById("flags").value );
+      regExpResult = text.replace(re, function(str, offset, s) {
+      matchesCounter++;
+      return "<code><b><span style=\"background: #00FF00; color: #000000;margin: 1px;\">" + str + "</span></b></code>";
+      }); 
+    
+     document.getElementById("regExpOutput").innerHTML = regExpResult + " <br>Совпадений найдено: " + matchesCounter;
+     
+      matchesCounter = 0;
+      } else {
+       matchesCounter = 0;
+       document.getElementById("regExpOutput").innerHTML = text + " <br>Текста нет<br>Совпадений найдено: " + matchesCounter;
+}
+    });
+
+     var consoleDisplay = "hide";
+     var calc = "hide";
+    	var hint = "hide";
+    	var mode = "sync";
+        var defaultCode = "<!DOCTYPE html>\n<html>\n<head>\n    <title><\/title>\n<style>\n    \/*Place CSS code here*\/\n<\/style>\n<\/head>\n<body>\n    <!--Place HTML code here-->\n<script>\n    //Place JS code here\n<\/script>\n<\/body>\n<\/html>";
+
+        var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+            mode: "htmlmixed",
+            theme: "monokai",
+            lineNumbers: true,
+            indentUnit: 4,
+            dragDrop: true,
+            cursorBlinkRate: 0,
+            autoCloseTags: true,
+            scrollbarStyle: "null",
+            lineWrapping: true
+        })
+
+buttonClearEditor.addEventListener("click", function(e) {
+          editor.setValue("");
+});
+buttonNewFile.addEventListener("click", function(e) {
+           editor.setValue(defaultCode);
+});
+        if (localStorage.getItem("autoSave") !== null) {
+        editor.setValue( localStorage.getItem("autoSave") );
+       document.getElementById("viewer").srcdoc = editor.getValue();
+        } else {
+        editor.setValue(defaultCode);
+        }
+
+        document.getElementById("viewer").srcdoc = defaultCode;
+
+        buttonEnableHint.addEventListener("click", function(e) {
+            editor.execCommand("autocomplete");
+        })
+       buttonCopyToClipboard.addEventListener("click", function(e) {
+             editor.execCommand("selectAll");
+            document.execCommand("copy");
+});
+
+        buttonCheckOnErrors.addEventListener("click", function(e) {
+                     document.getElementById("consoleOutput").innerHTML = "<font color=\"#00AA00\">Ошибок нет</font>";
+                      forCheck = editor.getValue().match(/(?<=<script>)(.|\n)*?(?=<\/script>)/gi).toString();
+                     forCheck = forCheck.replace( /["']/g, "\"");
+                     forCheck = forCheck.replace(/\n/g, "");
+                     eval(forCheck);
+
+});
+        buttonRefresh.addEventListener("click", function(e) {
+  
+             document.getElementById("viewer").srcdoc = editor.getValue();
+       
+        });
+
+        buttonChangeMode.addEventListener("click", function(e) {
+        	if (mode === "sync") {
+        		mode = "async";
+        		document.getElementById("buttonChangeMode").innerHTML = "Realtime режим (<font color=\"#DD0000\">Выключен</font>)";
+        	} else {
+        		mode = "sync";
+        		document.getElementById("buttonChangeMode").innerHTML = "Realtime режим (<font color=\"#00FF00\">Включён</font>)";
+        	}
+        });
+
+        showAutocompleteHint.addEventListener("click", function(e) {
+        	if (hint === "hide") {
+        		hint = "show";
+        		document.getElementById("autocompleteSpoiler").style.display = "block";
+        		document.getElementById("showAutocompleteHint").innerText = "Спрятать подсказку";
+        	} else {
+        		hint = "hide";
+        		document.getElementById("autocompleteSpoiler").style.display = "none";
+        		document.getElementById("showAutocompleteHint").innerText = "Автодополнение";
+        	}
+        });
+
+      showConsole.addEventListener("click", function(e) {
+             if (consoleDisplay === "hide") {
+               consoleDisplay = "show";
+               document.getElementById("consoleOutput").style.display = "block";
+              document.getElementById("showConsole").innerText = "</> Скрыть консоль";
+            }  else {
+              consoleDisplay = "hide";
+             document.getElementById("consoleOutput").style.display = "none";
+             document.getElementById("showConsole").innerText = "</> Показать консоль";
+            }
+       });
+      
+      let filesList = [];
+      for (let i=0; i <localStorage.length; i++) {
+        filesList[i] = `${localStorage.key(i)}.html`;
+      }
+      document.getElementById("showFiles").innerHTML = filesList.join("<br>");
+      
+     buttonLoadFromStorage.addEventListener("click", function(e) {
+        var  localCodeName = document.getElementById("codeName").value;
+          if ( localCodeName.match(/^[\sa-z0-9_]+$/i) && localStorage.getItem(localCodeName) !== null ) {
+         editor.setValue( localStorage.getItem(localCodeName) );
+         modal("Код " + document.getElementById("codeName").value + ".html загружен");
+         } else {
+         modal("Неправильное имя или такого файла не существует");
+}
+});
+         buttonClearCodes.addEventListener("click", function(e) {
+         let reallyClear = confirm("Вы уверены что хотите удалить все сохранённые коды?");
+         if (reallyClear === true) {
+          localStorage.clear();
+          modal("Локальное хранилище было очищено");
+          }
+});
+        buttonDeleteCode.addEventListener("click", function(e) {
+        if ( document.getElementById("codeName").value.match(/^[\sa-z0-9_]+$/i) && localStorage.getItem( document.getElementById("codeName").value ) !== null ) {
+         let reallyClear = confirm("Вы уверены что хотите удалить код " + document.getElementById("codeName").value + "?");
+         if (reallyClear === true) {
+         localStorage.removeItem( document.getElementById("codeName").value );
+         modal("Код " + document.getElementById("codeName").value + ".html удалён");
+         }
+         } else {
+         modal("Неправильное имя или такого файла не существует");
+}
+});
+        buttonSaveToStorage.addEventListener("click", function(e) {
+            if ( document.getElementById("codeName").value.match(/^[\sa-z0-9_]+$/i) ) {
+            localStorage.setItem( document.getElementById("codeName").value, editor.getValue());
+            modal("Код " + document.getElementById("codeName").value + ".html сохранён. Запомните его имя");
+           } else {
+           modal("Только латинские буквы, цифры, пробелы и символ _");
+          }
+});
+
+        buttonSave.addEventListener("click", function(e) {
+             document.getElementById("loader").classList.add("loader");
+        	function rand(min, max) {
+        		return Math.floor(Math.random() * (max - min + 1)) + min;
+        	}
+        	var generator = "0123456789";
+        	var randomKey = [];
+             var codeName = document.getElementById("codeName").value;
+             
+             if (codeName === "")
+                   codeName = "with_no_name";
+            
+             
+        	for (var i = 0; i < 20; i++) {
+        		randomKey.push(generator[rand(0, 9)]);
+        	}
+
+             if ( codeName.match(/^[\sa-z0-9_]+$/i) ) {
+
+        	$.post("http://1941r4.000webhostapp.com/share.php", {code: editor.getValue(), randomKey: randomKey.join(""), codeName: codeName}, function(data) {
+        		modal("Ссылка была успешно создана. Вы можете скопировать её чтобы поделиться с другом либо скачать по ней Ваш код");
+                    document.getElementById("loader").classList.remove("loader");
+        	});
+             codeName = codeName.replace(/\s/, "%20");
+        	document.getElementById("codeLink").value = "http://1941r4.000webhostapp.com/code_" + codeName + "_" + randomKey.join("") + ".html";
+        	document.getElementById("codeDownload").href = "http://1941r4.000webhostapp.com/code_" + codeName + "_" + randomKey.join("") + ".html";
+             document.getElementById("codeGoTo").href = "http://1941r4.000webhostapp.com/code_" + codeName + "_" + randomKey.join("") + ".html";
+
+               } else {
+       modal("Только латинские буквы, цифры, пробелы и символ _");
+       }
+
+        });
+
+         buttonAutoSaveTime.addEventListener("click", function(e) {
+         autoSaveTime = parseInt( (document.getElementById("autoSaveTimeInput").value + "000" ) );
+         if ( document.getElementById("autoSaveTimeInput").value.match(/^\d+$/) ) {
+         if ( parseInt( document.getElementById("autoSaveTimeInput").value ) < 0 || document.getElementById("autoSaveTimeInput").value > 3600 ) {
+         modal("Некорректное значение. Число не может быть меньше чем ноль секунд (автосохранение отключено) или больше чем 3600 секунд (один час)");
+        } else {
+        if ( parseInt( document.getElementById("autoSaveTimeInput").value ) === 0 ) {
+        clearInterval(autosaving);
+        modal("Автосохранение отключено. <font color=\"#FF0000\">Внимание!</font> Написанный код будет утрачен после обновления или закрытия страницы");
+} else {
+        clearInterval(autosaving);
+        autosaving = setInterval(autoSave, autoSaveTime);
+        modal("Код будет автоматически сохраняться через каждые " + document.getElementById("autoSaveTimeInput").value + " секунд");
+}
+        }
+        }
+});
+        function autoSave() {
+        localStorage.setItem( "autoSave", editor.getValue() );
+       }
+
+        editor.on("changes", function(e) {
+             if ( editor.getValue().match(/@@@/igm) ) {
+             cursorPosition = editor.getCursor();
+             editor.setValue( editor.getValue().replace(/@@@/igm, "") );
+              editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
+             editor.execCommand("autocomplete");
+             }
+              if ( editor.getValue().match(/jquery#/igm) ) {
+                cursorPosition = editor.getCursor();
+                editor.setValue( editor.getValue().replace(/jquery#/igm, "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js\"><\/script>") );
+                 editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
+                   }
+		if ( editor.getValue().match(/fa#/igm) ) {
+                cursorPosition = editor.getCursor();
+                editor.setValue( editor.getValue().replace(/fa#/igm, "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">") );
+                 editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
+                   }
+             if ( editor.getValue().match(/gameLoop#/igm) ) {
+                cursorPosition = editor.getCursor();
+                editor.setValue( editor.getValue().replace(/gameLoop#/igm, "var timeStart = 0;\nfunction gameLoop(timestamp) {\n    if (timestamp - timeStart >= 100) {\n        //loop code...\n        timeStart = timestamp;\n    }\n    requestAnimationFrame(gameLoop);\n}\ngameLoop();") );
+                 editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
+                   }
+        	if ( editor.getValue().match(/for#/igm) ) {
+                cursorPosition = editor.getCursor();
+                editor.setValue( editor.getValue().replace(/for#/igm, "for (var i = 0; i < num; i++\) {\n    \/\/code\n}") );
+                 editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
+                   }
+            if ( editor.getValue().match(/listener#/igm) ) {
+                cursorPosition = editor.getCursor();
+                editor.setValue( editor.getValue().replace(/listener#/igm, "elem.addEventListener(\"event\", function(e) {\n    \/\/code\n});") );
+                 editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
+              }
+            if ( editor.getValue().match(/id#/igm) ) {
+                cursorPosition = editor.getCursor();
+                editor.setValue( editor.getValue().replace(/id#/igm, "document.getElementById(\"elem\")") );
+                editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
+               }
+            if ( editor.getValue().match(/func#/igm) ) {
+              cursorPosition = editor.getCursor();
+            	editor.setValue( editor.getValue().replace(/func#/igm, "function function_name(arguments) {\n    // body...\n}") );
+              editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
+               }
+            if ( editor.getValue().match(/div#/igm) ) {
+               cursorPosition = editor.getCursor();
+              editor.setValue( editor.getValue().replace(/div#/igm, "<div id=\"block\"></div>") );
+              editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
+                }
+                //editor.setValue( (editor.getValue().replace()) );
+                if (mode === "sync") {
+            document.getElementById("viewer").srcdoc = editor.getValue();
+        }
+    });
+ 
+         editorHeightSettings.addEventListener("click", function(e) {
+        if ( document.getElementById("editorHeightSettings").checked === true )
+        document.querySelector(".CodeMirror").style.height = "auto";
+        else
+        document.querySelector(".CodeMirror").style.height = "295px";
+});
+
+         sliderFontSize.addEventListener("input", function(e) {
+            document.getElementById("sliderOutputFontSize").innerHTML = sliderFontSize.value;
+            let editorFont = document.querySelector(".CodeMirror").style.fontSize= sliderFontSize.value + "px";
+          editor.refresh();
+        });
+
+        sliderViewerHeight.addEventListener("input", function(e) {
+            document.getElementById("sliderOutputHeight").innerHTML = sliderViewerHeight.value;
+            document.getElementById("viewer").height = sliderViewerHeight.value * 100;
+        });
+
+        sliderViewerWidth.addEventListener("input", function(e) {
+            document.getElementById("sliderOutputWidth").innerHTML = sliderViewerWidth.value;
+            document.getElementById("viewer").width = sliderViewerWidth.value * 100;
+        });
+
+        sliderEditorWidth.addEventListener("input", function(e) {
+            document.getElementById("sliderEditorOutput").innerHTML = sliderEditorWidth.value;
+            document.getElementById("editorArea").style.width = (sliderEditorWidth.value * 10) + "%";
+        });
+       var autosaving = setInterval(autoSave, autoSaveTime);
+    </script>
+  <script src="calculator.js"></script>
+</body>
+</html>
