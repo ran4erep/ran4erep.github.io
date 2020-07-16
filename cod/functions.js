@@ -87,6 +87,18 @@ let drawTile = (tileNumber, x, y, tileset, opacity) => {
 	ctx.restore();
 }
 
+//функция отрисовки тайлов
+let drawSprite = (tileNumber, x, y, tileset, opacity) => {
+	if (tileset === undefined) tileset = graphics[4];
+	if (opacity === undefined) opacity = 1;
+	ctx.save();
+	ctx.globalAlpha = opacity;
+	ctx.drawImage(
+		tileset,tileNumber*spriteSize,0,spriteSize,spriteSize,x, y, tileSize, tileSize
+		);
+	ctx.restore();
+}
+
 //функция рисования текстбоксов
 let drawBox = (text,x,y) => {
 	let columns = 2;
@@ -154,7 +166,7 @@ let render = () => {
 	for (let i = 0; i < levelWidth; i++) {
 		for (let j = 0; j < levelHeight; j++) {
 			drawTile(maps[0][i][j],j,i);
-			drawTile(10,player.x, player.y, graphics[0]);
+			drawSprite(10,player.x, player.y, graphics[0]);
 			if (torch.isNight) {
 				//torch.updateLight();
 				//torch.placeLight(player.x+0.6,player.y+0.6,30);
@@ -169,18 +181,3 @@ let part;
 let array = [];
 let isDead = false;
 
-let makeBlood = (cx,cy,particle,particles,particlesAmount) => {
-        	if(particles.length < particlesAmount) {
-        		particle = new Particle(player.x,player.y);
-					particles.push(particle);
-				}
-				for(let i=0; i<particles.length; i++) {
-					particles[i].updateBlood(cx,cy);
-					particles[i].drawBlood();
-					isDead = particles[i].blood.isDead;
-					if (particles[i].blood.isDead) {
-						particlesAmount = 0;
-						//particles.splice(i,1);
-					}
-				}
-		}

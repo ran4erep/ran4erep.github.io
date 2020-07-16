@@ -28,6 +28,7 @@ buttonCredits.addEventListener("click", (e) => {
 });
 let bloodShow = false;
 buttonBlood.addEventListener("click", (e) => {
+	player.blood.burst();
 	bloodShow = !bloodShow;
 });
 let testLoading = 0;
@@ -52,17 +53,29 @@ let graphicsSumCounter = 0, allGraphicsLoaded = false, graphicsLoadingProgress =
 let times = [];
 let fps;
 
+
+document.onkeydown = (e) => {
+	if (e.keyCode === 68) player.vx = 1; //move right
+	if (e.keyCode === 65) player.vx = -1; //move left
+	if (e.keyCode === 87) player.vy = -1; //move up
+	if (e.keyCode === 83) player.vy = 1; //move down
+}
+document.onkeyup = (e) => {
+	player.vx = 0;
+	player.vy = 0;
+}
+
 buttonRight.addEventListener("click", (e) => {
-	player.moveRight();
+	player.move(1,0);
 });
 buttonLeft.addEventListener("click", (e) => {
-	player.moveLeft();
+	player.move(-1,0);
 });
 buttonUp.addEventListener("click", (e) => {
-	player.moveUp();
+	player.move(0,-1);
 });
 buttonDown.addEventListener("click", (e) => {
-	player.moveDown();
+	player.move(0,1);
 });
 
 
@@ -76,7 +89,6 @@ function gameLoop(timestamp) {
 		//начало игрового цикла-----
 		//если графика загрузилась, то можно начинать работу
 		if (graphicsIsLoaded(graphics,graphicsSumCounter)) {
-			if (engineIsWorking) {
 				logic();
 				update();
 				render();
@@ -88,21 +100,8 @@ function gameLoop(timestamp) {
 					drawText(`loading ${testLoading}%...`,2,10)
 				}
 				
-				if (bloodShow) {
-					makeBlood(player.x,player.y,particle,particles,particlesAmount);
-					/*
-					if (particles.length < particlesAmount) {
-						particle = new Particle(player.x,player.y);
-						particles.push(particle);
-					}
-					for(let i=0; i<particles.length; i++) {
-						particles[i].updateBlood(player.x,player.y);
-						particles[i].drawBlood();
-					}
-					*/
-				}
-
-			}
+					player.bleeding();
+					player.move();
 		}
 		const NOW = performance.now();
 		while(times.length > 0 && times[0] <= NOW - 1000) {
@@ -114,7 +113,9 @@ function gameLoop(timestamp) {
 	//конец игрового цикла-----
 	//timeStart = timestamp;
 //}
-requestAnimationFrame(gameLoop);
+if (engineIsWorking) {
+	requestAnimationFrame(gameLoop);
+}
 }
 
 gameLoop();

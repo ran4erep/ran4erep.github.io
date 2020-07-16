@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Line of Sight</title>
+	<style>
+		canvas {
+			border: 1px solid red;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas" width="300" height="300"></canvas>
+	<br>
+	<button id="bl">Left</button>
+	<button id="br">Right</button>
+	<button id="bu">Up</button>
+	<button id="bd">Down</button>
+	<script>
+		let canvas = document.getElementById("canvas");
+		let ctx = canvas.getContext("2d");
+		const TILE = 15;
+		//let x=4, y=4;
+		let map = [
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0],
+			[0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0],
+			[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0],
+			[0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0],
+			[0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0],
+			[1,1,1,0,0,1,1,1,0,0,0,0,0,0,0,1,0,1,0,0],
+			[1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],
+			[1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],
+			[1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,1,0,0],
+			[0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[1,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,1,1,1,0],
+			[1,0,0,1,0,1,0,1,0,1,0,1,1,1,0,1,0,0,0,0],
+			[1,1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0],
+			[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,0,1,0],
+			[1,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,1,1,1,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		];
+
+		let lightMap = [];
+		for (let i = 0; i < map.length; i++) {
+			lightMap.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+		}
+
+		let draw = () => {
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			for (let i = 0; i < 20; i++) {
+				for (let j = 0; j < 20; j++) {
+					if (map[i][j] === 1) {
+						ctx.fillStyle = "black";
+						ctx.fillRect(j*TILE,i*TILE,TILE,TILE);
+					}
+					if (map[i][j] === 0) {
+						ctx.fillStyle = "green";
+						ctx.fillRect(j*TILE,i*TILE,TILE,TILE);
+						ctx.strokeStyle = "red";
+						ctx.strokeRect(j*TILE,i*TILE,TILE,TILE);
+					}
+						
+				}
+			}
+
+			for (let i = 0; i < 20; i++) {
+				for (let j = 0; j < 20; j++) {
+					ctx.fillStyle = "rgba(0,0,0,0.6)";
+					ctx.fillRect(j*TILE,i*TILE,TILE,TILE);
+				}
+			}
+			//casting light and shadows from lightmap;
+			// for (let i = 0; i < 20; i++) {
+			// 	for (let j = 0; j < 20; j++) {
+			// 		if (lightMap[i][j] === 0) {
+			// 			ctx.fillStyle = "rgba(0,0,0,0.5)";
+			// 			ctx.fillRect(j*TILE,i*TILE,TILE,TILE);
+			// 		}
+			// 		if (lightMap[i][j] === 1) {
+			// 			ctx.fillStyle = `rgba(255,255,255,0.6)`
+			// 			ctx.fillRect(j*TILE,i*TILE,TILE,TILE);
+			// 		}
+			// 	}
+			// }
+
+		}
+
+		let plot = (x,y) => {
+			ctx.fillStyle = "rgba(255,255,255,0.1)";
+			ctx.fillRect(x*TILE,y*TILE,TILE,TILE);
+			//ctx.strokeStyle = "rgba(150,150,0,0.6)";
+			//ctx.strokeRect(x*TILE,y*TILE,TILE,TILE);
+			//if(map[x][y] === 1) return false;
+			//else return true;
+		}
+
+		let castRay = (map, x0,y0, x1,y1) => {
+			let swap = false;
+			let dx = x1-x0;
+			let dy = y1-y0;
+
+			if (Math.abs(dx) < Math.abs(dy)) {
+				let tmp;
+				tmp = dx; dx = dy; dy = tmp;
+				swap = true;
+			}
+
+			let a = Math.abs(dy);
+			let b = -Math.abs(dx);
+			let x = x0;
+			let y = y0;
+
+			let d = 2*a+b;
+			let q = 1;
+			let s = 1;
+
+			if (x0 > x1) q = -1;
+			if (y0 > y1) s = -1;
+			plot(x,y);
+
+			for(let k=0; k < -b; k++) {
+				if (d > 0) {
+					x = x + q; y = y + s;
+					d = d + 2 * (a + b);
+				}
+				else {
+					x = x + q;
+					if(swap) { y = y + s; x = x - q; }
+					d = d + 2 * a;
+				}
+
+				if ( hitTheWall(map, x,y) ) return;
+				
+				plot(x,y);
+				
+				//lightMap[y][x]=1;
+			}
+		}
+
+		let hitTheWall = (map,x,y) => (map[y][x] === 1) ? true : false;
+
+		let clearLightMap = () => {
+			lightMap = [];
+			for (let i = 0; i < map.length; i++) {
+				lightMap.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+			}
+		}
+
+		let distanceBetween = (x1,y1, x2,y2) => {
+			let distanceX = x1-x2;
+			let distanceY = y1-y2;
+			return Math.sqrt(distanceX*distanceX + distanceY*distanceY);
+		}
+
+		let playerX = 9; let playerY = 9;
+		let direction = "south";
+		let fovRange = 4;
+		let updateFOV = (angle) => {
+			if (angle === 90) {
+				switch (direction) {
+					case "north":
+					for(let x = 0; x < 20; x++) {
+						castRay(map,playerX,playerY,x,0);
+					}
+					break;
+					case "east":
+					for(let y = 0; y < 20; y++) {
+						castRay(map,playerX,playerY,19,y);
+					}
+					break;
+					case "south":
+					for(let x = 0; x < 20; x++) {
+						castRay(map,playerX,playerY,x,19);
+					}
+					break;
+					case "west":
+					console.log("work")
+					for(let y = 0; y < 20; y++) {
+						castRay(map,playerX,playerY,0,y);
+					}
+					break;
+				}
+			}
+			if (angle === 360) {
+				for(let x = 0; x < 20; x++) {
+					castRay(map,playerX,playerY,x,0);
+				}
+				for(let y = 0; y < 20; y++) {
+					castRay(map,playerX,playerY,19,y);
+				}
+				for(let x = 0; x < 20; x++) {
+					castRay(map,playerX,playerY,x,19);
+				}
+				for(let y = 0; y < 20; y++) {
+					castRay(map,playerX,playerY,0,y);
+				}
+			}
+			//lightMap[playerX][playerY] = 2;
+			ctx.fillStyle = "red";
+			ctx.fillRect(playerX*TILE,playerY*TILE,TILE,TILE);
+		}
+
+		bl.onclick = () => {
+			direction = "west";
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			draw();
+			playerX-=1;
+			clearLightMap();
+			updateFOV(360);
+		}
+		br.onclick = () => {
+			direction = "east";
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			draw();
+			playerX+=1;
+			clearLightMap();
+			updateFOV(360);
+		}
+		bu.onclick = () => {
+			direction = "north";
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			draw();
+			playerY-=1;
+			clearLightMap();
+			updateFOV(360);
+		}
+		bd.onclick = () => {
+			direction = "south";
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			draw();
+			playerY+=1;
+			clearLightMap();
+			updateFOV(360);
+		}
+		let gameLoop = () => {
+			draw();
+			ctx.fillStyle = "red";
+			ctx.fillRect(9*TILE,9*TILE,TILE,TILE);
+		
+		updateFOV(360);
+			//ctx.fillStyle = "blue";
+			//castRay(4,4,9,2)
+			//requestAnimationFrame(gameLoop);
+		}
+		gameLoop();
+	</script>
+</body>
+</html>

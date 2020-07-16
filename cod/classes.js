@@ -7,150 +7,193 @@
 //        |_:_._/                                            | |     \\
 //                                                           |_|     \\
 
+//класс частицы
+let Particle = function(cx,cy) {
+    this.x = 0;
+    this.y = 0;
+    this.w = 1;
+    this.h = 1;
+    this.vx = random(-0.2,0.2);
+    this.vy = random(1,3);
+    this.gravity = 0.2;
+    this.deathAt = 0;
+    this.color = "#c00000";
+    this.alpha = 1;
+    this.isDead = false;
+    this.timeBeforeDisappear = 100;
+
+    this.draw = () => {
+        ctx.fillStyle = `rgba(150,0,0,${this.alpha})`;
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+    }
+}
+
+let Blood = function() {
+    this.cx = 0;
+    this.cy = 0;
+    this.particle = null;
+    this.particles = [];
+    this.reset = true;
+
+    this.make = (cx,cy,particlesAmount) => {
+        if(!this.reset) {
+            if (this.particles.length <= particlesAmount) {
+                this.particle = new Particle(cx,cy);
+                this.particle.x = cx+random(0,8);
+                this.particle.y = cy+4;
+                this.particles.push(this.particle);
+            }
+        }
+    }
+
+    this.burst = () => {
+        if(!this.isBleeding()) this.reset = false;
+    }
+
+    this.update = (cx,cy) => {
+        for(let i=0; i<this.particles.length; i++) {
+            if (!this.particles[i].isDead) {
+                this.particles[i].y -= this.particles[i].vy-=this.particles[i].gravity;
+                this.particles[i].x += this.particles[i].vx;
+                this.particles[i].alpha -= 0.01;
+            }
+            if (this.particles[i].y+this.particles[i].h < 0 || this.particles[i].y > cy+spriteSize) {
+                this.particles[i].x = this.particles[i].x;
+                this.particles[i].vy = 0;
+                this.particles[i].y = this.particles[i].y;
+                this.particles[i].alpha = 1;
+                this.particles[i].isDead = true;
+            }
+            if (this.particles[i].isDead) {
+                this.particles[i].timeBeforeDisappear--;
+                if (this.particles[i].timeBeforeDisappear === 0) {
+                    this.reset = true;
+                    this.dying(i);
+                }
+            }
+        }
+    }
+
+    this.dying = (particle) => {
+        this.particles.splice(particle,1);
+    }
+
+    this.isBleeding = () => {
+        if (this.particles.length === 0) return false;
+        else return true;
+    }
+
+    this.draw = () => {
+        for(let i=0; i<this.particles.length; i++) {
+            this.particles[i].draw();
+        }
+    }
+
+    this.show = (cx,cy) => {
+        this.update(cx,cy);
+        this.draw();
+    }
+
+}
+let blood = new Blood();
+let test = new Blood();
+
+
 //класс персонажа
 let Character = function() {
-	this.x = 7;
-	this.y = 9;
-	this.vx = 1;
-	this.vy = 1;
-	this.currentFrame = 0;
-	this.tilesetMoveRight = {firstFrame:10,lastFrame:13};
-	this.moveRight = () => {
-		this.x = this.x+=1;
-		torch.placeLight(player.x+0.6,player.y+0.6,30);
-		torch.updateLight();
-	}
-	this.moveLeft = () => {
-		this.x = this.x-=1;
-	}
-	this.moveUp = () => {
-		this.y = this.y-=1;
-	}
-	this.moveDown = () => {
-		this.y = this.y+=1;
-	}
+    this.x = 0*8;
+    this.y = 9*8;
+    this.blood = new Blood();
+    this.directionX = 0;
+    this.directionY = 0;
+    this.vx = 0;
+    this.vy = 0;
+
+    this.bleeding = () => {
+        this.blood.make(this.x,this.y,50);
+        this.blood.show(this.x,this.y);
+    }
+
+    this.currentFrame = 0;
+    this.tilesetMoveRight = {firstFrame:10,lastFrame:13};
+    this.move = () => {
+        this.x+=this.vx;
+        this.y+=this.vy;
+        torch.placeLight(this.x+0.6,this.y+0.6,30);
+        torch.updateLight();
+    }
+
 }
 let player = new Character();
 
-//клвсс частицы
-let Particle = function(cx,cy) {
-		//кровь
-		this.blood = {
-			x : cx*spriteSize+random(0,8),
-        	y : cy*spriteSize+4,
-        	w : 1,
-        	h : 1,
-        	vx : random(-0.2,0.2),
-        	vy : random(1,3),
-        	gravity : 0.2,
-        	deathAt : 0,
-        	color : "#c00000",
-        	alpha : 1,
-        	isDone : false,
-        	isDead : false,
-        	timeBeforeDisappear : 100
-		};
-        
-        this.updateBlood = (cx,cy) => {
-        	if (!this.blood.isDone) {
-        		this.blood.y -= this.blood.vy-=this.blood.gravity;
-            	this.blood.x += this.blood.vx;
-            	this.blood.alpha -= 0.01;
-        	}
-            if (this.blood.y+this.blood.h < 0 || this.blood.y > cy*spriteSize+spriteSize) {
-                this.blood.x = this.blood.x;
-                this.blood.isDone = true;
-                this.blood.vy = 0;
-                this.blood.y = this.blood.y;
-                this.blood.alpha = 1;
-                this.blood.isDead = true;
-            }
-            if (this.blood.isDead) {
-            	this.blood.timeBeforeDisappear--;
-            	if (this.blood.timeBeforeDisappear === 0) {
-            		this.blood.x = -1;
-            		this.blood.y = -1;
-            	}
-            }
-        }
-        this.drawBlood = () => {
-            ctx.fillStyle = `rgba(150,0,0,${this.blood.alpha})`;
-            ctx.fillRect(this.blood.x, this.blood.y, this.blood.w, this.blood.h);
-        }
-}
-
-    let particle;
-    let particles = [];
-    let particlesAmount = 100;
-
 //класс системы света
     let LightSystem = function() {
-	this.isNight = false;
-	this.canvas = document.createElement("canvas");
-	this.canvas.style.position = "absolute";
-	this.canvas.style.margin = "8px";
-	this.ctx = null;
-	this.gradient = null;
-	this.createNight = () => {
-		this.ctx = this.canvas.getContext("2d");
-		this.canvas.width = 128;
-		this.canvas.height =128;
-		document.body.appendChild(this.canvas);
-		this.ctx.fillStyle = "rgba(0,0,0,0.8)";
-		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-		this.ctx.globalCompositeOperation = "destination-out";
-		this.canvas.style.display = "none";
-	}
-	this.placeLight = (x,y,radius) => {
-		this.gradient = this.ctx.createRadialGradient(x*spriteSize, y*spriteSize, 0, x*spriteSize, y*spriteSize, radius);
-		this.gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
-		this.gradient.addColorStop(0.8, "rgba(255, 255, 255, 0.8)");
-		this.gradient.addColorStop(0.6, "rgba(255, 255, 255, 0.6)");
-		this.gradient.addColorStop(0.4, "rgba(255, 255, 255, 0.4)");
-		this.gradient.addColorStop(1, "rgba(255, 255, 255, .001)");
-		this.ctx.fillStyle = this.gradient;
-		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-	}
-	this.updateLight = () => {
-		this.canvas.width+=0;
-		this.ctx.fillStyle = 'rgb(0,0,0)';
-		this.ctx.fillRect(0, 0, canvas.width, canvas.height);
-		this.ctx.globalCompositeOperation = "destination-out";
-		this.ctx.fillStyle = this.gradient;
-		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-	}
-	this.switchNight = () => {
-		if (!this.isNight) {
-			this.isNight = true;
-			this.canvas.style.display = "block";
-		}
-		else {
-			this.isNight = false;
-			this.canvas.style.display = "none";
-		}
-	}
+    this.isNight = false;
+    this.canvas = document.createElement("canvas");
+    this.canvas.style.position = "absolute";
+    this.canvas.style.margin = "8px";
+    this.ctx = null;
+    this.gradient = null;
+    this.createNight = () => {
+        this.ctx = this.canvas.getContext("2d");
+        this.canvas.width = 128;
+        this.canvas.height =128;
+        document.body.appendChild(this.canvas);
+        this.ctx.fillStyle = "rgba(0,0,0,0.85)";
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.globalCompositeOperation = "destination-out";
+        this.canvas.style.display = "none";
+    }
+    this.placeLight = (x,y,radius) => {
+        this.gradient = this.ctx.createRadialGradient(x, y, 20, x, y, 180);
+        this.gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+        this.gradient.addColorStop(0.8, "rgba(255, 255, 255, 0.8)");
+        this.gradient.addColorStop(0.6, "rgba(255, 255, 255, 0.6)");
+        this.gradient.addColorStop(0.4, "rgba(255, 255, 255, 0.4)");
+        this.gradient.addColorStop(1, "rgba(255, 255, 255, .001)");
+        this.ctx.fillStyle = this.gradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+    this.updateLight = () => {
+        this.canvas.width+=0;
+        this.ctx.fillStyle = 'rgba(0,0,0,0.85)';
+        this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+        this.ctx.globalCompositeOperation = "destination-out";
+        this.ctx.fillStyle = this.gradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+    this.switchNight = () => {
+        if (!this.isNight) {
+            this.isNight = true;
+            this.canvas.style.display = "block";
+        }
+        else {
+            this.isNight = false;
+            this.canvas.style.display = "none";
+        }
+    }
 }
 let torch = new LightSystem();
 torch.createNight();
 
 //класс титров
 let Credits = function (credits) {
-	this.credits = credits;
-	this.creditsY = 16;
-	this.creditsClock = 0;
-	this.getCenter = (textLength) => {
-		return Math.floor((16 - textLength) / 2);
-	}
-	this.scroll = (step,speed) => {
-		for (let i=0; i < this.credits.length; i++) {
-			drawText(this.credits[i], this.getCenter(this.credits[i].length), this.creditsY+i, graphics[5]);
-		}
-		this.creditsClock++;
-		if (this.creditsClock > speed) {
-			this.creditsClock = 0;
-			this.creditsY-=step;
-		}
-	}
+    this.credits = credits;
+    this.creditsY = 16;
+    this.creditsClock = 0;
+    this.getCenter = (textLength) => {
+        return Math.floor((16 - textLength) / 2);
+    }
+    this.scroll = (step,speed) => {
+        for (let i=0; i < this.credits.length; i++) {
+            drawText(this.credits[i], this.getCenter(this.credits[i].length), this.creditsY+i, graphics[5]);
+        }
+        this.creditsClock++;
+        if (this.creditsClock > speed) {
+            this.creditsClock = 0;
+            this.creditsY-=step;
+        }
+    }
 }
 
 endTitlesText = [
