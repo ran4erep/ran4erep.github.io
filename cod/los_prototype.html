@@ -22,27 +22,27 @@
 		const TILE = 15;
 		//let x=4, y=4;
 		let map = [
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0],
-			[0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0],
-			[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0],
-			[0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0],
-			[0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0],
-			[1,1,1,0,0,1,1,1,0,0,0,0,0,0,0,1,0,1,0,0],
-			[1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],
-			[1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],
-			[1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,1,0,0],
-			[0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[1,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,1,1,1,0],
-			[1,0,0,1,0,1,0,1,0,1,0,1,1,1,0,1,0,0,0,0],
-			[1,1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0],
-			[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,0,1,0],
-			[1,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,1,1,1,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-		];
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,1,1,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0],
+[0,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0],
+[0,0,0,1,1,0,1,1,0,0,0,0,0,0,1,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,0,0],
+[0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0],
+[0,0,0,0,1,0,0,1,1,0,0,1,1,0,0,1,0,0,0,0],
+[0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,1,0,1,1,1],
+[0,0,0,0,1,0,0,1,1,1,0,1,1,0,0,1,0,1,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],
+[0,1,0,0,0,1,1,1,0,0,0,1,0,1,1,1,0,0,0,0],
+[0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0],
+[0,1,1,1,0,1,0,0,0,1,1,1,0,0,0,1,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+];
 
 		let lightMap = [];
 		for (let i = 0; i < map.length; i++) {
@@ -73,7 +73,21 @@
 					ctx.fillRect(j*TILE,i*TILE,TILE,TILE);
 				}
 			}
-			//casting light and shadows from lightmap;
+
+			for (let i = 0; i < 20; i++) {
+				for (let j = 0; j < 20; j++) {
+					if (lightMap[i][j] > 0) {
+						let alpha = 0.8-lightMap[i][j];
+						ctx.fillStyle = `rgba(225,225,255,${alpha})`;
+						ctx.fillRect(j*TILE,i*TILE,TILE,TILE);
+					}
+				}
+			}
+
+			ctx.fillStyle = "red";
+			ctx.fillRect(playerX*TILE,playerY*TILE,TILE,TILE);
+
+			//casting light and shadows from lightMap;
 			// for (let i = 0; i < 20; i++) {
 			// 	for (let j = 0; j < 20; j++) {
 			// 		if (lightMap[i][j] === 0) {
@@ -90,7 +104,7 @@
 		}
 
 		let plot = (x,y) => {
-			ctx.fillStyle = "rgba(255,255,255,0.1)";
+			ctx.fillStyle = `rgb(90,90,90)`;
 			ctx.fillRect(x*TILE,y*TILE,TILE,TILE);
 			//ctx.strokeStyle = "rgba(150,150,0,0.6)";
 			//ctx.strokeRect(x*TILE,y*TILE,TILE,TILE);
@@ -120,7 +134,7 @@
 
 			if (x0 > x1) q = -1;
 			if (y0 > y1) s = -1;
-			plot(x,y);
+			//plot(x,y);
 
 			for(let k=0; k < -b; k++) {
 				if (d > 0) {
@@ -135,9 +149,11 @@
 
 				if ( hitTheWall(map, x,y) ) return;
 				
-				plot(x,y);
+				lightMap[y][x] = Math.floor( distanceBetween(playerX,playerY, x,y) )/20;
+
+				//plot(x,y);
 				
-				//lightMap[y][x]=1;
+				//lightMap[y][x] = 1;
 			}
 		}
 
@@ -200,48 +216,47 @@
 				}
 			}
 			//lightMap[playerX][playerY] = 2;
-			ctx.fillStyle = "red";
-			ctx.fillRect(playerX*TILE,playerY*TILE,TILE,TILE);
+			
 		}
 
 		bl.onclick = () => {
 			direction = "west";
-			ctx.clearRect(0,0,canvas.width,canvas.height);
-			draw();
 			playerX-=1;
 			clearLightMap();
 			updateFOV(360);
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			draw();
 		}
 		br.onclick = () => {
 			direction = "east";
-			ctx.clearRect(0,0,canvas.width,canvas.height);
-			draw();
 			playerX+=1;
 			clearLightMap();
 			updateFOV(360);
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			draw();
 		}
 		bu.onclick = () => {
 			direction = "north";
-			ctx.clearRect(0,0,canvas.width,canvas.height);
-			draw();
 			playerY-=1;
 			clearLightMap();
 			updateFOV(360);
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			draw();
 		}
 		bd.onclick = () => {
 			direction = "south";
-			ctx.clearRect(0,0,canvas.width,canvas.height);
-			draw();
 			playerY+=1;
 			clearLightMap();
 			updateFOV(360);
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			draw();
 		}
 		let gameLoop = () => {
+			direction = "south";
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			clearLightMap();
+			updateFOV(360);
 			draw();
-			ctx.fillStyle = "red";
-			ctx.fillRect(9*TILE,9*TILE,TILE,TILE);
-		
-		updateFOV(360);
 			//ctx.fillStyle = "blue";
 			//castRay(4,4,9,2)
 			//requestAnimationFrame(gameLoop);
