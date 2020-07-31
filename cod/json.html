@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script type="text/javascript">
+		let requestURL = 'lol.json'; //адрес JSON файла
+		let request = new XMLHttpRequest(); //экземпляр http запроса
+		request.open('GET', requestURL); //открываем соединение
+		request.responseType = 'json'; //указываем что хотим получить JSON в ответе от сервера
+		request.send(); //посылаем запрос
+		request.onload = function() { //дожидаемся загрузки джейсона
+  		let response = request.response; //сохраняем ответ в переменную
+  		console.log(response.tiles[2]); //используем переменную
+}
+	</script>
+</body>
+</html>
