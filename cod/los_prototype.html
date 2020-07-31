@@ -44,10 +44,16 @@
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 ];
 
-		let lightMap = [];
-		for (let i = 0; i < map.length; i++) {
-			lightMap.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+	let newMap = (v) => {
+			let map = [];
+			for (let i = 0; i < 20; i++) {
+				map.push([v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v]);
+			}
+			return map;
 		}
+
+
+		let lightMap = newMap(0);
 
 		let draw = () => {
 			ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -69,11 +75,16 @@
 
 			for (let i = 0; i < 20; i++) {
 				for (let j = 0; j < 20; j++) {
-					ctx.fillStyle = "rgba(0,0,0,0.6)";
+					ctx.fillStyle = "rgba(0,0,0,1)";
 					ctx.fillRect(j*TILE,i*TILE,TILE,TILE);
+					if (map[i][j] === 1) {
+						ctx.fillStyle = "gray";
+						ctx.fillRect(j*TILE,i*TILE,TILE,TILE);
+					}
 				}
 			}
 
+			//casting light from lightMap
 			for (let i = 0; i < 20; i++) {
 				for (let j = 0; j < 20; j++) {
 					if (lightMap[i][j] > 0) {
@@ -147,9 +158,10 @@
 					d = d + 2 * a;
 				}
 
-				if ( hitTheWall(map, x,y) ) return;
+				if ( hitTheWall(map, x,y) ) return; 
+				if ( Math.floor(distanceBetween(playerX,playerY,x,y)) > 5 ) return; //Max FOV 5
 				
-				lightMap[y][x] = Math.floor( distanceBetween(playerX,playerY, x,y) )/20;
+				lightMap[y][x] = Math.floor( distanceBetween(playerX,playerY, x,y) )/25; //20+ Max FOV
 
 				//plot(x,y);
 				
@@ -159,18 +171,9 @@
 
 		let hitTheWall = (map,x,y) => (map[y][x] === 1) ? true : false;
 
-		let clearLightMap = () => {
-			lightMap = [];
-			for (let i = 0; i < map.length; i++) {
-				lightMap.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-			}
-		}
+		
 
-		let distanceBetween = (x1,y1, x2,y2) => {
-			let distanceX = x1-x2;
-			let distanceY = y1-y2;
-			return Math.sqrt(distanceX*distanceX + distanceY*distanceY);
-		}
+		let distanceBetween = (x1,y1, x2,y2) => Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
 
 		let playerX = 9; let playerY = 9;
 		let direction = "south";
@@ -222,7 +225,7 @@
 		bl.onclick = () => {
 			direction = "west";
 			playerX-=1;
-			clearLightMap();
+			lightMap = newMap();
 			updateFOV(360);
 			ctx.clearRect(0,0,canvas.width,canvas.height);
 			draw();
@@ -230,7 +233,7 @@
 		br.onclick = () => {
 			direction = "east";
 			playerX+=1;
-			clearLightMap();
+			lightMap = newMap()
 			updateFOV(360);
 			ctx.clearRect(0,0,canvas.width,canvas.height);
 			draw();
@@ -238,7 +241,7 @@
 		bu.onclick = () => {
 			direction = "north";
 			playerY-=1;
-			clearLightMap();
+			lightMap = newMap()
 			updateFOV(360);
 			ctx.clearRect(0,0,canvas.width,canvas.height);
 			draw();
@@ -246,7 +249,7 @@
 		bd.onclick = () => {
 			direction = "south";
 			playerY+=1;
-			clearLightMap();
+			lightMap = newMap()
 			updateFOV(360);
 			ctx.clearRect(0,0,canvas.width,canvas.height);
 			draw();
@@ -254,7 +257,7 @@
 		let gameLoop = () => {
 			direction = "south";
 			ctx.clearRect(0,0,canvas.width,canvas.height);
-			clearLightMap();
+			lightMap = newMap()
 			updateFOV(360);
 			draw();
 			//ctx.fillStyle = "blue";

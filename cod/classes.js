@@ -100,31 +100,98 @@ let test = new Blood();
 
 
 //класс персонажа
-let Character = function() {
-    this.x = 0*8;
-    this.y = 9*8;
+let Character = function(spritesheet,animations,x,y) {
+	this.spritesheet = spritesheet;
+	this.animations = animations;
+    this.x = x;
+    this.y = y;
+    this.atTileX = Math.floor(this.x/spriteSize);
+    this.atTileY = Math.floor(this.y/spriteSize);
+    this.destinationTileX = 0;
+    this.destinationTileY = 0;
     this.blood = new Blood();
     this.directionX = 0;
     this.directionY = 0;
     this.vx = 0;
     this.vy = 0;
+    this.frictionX = 0, this.frictionY = 0;
+    this.friction = 1;
+    this.speed = 2;
+    this.currentAnimation = [0,1];
+    this.currentFrame = 0;
+    this.animationSpeed= 0;
+    this.facing = "w";
+    this.frameSpeed = 10;
+    this.isWalking = false;
+
+    this.setCurrentAnimation = (animation,frameSpeed) => {
+    	(frameSpeed) ? this.frameSpeed = frameSpeed : this.frameSpeed = 3000;
+    	this.currentFrame = 0;
+    	for (let i = 0; i < animations.length; i++) {
+    		if(animation === this.animations[i].name) {
+    			this.currentAnimation = this.animations[i].frames;
+    		}
+    	}
+    };
+
+    this.animate = () => {
+    	if (this.animationSpeed>this.frameSpeed) { 
+    		this.currentFrame++;
+    		if (this.currentFrame===this.currentAnimation.length) this.currentFrame=0;
+    		this.animationSpeed=0;
+    	}
+    	drawSprite(this.currentAnimation[this.currentFrame],player.x, player.y, graphics[this.spritesheet]);
+    	this.animationSpeed++;
+    }
 
     this.bleeding = () => {
         this.blood.make(this.x,this.y,50);
         this.blood.show(this.x,this.y);
     }
 
-    this.currentFrame = 0;
-    this.tilesetMoveRight = {firstFrame:10,lastFrame:13};
+    this.setVelocity = (vx,vy) => {
+    	this.vx = vx;
+    	this.vy = vy;
+    	(vx === 0) ? this.isMoving=false : this.isMoving=true;
+    	(vy === 0) ? this.isMoving=false : this.isMoving=true;
+    }
+
+    this.getDestination = () => {
+    	if (this.facing === "w") {
+    		this.destinationTileX = this.atTileX-1;
+    		this.destinationTileY = this.atTileY;
+    	}
+    	if (this.facing === "e") {
+    		this.destinationTileX = this.atTileX+1;
+    		this.destinationTileY = this.atTileY;
+    	}
+    	if (this.facing === "n") {
+    		this.destinationTileX = this.atTileX;
+    		this.destinationTileY = this.atTileY-1;
+    	}
+    	if (this.facing === "s") {
+    		this.destinationTileX = this.atTileX;
+    		this.destinationTileY = this.atTileY+1;
+    	}
+    }
+
     this.move = () => {
-        this.x+=this.vx;
-        this.y+=this.vy;
-        torch.placeLight(this.x+0.6,this.y+0.6,30);
-        torch.updateLight();
+    	this.atTileX = Math.floor(this.x/spriteSize);
+    	this.atTileY = Math.floor(this.y/spriteSize);
+    	this.getDestination();
+    	this.vx *= this.friction;
+        this.x += this.vx;
+        this.vy *= this.friction;
+        this.y += this.vy;
+        (this.vx > 0 || this.vy > 0 || this.vx < 0 || this.vy < 0) ? this.isWalking = true : this.isWalking = false;
+        if (this.isWalking && this.facing === "e") mapOffsetX +=1;
+        if (this.isWalking && this.facing === "w") mapOffsetX -=1;
+        if (this.isWalking && this.facing === "n") mapOffsetY -=1;
+        if (this.isWalking && this.facing === "s") mapOffsetY +=1;
     }
 
 }
-let player = new Character();
+let player = new Character(0,alex_animations,7*spriteSize,9*spriteSize);
 
 //класс системы света
     let LightSystem = function() {
@@ -186,13 +253,15 @@ let Credits = function (credits) {
     }
     this.scroll = (step,speed) => {
         for (let i=0; i < this.credits.length; i++) {
-            drawText(this.credits[i], this.getCenter(this.credits[i].length), this.creditsY+i, graphics[5]);
+            drawText(this.credits[i], this.getCenter(this.credits[i].length), this.creditsY+i, graphics[13]);
         }
         this.creditsClock++;
         if (this.creditsClock > speed) {
             this.creditsClock = 0;
             this.creditsY-=step;
         }
+        if (this.creditsY>-this.credits.length) return true;
+        else return false;
     }
 }
 
@@ -202,8 +271,6 @@ endTitlesText = [
 "game developed",
 "by",
 "ran4erep",
-" ",
-"catCstudio, 2020",
 " ",
 "music by",
 "naked death",
@@ -229,3 +296,106 @@ endTitlesText = [
 "tiles"
 ];
 let endTitles = new Credits(endTitlesText);
+
+let Window = function (x,y,text) {
+	this.x = x;
+	this.y = y;
+	this.text = text.split("/");
+	this.height = this.text.length;
+	this.width = 0;
+	this.slideY = 0;
+	this.timer = 0;
+	this.closing = false;
+
+	for (let i=0; i < this.text.length; i++) {
+		if (this.text[i].length > this.width) {
+			this.width = this.text[i].length;
+		}
+	}
+
+	this.animate = () => {
+		if (this.slideY < this.y + this.height*spriteSize) {
+			ctx.fillStyle = `rgba(${palette[1].rgb},0.8)`;
+			ctx.fillRect(this.x*spriteSize,this.y*spriteSize,this.width*spriteSize,this.slideY);
+			this.slideY+=6;
+			ctx.strokeStyle = palette[6].hex;
+			ctx.strokeRect(this.x*spriteSize-1,this.y*spriteSize-1,this.width*spriteSize+2,this.slideY);
+		}
+		else this.open();
+	}
+
+	this.open = () => {
+		//opening animation
+		if (this.slideY < this.y + this.height*spriteSize && !this.closing) {
+			ctx.fillStyle = `rgba(${palette[1].rgb},0.8)`;
+			ctx.fillRect(this.x*spriteSize,this.y*spriteSize,this.width*spriteSize,this.slideY);
+			this.slideY+=6;
+			ctx.strokeStyle = palette[6].hex;
+			ctx.strokeRect(this.x*spriteSize-1,this.y*spriteSize-1,this.width*spriteSize+2,this.slideY);
+		/////////////////
+		} 
+		else if(this.slideY > this.y + this.height*spriteSize && !this.closing) {
+		ctx.fillStyle = `rgba(${palette[1].rgb},0.8)`;
+		ctx.fillRect(this.x*spriteSize,this.y*spriteSize,this.width*spriteSize,this.height*spriteSize);
+
+		ctx.strokeStyle = palette[6].hex;
+		ctx.lineWidth = 1;
+		ctx.strokeRect(this.x*spriteSize-1,this.y*spriteSize-1,this.width*spriteSize+2,this.height*spriteSize+2);
+		for (let i=0; i < this.height; i++) {
+			drawText(this.text[i],this.x,this.y+i);
+		}
+		switchColor(this.x*spriteSize,this.y*spriteSize,this.width*spriteSize,this.height*spriteSize,0,7)
+	}
+}
+	this.close = () => {
+		if (this.slideY > 0) {
+			this.closing = true;
+		} 
+		if(this.slideY > 0 && this.closing) {
+		ctx.fillStyle = `rgba(${palette[1].rgb},0.8)`;
+		ctx.fillRect(this.x*spriteSize,this.y*spriteSize,this.width*spriteSize,this.slideY);
+		ctx.strokeStyle = palette[6].hex;
+		ctx.strokeRect(this.x*spriteSize-1,this.y*spriteSize-1,this.width*spriteSize+2,this.slideY);
+		if (this.slideY>=0) this.slideY-=6;
+		if (this.slideY===0) this.closing=false;
+	}
+		// else {
+		// 	this.x = -128;
+		// 	this.y = -128;
+		// }
+
+	}
+this.mode = this.close;
+}
+let windowTest = new Window(1,3,"this is/just a/testing/new line/and more lines/yeeeeeeeah");
+
+let Button = function() {
+
+	this.draw = (x,y,text) => {
+		ctx.fillStyle = "rgba(" + palette[6].rgb + ",0.8" + ")";
+		ctx.fillRect(x*spriteSize,y*spriteSize,spriteSize*text.length,spriteSize);
+		ctx.strokeStyle = palette[0].hex;
+		ctx.strokeRect(x*spriteSize-1,y*spriteSize-1,spriteSize*text.length+2,8+2);
+		drawText(text,x,y);
+	}
+}
+let buttons = [];
+for(let i=0; i<3; i++) {
+	buttons[i] = new Button();
+}
+
+let Cursor = function() {
+	this.x = 3;
+	this.y = 8;
+
+	this.draw = () => {
+		drawSprite(10,this.x*spriteSize,this.y*spriteSize+6,graphics[6]);
+	}
+	this.move = (v) => {
+		if(v>0 && this.y !==12)
+			this.y+=v;
+		if(v<0 && this.y !==8)
+			this.y+=v;
+	}
+}
+let cursor = new Cursor();

@@ -37,47 +37,181 @@ buttonLoading.addEventListener("click", (e) => {
 	showLoading = true;
 });
 
-let canvas = document.getElementById("canvas");
-let ctx = canvas.getContext("2d");
-ctx.imageSmoothingEnabled = false;
-canvas.width = 128;
-canvas.height = 128;
-let levelWidth = 16;
-let levelHeight = 16;
-let spriteSize = 8;
-let tileSize = canvas.width / levelWidth;
-let root = "data/";
-let graphicsFiles = ["alex.png", "zombie_female.png", "font.png", "heart.png", "tileset.png", "font_inverted.png", "hud.png"];
-let graphics = [];
-let graphicsSumCounter = 0, allGraphicsLoaded = false, graphicsLoadingProgress = 0;
-let times = [];
-let fps;
-
 
 document.onkeydown = (e) => {
-	if (e.keyCode === 68) player.vx = 1; //move right
-	if (e.keyCode === 65) player.vx = -1; //move left
-	if (e.keyCode === 87) player.vy = -1; //move up
-	if (e.keyCode === 83) player.vy = 1; //move down
+	if (e.keyCode === 68) {
+		player.move( 1,  0) //move right
+		torch.placeLight(player.x+0.6,player.y+0.6,30);
+        torch.updateLight();
+	}
+	if (e.keyCode === 65) {
+		player.move(-1,  0);
+		torch.placeLight(player.x+0.6,player.y+0.6,30);
+    	torch.updateLight();
+	} //move left
+	if (e.keyCode === 87) {
+		player.move( 0, -1);
+		torch.placeLight(player.x+0.6,player.y+0.6,30);
+    	torch.updateLight();
+	}//move up
+	if (e.keyCode === 83) {
+		player.move( 0,  1);
+		torch.placeLight(player.x+0.6,player.y+0.6,30);
+    	torch.updateLight();
+	} //move down
 }
 document.onkeyup = (e) => {
 	player.vx = 0;
 	player.vy = 0;
 }
 
-buttonRight.addEventListener("click", (e) => {
-	player.move(1,0);
+buttonRight.addEventListener("touchstart", (e) => {
+	e.preventDefault();
+	player.facing = "e";
+	player.setVelocity(1,0);
+	torch.placeLight(player.x+0.6,player.y+0.6,30);
+    torch.updateLight();
+    player.setCurrentAnimation("walkingRight",5);
 });
-buttonLeft.addEventListener("click", (e) => {
-	player.move(-1,0);
+buttonLeft.addEventListener("touchstart", (e) => {
+	e.preventDefault();
+	player.facing = "w";
+	player.setVelocity(-1,0);
+	torch.placeLight(player.x+0.6,player.y+0.6,30);
+    torch.updateLight();
+    player.setCurrentAnimation("walkingLeft",5);
 });
-buttonUp.addEventListener("click", (e) => {
-	player.move(0,-1);
+buttonUp.addEventListener("touchstart", (e) => {
+	e.preventDefault();
+	player.facing = "n";
+	player.setVelocity(0,-1);
+	torch.placeLight(player.x+0.6,player.y+0.6,30);
+    torch.updateLight();
+    player.setCurrentAnimation("walkingUp",5)
+
+    if (gameMode === mainMenu) {
+    	cursor.move(-2);
+    }
 });
-buttonDown.addEventListener("click", (e) => {
-	player.move(0,1);
+buttonDown.addEventListener("touchstart", (e) => {
+	e.preventDefault();
+	player.facing = "s";
+	player.setVelocity(0,1);
+	torch.placeLight(player.x+0.6,player.y+0.6,30);
+    torch.updateLight();
+    player.setCurrentAnimation("walkingDown",5);
+
+    if (gameMode === mainMenu) {
+    	cursor.move(2);
+    }
 });
 
+buttonA.addEventListener("touchstart", (e) => {
+	e.preventDefault();
+	windowTest.mode = windowTest.close;
+
+	if (gameMode === mainMenu && cursor.y === 8) {
+		gameMode = game;
+	}
+	if (gameMode === mainMenu && cursor.y === 10) {
+		show = 3;
+	}
+	if (gameMode === mainMenu && cursor.y === 12) {
+		window.opener = self;
+		window.close();
+	}
+});
+
+buttonB.addEventListener("touchstart", (e) => {
+	windowTest.mode = windowTest.open;
+});
+
+buttonX.addEventListener("touchstart", (e) => {});
+
+buttonY.addEventListener("touchstart", (e) => {});
+
+document.body.addEventListener("touchend", (e) => {
+	player.setVelocity(0,0);
+	if (player.facing === "w")
+		player.setCurrentAnimation("breathingLeft",10);
+	if (player.facing === "e")
+		player.setCurrentAnimation("breathingRight",10);
+	if (player.facing === "n")
+		player.setCurrentAnimation("breathingUp",10);
+	if (player.facing === "s")
+		player.setCurrentAnimation("breathingDown",10);
+});
+
+let game = () => {
+	logic();
+	update();
+	render();
+	if (showLoading) {
+		ctx.fillStyle = "white";
+		ctx.strokeStyle = "white"
+		if (testLoading < 100) testLoading++;
+		drawBar(percentOf(testLoading,100),2*8,8*8,100,10);
+		drawText(`loading ${testLoading}%...`,2,10)
+	}
+
+	player.bleeding();
+	player.move();
+	//drawMinimapSector()
+	//windowTest.open();
+	windowTest.mode();
+	//switchColor(player.x,player.y,spriteSize,spriteSize,15,4);
+}
+
+let show = 0;
+let fadeAlpha = 0;
+setTimeout(()=> {
+	show=1;
+},3000);
+setTimeout(()=> {
+	show=2;
+},5000);
+
+
+let mainMenu = () => {
+	//update();
+	if (show === 0) {
+		ctx.drawImage(graphics[10],0,0,canvas.width,canvas.height);
+	}
+	if (show === 1) {
+		ctx.fillStyle = "rgba(" + palette[0].rgb + "," + fadeAlpha +")";
+		ctx.fillRect(0,0,canvas.width,canvas.height);
+		if (fadeAlpha<1) fadeAlpha+=0.01;
+	}
+	if (show === 2) {
+		ctx.drawImage(graphics[14],0,0,canvas.width,canvas.height);
+		ctx.fillRect(0,0,canvas.width,canvas.height);
+		drawText("cradle",logoX,logoY,graphics[13]);
+		drawText("of",logoX+2,logoY+1,graphics[13]);
+		drawText("death",logoX+0.5,logoY+2,graphics[13]);
+		buttons[0].draw(logoX-0.5,logoY+4,"new game");
+		buttons[1].draw(logoX,logoY+6,"credits");
+		buttons[2].draw(logoX+0.5,logoY+8,"exit");
+		cursor.draw();
+
+		//--fading
+		ctx.fillStyle = "rgba(" + palette[0].rgb + "," + fadeAlpha +")";
+		ctx.fillRect(0,0,canvas.width,canvas.height);
+		if (fadeAlpha>0) fadeAlpha-=0.01;
+	}
+	
+	if (show === 3) {
+		ctx.drawImage(graphics[14],0,0,canvas.width,canvas.height);
+		if (endTitles.scroll()) {endTitles.scroll(0.2,5)}
+			else {
+				show = 2;
+				cursor.y = 8;
+			}
+		//if (endTitles.creditsY>-endTitles.credits.length && showCredits) endTitles.scroll(0.2,1);
+	}
+	//if (fade.in) fade.in();
+}
+
+let gameMode = game;//mainMenu;
 
 //Основной блок игры-----------------------
 
@@ -89,19 +223,7 @@ function gameLoop(timestamp) {
 		//начало игрового цикла-----
 		//если графика загрузилась, то можно начинать работу
 		if (graphicsIsLoaded(graphics,graphicsSumCounter)) {
-				logic();
-				update();
-				render();
-				if (showLoading) {
-					ctx.fillStyle = "white";
-					ctx.strokeStyle = "white"
-					if (testLoading < 100) testLoading++;
-					drawBar(percentOf(testLoading,100),2*8,8*8,100,10);
-					drawText(`loading ${testLoading}%...`,2,10)
-				}
-				
-					player.bleeding();
-					player.move();
+				gameMode();
 		}
 		const NOW = performance.now();
 		while(times.length > 0 && times[0] <= NOW - 1000) {
@@ -109,7 +231,7 @@ function gameLoop(timestamp) {
 		}
 		times.push(NOW)
 		fps = times.length;
-		drawText(`fps ${fps}`,levelWidth-6,levelHeight-1,graphics[5]);
+		drawText(`fps ${fps}`,levelWidth-6,0,graphics[5]);
 	//конец игрового цикла-----
 	//timeStart = timestamp;
 //}
