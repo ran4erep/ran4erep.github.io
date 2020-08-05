@@ -552,37 +552,39 @@
           let key = e.target.innerText;
           if (e.target.className !== "keyboard") e.target.style = "background: rgba(255,255,255,0.12)";
           editor.focus();
+          if (key.match(/^[a-z]$/igm))
+            insertTextAtCursor(editor, key);
           if (key === "backspace") {
             editor.execCommand("delCharBefore");
-            return;
+            
           }
           if (key === "space_bar") {
             insertTextAtCursor(editor, " ");
-            return;
+            
           }
           if (key === "keyboard_tab") {
             editor.execCommand("defaultTab");
-            return;
+            
           }
           if (key === "keyboard_return") {
             insertTextAtCursor(editor, "\n");
-            return;
+            
           }
           if (key === "keyboard_arrow_left") {
             editor.execCommand("goCharLeft");
-            return;
+            
           }
           if (key === "keyboard_arrow_right") {
             editor.execCommand("goCharRight");
-            return;
+            
           }
           if (key === "keyboard_arrow_up") {
             editor.execCommand("goLineUp");
-            return;
+            
           }
           if (key === "keyboard_arrow_down") {
             editor.execCommand("goLineDown");
-            return;
+            
           }
           if (key === "keyboard_capslock") {
             caps = !caps;
@@ -611,9 +613,9 @@
               }
           
             }
-            return;
+            
           }
-          insertTextAtCursor(editor, key);
+          
         };
         action();
         longTouch = setTimeout(() => {
