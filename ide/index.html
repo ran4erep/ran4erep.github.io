@@ -3,6 +3,8 @@
 <head>
     <meta http-equiv="Cache-Control" content="no-cache">
     <script src="jquery.js"></script>
+    <link href="material_icons.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="keyboard_style.css">
     <link rel="stylesheet" href="codemirror/lib/codemirror.css">
     <link rel="stylesheet" href="codemirror/theme/monokai.css">
     <link rel="stylesheet" href="codemirror/addon/hint/show-hint.css">
@@ -39,6 +41,11 @@
     	margin: 1px;
     }
     .buttons {
+      outline: none;
+      display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        vertical-align: top;
       margin: 2px;
     	background-color: #5c88ce;
     	color: #FFFFFF;
@@ -274,6 +281,10 @@
 </head>
 
 <body>
+  <button id="hide-keyboard-button" onclick="toggleKeyboard()">
+        <i class="material-icons">keyboard</i>
+    </button>
+    <div class="keyboard keyboard-hidden"></div>
 <div id="modal">
         <div id="modalContent">
             <button id="closeBtn"><b>&times;</b></button>
@@ -283,7 +294,7 @@
 
      <div id="ide">
 
-    <div id="pageTitle" align="center"><h2>Web IDE for HTML, CSS and JS</h2></div>
+    <div id="pageTitle" align="center"><h2>Web IDE for HTML, CSS and JS <i class="material-icons">phonelink</i></h2></div>
 
     <div id="calcModal">
    <div id="calculator">
@@ -338,7 +349,7 @@
 	<button class="buttonsCalc" id="buttonRandom"><strong>RND</strong></button>
 </div>
 
-<div align="center" id="buttonCalculator"><button class="buttons" id="closeCalc">+-&#215;&#247; Скрыть калькулятор</button></div>
+<div align="center" id="buttonCalculator"><button class="buttons" id="closeCalc"><i class="material-icons">calculate</i> Скрыть калькулятор</button></div>
 
 </div>
 
@@ -349,7 +360,7 @@
       <div id="toolsBlock">
 
        <div id="checkRegExp">
-      <p>Проверка регулярных выражений:</p>
+      <p><i class="material-icons">fact_check</i>Проверка регулярных выражений:</p>
       <b>/</b><input placeholder="  Регулярное выражение" class="inputs" id="regExp" size="40"><b>/</b><input style="text-align: center;" class="inputs" size="2" id="flags" value = "ig">
         <br>
       <textarea placeholder="  Текст для проверки" class="inputs" id="regExpText" cols="48" rows="4"></textarea>
@@ -357,20 +368,20 @@
         </div>
 
       <div id="colorPicker">
-     <p align="center">Подбор цвета:</p>
+     <p align="center"><i class="material-icons">color_lens</i>Цвет:</p>
      <div align="center"> <input type="color" id="color" value="#FFFFFF"></div>
     <div align="center"> <input class="inputs" id="colorPick" placeholder=" HEX color" size="6"></div>
-    <div id="buttonCalculator"><button class="buttons" id="showCalc">+-&#215;&#247; Показать калькулятор</button></div>
+    <div id="buttonCalculator"><button class="buttons" id="showCalc"><i class="material-icons">calculate</i>Показать калькулятор</button></div>
      </div>
         <div id="toDoBlock">
 <p>Список ToDo:</p>
     <div id="toDoList">
     </div>
-    <input class="inputs" placeholder="  Добавить задачу" id="creatingTask"><button class="buttons" id="buttonAddTask">Ok</button>
+    <input class="inputs" placeholder="  Добавить задачу" id="creatingTask"><button class="buttons" id="buttonAddTask"><i class="material-icons">add_task</i></button>
     </div>
 
     <div id="filesBlock">
-      Список локально сохранённых файлов:
+      <i class="material-icons">folder</i>Список локально сохранённых файлов:
   <div id="showFiles"></div>
 </div>
         </div>
@@ -378,7 +389,7 @@
       <div id="infoBlock">
 
 	<div class="autocompleteHint" style="text-align: center;">
-		<img id="infoIcon" src="info.png">
+		<i class="material-icons">info</i>
 		<button class="buttons" id="showAutocompleteHint">Автодополнение</button>
 	
 <div class="autocompleteHint" id="autocompleteSpoiler">
@@ -398,6 +409,7 @@
 </div>
 
 <div class="console" style="text-align: center;">
+  <i class="material-icons">code</i>
 <button class="buttons" id="showConsole">&lt;/&gt; Показать консоль</button>
 
 <div claas="console" id="consoleOutput">
@@ -409,11 +421,11 @@
 
 </div>
 
-      <div id="settingsTitle" align="center">Настройки:</div>
+      <div id="settingsTitle" align="center"><i class="material-icons">settings</i>Настройки:</div>
       <div class="settings">
 
 	<div id="dimensionSettings">
-
+<i class="material-icons">aspect_ratio</i>Настройки отображения:
         <div id="setEditorWidth">
             <span class="optionTags">Ширина редактора:&nbsp;</span>
             <span class="optionTags" id="sliderEditorOutput">9</span>/10
@@ -441,13 +453,13 @@
             <div id="someSettings">
     	Имя файла: <br>
       <input size="10" id="codeName">.html
-       <p>Частота автосохранения:</p>
+       <p><i class="material-icons">timer</i>Частота автосохранения:</p>
       <input style="text-align: center;" class="inputs" size="2" id="autoSaveTimeInput" value="30">&nbsp;с.
       <button class="buttons" id="buttonAutoSaveTime">Применить</buttons>
     </div>
 
 <div id="editorSettings">
-    <p>Настройки редактора:</p>
+    <p><i class="material-icons">edit</i>Настройки редактора:</p>
      Перенос строки? <input type="checkbox" id="wrappingSettings" checked=""><br>
      Код целиком? <input type="checkbox" id="editorHeightSettings">
 </div>
@@ -471,24 +483,24 @@
     </div>
         
         <div class="menu">
-        	<button class="buttons" id="buttonRefresh">Обновить вьюпорт</button>
-        	<button class="buttons" id="buttonEnableHint">Показать варианты</button>
-        	<button class="buttons" id="buttonChangeMode">Realtime режим (<font color="#00FF00">Включён</font>)</button>
-        	<button class="buttons" id="buttonSave">Поделиться кодом</button>
-              <button class="buttons" id="buttonCheckOnErrors">Проверить JS код на ошибки</button>
-             <button class="buttons" id="buttonSaveToStorage">Сохранить код</button>
-             <button class="buttons" id="buttonNewFile">Новый код</button>
-             <button class="buttons" id="buttonLoadFromStorage">Загрузить код</button>
-             <button class="buttons" id="buttonDeleteCode">Удалить код</button>
-              <button class="buttons" id="buttonClearCodes">Очистить хранилище</button>
-              <button class="buttons" id="buttonClearEditor">Очистить редактор</button>
-              <button class="buttons" id="buttonCopyToClipboard">Скопировать код в буфер обмена</button>
+        	<button class="buttons" id="buttonRefresh"><i class="material-icons">refresh</i>Обновить вьюпорт</button>
+        	<button class="buttons" id="buttonEnableHint"><i class="material-icons">list</i>Показать варианты</button>
+        	<button class="buttons" id="buttonChangeMode"><i class="material-icons">toggle_on</i>Realtime режим (<font color="#00FF00">Включён</font>)</button>
+        	<button class="buttons" id="buttonSave"><i class="material-icons">share</i>Поделиться кодом</button>
+              <button class="buttons" id="buttonCheckOnErrors"><i class="material-icons">bug_report</i>Проверить JS код на ошибки</button>
+             <button class="buttons" id="buttonSaveToStorage"><i class="material-icons">save</i>Сохранить код</button>
+             <button class="buttons" id="buttonNewFile"><i class="material-icons">add</i>Новый код</button>
+             <button class="buttons" id="buttonLoadFromStorage"><i class="material-icons">unarchive</i>Загрузить код</button>
+             <button class="buttons" id="buttonDeleteCode"><i class="material-icons">clear</i>Удалить код</button>
+              <button class="buttons" id="buttonClearCodes"><i class="material-icons">delete_sweep</i>Очистить хранилище</button>
+              <button class="buttons" id="buttonClearEditor"><i class="material-icons">content_cut</i>Очистить редактор</button>
+              <button class="buttons" id="buttonCopyToClipboard"><i class="material-icons">content_copy</i>Скопировать код в буфер обмена</button>
     </div>
     <hr>
      
     <div id="saving" align="center">
     	
-    	<div id="loader"></div><input size="60" id="codeLink" value="  Ссылка на скачивание Вашего кода появится здесь"><a download="" id="codeDownload" href="#"><button class="buttons">Скачать</button></a><a target="_blank" id="codeGoTo" href="#"><button class="buttons">Перейти</button></a>
+    	<div id="loader"></div><i class="material-icons">http</i><input size="60" id="codeLink" value="  Ссылка на скачивание Вашего кода появится здесь"><a download="" id="codeDownload" href="#"><button class="buttons"><i class="material-icons">cloud_download</i> Скачать</button></a><a target="_blank" id="codeGoTo" href="#"><button class="buttons"><i class="material-icons">launch</i> Перейти</button></a>
     </div>
         <div id="viewerBlock">
         <iframe id="viewer" width="700" height="100"></iframe>
@@ -503,6 +515,165 @@
 </div>
 
     <script>
+
+    let caps = false;
+    let keyboardKeys = document.getElementsByClassName("keyboard-key");
+    let isTouched = false;
+    let holdButton;
+    let longTouch;
+
+    function insertTextAtCursor(editor, text) {
+     var doc = editor.getDoc();
+      var cursor = doc.getCursor();
+      doc.replaceRange(text, cursor);
+    }
+
+    let insertAtCursor = (input, textToInsert) => {
+        let value = input.value;
+        let start = input.selectionStart;
+        let end = input.selectionEnd;
+        input.value = value.slice(0, start) + textToInsert + value.slice(end);
+        input.selectionStart = input.selectionEnd = start + textToInsert.length;
+    }
+
+    document.getElementsByClassName("keyboard")[0].addEventListener("touchend", function(e) {
+      isTouched = false;
+      clearTimeout(longTouch);
+      clearInterval(holdButton);
+      if (e.target.className !== "keyboard") e.target.style = "background: rgba(255,255,255,0.2)";
+    });
+
+    //action when keyboard key touched
+    document.getElementsByClassName("keyboard")[0].addEventListener("touchstart", function(e) {
+        isTouched = true;
+        e.preventDefault();
+        
+        let action = () => {
+          let key = e.target.innerText;
+          if (e.target.className !== "keyboard") e.target.style = "background: rgba(255,255,255,0.12)";
+          editor.focus();
+          if (key === "backspace") {
+            editor.execCommand("delCharBefore");
+            return;
+          }
+          if (key === "space_bar") {
+            insertTextAtCursor(editor, " ");
+            return;
+          }
+          if (key === "keyboard_tab") {
+            editor.execCommand("defaultTab");
+            return;
+          }
+          if (key === "keyboard_return") {
+            insertTextAtCursor(editor, "\n");
+            return;
+          }
+          if (key === "keyboard_arrow_left") {
+            editor.execCommand("goCharLeft");
+            return;
+          }
+          if (key === "keyboard_arrow_right") {
+            editor.execCommand("goCharRight");
+            return;
+          }
+          if (key === "keyboard_arrow_up") {
+            editor.execCommand("goLineUp");
+            return;
+          }
+          if (key === "keyboard_arrow_down") {
+            editor.execCommand("goLineDown");
+            return;
+          }
+          if (key === "keyboard_capslock") {
+            caps = !caps;
+            e.currentTarget.childNodes[27].classList.toggle("keyboard-key-caps-enabled");
+          
+            for (let i=0; i<keys.length; i++) {
+              if (caps) {
+                keyboardKeys[i].innerText = keysCaps[i];
+                if (keyboardKeys[i].innerText === "space_bar") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">space_bar</i>";
+                if (keyboardKeys[i].innerText === "backspace") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">backspace</i>";
+                if (keyboardKeys[i].innerText === "keyboard_tab") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">keyboard_tab</i>";
+                if (keyboardKeys[i].innerText === "keyboard_capslock") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">keyboard_capslock</i>";
+                if (keyboardKeys[i].innerText === "keyboard_return") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">keyboard_return</i>";
+                if (keyboardKeys[i].innerText === "keyboard_arrow_up") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">keyboard_arrow_up</i>";
+                if (keyboardKeys[i].innerText === "keyboard_arrow_down") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">keyboard_arrow_down</i>";
+              }
+              if (!caps) {
+                keyboardKeys[i].innerText = keys[i];
+                if (keyboardKeys[i].innerText === "space_bar") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">space_bar</i>";
+                if (keyboardKeys[i].innerText === "backspace") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">backspace</i>";
+                if (keyboardKeys[i].innerText === "keyboard_tab") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">keyboard_tab</i>";
+                if (keyboardKeys[i].innerText === "keyboard_capslock") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">keyboard_capslock</i>";
+                if (keyboardKeys[i].innerText === "keyboard_return") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">keyboard_return</i>";
+                if (keyboardKeys[i].innerText === "keyboard_arrow_left") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">keyboard_arrow_left</i>";
+                if (keyboardKeys[i].innerText === "keyboard_arrow_right") keyboardKeys[i].innerHTML = "<i class=\"material-icons\">keyboard_arrow_right</i>";
+              }
+          
+            }
+            return;
+          }
+          insertTextAtCursor(editor, key);
+        };
+        action();
+        longTouch = setTimeout(() => {
+          holdButton = setInterval(action,1);
+        },400)
+    });
+
+    
+
+    //keyboard layout
+    const keysCaps = ["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "backspace",
+                  "keyboard_tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]",
+                  "keyboard_capslock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ":", "keyboard_return",
+                  "\\", "Z", "X", "C", "V", "B", "N", "M", "!", "?", "/",
+                  "keyboard_arrow_up", "keyboard_arrow_down", ".", ",", "space_bar", "<", ">"];
+
+    const keys = ["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "backspace",
+                  "keyboard_tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "{", "}",
+                  "keyboard_capslock", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "keyboard_return",
+                  "\\", "z", "x", "c", "v", "b", "n", "m", "!", "?", "/",
+                  "keyboard_arrow_left", "keyboard_arrow_right", ".", ",", "space_bar", "<", ">"];
+
+    //building keyboard keys DOM structure
+    let buildKeyboard = () => {
+        let keyboardContainer = document.getElementsByClassName("keyboard");
+        for(let i=0; i<keys.length; i++) {
+            let key = document.createElement("button");
+            key.innerHTML = keys[i];
+            if (key.innerHTML.length > 1) key.innerHTML = `<i class="material-icons">${keys[i]}</i>`;
+            key.classList.add("keyboard-key");
+            //special keys
+            if (key.innerHTML.length > 1 && key.innerHTML !== "<i class=\"material-icons\">space_bar</i>")
+                key.classList.add("keyboard-key-large");
+            if (key.innerHTML === "<i class=\"material-icons\">space_bar</i>")
+                key.classList.add("keyboard-key-very-large");
+            if (key.innerHTML === "<i class=\"material-icons\">keyboard_capslock</i>")
+                key.classList.add("keyboard-key-caps-disabled");
+            //////////////
+            document.getElementsByClassName("keyboard")[0].appendChild(key);
+            //break points for each new row
+            if (i===11 || i===24 || i===36 || i===47) 
+                keyboardContainer[0].innerHTML = `${keyboardContainer[0].innerHTML}<br>`;
+        }
+    }
+    
+    
+    let keyboardIsHidden = true;
+    
+    let toggleKeyboard = () => {
+      keyboardIsHidden = !keyboardIsHidden;
+      let keyboardElememt = document.getElementsByClassName("keyboard")[0];
+      let hideButton = document.getElementById("hide-keyboard-button");
+
+      keyboardElememt.classList.toggle("keyboard-hidden")
+      if (keyboardIsHidden) hideButton.innerHTML = "<i class=\"material-icons\">keyboard</i>";
+      else hideButton.innerHTML = "<i class=\"material-icons\">keyboard_hide</i>";
+    }
+    buildKeyboard();
+
+
 
 function modal(text) {
         document.body.classList.add("modalHide");
@@ -581,17 +752,17 @@ window.addEventListener("click", function(e) {
          showCalc.addEventListener("click", function(e) {
          if (calc === "hide") {
         document.getElementById("calculator").style.display = "block";
-        document.getElementById("showCalc").innerHTML = "+-×÷ Скрыть калькулятор";
+        document.getElementById("showCalc").innerHTML = "<i class=\"material-icons\">calculate</i>Скрыть калькулятор";
          calc = "show";
          } else {
          document.getElementById("calculator").style.display = "none";
-         document.getElementById("showCalc").innerHTML = "+-×÷ Показать калькулятор";
+         document.getElementById("showCalc").innerHTML = "<i class=\"material-icons\">calculate</i>Показать калькулятор";
          calc = "hide";
         }
 });
      closeCalc.addEventListener("click", function(e) {
       document.getElementById("calculator").style.display = "none";
-      document.getElementById("showCalc").innerHTML = "+-×÷ Показать калькулятор";
+      document.getElementById("showCalc").innerHTML = "<i class=\"material-icons\">calculate</i>Показать калькулятор";
       calc = "hide";
 });
      var autoSaveTime = 30000;
@@ -656,19 +827,20 @@ regExp.addEventListener("input", function (e) {
      var calc = "hide";
     	var hint = "hide";
     	var mode = "sync";
-        var defaultCode = "<!DOCTYPE html>\n<html>\n<head>\n    <title><\/title>\n<style>\n    \/*Place CSS code here*\/\n<\/style>\n<\/head>\n<body>\n    <!--Place HTML code here-->\n<script>\n    //Place JS code here\n<\/script>\n<\/body>\n<\/html>";
+        var defaultCode = "<!DOCTYPE html>\n<html>\n<head>\n  <title><\/title>\n<style>\n  \/*Place CSS code here*\/\n<\/style>\n<\/head>\n<body>\n  <!--Place HTML code here-->\n<script>\n  //Place JS code here\n<\/script>\n<\/body>\n<\/html>";
 
         var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
             mode: "htmlmixed",
             theme: "monokai",
             lineNumbers: true,
-            indentUnit: 4,
+            indentUnit: 2,
             dragDrop: true,
             cursorBlinkRate: 0,
             autoCloseTags: true,
             scrollbarStyle: "null",
-            lineWrapping: true
-        })
+            lineWrapping: true,
+        });
+
 
 buttonClearEditor.addEventListener("click", function(e) {
           editor.setValue("");
@@ -710,10 +882,10 @@ buttonNewFile.addEventListener("click", function(e) {
         buttonChangeMode.addEventListener("click", function(e) {
         	if (mode === "sync") {
         		mode = "async";
-        		document.getElementById("buttonChangeMode").innerHTML = "Realtime режим (<font color=\"#DD0000\">Выключен</font>)";
+        		document.getElementById("buttonChangeMode").innerHTML = "<i class=\"material-icons\">toggle_off</i>Realtime режим (<font color=\"#DD0000\">Выключен</font>)";
         	} else {
         		mode = "sync";
-        		document.getElementById("buttonChangeMode").innerHTML = "Realtime режим (<font color=\"#00FF00\">Включён</font>)";
+        		document.getElementById("buttonChangeMode").innerHTML = "<i class=\"material-icons\">toggle_on</i>Realtime режим (<font color=\"#00FF00\">Включён</font>)";
         	}
         });
 
@@ -743,7 +915,7 @@ buttonNewFile.addEventListener("click", function(e) {
       
       let filesList = [];
       for (let i=0; i <localStorage.length; i++) {
-        filesList[i] = `${localStorage.key(i)}.html`;
+        filesList[i] = `<i class="material-icons">insert_drive_file</i>${localStorage.key(i)}.html`;
       }
       document.getElementById("showFiles").innerHTML = filesList.join("<br>");
       
@@ -838,6 +1010,8 @@ buttonNewFile.addEventListener("click", function(e) {
         localStorage.setItem( "autoSave", editor.getValue() );
        }
 
+       
+
         editor.on("changes", function(e) {
              if ( editor.getValue().match(/@@@/igm) ) {
              cursorPosition = editor.getCursor();
@@ -857,17 +1031,17 @@ buttonNewFile.addEventListener("click", function(e) {
                    }
              if ( editor.getValue().match(/gameLoop#/igm) ) {
                 cursorPosition = editor.getCursor();
-                editor.setValue( editor.getValue().replace(/gameLoop#/igm, "var timeStart = 0;\nfunction gameLoop(timestamp) {\n    if (timestamp - timeStart >= 100) {\n        //loop code...\n        timeStart = timestamp;\n    }\n    requestAnimationFrame(gameLoop);\n}\ngameLoop();") );
+                editor.setValue( editor.getValue().replace(/gameLoop#/igm, "var timeStart = 0;\nfunction gameLoop(timestamp) {\n  if (timestamp - timeStart >= 100) {\n      //loop code...\n      timeStart = timestamp;\n  }\n  requestAnimationFrame(gameLoop);\n}\ngameLoop();") );
                  editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
                    }
         	if ( editor.getValue().match(/for#/igm) ) {
                 cursorPosition = editor.getCursor();
-                editor.setValue( editor.getValue().replace(/for#/igm, "for (var i = 0; i < num; i++\) {\n    \/\/code\n}") );
+                editor.setValue( editor.getValue().replace(/for#/igm, "for (var i = 0; i < num; i++\) {\n  \/\/code\n}") );
                  editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
                    }
             if ( editor.getValue().match(/listener#/igm) ) {
                 cursorPosition = editor.getCursor();
-                editor.setValue( editor.getValue().replace(/listener#/igm, "elem.addEventListener(\"event\", function(e) {\n    \/\/code\n});") );
+                editor.setValue( editor.getValue().replace(/listener#/igm, "elem.addEventListener(\"event\", function(e) {\n  \/\/code\n});") );
                  editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
               }
             if ( editor.getValue().match(/id#/igm) ) {
@@ -877,7 +1051,7 @@ buttonNewFile.addEventListener("click", function(e) {
                }
             if ( editor.getValue().match(/func#/igm) ) {
               cursorPosition = editor.getCursor();
-            	editor.setValue( editor.getValue().replace(/func#/igm, "function function_name(arguments) {\n    // body...\n}") );
+            	editor.setValue( editor.getValue().replace(/func#/igm, "function function_name(arguments) {\n  // body...\n}") );
               editor.setCursor({line: cursorPosition.line, ch: cursorPosition.ch});
                }
             if ( editor.getValue().match(/div#/igm) ) {
