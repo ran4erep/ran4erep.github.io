@@ -552,7 +552,7 @@
           let key = e.target.innerText;
           if (e.target.className !== "keyboard") e.target.style = "background: rgba(255,255,255,0.12)";
           editor.focus();
-          if (key.match(/^[a-z]$/igm))
+          if (key.length <= 1)
             insertTextAtCursor(editor, key);
           if (key === "backspace") {
             editor.execCommand("delCharBefore");
