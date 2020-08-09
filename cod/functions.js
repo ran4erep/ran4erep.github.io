@@ -118,8 +118,16 @@ let update = () => {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+let minX = Math.floor(cameraX/tileSize);
+let maxX = minX + (128/8);
+let minY = Math.floor(cameraY/tileSize);
+let maxY = minY + (128/8);
+let offsetX = -cameraX + minX * tileSize;
+let offsetY = -cameraY + minY * tileSize;
+
 //функция логики игры
 let logic = () => {
+	//smoking
 	if (smokingTimer >= 200 && !isSmoking && !player.isWalking) {
 		player.setCurrentAnimation("smoking",5);
 		isSmoking = true;
@@ -128,15 +136,17 @@ let logic = () => {
 	if (!isSmoking && !player.isWalking) smokingTimer++;
 	if (player.isWalking) smokingTimer = 0
 		else isSmoking = false;
+	//--------
+
 }
 
 // функция рендеринга изображения
 let render = () => {
-	for (let i = 0; i < levelWidth; i++) {
-		for (let j = 0; j < levelHeight; j++) {
-			drawTile(maps[0][i+mapOffsetY][j+mapOffsetX],j,i); // i for Y and j for X
-			
-			//drawSprite(10,player.x, player.y, graphics[0]);
+
+	for (let x = 0; x < levelWidth; x++) {
+		for (let y = 0; y < levelHeight; y++) {
+			drawSprite(maps[1][y][x],x*spriteSize,y*spriteSize);
+
 			if (torch.isNight) {
 				//torch.updateLight();
 				//torch.placeLight(player.x+0.6,player.y+0.6,30);
@@ -149,6 +159,9 @@ let render = () => {
 	//рисуем титры
 	 if (endTitles.creditsY>-endTitles.credits.length && showCredits) endTitles.scroll(0.2,1);
 	 drawHud(100,100,12*3,20);
+	 ctx.strokeStyle = "green";
+	 ctx.strokeRect(0,0,128,128);
+	 //minimap();
 }
 let part;
 let array = [];
@@ -314,6 +327,27 @@ let makeScreenshot = () => {
 	a.setAttribute("download", "CoD_screenshot.png");
 	a.setAttribute("href", bufferCanvas.toDataURL("image.png").replace("image/png", "image/octet-stream"));
 	a.click();
+}
+
+let minimap = () => {
+	let bufferCanvas = document.createElement("canvas");
+	let buffer = bufferCanvas.getContext("2d");
+	bufferCanvas.width = canvas.width;
+	bufferCanvas.height = canvas.height;
+	buffer.imageSmoothingEnabled = false;
+	for(let x=0; x<32; x++) {
+		for(let y=0; y<32; y++) {
+			buffer.drawImage(graphics[4],maps[1][y][x]*spriteSize,0,spriteSize,spriteSize,x*4, y*4, 4,4);
+		}
+	}
+	let x = player.x/2, y = player.y/2;
+	let rectX = x-32, rectY = y-32;
+	buffer.drawImage(graphics[0],0,0,8,8,x,y,8,8);
+	buffer.strokeStyle = palette[11].hex;
+	buffer.strokeRect(rectX,rectY,64,64);
+	buffer.strokeStyle = palette[8].hex;
+	buffer.strokeRect(0,0,128,128);
+	ctx.drawImage(bufferCanvas,0,0,64,64);
 }
 
 let drawHud = (hp,panic,weapon,ammo) => {

@@ -184,10 +184,30 @@ let Character = function(spritesheet,animations,x,y) {
         this.vy *= this.friction;
         this.y += this.vy;
         (this.vx > 0 || this.vy > 0 || this.vx < 0 || this.vy < 0) ? this.isWalking = true : this.isWalking = false;
-        if (this.isWalking && this.facing === "e") mapOffsetX +=1;
-        if (this.isWalking && this.facing === "w") mapOffsetX -=1;
-        if (this.isWalking && this.facing === "n") mapOffsetY -=1;
-        if (this.isWalking && this.facing === "s") mapOffsetY +=1;
+        if (this.isWalking && this.facing === "e") {
+        	//mapOffsetX +=8;
+        	tileOffsetX +=1;
+        	cameraX +=1;
+        	
+        }
+        if (this.isWalking && this.facing === "w") {
+        	//mapOffsetX -=8;
+        	tileOffsetX -=1;
+        	cameraX -=1;
+        	
+        }
+        if (this.isWalking && this.facing === "n") {
+        	//mapOffsetY -=8;
+        	tileOffsetY -=1;
+        	cameraY -=1;
+        	
+        }
+        if (this.isWalking && this.facing === "s") {
+        	//mapOffsetY +=8;
+        	tileOffsetY +=1;
+        	cameraY +=1;
+        	
+        }
     }
 
 }
