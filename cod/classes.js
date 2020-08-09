@@ -123,24 +123,44 @@ let Character = function(spritesheet,animations,x,y) {
     this.facing = "w";
     this.frameSpeed = 10;
     this.isWalking = false;
+    this.animationType = "endless";
+    this.isDead = false;
 
-    this.setCurrentAnimation = (animation,frameSpeed) => {
-    	(frameSpeed) ? this.frameSpeed = frameSpeed : this.frameSpeed = 3000;
-    	this.currentFrame = 0;
-    	for (let i = 0; i < animations.length; i++) {
-    		if(animation === this.animations[i].name) {
-    			this.currentAnimation = this.animations[i].frames;
-    		}
-    	}
+    this.setCurrentAnimation = (animation,frameSpeed,type) => {
+    	(type) ? this.animationType = type : this.animationType = "endless";
+        (frameSpeed) ? this.frameSpeed = frameSpeed : this.frameSpeed = 3000;
+            this.currentFrame = 0;
+            for (let i = 0; i < this.animations.length; i++) {
+                if(animation === this.animations[i].name) {
+                    this.currentAnimation = this.animations[i].frames;
+                }
+            }
     };
 
-    this.animate = () => {
+    this.render = () => {
     	if (this.animationSpeed>this.frameSpeed) { 
-    		this.currentFrame++;
-    		if (this.currentFrame===this.currentAnimation.length) this.currentFrame=0;
-    		this.animationSpeed=0;
+    		if(this.animationType === "endless") {
+                if (this.currentFrame !== this.currentAnimation.length)
+                    this.currentFrame++;
+                if (this.currentFrame === this.currentAnimation.length)
+                    this.currentFrame=0;
+                this.animationSpeed=0;
+            }
+            if(this.animationType === "once") {
+                if (this.currentFrame !== this.currentAnimation.length)
+                    this.currentFrame++;
+                if (this.currentFrame === this.currentAnimation.length)
+                    this.currentFrame=this.currentAnimation.length-1;
+                this.animationSpeed=0;
+            }
     	}
-    	drawSprite(this.currentAnimation[this.currentFrame],player.x, player.y, graphics[this.spritesheet]);
+        
+        //rendering character
+    	drawSprite(this.currentAnimation[this.currentFrame],
+            player.x+camera.x,
+            player.y+camera.y,
+            graphics[this.spritesheet]
+            );
     	this.animationSpeed++;
     }
 
@@ -179,33 +199,44 @@ let Character = function(spritesheet,animations,x,y) {
     	this.atTileX = Math.floor(this.x/spriteSize);
     	this.atTileY = Math.floor(this.y/spriteSize);
     	this.getDestination();
-    	this.vx *= this.friction;
-        this.x += this.vx;
-        this.vy *= this.friction;
-        this.y += this.vy;
+    	//this.vx *= this.friction;
+        if (this.vx === 1 && !this.isDead) {
+            this.x++;
+            camera.move(camera.x--,0);
+        }
+        if (this.vx === -1 && !this.isDead) {
+            this.x--;
+            camera.move(camera.x++,0);
+        }
+        if (this.vy === -1 && !this.isDead) {
+            this.y--;
+            camera.move(0,camera.y++);
+        }
+        if (this.vy === 1 && !this.isDead) {
+            this.y++;
+            camera.move(0,camera.y--);
+        }
+        //this.vy *= this.friction;
+        //this.y += this.vy;
         (this.vx > 0 || this.vy > 0 || this.vx < 0 || this.vy < 0) ? this.isWalking = true : this.isWalking = false;
         if (this.isWalking && this.facing === "e") {
         	//mapOffsetX +=8;
         	tileOffsetX +=1;
-        	cameraX +=1;
         	
         }
         if (this.isWalking && this.facing === "w") {
         	//mapOffsetX -=8;
         	tileOffsetX -=1;
-        	cameraX -=1;
         	
         }
         if (this.isWalking && this.facing === "n") {
         	//mapOffsetY -=8;
         	tileOffsetY -=1;
-        	cameraY -=1;
         	
         }
         if (this.isWalking && this.facing === "s") {
         	//mapOffsetY +=8;
         	tileOffsetY +=1;
-        	cameraY +=1;
         	
         }
     }

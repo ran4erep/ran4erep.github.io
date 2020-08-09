@@ -118,17 +118,13 @@ let update = () => {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-let minX = Math.floor(cameraX/tileSize);
-let maxX = minX + (128/8);
-let minY = Math.floor(cameraY/tileSize);
-let maxY = minY + (128/8);
-let offsetX = -cameraX + minX * tileSize;
-let offsetY = -cameraY + minY * tileSize;
 
 //функция логики игры
 let logic = () => {
+	
+
 	//smoking
-	if (smokingTimer >= 200 && !isSmoking && !player.isWalking) {
+	if (smokingTimer >= 200 && !isSmoking && !player.isWalking && !player.isDead) {
 		player.setCurrentAnimation("smoking",5);
 		isSmoking = true;
 		smokingTimer = 0;
@@ -143,9 +139,9 @@ let logic = () => {
 // функция рендеринга изображения
 let render = () => {
 
-	for (let x = 0; x < levelWidth; x++) {
-		for (let y = 0; y < levelHeight; y++) {
-			drawSprite(maps[1][y][x],x*spriteSize,y*spriteSize);
+	for (let x = 0; x < levelWidth*2; x++) {
+		for (let y = 0; y < levelHeight*2; y++) {
+			drawSprite(maps[1][y][x],(x*spriteSize)+camera.x,(y*spriteSize)+camera.y);
 
 			if (torch.isNight) {
 				//torch.updateLight();
@@ -154,14 +150,15 @@ let render = () => {
 		}
 	}
 
-	player.animate();
-	if (drawMeTheBox) drawBox("just/testing/textbox",4,4);
+
+	player.render();
+	
 	//рисуем титры
 	 if (endTitles.creditsY>-endTitles.credits.length && showCredits) endTitles.scroll(0.2,1);
 	 drawHud(100,100,12*3,20);
 	 ctx.strokeStyle = "green";
 	 ctx.strokeRect(0,0,128,128);
-	 //minimap();
+	 if (minimapToggle) minimap();
 }
 let part;
 let array = [];
@@ -337,6 +334,7 @@ let minimap = () => {
 	buffer.imageSmoothingEnabled = false;
 	for(let x=0; x<32; x++) {
 		for(let y=0; y<32; y++) {
+			buffer.globalAlpha = 0.7;
 			buffer.drawImage(graphics[4],maps[1][y][x]*spriteSize,0,spriteSize,spriteSize,x*4, y*4, 4,4);
 		}
 	}

@@ -13,15 +13,21 @@ buttonStopEngine.addEventListener("click", (e) => {
 	engineIsWorking = false;
 	buttonStopEngine.style.display = "none";
 });
+buttonMinimap.addEventListener("click", (e) => {
+	minimapToggle = !minimapToggle;
+});
+buttonDeath.addEventListener("click", (e) => {
+	if(gameMode === game) {
+		player.setCurrentAnimation("death",10,"once");
+		player.isDead = true;
+	}
+});
 buttonNight.addEventListener("click", (e) => {
 	torch.switchNight();
 	torch.placeLight(player.x+0.6,player.y+0.6,30);
 	torch.updateLight();
 });
-drawMeTheBox = false;
-buttonBox.addEventListener("click", (e) => {
-	drawMeTheBox = !drawMeTheBox;
-});
+
 let showCredits = false;
 buttonCredits.addEventListener("click", (e) => {
 	showCredits = true;
@@ -38,36 +44,90 @@ buttonLoading.addEventListener("click", (e) => {
 });
 
 
+//KEYBOARD CONTROLS//////////////////////
 document.onkeydown = (e) => {
 	if (e.keyCode === 68) {
-		player.move( 1,  0) //move right
+		e.preventDefault();
+		if(gameMode === game) player.facing = "e";
+		player.setVelocity(1,0);
 		torch.placeLight(player.x+0.6,player.y+0.6,30);
-        torch.updateLight();
+    	torch.updateLight();
+    	if(keyboardKeyAnimationFix === 0)
+    		player.setCurrentAnimation("walkingRight",5);
+    	keyboardKeyAnimationFix++;
 	}
 	if (e.keyCode === 65) {
-		player.move(-1,  0);
+		e.preventDefault();
+		if(gameMode === game) player.facing = "w";
+		player.setVelocity(-1,0);
 		torch.placeLight(player.x+0.6,player.y+0.6,30);
     	torch.updateLight();
-	} //move left
+    	if(keyboardKeyAnimationFix === 0)
+    		player.setCurrentAnimation("walkingLeft",5);
+    	keyboardKeyAnimationFix++;
+	}
 	if (e.keyCode === 87) {
-		player.move( 0, -1);
+		e.preventDefault();
+		if(gameMode === game) player.facing = "n";
+		player.setVelocity(0,-1);
 		torch.placeLight(player.x+0.6,player.y+0.6,30);
     	torch.updateLight();
-	}//move up
+    	if(keyboardKeyAnimationFix === 0)
+    		player.setCurrentAnimation("walkingUp",5);
+    	keyboardKeyAnimationFix++;
+
+    	if (gameMode === mainMenu) {
+    		cursor.move(-2);
+    	}
+	}
 	if (e.keyCode === 83) {
-		player.move( 0,  1);
+		e.preventDefault();
+		 if(gameMode === game) player.facing = "s";
+		player.setVelocity(0,1);
 		torch.placeLight(player.x+0.6,player.y+0.6,30);
     	torch.updateLight();
-	} //move down
+    	if(keyboardKeyAnimationFix === 0)
+    		player.setCurrentAnimation("walkingDown",5);
+    	keyboardKeyAnimationFix++;
+
+    	if (gameMode === mainMenu) {
+    		cursor.move(2);
+    	}
+	}
+
+	if (e.keyCode === 13) {
+		e.preventDefault();
+		windowTest.mode = windowTest.close;
+
+		if (gameMode === mainMenu && cursor.y === 8) {
+			gameMode = game;
+		}
+		if (gameMode === mainMenu && cursor.y === 10) {
+			show = 3;
+		}
+		if (gameMode === mainMenu && cursor.y === 12) {
+			window.opener = self;
+			window.close();
+		}
+	}
 }
 document.onkeyup = (e) => {
-	player.vx = 0;
-	player.vy = 0;
+	keyboardKeyAnimationFix = 0;
+	player.setVelocity(0,0);
+	if (player.facing === "w")
+		player.setCurrentAnimation("breathingLeft",10);
+	if (player.facing === "e")
+		player.setCurrentAnimation("breathingRight",10);
+	if (player.facing === "n")
+		player.setCurrentAnimation("breathingUp",10);
+	if (player.facing === "s")
+		player.setCurrentAnimation("breathingDown",10);
 }
 
+//TOUCH CONTROLS////////////////
 buttonRight.addEventListener("touchstart", (e) => {
 	e.preventDefault();
-	player.facing = "e";
+	if(gameMode === game) player.facing = "e";
 	player.setVelocity(1,0);
 	torch.placeLight(player.x+0.6,player.y+0.6,30);
     torch.updateLight();
@@ -75,7 +135,7 @@ buttonRight.addEventListener("touchstart", (e) => {
 });
 buttonLeft.addEventListener("touchstart", (e) => {
 	e.preventDefault();
-	player.facing = "w";
+	if(gameMode === game) player.facing = "w";
 	player.setVelocity(-1,0);
 	torch.placeLight(player.x+0.6,player.y+0.6,30);
     torch.updateLight();
@@ -83,7 +143,7 @@ buttonLeft.addEventListener("touchstart", (e) => {
 });
 buttonUp.addEventListener("touchstart", (e) => {
 	e.preventDefault();
-	player.facing = "n";
+	if(gameMode === game) player.facing = "n";
 	player.setVelocity(0,-1);
 	torch.placeLight(player.x+0.6,player.y+0.6,30);
     torch.updateLight();
@@ -95,7 +155,7 @@ buttonUp.addEventListener("touchstart", (e) => {
 });
 buttonDown.addEventListener("touchstart", (e) => {
 	e.preventDefault();
-	player.facing = "s";
+	if(gameMode === game) player.facing = "s";
 	player.setVelocity(0,1);
 	torch.placeLight(player.x+0.6,player.y+0.6,30);
     torch.updateLight();
@@ -141,11 +201,13 @@ document.body.addEventListener("touchend", (e) => {
 	if (player.facing === "s")
 		player.setCurrentAnimation("breathingDown",10);
 });
+////////////////////////////
 
 let game = () => {
 	logic();
 	update();
 	render();
+	
 	if (showLoading) {
 		ctx.fillStyle = "white";
 		ctx.strokeStyle = "white"
@@ -154,8 +216,8 @@ let game = () => {
 		drawText(`loading ${testLoading}%...`,2,10)
 	}
 
-	player.bleeding();
 	player.move();
+	player.bleeding();
 	//drawMinimapSector()
 	//windowTest.open();
 	windowTest.mode();
@@ -211,7 +273,7 @@ let mainMenu = () => {
 	//if (fade.in) fade.in();
 }
 
-let gameMode = game;//mainMenu;
+let gameMode = mainMenu;//mainMenu;
 
 //Основной блок игры-----------------------
 

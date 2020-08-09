@@ -64,4 +64,14 @@ let mapOffsetX = 0;
 let mapOffsetY = 0;
 let tileOffsetX = 0;
 let tileOffsetY = 0;
-let cameraX =3, cameraY = 5;
+let camera = {
+	x : 0,
+	y : 0,
+	move : (x,y) => {
+		this.x = x;
+		this.y = y;
+	}
+};
+let minimapToggle = false;
+let keyboardKeyAnimationFix = 0;
+
