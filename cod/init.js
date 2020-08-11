@@ -12,6 +12,8 @@ let ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 canvas.width = 128;
 canvas.height = 128;
+canvas.style.width =  `${window.innerHeight}px`;
+canvas.style.height = `${window.innerHeight}px`;
 let levelWidth = 16;
 let levelHeight = 16;
 let spriteSize = 8;
@@ -74,4 +76,14 @@ let camera = {
 };
 let minimapToggle = false;
 let keyboardKeyAnimationFix = 0;
-
+let viewport = {
+	x : {
+		min: 0,
+		max: 32
+	},
+	y : {
+		min: 0,
+		max: 32
+	}
+};
+let viewDistance = 10;

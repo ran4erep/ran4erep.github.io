@@ -121,7 +121,12 @@ let update = () => {
 
 //функция логики игры
 let logic = () => {
-	
+	canvas.style.width =  `${window.innerHeight}px`;
+	canvas.style.height = `${window.innerHeight}px`;
+	(player.atTileX - viewDistance < 0)  ? viewport.x.min = 0    : viewport.x.min = player.atTileX - viewDistance;
+	(player.atTileX + viewDistance > 128) ? viewport.x.max = 128 : viewport.x.max = player.atTileX + viewDistance;
+	(player.atTileY - viewDistance < 0)  ? viewport.y.min = 0    : viewport.y.min = player.atTileY - viewDistance;
+	(player.atTileY + viewDistance > 128) ? viewport.y.max = 128 : viewport.y.max = player.atTileY + viewDistance;
 
 	//smoking
 	if (smokingTimer >= 200 && !isSmoking && !player.isWalking && !player.isDead) {
@@ -138,9 +143,8 @@ let logic = () => {
 
 // функция рендеринга изображения
 let render = () => {
-
-	for (let x = 0; x < levelWidth*2; x++) {
-		for (let y = 0; y < levelHeight*2; y++) {
+	for (let x = viewport.x.min; x < viewport.x.max; x++) {
+		for (let y = viewport.y.min; y < viewport.y.max; y++) {
 			drawSprite(maps[1][y][x],(x*spriteSize)+camera.x,(y*spriteSize)+camera.y);
 
 			if (torch.isNight) {
@@ -156,8 +160,6 @@ let render = () => {
 	//рисуем титры
 	 if (endTitles.creditsY>-endTitles.credits.length && showCredits) endTitles.scroll(0.2,1);
 	 drawHud(100,100,12*3,20);
-	 ctx.strokeStyle = "green";
-	 ctx.strokeRect(0,0,128,128);
 	 if (minimapToggle) minimap();
 }
 let part;

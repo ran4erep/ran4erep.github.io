@@ -21,10 +21,14 @@ let Particle = function(cx,cy) {
     this.alpha = 1;
     this.isDead = false;
     this.timeBeforeDisappear = 100;
+    this.placeOfDeath = {
+        x: 0,
+        y: 0
+    };
 
     this.draw = () => {
         ctx.fillStyle = `rgba(150,0,0,${this.alpha})`;
-        ctx.fillRect(this.x, this.y, this.w, this.h);
+        ctx.fillRect(this.x+camera.x, this.y+camera.y, this.w, this.h);
     }
 }
 
@@ -57,7 +61,7 @@ let Blood = function() {
                 this.particles[i].x += this.particles[i].vx;
                 this.particles[i].alpha -= 0.01;
             }
-            if (this.particles[i].y+this.particles[i].h < 0 || this.particles[i].y > cy+spriteSize) {
+            if (this.particles[i].y > cy+spriteSize) {
                 this.particles[i].x = this.particles[i].x;
                 this.particles[i].vy = 0;
                 this.particles[i].y = this.particles[i].y;
@@ -65,6 +69,9 @@ let Blood = function() {
                 this.particles[i].isDead = true;
             }
             if (this.particles[i].isDead) {
+                this.particles[i].placeOfDeath.x = this.particles[i].x;
+                this.particles[i].placeOfDeath.y = this.particles[i].y;
+                Object.freeze(this.particles[i].placeOfDeath);
                 this.particles[i].timeBeforeDisappear--;
                 if (this.particles[i].timeBeforeDisappear === 0) {
                     this.reset = true;
