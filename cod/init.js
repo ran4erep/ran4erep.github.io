@@ -9,7 +9,7 @@
 
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
-ctx.imageSmoothingEnabled = false;
+//ctx.imageSmoothingEnabled = false;
 canvas.width = 128;
 canvas.height = 128;
 canvas.style.width =  `${window.innerHeight}px`;
