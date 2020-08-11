@@ -121,12 +121,34 @@ let update = () => {
 
 //функция логики игры
 let logic = () => {
-	canvas.style.width =  `${window.innerHeight}px`;
-	canvas.style.height = `${window.innerHeight}px`;
-	(player.atTileX - viewDistance < 0)  ? viewport.x.min = 0    : viewport.x.min = player.atTileX - viewDistance;
-	(player.atTileX + viewDistance > 128) ? viewport.x.max = 128 : viewport.x.max = player.atTileX + viewDistance;
-	(player.atTileY - viewDistance < 0)  ? viewport.y.min = 0    : viewport.y.min = player.atTileY - viewDistance;
-	(player.atTileY + viewDistance > 128) ? viewport.y.max = 128 : viewport.y.max = player.atTileY + viewDistance;
+	//fullscreen canvas
+	if(screen.orientation.type === "landscape-primary" || screen.orientation.type === "landscape-secondary") {
+		canvas.style.left = `${(window.innerWidth/2)-(parseInt(canvas.style.width.replace("px",""))/2)}px`;
+		canvas.style.width =  `${window.innerHeight}px`;
+		canvas.style.height = `${window.innerHeight}px`;
+	}
+	if(screen.orientation.type === "portrait-primary" || screen.orientation.type === "portrait-secondary") {
+		canvas.style.width =  `${window.innerWidth}px`;
+		canvas.style.height = `${window.innerWidth}px`;
+	}
+
+	//large maps optimization
+	mapSize = maps[currentMap].length;
+	(player.atTileX - viewDistance < 0)  ?
+	viewport.x.min = 0    
+	: viewport.x.min = player.atTileX - viewDistance;
+
+	(player.atTileX + viewDistance > mapSize) ?
+	viewport.x.max = mapSize 
+	: viewport.x.max = player.atTileX + viewDistance;
+
+	(player.atTileY - viewDistance < 0)  ? 
+	viewport.y.min = 0    
+	: viewport.y.min = player.atTileY - viewDistance;
+
+	(player.atTileY + viewDistance > mapSize) ?
+	viewport.y.max = mapSize
+	: viewport.y.max = player.atTileY + viewDistance;
 
 	//smoking
 	if (smokingTimer >= 200 && !isSmoking && !player.isWalking && !player.isDead) {
@@ -145,7 +167,7 @@ let logic = () => {
 let render = () => {
 	for (let x = viewport.x.min; x < viewport.x.max; x++) {
 		for (let y = viewport.y.min; y < viewport.y.max; y++) {
-			drawSprite(maps[1][y][x],(x*spriteSize)+camera.x,(y*spriteSize)+camera.y);
+			drawSprite(maps[currentMap][y][x],(x*spriteSize)+camera.x,(y*spriteSize)+camera.y);
 
 			if (torch.isNight) {
 				//torch.updateLight();

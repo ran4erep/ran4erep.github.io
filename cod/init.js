@@ -9,11 +9,18 @@
 
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
-//ctx.imageSmoothingEnabled = false;
+ctx.imageSmoothingEnabled = false;
 canvas.width = 128;
 canvas.height = 128;
-canvas.style.width =  `${window.innerHeight}px`;
-canvas.style.height = `${window.innerHeight}px`;
+if(screen.orientation.type === "landscape-primary" || screen.orientation.type === "landscape-secondary") {
+	canvas.style.left = `${(window.innerWidth/2)-(parseInt(canvas.style.width.replace("px",""))/2)}px`;
+	canvas.style.width =  `${window.innerHeight}px`;
+	canvas.style.height = `${window.innerHeight}px`;
+}
+if(screen.orientation.type === "portrait-primary" || screen.orientation.type === "portrait-secondary") {
+	canvas.style.width =  `${window.innerWidth}px`;
+	canvas.style.height = `${window.innerWidth}px`;
+}
 let levelWidth = 16;
 let levelHeight = 16;
 let spriteSize = 8;
@@ -87,3 +94,5 @@ let viewport = {
 	}
 };
 let viewDistance = 10;
+let mapSize = 32;
+let currentMap = 1;
