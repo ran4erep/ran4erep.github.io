@@ -160,6 +160,9 @@ let logic = () => {
 	if (player.isWalking) smokingTimer = 0
 		else isSmoking = false;
 	//--------
+	for(let r=0; r<128; r++) {
+		rays[r] = raycast(player.x+4,player.y+2,-camera.x+r,-camera.y);
+	}
 
 }
 
@@ -168,6 +171,7 @@ let render = () => {
 	for (let x = viewport.x.min; x < viewport.x.max; x++) {
 		for (let y = viewport.y.min; y < viewport.y.max; y++) {
 			drawSprite(maps[currentMap][y][x],(x*spriteSize)+camera.x,(y*spriteSize)+camera.y);
+			//raycast(player.x+4,player.y+2,0,0);
 
 			if (torch.isNight) {
 				//torch.updateLight();
@@ -183,6 +187,23 @@ let render = () => {
 	 if (endTitles.creditsY>-endTitles.credits.length && showCredits) endTitles.scroll(0.2,1);
 	 drawHud(100,100,12*3,20);
 	 if (minimapToggle) minimap();
+
+	 for(let j=0; j<rays.length; j++) {
+	 	for(let i=0; i<rays[j].length; i++) {
+	 		plot(rays[j][i].x, rays[j][i].y, rays[j][i].alpha);
+	 	}
+	 }
+
+	 // for(let r=0; r<rays.length; r++) {
+	 // 	for(let p=0; rays[r].length; p++) {
+	 // 		//if (rays[r][p] !== undefined) plot(rays[r][p].x, rays[r][p].y);
+	 // 	}
+	 // }
+
+	 //for (let x = -camera.x; x < -camera.x+20; x++) {
+	 	//raycast(player.x+4,player.y+2,-camera.x,-camera.y);
+	 	//raycast(player.x+4,player.y+2,8,0);
+	 //}
 }
 let part;
 let array = [];
@@ -394,4 +415,42 @@ let drawHud = (hp,panic,weapon,ammo) => {
 	drawSprite(weapon+1,88,y+1,weaponGraphics);
 	drawSprite(weapon+2,96,y+1,weaponGraphics);
 	drawText(ammo.toString(),104,y+1,graphics[2],"pixel");
+};
+
+let dist = (x1,y1, x2,y2) => Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+
+let plot = (x,y,alpha) => {
+	ctx.fillStyle = `rgba(255,0,0,${alpha})`;
+	ctx.fillRect(x,y,1,1);
 }
+
+//let hitTheWall = (x,y) => (map[y][x] === 1) ? true : false;
+
+let raycast = (x0,y0, x1,y1) => {
+	let dx = Math.abs(x1-x0);
+	let dy = Math.abs(y1-y0);
+	let sx = (x0 < x1) ? 1 : -1;
+	let sy = (y0 < y1) ? 1 : -1;
+	let err = dx - dy;
+	let alpha = 1.0;
+	let ray = [];
+
+	while(true) {
+		//(x*spriteSize)+camera.x
+		if( maps[currentMap][Math.floor(y0/tileSize)][Math.floor(x0/tileSize)] === 41 ) {
+			return ray;
+		}
+		//plot(x0+camera.x,y0+camera.y);
+		alpha -= 0.01;
+		ray.push({
+			x : x0+camera.x,
+			y : y0+camera.y,
+			alpha : alpha
+		});
+
+		if((x0===x1) && (y0===y1)) return ray;
+		let e2 = 2*err;
+		if(e2 > -dy) {err -= dy; x0 += sx;}
+		if(e2 < dx) {err += dx; y0 += sy;}
+	}
+};
