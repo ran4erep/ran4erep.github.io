@@ -273,7 +273,7 @@ let mainMenu = () => {
 	//if (fade.in) fade.in();
 }
 
-let gameMode = mainMenu;//mainMenu;
+let gameMode = game;//mainMenu;
 
 //Основной блок игры-----------------------
 

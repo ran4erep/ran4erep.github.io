@@ -12,6 +12,15 @@ let ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 canvas.width = 128;
 canvas.height = 128;
+// if(screen.orientation.type === "landscape-primary" || screen.orientation.type === "landscape-secondary") {
+// 	canvas.style.left = `${(window.innerWidth/2)-(parseInt(canvas.style.width.replace("px",""))/2)}px`;
+// 	canvas.style.width =  `${window.innerHeight}px`;
+// 	canvas.style.height = `${window.innerHeight}px`;
+// }
+// if(screen.orientation.type === "portrait-primary" || screen.orientation.type === "portrait-secondary") {
+// 	canvas.style.width =  `${window.innerWidth}px`;
+// 	canvas.style.height = `${window.innerWidth}px`;
+// }
 let levelWidth = 16;
 let levelHeight = 16;
 let spriteSize = 8;
@@ -67,6 +76,7 @@ let tileOffsetY = 0;
 let camera = {
 	x : 0,
 	y : 0,
+
 	move : (x,y) => {
 		this.x = x;
 		this.y = y;
@@ -74,4 +84,18 @@ let camera = {
 };
 let minimapToggle = false;
 let keyboardKeyAnimationFix = 0;
-
+let viewport = {
+	x : {
+		min: 0,
+		max: 32
+	},
+	y : {
+		min: 0,
+		max: 32
+	}
+};
+let viewDistance = 10;
+let mapSize = 32;
+let currentMap = 1;
+let rays = [];
+let testing = 0;
