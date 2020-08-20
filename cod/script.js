@@ -46,58 +46,59 @@ buttonLoading.addEventListener("click", (e) => {
 
 //KEYBOARD CONTROLS//////////////////////
 document.onkeydown = (e) => {
-	if (e.keyCode === 68) {
-		e.preventDefault();
-		if(gameMode === game) player.facing = "e";
-		player.setVelocity(1,0);
-		torch.placeLight(player.x+0.6,player.y+0.6,30);
-    	torch.updateLight();
-    	if(keyboardKeyAnimationFix === 0)
-    		player.setCurrentAnimation("walkingRight",5);
-    	keyboardKeyAnimationFix++;
-	}
-	if (e.keyCode === 65) {
-		e.preventDefault();
-		if(gameMode === game) player.facing = "w";
-		player.setVelocity(-1,0);
-		torch.placeLight(player.x+0.6,player.y+0.6,30);
-    	torch.updateLight();
-    	if(keyboardKeyAnimationFix === 0)
-    		player.setCurrentAnimation("walkingLeft",5);
-    	keyboardKeyAnimationFix++;
-	}
-	if (e.keyCode === 87) {
-		e.preventDefault();
-		if(gameMode === game) player.facing = "n";
-		player.setVelocity(0,-1);
-		torch.placeLight(player.x+0.6,player.y+0.6,30);
-    	torch.updateLight();
-    	if(keyboardKeyAnimationFix === 0)
-    		player.setCurrentAnimation("walkingUp",5);
-    	keyboardKeyAnimationFix++;
-
-    	if (gameMode === mainMenu) {
-    		cursor.move(-2);
+	if (document.activeElement.tagName !== "INPUT") {
+		if (e.keyCode === 68) {
+			e.preventDefault();
+			if(gameMode === game) player.facing = "e";
+			player.setVelocity(1,0);
+			torch.placeLight(player.x+0.6,player.y+0.6,30);
+    		torch.updateLight();
+    		if(keyboardKeyAnimationFix === 0)
+    			player.setCurrentAnimation("walkingRight",5);
+    		keyboardKeyAnimationFix++;
     	}
-	}
-	if (e.keyCode === 83) {
-		e.preventDefault();
-		 if(gameMode === game) player.facing = "s";
-		player.setVelocity(0,1);
-		torch.placeLight(player.x+0.6,player.y+0.6,30);
-    	torch.updateLight();
-    	if(keyboardKeyAnimationFix === 0)
-    		player.setCurrentAnimation("walkingDown",5);
-    	keyboardKeyAnimationFix++;
+		if (e.keyCode === 65) {
+			e.preventDefault();
+			if(gameMode === game) player.facing = "w";
+			player.setVelocity(-1,0);
+			torch.placeLight(player.x+0.6,player.y+0.6,30);
+    		torch.updateLight();
+    		if(keyboardKeyAnimationFix === 0)
+    			player.setCurrentAnimation("walkingLeft",5);
+    		keyboardKeyAnimationFix++;
+		}
+		if (e.keyCode === 87) {
+			e.preventDefault();
+			if(gameMode === game) player.facing = "n";
+			player.setVelocity(0,-1);
+			torch.placeLight(player.x+0.6,player.y+0.6,30);
+    		torch.updateLight();
+    		if(keyboardKeyAnimationFix === 0)
+    			player.setCurrentAnimation("walkingUp",5);
+    		keyboardKeyAnimationFix++;
 
-    	if (gameMode === mainMenu) {
-    		cursor.move(2);
-    	}
-	}
+    		if (gameMode === mainMenu) {
+    			cursor.move(-2);
+    		}
+		}
+		if (e.keyCode === 83) {
+			e.preventDefault();
+		 	if(gameMode === game) player.facing = "s";
+			player.setVelocity(0,1);
+			torch.placeLight(player.x+0.6,player.y+0.6,30);
+    		torch.updateLight();
+    		if(keyboardKeyAnimationFix === 0)
+    			player.setCurrentAnimation("walkingDown",5);
+    		keyboardKeyAnimationFix++;
 
-	if (e.keyCode === 13) {
-		e.preventDefault();
-		windowTest.mode = windowTest.close;
+    		if (gameMode === mainMenu) {
+    			cursor.move(2);
+    		}
+		}
+
+		if (e.keyCode === 13) {
+			e.preventDefault();
+			windowTest.mode = windowTest.close;
 
 		if (gameMode === mainMenu && cursor.y === 8) {
 			gameMode = game;
@@ -109,6 +110,8 @@ document.onkeydown = (e) => {
 			window.opener = self;
 			window.close();
 		}
+	}
+
 	}
 }
 document.onkeyup = (e) => {
@@ -132,6 +135,7 @@ buttonRight.addEventListener("touchstart", (e) => {
 	torch.placeLight(player.x+0.6,player.y+0.6,30);
     torch.updateLight();
     player.setCurrentAnimation("walkingRight",5);
+    pressedButton = "r";
 });
 buttonLeft.addEventListener("touchstart", (e) => {
 	e.preventDefault();
@@ -140,6 +144,7 @@ buttonLeft.addEventListener("touchstart", (e) => {
 	torch.placeLight(player.x+0.6,player.y+0.6,30);
     torch.updateLight();
     player.setCurrentAnimation("walkingLeft",5);
+    pressedButton = "l";
 });
 buttonUp.addEventListener("touchstart", (e) => {
 	e.preventDefault();
@@ -152,6 +157,7 @@ buttonUp.addEventListener("touchstart", (e) => {
     if (gameMode === mainMenu) {
     	cursor.move(-2);
     }
+    pressedButton = "u";
 });
 buttonDown.addEventListener("touchstart", (e) => {
 	e.preventDefault();
@@ -164,10 +170,11 @@ buttonDown.addEventListener("touchstart", (e) => {
     if (gameMode === mainMenu) {
     	cursor.move(2);
     }
+    pressedButton = "d";
 });
 
 buttonA.addEventListener("touchstart", (e) => {
-	e.preventDefault();
+	//e.preventDefault();
 	windowTest.mode = windowTest.close;
 
 	if (gameMode === mainMenu && cursor.y === 8) {
@@ -180,15 +187,24 @@ buttonA.addEventListener("touchstart", (e) => {
 		window.opener = self;
 		window.close();
 	}
+	pressedButton = "a";
 });
 
 buttonB.addEventListener("touchstart", (e) => {
+	//e.preventDefault();
 	windowTest.mode = windowTest.open;
+	pressedButton = "b";
 });
 
-buttonX.addEventListener("touchstart", (e) => {});
+buttonX.addEventListener("touchstart", (e) => {
+	//e.preventDefault();
+	pressedButton = "x";
+});
 
-buttonY.addEventListener("touchstart", (e) => {});
+buttonY.addEventListener("touchstart", (e) => {
+	//e.preventDefault();
+	pressedButton = "y";
+});
 
 document.body.addEventListener("touchend", (e) => {
 	player.setVelocity(0,0);
@@ -202,6 +218,12 @@ document.body.addEventListener("touchend", (e) => {
 		player.setCurrentAnimation("breathingDown",10);
 });
 ////////////////////////////
+
+consoleDo.addEventListener("click", (e) => {
+	eval(document.getElementById("consoleInput").value);
+	document.getElementById("consoleHistory").innerHTML = document.getElementById("consoleHistory").innerHTML += (document.getElementById("consoleInput").value + "<br>");
+	document.getElementById("consoleInput").value = "";
+});
 
 let game = () => {
 	logic();
@@ -235,6 +257,7 @@ setTimeout(()=> {
 
 
 let mainMenu = () => {
+	fullscreen();
 	//update();
 	if (show === 0) {
 		ctx.drawImage(graphics[10],0,0,canvas.width,canvas.height);
@@ -273,7 +296,7 @@ let mainMenu = () => {
 	//if (fade.in) fade.in();
 }
 
-let gameMode = game;//mainMenu;
+let gameMode = mainMenu;//mainMenu or game;
 
 //Основной блок игры-----------------------
 

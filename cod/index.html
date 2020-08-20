@@ -20,32 +20,160 @@
     button {
         touch-action: none;
     }
+    #d-pad {
+        position: relative;
+        width: 130px;
+        height: 130px;
+        margin-left: 20px;
+    }
+    #buttonUp {
+        width: 45px;
+        height: 45px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 0px;
+    }
+    #buttonLeft {
+        width: 45px;
+        height: 45px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 0px;
+    }
+    #buttonRight {
+        width: 45px;
+        height: 45px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 0px;
+    }
+    #buttonDown {
+        width: 45px;
+        height: 45px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0px;
+    }
+    .d-pad-button {
+        transition: all .2s ease-in-out;
+    }
+    #main-buttons {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+        position: fixed;
+        bottom: 0px;
+    }
+    #face-buttons {
+        position: relative;
+        width: 130px;
+        height: 130px;
+        margin-right: 20px;
+    }
+    #buttonA {
+        width: 45px;
+        height: 45px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0px;
+    }
+    #buttonB {
+        width: 45px;
+        height: 45px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 0px;
+    }
+    #buttonX {
+        width: 45px;
+        height: 45px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 0px;
+    }
+    #buttonY {
+        width: 45px;
+        height: 45px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 0px;
+    }
+    .face-button {
+        transition: all .2s ease-in-out;
+    }
+    .face-button:active {
+        background: #000000;
+        border-radius: 50%;
+        transform: scale(5);
+    }
+    .d-pad-button:active {
+        background: #000000;
+        border-radius: 50%;
+        transform: scale(5);
+    }
+    .face-button:not(:active) {
+        background: #ffffff;
+    }
+    #take-screenshot-button {
+        position: fixed;
+        right: 0px;
+    }
+    #buttonStopEngine {
+        position: fixed;
+        right: 50px;
+    }
+    .hide {
+        display: none;
+    }
+    #consoleWrapper {
+        width: fit-content;
+    }
     /*Place CSS code here*/
 </style>
 </head>
 <body>
     <div id="container">
-        <div id="game">
-            <canvas id="canvas"></canvas>
+        <div id="consoleWrapper" class="hide">
+            <div id="consoleHistory"></div>
+            <input placeholder="~ waiting for command" id="consoleInput">
+            <button id="consoleDo">Enter</button>
         </div>
-        <br>
-        Да, блэт, WASD работает
-        <br>
+        <button id="buttonStopEngine">Остановить движок</button>
+        <button id="take-screenshot-button"><img src="data/camera.png" onclick="makeScreenshot()"></button>
+        <div id="game">
+            <canvas id="canvas" oncontextmenu="return false"></canvas>
+        </div>
+        
         <div id="buttons">
-            <div id="movement">
-                <button id="buttonUp">Вверх</button>
-                <button id="buttonLeft">Влево</button>
-                <button id="buttonRight">Вправо</button>
-                <button id="buttonDown">Вниз</button>
+
+            <div id="main-buttons">
+                <div id="d-pad">
+                    <img src="data/d-pad-up.png" class="d-pad-button" id="buttonUp" oncontextmenu="return false">
+                    <img src="data/d-pad-left.png" class="d-pad-button" id="buttonLeft" oncontextmenu="return false">
+                    <img src="data/d-pad-right.png" class="d-pad-button" id="buttonRight" oncontextmenu="return false">
+                    <img src="data/d-pad-down.png" class="d-pad-button" id="buttonDown" oncontextmenu="return false">
+                </div>
+            
+                <div id="face-buttons">
+                    <img src="data/button-A.png" class="face-button" id="buttonA" oncontextmenu="return false">
+                    <img src="data/button-B.png" class="face-button" id="buttonB" oncontextmenu="return false">
+                    <img src="data/button-X.png" class="face-button" id="buttonX" oncontextmenu="return false">
+                    <img src="data/button-Y.png" class="face-button" id="buttonY" oncontextmenu="return false">
+                </div>
             </div>
-            <br>
-                <button id="buttonA">A</button>&nbsp;&nbsp;
-                <button id="buttonB">B</button>&nbsp;&nbsp;
-                <button id="buttonX">X</button>&nbsp;&nbsp;
-                <button id="buttonY">Y</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <button id="buttonStopEngine">Остановить движок</button>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button><img src="data/camera.png" onclick="makeScreenshot()"></button>
-            <br><br>
+                
+                
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <br><br><br><br><br><br>
             
             <button id="buttonMinimap">Миникарта</button>
             <button id="buttonNight">Переключить ночь</button>

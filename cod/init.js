@@ -73,15 +73,7 @@ let mapOffsetX = 0;
 let mapOffsetY = 0;
 let tileOffsetX = 0;
 let tileOffsetY = 0;
-let camera = {
-	x : 0,
-	y : 0,
 
-	move : (x,y) => {
-		this.x = x;
-		this.y = y;
-	}
-};
 let minimapToggle = false;
 let keyboardKeyAnimationFix = 0;
 let viewport = {
@@ -97,5 +89,5 @@ let viewport = {
 let viewDistance = 10;
 let mapSize = 32;
 let currentMap = 1;
-let rays = [];
-let testing = 0;
+let pressedButton;
+let konamiInput = "";

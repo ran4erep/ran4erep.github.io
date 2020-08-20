@@ -203,25 +203,25 @@ let Character = function(spritesheet,animations,x,y) {
     }
 
     this.move = () => {
-    	this.atTileX = Math.floor(this.x/spriteSize);
-    	this.atTileY = Math.floor(this.y/spriteSize);
+    	this.atTileX = Math.floor( (this.x+(spriteSize/2) )/spriteSize );
+    	this.atTileY = Math.floor( (this.y+(spriteSize/2) )/spriteSize );
     	this.getDestination();
     	//this.vx *= this.friction;
         if (this.vx === 1 && !this.isDead) {
             this.x++;
-            camera.move(camera.x--,0);
+            camera.move(camera.x--,0,camera.tx++,0);
         }
         if (this.vx === -1 && !this.isDead) {
             this.x--;
-            camera.move(camera.x++,0);
+            camera.move(camera.x++,0,camera.tx--,0);
         }
         if (this.vy === -1 && !this.isDead) {
             this.y--;
-            camera.move(0,camera.y++);
+            camera.move(0,camera.y++,0,camera.ty++);
         }
         if (this.vy === 1 && !this.isDead) {
             this.y++;
-            camera.move(0,camera.y--);
+            camera.move(0,camera.y--,0,camera.ty--);
         }
         //this.vy *= this.friction;
         //this.y += this.vy;
@@ -249,7 +249,22 @@ let Character = function(spritesheet,animations,x,y) {
     }
 
 }
-let player = new Character(0,alex_animations,7*spriteSize,9*spriteSize);
+
+let player = new Character(0,alex_animations,7*spriteSize,7*spriteSize);
+
+let camera = {
+    x : (7 - player.atTileX) * tileSize,
+    y : (7 - player.atTileY) * tileSize,
+    tx: (player.atTileX - 7)*8, //тут должна быть разница между спаунХ и оффсетХ. Напимер, спаун по Х нв 8, а центр 7. Значит делаем tx=8
+    ty: -(player.atTileY - 7)*8,
+
+    move : (x,y,tx,ty) => {
+        this.x = x;
+        this.y = y;
+        this.tx = tx/tileSize;
+        this.ty = ty/tileSize;
+    }
+};
 
 //класс системы света
     let LightSystem = function() {
