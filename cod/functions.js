@@ -171,17 +171,21 @@ let render = () => {
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 	for (let x = viewport.x.min; x < viewport.x.max; x++) {
 		for (let y = viewport.y.min; y < viewport.y.max; y++) {
+			
 			drawSprite(maps[currentMap][y][x],(x*spriteSize)+camera.x,(y*spriteSize)+camera.y);
 			//drawing the light from lightmap
+			ctx.save();
+			ctx.globalCompositeOperation = "multiply";
 			if (lightMap[y][x] > 0) {
-				ctx.fillStyle = `rgba(${lightMap[y][x]*10},${lightMap[y][x]*10},${lightMap[y][x]*10},0.5)`;
+				ctx.fillStyle = `rgba(${r},${g},${b},0.5)`;
+				//ctx.fillStyle = `rgba(${lightMap[y][x]*10},${lightMap[y][x]*10},${lightMap[y][x]*10},0.5)`;
 				ctx.fillRect( (x*spriteSize)+camera.x, (y*spriteSize)+camera.y, 8,8 );
 			}
 			if (lightMap[y][x] === 0) {
 				ctx.fillStyle = "black";
 				ctx.fillRect( (x*spriteSize)+camera.x, (y*spriteSize)+camera.y, 8,8 );
 			}
-
+			ctx.restore();
 
 			if (torch.isNight) {
 				//torch.updateLight();
