@@ -100,12 +100,12 @@ let drawTile = (tileNumber, x, y, tileset, opacity) => {
 let drawSprite = (tileNumber, x, y, tileset, opacity) => {
 	if (tileset === undefined) tileset = graphics[4];
 	if (opacity === undefined) opacity = 1;
-	ctx.save();
-	ctx.globalAlpha = opacity;
+	//ctx.save();
+	//ctx.globalAlpha = opacity;
 	ctx.drawImage(
 		tileset,tileNumber*spriteSize,0,spriteSize,spriteSize,x, y, tileSize, tileSize
 		);
-	ctx.restore();
+	//ctx.restore();
 }
 
 
@@ -188,14 +188,14 @@ let render = () => {
 	for (let x = viewport.x.min; x < viewport.x.max; x++) {
 		for (let y = viewport.y.min; y < viewport.y.max; y++) {
 			//drawing the light from lightmap
-			ctx.save();
-			ctx.globalCompositeOperation = "multiply";
+			//ctx.save();
+			//ctx.globalCompositeOperation = "multiply";
 			if (lightMap[y][x] > 0) {
 				//ctx.fillStyle = `rgba(${r},${g},${b},0.5)`;
 				ctx.fillStyle = `rgba(${lightMap[y][x]*20+r},${lightMap[y][x]*20+g},${lightMap[y][x]*20+b},0.5)`;
 				ctx.fillRect( (x*spriteSize)+camera.x, (y*spriteSize)+camera.y, 8,8 );
 			}
-			ctx.restore();
+			//ctx.restore();
 			if (lightMap[y][x] === 0) {
 				ctx.fillStyle = "rgb(50,50,50)";
 				ctx.fillRect( (x*spriteSize)+camera.x, (y*spriteSize)+camera.y, 8,8 );
