@@ -91,3 +91,4 @@ let mapSize = 32;
 let currentMap = 1;
 let pressedButton;
 let konamiInput = "";
+let LOSFOV = 5;

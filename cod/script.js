@@ -296,7 +296,7 @@ let mainMenu = () => {
 	//if (fade.in) fade.in();
 }
 
-let gameMode = mainMenu;//mainMenu or game;
+let gameMode = game;//mainMenu or game;
 
 //Основной блок игры-----------------------
 
@@ -307,7 +307,7 @@ function gameLoop(timestamp) {
 	//if (timestamp - timeStart >= 0) {
 		//начало игрового цикла-----
 		//если графика загрузилась, то можно начинать работу
-		if (graphicsIsLoaded(graphics,graphicsSumCounter)) {
+		if (graphicsIsLoaded(graphics,graphicsSumCounter) && engineIsWorking) {
 				gameMode();
 		}
 		const NOW = performance.now();

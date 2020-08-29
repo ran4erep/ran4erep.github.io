@@ -25,6 +25,7 @@
         width: 130px;
         height: 130px;
         margin-left: 20px;
+        margin-bottom: 20px;
     }
     #buttonUp {
         width: 45px;
@@ -66,14 +67,15 @@
         flex-direction: row;
         width: 100%;
         justify-content: space-between;
-        position: fixed;
-        bottom: 0px;
+        position: absolute;
+        bottom: 150px;
     }
     #face-buttons {
         position: relative;
         width: 130px;
         height: 130px;
         margin-right: 20px;
+        margin-bottom: 20px;
     }
     #buttonA {
         width: 45px;
@@ -147,7 +149,7 @@
             <input placeholder="~ waiting for command" id="consoleInput">
             <button id="consoleDo">Enter</button>
         </div>
-        <button id="buttonStopEngine">Остановить движок</button>
+        <button id="buttonStopEngine"><img src="data/power.png"></button>
         <button id="take-screenshot-button"><img src="data/camera.png" onclick="makeScreenshot()"></button>
         <div id="game">
             <canvas id="canvas" oncontextmenu="return false"></canvas>

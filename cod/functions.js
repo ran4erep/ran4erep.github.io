@@ -172,7 +172,16 @@ let render = () => {
 	for (let x = viewport.x.min; x < viewport.x.max; x++) {
 		for (let y = viewport.y.min; y < viewport.y.max; y++) {
 			drawSprite(maps[currentMap][y][x],(x*spriteSize)+camera.x,(y*spriteSize)+camera.y);
-			//raycast(player.x+4,player.y+2,0,0);
+			//drawing the light from lightmap
+			if (lightMap[y][x] > 0) {
+				ctx.fillStyle = `rgba(${lightMap[y][x]*10},${lightMap[y][x]*10},${lightMap[y][x]*10},0.5)`;
+				ctx.fillRect( (x*spriteSize)+camera.x, (y*spriteSize)+camera.y, 8,8 );
+			}
+			if (lightMap[y][x] === 0) {
+				ctx.fillStyle = "black";
+				ctx.fillRect( (x*spriteSize)+camera.x, (y*spriteSize)+camera.y, 8,8 );
+			}
+
 
 			if (torch.isNight) {
 				//torch.updateLight();
@@ -183,13 +192,14 @@ let render = () => {
 	
 	//рисуем титры
 	 if (endTitles.creditsY>-endTitles.credits.length && showCredits) endTitles.scroll(0.2,1);
-	 drawHud(100,100,12*3,20);
+	 
 	 if (minimapToggle) minimap();
 
 	 //тайловые координаты игрока с учётом камеры и спауна:
 	 //player.atTileX*8-camera.tx, player.atTileY*8+camera.ty
 	 player.render();
 	 
+	 lightMap = newMap(maps[currentMap].length, 0)
 	 for(let i=0; i<16; i++) {
 	 	raycast(player.atTileX,player.atTileY,(player.atTileX-7)+i,player.atTileY-7);
 	 }
@@ -205,6 +215,8 @@ let render = () => {
 	 
 	 ctx.strokeStyle = palette[3].hex;
 	 ctx.strokeRect( player.atTileX*8-camera.tx, player.atTileY*8+camera.ty, 8, 8 );
+
+	 drawHud(100,100,12*3,20);
 
 }
 let part;
@@ -426,11 +438,13 @@ let plot = (x,y,alpha) => {
 	ctx.strokeRect(x*8-camera.tx,y*8+camera.ty,8,8);
 }
 
-//let hitTheWall = (x,y) => (map[y][x] === 1) ? true : false;
+let hitTheWall = (x,y) => (maps[currentMap][x][y] === 41) ? true : false;
 
 let raycast = (x0,y0, x1,y1) => {
 	(x1 < 0) ? x1 = 0 : x1 = x1;
 	(y1 < 0) ? y1 = 0 : y1 = y1;
+	(x1 > maps[currentMap].length-1) ? x1 = maps[currentMap].length-1 : x1 = x1;
+	(y1 > maps[currentMap].length-1) ? y1 = maps[currentMap].length-1 : y1 = y1;
 	let dx = Math.abs(x1-x0);
 	let dy = Math.abs(y1-y0);
 	let sx = (x0 < x1) ? 1 : -1;
@@ -439,9 +453,17 @@ let raycast = (x0,y0, x1,y1) => {
 	let alpha = 1.0;
 
 	while(true) {
-		if (maps[currentMap][y0][x0] === 41) break;
-		plot(x0, y0,1);
+		let light = Math.floor(dist( player.atTileX,player.atTileY, x0,y0) );
+		//if (maps[currentMap][y0][x0] === 41) break;
+		if ( hitTheWall(y0, x0) ) {
+			lightMap[y0][x0] = light;
+			break;
+		}
+		//if ( Math.floor(dist(player.atTileX,player.atTileY,x0,y0)) > LOSFOV ) break;
+		//plot(x0, y0,1);
 		alpha -= 0.01;
+		lightMap[y0][x0] = light;
+		//lightMap[y0][x0] = 0.6-(Math.floor(dist( player.atTileX,player.atTileY, x0,y0) )/8);
 
 		if((x0===x1) && (y0===y1)) break;
 		let e2 = 2*err;
