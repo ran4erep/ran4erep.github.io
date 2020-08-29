@@ -67,6 +67,13 @@ let alex_animations = [
 	{name : "breathingDown", frames : [39,40]}
 ];
 
+let zombie_animations = [
+	{name : "walkingLeft", frames  : [0,1,2,3]},
+	{name : "walkingRight", frames : [4,5,6,7]},
+	{name : "walkingUp", frames    : [8,9,10,11]},
+	{name : "walkingDown", frames  : [12,13,14,15]}
+]
+
 let smokingTimer = 0;
 let isSmoking = false;
 let mapOffsetX = 0;
@@ -93,3 +100,18 @@ let pressedButton;
 let konamiInput = "";
 let LOSFOV = 5;
 let r = 50, g = 50, b = 50;
+let tilesetProperties;
+
+let loadJSON = (file) => {
+	let requestURL = file;
+	let request = new XMLHttpRequest();
+	request.open('GET', requestURL);
+	request.responseType = 'json';
+	request.send();
+	request.onload = function() {
+		tilesetProperties = request.response;
+	}
+}
+
+loadJSON("tileset.json");
+let cantSee = true;

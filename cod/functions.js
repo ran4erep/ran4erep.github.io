@@ -133,7 +133,7 @@ let fullscreen = () => {
 //функция логики игры
 let logic = () => {
 	
-	fullscreen();
+	//fullscreen();
 	//large maps optimization
 	mapSize = maps[currentMap].length;
 	(player.atTileX - viewDistance < 0)  ?
@@ -162,8 +162,10 @@ let logic = () => {
 	if (player.isWalking) smokingTimer = 0
 		else isSmoking = false;
 	//--------
+	zombie.AI();
 
 }
+
 
 // функция рендеринга изображения
 let render = () => {
@@ -173,19 +175,6 @@ let render = () => {
 		for (let y = viewport.y.min; y < viewport.y.max; y++) {
 			
 			drawSprite(maps[currentMap][y][x],(x*spriteSize)+camera.x,(y*spriteSize)+camera.y);
-			//drawing the light from lightmap
-			ctx.save();
-			ctx.globalCompositeOperation = "multiply";
-			if (lightMap[y][x] > 0) {
-				ctx.fillStyle = `rgba(${r},${g},${b},0.5)`;
-				//ctx.fillStyle = `rgba(${lightMap[y][x]*10},${lightMap[y][x]*10},${lightMap[y][x]*10},0.5)`;
-				ctx.fillRect( (x*spriteSize)+camera.x, (y*spriteSize)+camera.y, 8,8 );
-			}
-			if (lightMap[y][x] === 0) {
-				ctx.fillStyle = "black";
-				ctx.fillRect( (x*spriteSize)+camera.x, (y*spriteSize)+camera.y, 8,8 );
-			}
-			ctx.restore();
 
 			if (torch.isNight) {
 				//torch.updateLight();
@@ -193,7 +182,27 @@ let render = () => {
 			}
 		}
 	}
-	
+
+	zombie.render();
+
+	for (let x = viewport.x.min; x < viewport.x.max; x++) {
+		for (let y = viewport.y.min; y < viewport.y.max; y++) {
+			//drawing the light from lightmap
+			ctx.save();
+			ctx.globalCompositeOperation = "multiply";
+			if (lightMap[y][x] > 0) {
+				//ctx.fillStyle = `rgba(${r},${g},${b},0.5)`;
+				ctx.fillStyle = `rgba(${lightMap[y][x]*20+r},${lightMap[y][x]*20+g},${lightMap[y][x]*20+b},0.5)`;
+				ctx.fillRect( (x*spriteSize)+camera.x, (y*spriteSize)+camera.y, 8,8 );
+			}
+			ctx.restore();
+			if (lightMap[y][x] === 0) {
+				ctx.fillStyle = "rgb(50,50,50)";
+				ctx.fillRect( (x*spriteSize)+camera.x, (y*spriteSize)+camera.y, 8,8 );
+			}
+		}
+	}
+
 	//рисуем титры
 	 if (endTitles.creditsY>-endTitles.credits.length && showCredits) endTitles.scroll(0.2,1);
 	 
@@ -201,6 +210,10 @@ let render = () => {
 
 	 //тайловые координаты игрока с учётом камеры и спауна:
 	 //player.atTileX*8-camera.tx, player.atTileY*8+camera.ty
+
+	 //players's tile position visualization
+	 ctx.strokeStyle = palette[3].hex;
+	 ctx.strokeRect( player.atTileX*8-camera.tx, player.atTileY*8+camera.ty, 8, 8 );
 	 player.render();
 	 
 	 lightMap = newMap(maps[currentMap].length, 0)
@@ -217,8 +230,8 @@ let render = () => {
 	 	raycast(player.atTileX,player.atTileY,(player.atTileX-7)+i,(player.atTileY-7)+15);
 	 }
 	 
-	 ctx.strokeStyle = palette[3].hex;
-	 ctx.strokeRect( player.atTileX*8-camera.tx, player.atTileY*8+camera.ty, 8, 8 );
+	 castLine(zombie.x,zombie.y, player.x,player.y);
+
 
 	 drawHud(100,100,12*3,20);
 
@@ -437,12 +450,35 @@ let drawHud = (hp,panic,weapon,ammo) => {
 
 let dist = (x1,y1, x2,y2) => Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
 
-let plot = (x,y,alpha) => {
-	ctx.strokeStyle = `rgba(255,0,0,${alpha})`;
-	ctx.strokeRect(x*8-camera.tx,y*8+camera.ty,8,8);
+let plot = (x,y) => {
+	ctx.fillStyle = `rgb(255,0,0)`;
+	ctx.fillRect(x,y,1,1);
 }
 
-let hitTheWall = (x,y) => (maps[currentMap][x][y] === 41) ? true : false;
+let castLine = (x0,y0, x1,y1) => {
+			let dx = Math.abs(x1-x0);
+			let dy = Math.abs(y1-y0);
+			let sx = (x0 < x1) ? 1 : -1;
+			let sy = (y0 < y1) ? 1 : -1;
+			let err = dx - dy;
+
+			while(true) {
+				if( maps[currentMap][Math.floor(y0/8)][Math.floor(x0/8)] === 41 ) {
+					cantSee = true;
+					break;
+				};
+				plot(x0+camera.x,y0+camera.y);
+				cantSee = false;
+
+				if((x0===x1) && (y0===y1)) break;
+				let e2 = 2*err;
+				if(e2 > -dy) {err -= dy; x0 += sx;}
+				if(e2 < dx) {err += dx; y0 += sy;}
+			}
+};
+
+//tilesetProperties.tiles[maps[currentMap][x][y]].properties[0].value
+let hitTheWall = (x,y) => (tilesetProperties.tiles[maps[currentMap][x][y]].properties[0].value === true) ? true : false;
 
 let raycast = (x0,y0, x1,y1) => {
 	(x1 < 0) ? x1 = 0 : x1 = x1;
@@ -467,6 +503,7 @@ let raycast = (x0,y0, x1,y1) => {
 		//plot(x0, y0,1);
 		alpha -= 0.01;
 		lightMap[y0][x0] = light;
+		lightMap[player.atTileY][player.atTileX] = 1;
 		//lightMap[y0][x0] = 0.6-(Math.floor(dist( player.atTileX,player.atTileY, x0,y0) )/8);
 
 		if((x0===x1) && (y0===y1)) break;

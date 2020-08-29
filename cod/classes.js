@@ -133,9 +133,33 @@ let Character = function(spritesheet,animations,x,y) {
     this.animationType = "endless";
     this.isDead = false;
 
+    this.AI = () => {
+        if(this.x < player.x && this.y < player.y) this.facing = "e";
+        if(this.x > player.x && this.y < player.y) this.facing = "w";
+        //if(this.y > player.y) this.facing = "n";
+        //if(this.y < player.y) this.facing = "s";
+        //if(this.facing === "e") this.setCurrentAnimation("walkingRight",5);
+        //if(this.facing === "w") this.setCurrentAnimation("walkingLeft",5);
+        //if(this.facing === "n") this.setCurrentAnimation("walkingUp",5);
+        //if(this.facing === "s") this.setCurrentAnimation("walkingDown",5);
+        let dirX = player.x - this.x;
+        let dirY = player.y - this.y;
+        let hyp = Math.sqrt(dirX*dirX + dirY*dirY);
+        dirX /= hyp;
+        dirY /= hyp;
+
+        if (!cantSee) {
+            this.x += Math.round(dirX) * 1;
+            this.y += Math.round(dirY) * 1;
+        }
+        
+    }
+
+    //tilesetProperties.tiles[4].objectgroup.objects[0].x || y || width || height --- данные о коллизии тайла
+
     this.setCurrentAnimation = (animation,frameSpeed,type) => {
     	(type) ? this.animationType = type : this.animationType = "endless";
-        (frameSpeed) ? this.frameSpeed = frameSpeed : this.frameSpeed = 3000;
+        (frameSpeed) ? this.frameSpeed = frameSpeed : this.frameSpeed = 5;
             this.currentFrame = 0;
             for (let i = 0; i < this.animations.length; i++) {
                 if(animation === this.animations[i].name) {
@@ -164,8 +188,8 @@ let Character = function(spritesheet,animations,x,y) {
         
         //rendering character
     	drawSprite(this.currentAnimation[this.currentFrame],
-            player.x+camera.x,
-            player.y+camera.y,
+            this.x+camera.x,
+            this.y+camera.y,
             graphics[this.spritesheet]
             );
     	this.animationSpeed++;
@@ -251,6 +275,8 @@ let Character = function(spritesheet,animations,x,y) {
 }
 
 let player = new Character(0,alex_animations,7*spriteSize,7*spriteSize);
+let zombie = new Character(1,zombie_animations,0*spriteSize,0*spriteSize);
+zombie.setCurrentAnimation("walkingRight",5);
 
 let camera = {
     x : (7 - player.atTileX) * tileSize,
