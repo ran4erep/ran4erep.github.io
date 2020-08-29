@@ -116,4 +116,5 @@ let loadJSON = (file) => {
 loadJSON("tileset.json");
 let cantSee = true;
 
-alert("No Save and Restore version");
+//alert("No Save and Restore version");
+alert("Out of for loop version");

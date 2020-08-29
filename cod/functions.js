@@ -185,6 +185,8 @@ let render = () => {
 
 	zombie.render();
 
+	ctx.save();
+	ctx.globalCompositeOperation = "multiply";
 	for (let x = viewport.x.min; x < viewport.x.max; x++) {
 		for (let y = viewport.y.min; y < viewport.y.max; y++) {
 			//drawing the light from lightmap
@@ -202,6 +204,7 @@ let render = () => {
 			}
 		}
 	}
+	ctx.restore();
 
 	//рисуем титры
 	 if (endTitles.creditsY>-endTitles.credits.length && showCredits) endTitles.scroll(0.2,1);
