@@ -53,25 +53,29 @@ let palette = [
 ];
 
 let alex_animations = [
-	{name : "breathingLeft", frames : [0,1]},
+	{name : "breathingLeft", frames  : [0,1]},
 	{name : "breathingRight", frames : [2,3]},
-	{name : "smoking", frames : [4,5,6,7,8,9]},
-	{name : "walkingLeft", frames : [10,11,12,13]},
-	{name : "walkingRight", frames : [14,15,16,17]},
-	{name : "walkingUp", frames : [18,19,20,21]},
-	{name : "walkingDown", frames : [22,23,24,25]},
-	{name : "talkingLeft", frames : [26,27]},
-	{name : "talkingRight", frames : [28,29]},
-	{name : "death", frames : [30,31,32,33,34,35,36]},
-	{name : "breathingUp", frames : [37,38]},
-	{name : "breathingDown", frames : [39,40]}
+	{name : "smoking", frames        : [4,5,6,7,8,9]},
+	{name : "walkingLeft", frames    : [10,11,12,13]},
+	{name : "walkingRight", frames   : [14,15,16,17]},
+	{name : "walkingUp", frames      : [18,19,20,21]},
+	{name : "walkingDown", frames    : [22,23,24,25]},
+	{name : "talkingLeft", frames    : [26,27]},
+	{name : "talkingRight", frames   : [28,29]},
+	{name : "death", frames          : [30,31,32,33,34,35,36]},
+	{name : "breathingUp", frames    : [37,38]},
+	{name : "breathingDown", frames  : [39,40]}
 ];
 
 let zombie_animations = [
-	{name : "walkingLeft", frames  : [0,1,2,3]},
-	{name : "walkingRight", frames : [4,5,6,7]},
-	{name : "walkingUp", frames    : [8,9,10,11]},
-	{name : "walkingDown", frames  : [12,13,14,15]}
+	{name : "walkingLeft", frames       : [0,1,2,3]},
+	{name : "walkingRight", frames      : [4,5,6,7]},
+	{name : "walkingUp", frames         : [8,9,10,11]},
+	{name : "walkingDown", frames       : [12,13,14,15]},
+	{name : "breathingLeft", frames     : [18,19]},
+	{name : "breathingRight", frames    : [20,21]},
+	{name : "breathingUp", frames       : [22,23]},
+	{name : "breathingDown", frames     : [24,25]},
 ]
 
 let smokingTimer = 0;
@@ -117,4 +121,4 @@ loadJSON("tileset.json");
 let cantSee = true;
 
 //alert("No Save and Restore version");
-alert("Out of for loop version");
+//alert("Out of for loop version");

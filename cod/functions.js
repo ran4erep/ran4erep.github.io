@@ -88,12 +88,12 @@ let drawText = (text, x, y, fontFile, c) => {
 let drawTile = (tileNumber, x, y, tileset, opacity) => {
 	if (tileset === undefined) tileset = graphics[4];
 	if (opacity === undefined) opacity = 1;
-	ctx.save();
-	ctx.globalAlpha = opacity;
+	//ctx.save();
+	//ctx.globalAlpha = opacity;
 	ctx.drawImage(
 		tileset,tileNumber*spriteSize,0,spriteSize,spriteSize,x*tileSize, y*tileSize, tileSize, tileSize
 		);
-	ctx.restore();
+	//ctx.restore();
 }
 
 //функция отрисовки тайлов
@@ -185,8 +185,6 @@ let render = () => {
 
 	zombie.render();
 
-	ctx.save();
-	ctx.globalCompositeOperation = "multiply";
 	for (let x = viewport.x.min; x < viewport.x.max; x++) {
 		for (let y = viewport.y.min; y < viewport.y.max; y++) {
 			//drawing the light from lightmap
@@ -204,7 +202,6 @@ let render = () => {
 			}
 		}
 	}
-	ctx.restore();
 
 	//рисуем титры
 	 if (endTitles.creditsY>-endTitles.credits.length && showCredits) endTitles.scroll(0.2,1);
@@ -233,7 +230,7 @@ let render = () => {
 	 	raycast(player.atTileX,player.atTileY,(player.atTileX-7)+i,(player.atTileY-7)+15);
 	 }
 	 
-	 castLine(zombie.x,zombie.y, player.x,player.y);
+	 castLine(zombie.x+4,zombie.y+4, player.x+4,player.y+4);
 
 
 	 drawHud(100,100,12*3,20);
@@ -454,7 +451,7 @@ let drawHud = (hp,panic,weapon,ammo) => {
 let dist = (x1,y1, x2,y2) => Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
 
 let plot = (x,y) => {
-	ctx.fillStyle = `rgb(255,0,0)`;
+	ctx.fillStyle = `rgba(255,0,0,0.5)`;
 	ctx.fillRect(x,y,1,1);
 }
 

@@ -149,6 +149,8 @@ let Character = function(spritesheet,animations,x,y) {
         dirY /= hyp;
 
         if (!cantSee) {
+            this.currentAnimation = [4,5,6,7];
+            this.frameSpeed = 5;
             this.x += Math.round(dirX) * 1;
             this.y += Math.round(dirY) * 1;
         }
@@ -276,7 +278,7 @@ let Character = function(spritesheet,animations,x,y) {
 
 let player = new Character(0,alex_animations,7*spriteSize,7*spriteSize);
 let zombie = new Character(1,zombie_animations,0*spriteSize,0*spriteSize);
-zombie.setCurrentAnimation("walkingRight",5);
+zombie.setCurrentAnimation("breathingDown",10);
 
 let camera = {
     x : (7 - player.atTileX) * tileSize,
