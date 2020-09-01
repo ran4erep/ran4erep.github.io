@@ -187,4 +187,16 @@ let maps = [
 ]
 													];
 
-let lightMap = newMap(maps[currentMap].length, 0);
+let lightMap     = newMap(maps[currentMap].length, 0 );
+let collisionMap = newMap(maps[currentMap].length, undefined);
+
+for(let i=0; i < collisionMap.length; i++) {
+	for(let j=0; j < collisionMap.length; j++) {
+		collisionMap[i][j] = {
+			x      : 0,
+			y      : 0,
+			width  : 0,
+			height : 0
+		};
+	}
+}

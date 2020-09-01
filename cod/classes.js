@@ -132,27 +132,30 @@ let Character = function(spritesheet,animations,x,y) {
     this.isWalking = false;
     this.animationType = "endless";
     this.isDead = false;
+    this.dirX = 0;
+    this.dirY = 0;
 
     this.AI = () => {
-        if(this.x < player.x && this.y < player.y) this.facing = "e";
-        if(this.x > player.x && this.y < player.y) this.facing = "w";
-        //if(this.y > player.y) this.facing = "n";
-        //if(this.y < player.y) this.facing = "s";
-        //if(this.facing === "e") this.setCurrentAnimation("walkingRight",5);
-        //if(this.facing === "w") this.setCurrentAnimation("walkingLeft",5);
-        //if(this.facing === "n") this.setCurrentAnimation("walkingUp",5);
-        //if(this.facing === "s") this.setCurrentAnimation("walkingDown",5);
-        let dirX = player.x - this.x;
-        let dirY = player.y - this.y;
-        let hyp = Math.sqrt(dirX*dirX + dirY*dirY);
-        dirX /= hyp;
-        dirY /= hyp;
+        if(this.x < player.x) this.facing = "e";
+        if(this.x > player.x) this.facing = "w";
+        //if(this.dirY < 0) this.facing = "n";
+        //if(this.dirY > 0) this.facing = "s";
+        if(this.facing === "e") this.setCurrentAnimation("walkingRight",5);
+        if(this.facing === "w") this.setCurrentAnimation("walkingLeft",5);
+        if(this.facing === "n") this.setCurrentAnimation("walkingUp",5);
+        if(this.facing === "s") this.setCurrentAnimation("walkingDown",5);
+        // this.dirX = player.x - this.x;
+        // this.dirY = player.y - this.y;
+        // let hyp = Math.sqrt(this.dirX*this.dirX + this.dirY*this.dirY);
+        // this.dirX /= hyp;
+        // this.dirY /= hyp;
+        let a = Math.atan2(player.y - this.y, player.x - this.x);
 
         if (!cantSee) {
-            this.currentAnimation = [4,5,6,7];
-            this.frameSpeed = 5;
-            this.x += Math.round(dirX) * 1;
-            this.y += Math.round(dirY) * 1;
+            // this.x += Math.round(this.dirX) * 1;
+            // this.y += Math.round(this.dirY) * 1;
+            this.x += Math.round(Math.cos(a)) * 1;
+            this.y += Math.round(Math.sin(a)) * 1;
         }
         
     }
@@ -162,12 +165,12 @@ let Character = function(spritesheet,animations,x,y) {
     this.setCurrentAnimation = (animation,frameSpeed,type) => {
     	(type) ? this.animationType = type : this.animationType = "endless";
         (frameSpeed) ? this.frameSpeed = frameSpeed : this.frameSpeed = 5;
-            this.currentFrame = 0;
             for (let i = 0; i < this.animations.length; i++) {
                 if(animation === this.animations[i].name) {
                     this.currentAnimation = this.animations[i].frames;
                 }
             }
+            if(this.currentFrame >= this.currentAnimation.length) this.currentFrame = 0;
     };
 
     this.render = () => {
@@ -277,7 +280,7 @@ let Character = function(spritesheet,animations,x,y) {
 }
 
 let player = new Character(0,alex_animations,7*spriteSize,7*spriteSize);
-let zombie = new Character(1,zombie_animations,0*spriteSize,0*spriteSize);
+let zombie = new Character(1,zombie_animations,15*spriteSize,0*spriteSize);
 zombie.setCurrentAnimation("breathingDown",10);
 
 let camera = {

@@ -133,7 +133,7 @@ let fullscreen = () => {
 //функция логики игры
 let logic = () => {
 	
-	//fullscreen();
+	fullscreen();
 	//large maps optimization
 	mapSize = maps[currentMap].length;
 	(player.atTileX - viewDistance < 0)  ?
@@ -175,6 +175,12 @@ let render = () => {
 		for (let y = viewport.y.min; y < viewport.y.max; y++) {
 			
 			drawSprite(maps[currentMap][y][x],(x*spriteSize)+camera.x,(y*spriteSize)+camera.y);
+			ctx.strokeStyle = "blue";
+			ctx.strokeRect(
+				collisionMap[y][x].x + camera.x,
+				collisionMap[y][x].y + camera.y,
+				collisionMap[y][x].width,
+				collisionMap[y][x].height);
 
 			if (torch.isNight) {
 				//torch.updateLight();
@@ -192,7 +198,7 @@ let render = () => {
 			//ctx.globalCompositeOperation = "multiply";
 			if (lightMap[y][x] > 0) {
 				//ctx.fillStyle = `rgba(${r},${g},${b},0.5)`;
-				ctx.fillStyle = `rgba(${lightMap[y][x]*20+r},${lightMap[y][x]*20+g},${lightMap[y][x]*20+b},0.5)`;
+				ctx.fillStyle = `rgba(${lightMap[y][x]*20+r},${lightMap[y][x]*20+g},${lightMap[y][x]*20+b},0.2)`;
 				ctx.fillRect( (x*spriteSize)+camera.x, (y*spriteSize)+camera.y, 8,8 );
 			}
 			//ctx.restore();
@@ -463,7 +469,11 @@ let castLine = (x0,y0, x1,y1) => {
 			let err = dx - dy;
 
 			while(true) {
-				if( maps[currentMap][Math.floor(y0/8)][Math.floor(x0/8)] === 41 ) {
+				(x0 < 0) ? 0 : x0 = x0;
+				(y0 < 0) ? 0 : y0 = y0;
+				(x1 < 0) ? 0 : x1 = x1;
+				(y1 < 0) ? 0 : y1 = y1;
+				if( maps[currentMap][Math.floor(y0/8)][Math.floor(x0/8)] === 41) {
 					cantSee = true;
 					break;
 				};
