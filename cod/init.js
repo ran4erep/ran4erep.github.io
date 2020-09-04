@@ -26,7 +26,7 @@ let levelHeight = 16;
 let spriteSize = 8;
 let tileSize = canvas.width / levelWidth;
 let root = "data/";
-let graphicsFiles = ["alex.png", "zombie_female.png", "font.png", "heart.png", "tileset.png", "font_inverted.png", "hud.png", "alex_portrait.png", "fich_portrait.png", "cars.png", "logo.png", "sveta_portrait.png", "weapons.png", "font_logo.png", "title_picture.png"];
+let graphicsFiles = ["alex.png", "zombie_female.png", "font.png", "heart.png", "tileset.png", "font_inverted.png", "hud.png", "alex_portrait.png", "fich_portrait.png", "cars.png", "logo.png", "sveta_portrait.png", "weapons.png", "font_logo.png", "title_picture.png", "sveta.png"];
 let graphics = [];
 let graphicsSumCounter = 0, allGraphicsLoaded = false, graphicsLoadingProgress = 0;
 let times = [];

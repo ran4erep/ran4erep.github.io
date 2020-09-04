@@ -133,7 +133,7 @@ let fullscreen = () => {
 //функция логики игры
 let logic = () => {
 	
-	fullscreen();
+	//fullscreen();
 	//large maps optimization
 	mapSize = maps[currentMap].length;
 	(player.atTileX - viewDistance < 0)  ?
@@ -162,7 +162,36 @@ let logic = () => {
 	if (player.isWalking) smokingTimer = 0
 		else isSmoking = false;
 	//--------
-	zombie.AI();
+	//zombie.AI();
+
+	for (let x = viewport.x.min; x < viewport.x.max; x++) {
+		for (let y = viewport.y.min; y < viewport.y.max; y++) {
+			if (player.facing === "n" && 
+				collisionMap[y][player.atTileX].y+collisionMap[y][player.atTileX].height === player.y+player.collisionBox.y) {
+				player.y += 1;
+				camera.y -= 1;
+				camera.ty -= 1;
+			}
+
+			if (player.facing === "s" &&
+				collisionMap[y][player.atTileX].y === ((player.y+player.collisionBox.y)+player.collisionBox.height)+1 ) {
+				player.y -= 1;
+				camera.y += 1;
+				camera.ty += 1;
+			}
+			if (player.facing === "w" && collisionMap[player.atTileY][x].x+collisionMap[player.atTileY][x].width === (player.x+player.collisionBox.x) ) {
+				player.x += 1;
+				camera.x -= 1;
+				camera.tx -= 1;
+			}
+			if (player.facing === "e" && collisionMap[player.atTileY][x].x === (player.x+player.collisionBox.x)+player.collisionBox.width ) {
+				player.x -= 1;
+				camera.x += 1;
+				camera.tx += 1;
+			}
+
+		}
+	}
 
 }
 
@@ -190,6 +219,7 @@ let render = () => {
 	}
 
 	zombie.render();
+	sveta.render();
 
 	for (let x = viewport.x.min; x < viewport.x.max; x++) {
 		for (let y = viewport.y.min; y < viewport.y.max; y++) {
@@ -219,7 +249,10 @@ let render = () => {
 
 	 //players's tile position visualization
 	 ctx.strokeStyle = palette[3].hex;
-	 ctx.strokeRect( player.atTileX*8-camera.tx, player.atTileY*8+camera.ty, 8, 8 );
+	 ctx.strokeRect( (player.x+camera.x)+player.collisionBox.x,
+	 				 (player.y+camera.y)+player.collisionBox.y,
+	 				  player.collisionBox.width,
+	 				  player.collisionBox.height);
 	 player.render();
 	 
 	 lightMap = newMap(maps[currentMap].length, 0)
@@ -236,7 +269,7 @@ let render = () => {
 	 	raycast(player.atTileX,player.atTileY,(player.atTileX-7)+i,(player.atTileY-7)+15);
 	 }
 	 
-	 castLine(zombie.x+4,zombie.y+4, player.x+4,player.y+4);
+	 //castLine(zombie.x+4,zombie.y+4, player.x+4,player.y+4);
 
 
 	 drawHud(100,100,12*3,20);
@@ -435,7 +468,7 @@ let drawHud = (hp,panic,weapon,ammo) => {
 	let y = canvas.height-11;
 	let hudGraphics = graphics[6];
 	let weaponGraphics = graphics[12];
-	let portraitGraphics = graphics[7];
+	let portraitGraphics = graphics[7]; //7
 
 	ctx.fillStyle = palette[13].hex;
 	ctx.fillRect(x,y, canvas.width-2,10);
@@ -506,14 +539,16 @@ let raycast = (x0,y0, x1,y1) => {
 		let light = Math.floor(dist( player.atTileX,player.atTileY, x0,y0) );
 		//if (maps[currentMap][y0][x0] === 41) break;
 		if ( hitTheWall(y0, x0) ) {
-			lightMap[y0][x0] = light;
+			lightMap[y0][x0] = 11-light;
 			break;
 		}
+		//limited field of view
 		//if ( Math.floor(dist(player.atTileX,player.atTileY,x0,y0)) > LOSFOV ) break;
+
 		//plot(x0, y0,1);
 		alpha -= 0.01;
-		lightMap[y0][x0] = light;
-		lightMap[player.atTileY][player.atTileX] = 1;
+		lightMap[y0][x0] = 11-light;
+		lightMap[player.atTileY][player.atTileX] = 7;
 		//lightMap[y0][x0] = 0.6-(Math.floor(dist( player.atTileX,player.atTileY, x0,y0) )/8);
 
 		if((x0===x1) && (y0===y1)) break;

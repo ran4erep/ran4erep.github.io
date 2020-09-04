@@ -134,6 +134,12 @@ let Character = function(spritesheet,animations,x,y) {
     this.isDead = false;
     this.dirX = 0;
     this.dirY = 0;
+    this.collisionBox = {
+        x      : 2,
+        y      : 2,
+        width  : 4,
+        height : 5
+    };
 
     this.AI = () => {
         if(this.x < player.x) this.facing = "e";
@@ -281,6 +287,7 @@ let Character = function(spritesheet,animations,x,y) {
 
 let player = new Character(0,alex_animations,7*spriteSize,7*spriteSize);
 let zombie = new Character(1,zombie_animations,15*spriteSize,0*spriteSize);
+let sveta = new Character(15,alex_animations, 5*spriteSize, 7*spriteSize);
 zombie.setCurrentAnimation("breathingDown",10);
 
 let camera = {

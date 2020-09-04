@@ -755,7 +755,7 @@
                 {
                  "name":"isSolid",
                  "type":"bool",
-                 "value":true
+                 "value":false
                 }]
         }, 
         {
@@ -924,7 +924,7 @@
                 {
                  "name":"isSolid",
                  "type":"bool",
-                 "value":true
+                 "value":false
                 }]
         }, 
         {
