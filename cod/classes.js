@@ -132,39 +132,46 @@ let Character = function(spritesheet,animations,x,y) {
     this.isWalking = false;
     this.animationType = "endless";
     this.isDead = false;
-    this.dirX = 0;
-    this.dirY = 0;
-    this.collisionBox = {
+    this.hitbox = {
         x      : 2,
         y      : 2,
         width  : 4,
         height : 5
     };
+    this.distancesToPlayer = [];
+    this.candidatToMove = 0;
+    this.moveTimer = 0;
+    this.enemyMovementSpeed = 3;
+    this.isColliding = false;
+    this.tileX = Math.floor(this.x/spriteSize);
+    this.tileY = Math.floor(this.y/spriteSize);
 
     this.AI = () => {
-        if(this.x < player.x) this.facing = "e";
-        if(this.x > player.x) this.facing = "w";
-        //if(this.dirY < 0) this.facing = "n";
-        //if(this.dirY > 0) this.facing = "s";
+        this.moveTimer++;
+        for(let i=0; i<4; i++) {
+            let x = this.x+dirX[i];
+            let y = this.y+dirY[i];
+            let distance = dist(x,y, player.x,player.y);
+            this.distancesToPlayer[i] = Math.round(distance);
+        }
+        this.candidatToMove = Math.min(...this.distancesToPlayer);
+        if(this.candidatToMove === this.distancesToPlayer[0]) this.facing = "w";
+        if(this.candidatToMove === this.distancesToPlayer[1]) this.facing = "n";
+        if(this.candidatToMove === this.distancesToPlayer[2]) this.facing = "e";
+        if(this.candidatToMove === this.distancesToPlayer[3]) this.facing = "s";
         if(this.facing === "e") this.setCurrentAnimation("walkingRight",5);
         if(this.facing === "w") this.setCurrentAnimation("walkingLeft",5);
         if(this.facing === "n") this.setCurrentAnimation("walkingUp",5);
         if(this.facing === "s") this.setCurrentAnimation("walkingDown",5);
-        // this.dirX = player.x - this.x;
-        // this.dirY = player.y - this.y;
-        // let hyp = Math.sqrt(this.dirX*this.dirX + this.dirY*this.dirY);
-        // this.dirX /= hyp;
-        // this.dirY /= hyp;
-        let a = Math.atan2(player.y - this.y, player.x - this.x);
 
-        if (!cantSee) {
-            // this.x += Math.round(this.dirX) * 1;
-            // this.y += Math.round(this.dirY) * 1;
-            this.x += Math.round(Math.cos(a)) * 1;
-            this.y += Math.round(Math.sin(a)) * 1;
+        if (!cantSee && dist(this.x,this.y, player.x,player.y) > 8 && this.moveTimer >= this.enemyMovementSpeed) {
+            if(this.facing === "w") this.x -= 1;
+            if(this.facing === "e") this.x += 1;
+            if(this.facing === "n") this.y -= 1;
+            if(this.facing === "s") this.y += 1;
+            this.moveTimer = 0;
         }
-        
-    }
+    };
 
     //tilesetProperties.tiles[4].objectgroup.objects[0].x || y || width || height --- данные о коллизии тайла
 
@@ -240,21 +247,23 @@ let Character = function(spritesheet,animations,x,y) {
     this.move = () => {
     	this.atTileX = Math.floor( (this.x+(spriteSize/2) )/spriteSize );
     	this.atTileY = Math.floor( (this.y+(spriteSize/2) )/spriteSize );
+        this.tileX = Math.floor( (this.x+spriteSize)/spriteSize );
+        this.tileY = Math.floor( (this.y+spriteSize)/spriteSize );
     	this.getDestination();
     	//this.vx *= this.friction;
-        if (this.vx === 1 && !this.isDead) {
+        if (this.vx === 1 && !this.isDead && !this.isColliding) {
             this.x++;
             camera.move(camera.x--,0,camera.tx++,0);
         }
-        if (this.vx === -1 && !this.isDead) {
+        if (this.vx === -1 && !this.isDead && !this.isColliding) {
             this.x--;
             camera.move(camera.x++,0,camera.tx--,0);
         }
-        if (this.vy === -1 && !this.isDead) {
+        if (this.vy === -1 && !this.isDead && !this.isColliding) {
             this.y--;
             camera.move(0,camera.y++,0,camera.ty++);
         }
-        if (this.vy === 1 && !this.isDead) {
+        if (this.vy === 1 && !this.isDead && !this.isColliding) {
             this.y++;
             camera.move(0,camera.y--,0,camera.ty--);
         }
@@ -286,7 +295,7 @@ let Character = function(spritesheet,animations,x,y) {
 }
 
 let player = new Character(0,alex_animations,7*spriteSize,7*spriteSize);
-let zombie = new Character(1,zombie_animations,15*spriteSize,0*spriteSize);
+let zombie = new Character(1,zombie_animations,0*spriteSize,0*spriteSize);
 let sveta = new Character(15,alex_animations, 5*spriteSize, 7*spriteSize);
 zombie.setCurrentAnimation("breathingDown",10);
 

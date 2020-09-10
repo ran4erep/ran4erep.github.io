@@ -312,7 +312,7 @@ function gameLoop(timestamp) {
 	//if (timestamp - timeStart >= 0) {
 		//начало игрового цикла-----
 		//если графика загрузилась, то можно начинать работу
-		if (graphicsIsLoaded(graphics,graphicsSumCounter) && engineIsWorking) {
+		if (graphicsIsLoaded(graphics,graphicsSumCounter) && collisionLoaded && engineIsWorking) {
 				gameMode();
 		}
 		const NOW = performance.now();

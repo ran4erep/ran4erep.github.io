@@ -106,6 +106,7 @@ let LOSFOV = 5;
 let r = 50, g = 50, b = 50;
 let tilesetProperties;
 let tilesetJSONLoaded = false;
+let collisionLoaded = false;
 
 let loadJSON = (file) => {
 	let requestURL = file;
@@ -115,26 +116,7 @@ let loadJSON = (file) => {
 	request.send();
 	request.onload = function() {
 		tilesetProperties = request.response;
-		for(let i=0; i < maps[currentMap].length; i++) {
-	for(let j=0; j < maps[currentMap].length; j++) {
-		if(tilesetProperties.tiles[maps[currentMap][j][i]].objectgroup) {
-			collisionMap[j][i].x = (i*spriteSize) + tilesetProperties.tiles[maps[currentMap][j][i]].objectgroup.objects[0].x;
-			collisionMap[j][i].y = (j*spriteSize) + tilesetProperties.tiles[maps[currentMap][j][i]].objectgroup.objects[0].y;
-			collisionMap[j][i].width = tilesetProperties.tiles[maps[currentMap][j][i]].objectgroup.objects[0].width;
-			collisionMap[j][i].height = tilesetProperties.tiles[maps[currentMap][j][i]].objectgroup.objects[0].height;
-		} else {
-			collisionMap[j][i].x = 0;
-			collisionMap[j][i].y = 0;
-			collisionMap[j][i].width = 0;
-			collisionMap[j][i].height = 0;
-		}
-		bakedCollision++;
-		//ctx.fillStyle = "red";
-	//drawBar(percentOf(bakedCollision,maps[currentMap].length*maps[currentMap].length),(canvas.width/2)-50,(canvas.height/2)-10,100,10);
-	}
-}
-
-
+		bakeCollision();
 	}
 }
 
@@ -145,3 +127,8 @@ let cantSee = true;
 //alert("Out of for loop version");
 
 let bakedCollision = 0;
+
+let dist = (x1,y1, x2,y2) => Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+
+const dirX = [-1, 0, 1, 0];
+const dirY = [0, -1, 0, 1];

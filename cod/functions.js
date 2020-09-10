@@ -130,6 +130,18 @@ let fullscreen = () => {
 	}
 }
 
+isCollided = (rect1, rect2) => {
+	if (rect1.x < rect2.x + rect2.width &&
+		rect1.x + rect1.width > rect2.x &&
+		rect1.y < rect2.y + rect2.height &&
+		rect1.y + rect1.height > rect2.y
+		){
+		return true;
+	} else {
+		return false;
+	}
+}
+
 //функция логики игры
 let logic = () => {
 	
@@ -162,33 +174,74 @@ let logic = () => {
 	if (player.isWalking) smokingTimer = 0
 		else isSmoking = false;
 	//--------
-	//zombie.AI();
+	zombie.AI();
+
+	if(player.facing === "n") {
+		for(let i=0; i<8; i++){
+			let y = player.y;
+			let x = player.x + i;
+			let ty = Math.floor(y/8);
+			let tx = Math.floor(x/8);
+			if(y < collisionMap[ty][tx].y + collisionMap[ty][tx].height) {
+				player.y++;
+				camera.y--;
+				camera.ty--;
+			}
+		};
+	}
+
+	if(player.facing === "w") {
+		for(let i=0; i<8; i++){
+			let y = player.y + i;
+			let x = player.x;
+			let ty = Math.floor(y/8);
+			let tx = Math.floor(x/8);
+			if(x < collisionMap[ty][tx].x + collisionMap[ty][tx].width) {
+				player.x++;
+				camera.x--;
+				camera.tx--;
+			}
+		};
+	}
+
+	if(player.facing === "s") {
+		for(let i=0; i<8; i++){
+			let y = player.y+8;
+			let x = player.x+i;
+			let ty = Math.floor(y/8)+1;
+			let tx = Math.floor(x/8);
+			if(y > collisionMap[ty][tx].y) {
+				player.y--;
+				camera.y++;
+				camera.ty++;
+			}
+		}
+	}
 
 	for (let x = viewport.x.min; x < viewport.x.max; x++) {
 		for (let y = viewport.y.min; y < viewport.y.max; y++) {
-			if (player.facing === "n" && 
-				collisionMap[y][player.atTileX].y+collisionMap[y][player.atTileX].height === player.y+player.collisionBox.y) {
-				player.y += 1;
-				camera.y -= 1;
-				camera.ty -= 1;
-			}
+			
+			// 		player.y += 1;
+			// 		camera.y -= 1;
+			// 		camera.ty -= 1;
+			// }
 
-			if (player.facing === "s" &&
-				collisionMap[y][player.atTileX].y === ((player.y+player.collisionBox.y)+player.collisionBox.height)+1 ) {
-				player.y -= 1;
-				camera.y += 1;
-				camera.ty += 1;
-			}
-			if (player.facing === "w" && collisionMap[player.atTileY][x].x+collisionMap[player.atTileY][x].width === (player.x+player.collisionBox.x) ) {
-				player.x += 1;
-				camera.x -= 1;
-				camera.tx -= 1;
-			}
-			if (player.facing === "e" && collisionMap[player.atTileY][x].x === (player.x+player.collisionBox.x)+player.collisionBox.width ) {
-				player.x -= 1;
-				camera.x += 1;
-				camera.tx += 1;
-			}
+			// if (player.facing === "s" &&
+			// 	collisionMap[y][player.atTileX].y === ((player.y+player.collisionBox.y)+player.collisionBox.height)+1 ) {
+			// 	player.y -= 1;
+			// 	camera.y += 1;
+			// 	camera.ty += 1;
+			// }
+			// if (player.facing === "w" && collisionMap[player.atTileY][x].x+collisionMap[player.atTileY][x].width === (player.x+player.collisionBox.x) ) {
+			// 	player.x += 1;
+			// 	camera.x -= 1;
+			// 	camera.tx -= 1;
+			// }
+			// if (player.facing === "e" && collisionMap[player.atTileY][x].x === (player.x+player.collisionBox.x)+player.collisionBox.width ) {
+			// 	player.x -= 1;
+			// 	camera.x += 1;
+			// 	camera.tx += 1;
+			// }
 
 		}
 	}
@@ -248,11 +301,15 @@ let render = () => {
 	 //player.atTileX*8-camera.tx, player.atTileY*8+camera.ty
 
 	 //players's tile position visualization
-	 ctx.strokeStyle = palette[3].hex;
-	 ctx.strokeRect( (player.x+camera.x)+player.collisionBox.x,
-	 				 (player.y+camera.y)+player.collisionBox.y,
-	 				  player.collisionBox.width,
-	 				  player.collisionBox.height);
+	 ctx.strokeStyle = palette[8].hex;
+	 ctx.strokeRect(player.x+camera.x, player.y+camera.y, 8,8)
+	 ctx.fillStyle = "yellow";
+	 ctx.fillRect(player.x+camera.x,(player.y+camera.y)+8,1,1)
+	 // ctx.strokeRect( (player.x+camera.x)+player.hitbox.x,
+	 // 				 (player.y+camera.y)+player.hitbox.y,
+	 // 				  player.hitbox.width,
+	 // 				  player.hitbox.height);
+
 	 player.render();
 	 
 	 lightMap = newMap(maps[currentMap].length, 0)
@@ -269,7 +326,7 @@ let render = () => {
 	 	raycast(player.atTileX,player.atTileY,(player.atTileX-7)+i,(player.atTileY-7)+15);
 	 }
 	 
-	 //castLine(zombie.x+4,zombie.y+4, player.x+4,player.y+4);
+	 castLine(zombie.x+4,zombie.y+4, player.x+4,player.y+4);
 
 
 	 drawHud(100,100,12*3,20);
@@ -487,7 +544,6 @@ let drawHud = (hp,panic,weapon,ammo) => {
 	drawText(ammo.toString(),104,y+1,graphics[2],"pixel");
 };
 
-let dist = (x1,y1, x2,y2) => Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
 
 let plot = (x,y) => {
 	ctx.fillStyle = `rgba(255,0,0,0.5)`;
@@ -548,7 +604,7 @@ let raycast = (x0,y0, x1,y1) => {
 		//plot(x0, y0,1);
 		alpha -= 0.01;
 		lightMap[y0][x0] = 11-light;
-		lightMap[player.atTileY][player.atTileX] = 7;
+		lightMap[player.atTileY][player.atTileX] = 11;
 		//lightMap[y0][x0] = 0.6-(Math.floor(dist( player.atTileX,player.atTileY, x0,y0) )/8);
 
 		if((x0===x1) && (y0===y1)) break;
@@ -570,4 +626,4 @@ let onKonamiCode = (callback) => {
 
 onKonamiCode(() => {
 	document.getElementById("consoleWrapper").classList.toggle("hide");
-})
+});
