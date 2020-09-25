@@ -132,3 +132,5 @@ let dist = (x1,y1, x2,y2) => Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
 
 const dirX = [-1, 0, 1, 0];
 const dirY = [0, -1, 0, 1];
+
+let collisionBuffer = 0, collisionRay1 = 0, collisionRay2 = 0;

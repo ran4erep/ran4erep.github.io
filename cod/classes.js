@@ -133,8 +133,8 @@ let Character = function(spritesheet,animations,x,y) {
     this.animationType = "endless";
     this.isDead = false;
     this.hitbox = {
-        x      : 2,
-        y      : 2,
+        x      : this.x + 2,
+        y      : this.y + 2,
         width  : 4,
         height : 5
     };
@@ -254,18 +254,26 @@ let Character = function(spritesheet,animations,x,y) {
         if (this.vx === 1 && !this.isDead && !this.isColliding) {
             this.x++;
             camera.move(camera.x--,0,camera.tx++,0);
+            this.hitbox.x = this.x + 2;
+            this.hitbox.y = this.y + 2;
         }
         if (this.vx === -1 && !this.isDead && !this.isColliding) {
             this.x--;
             camera.move(camera.x++,0,camera.tx--,0);
+            this.hitbox.x = this.x + 2;
+            this.hitbox.y = this.y + 2;
         }
         if (this.vy === -1 && !this.isDead && !this.isColliding) {
             this.y--;
             camera.move(0,camera.y++,0,camera.ty++);
+            this.hitbox.x = this.x + 2;
+            this.hitbox.y = this.y + 2;
         }
         if (this.vy === 1 && !this.isDead && !this.isColliding) {
             this.y++;
             camera.move(0,camera.y--,0,camera.ty--);
+            this.hitbox.x = this.x + 2;
+            this.hitbox.y = this.y + 2;
         }
         //this.vy *= this.friction;
         //this.y += this.vy;

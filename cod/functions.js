@@ -145,7 +145,7 @@ isCollided = (rect1, rect2) => {
 //функция логики игры
 let logic = () => {
 	
-	//fullscreen();
+	fullscreen();
 	//large maps optimization
 	mapSize = maps[currentMap].length;
 	(player.atTileX - viewDistance < 0)  ?
@@ -177,74 +177,57 @@ let logic = () => {
 	zombie.AI();
 
 	if(player.facing === "n") {
-		for(let i=0; i<8; i++){
-			let y = player.y;
-			let x = player.x + i;
-			let ty = Math.floor(y/8);
-			let tx = Math.floor(x/8);
-			if(y < collisionMap[ty][tx].y + collisionMap[ty][tx].height) {
-				player.y++;
-				camera.y--;
-				camera.ty--;
-			}
-		};
+	 	castCollisionLine(player.hitbox.x, player.hitbox.y, player.hitbox.x, player.y-8);
+		 collisionRay1 = collisionBuffer;
+		 castCollisionLine(player.hitbox.x+player.hitbox.width, player.hitbox.y, player.hitbox.x+player.hitbox.width, player.y-8);
+		 collisionRay2 = collisionBuffer;
+
+		 if (collisionRay1 === 2 || collisionRay2 === 6 || player.y < 0) {
+		 	player.y += 1;
+		 	camera.y -= 1;
+		 	camera.ty -= 1;
+		 }
+	 }
+
+	 if(player.facing === "s") {
+		castCollisionLine(player.hitbox.x, player.hitbox.y+player.hitbox.height, player.hitbox.x, player.hitbox.y + (player.hitbox.height+8) );
+		collisionRay1 = collisionBuffer;
+		castCollisionLine(player.hitbox.x+player.hitbox.width, player.hitbox.y+player.hitbox.height, player.hitbox.x+player.hitbox.width, player.hitbox.y + (player.hitbox.height+8) );
+		collisionRay2 = collisionBuffer;
+
+		if (collisionRay1 < 8 || collisionRay2 < 10 || player.y > (maps[currentMap].length*8)-9) {
+		 	player.y -= 1;
+		 	camera.y += 1;
+		 	camera.ty += 1;
+		}
 	}
 
 	if(player.facing === "w") {
-		for(let i=0; i<8; i++){
-			let y = player.y + i;
-			let x = player.x;
-			let ty = Math.floor(y/8);
-			let tx = Math.floor(x/8);
-			if(x < collisionMap[ty][tx].x + collisionMap[ty][tx].width) {
-				player.x++;
-				camera.x--;
-				camera.tx--;
-			}
-		};
-	}
+		castCollisionLine(player.hitbox.x, player.hitbox.y, player.hitbox.x-8, player.hitbox.y);
+		collisionRay1 = collisionBuffer;
+		castCollisionLine(player.hitbox.x, player.hitbox.y+player.hitbox.height, player.hitbox.x-8, player.hitbox.y+player.hitbox.height);
+		collisionRay2 = collisionBuffer;
 
-	if(player.facing === "s") {
-		for(let i=0; i<8; i++){
-			let y = player.y+8;
-			let x = player.x+i;
-			let ty = Math.floor(y/8)+1;
-			let tx = Math.floor(x/8);
-			if(y > collisionMap[ty][tx].y) {
-				player.y--;
-				camera.y++;
-				camera.ty++;
-			}
+		if (collisionRay1 === 2 || collisionRay2 === 7 || player.x < 0) {
+		 	player.x += 1;
+		 	camera.x -= 1;
+		 	camera.xy -= 1;
 		}
 	}
 
-	for (let x = viewport.x.min; x < viewport.x.max; x++) {
-		for (let y = viewport.y.min; y < viewport.y.max; y++) {
-			
-			// 		player.y += 1;
-			// 		camera.y -= 1;
-			// 		camera.ty -= 1;
-			// }
+	if(player.facing === "e") {
+		castCollisionLine(player.hitbox.x+player.hitbox.width, player.hitbox.y, player.hitbox.x+(player.hitbox.width+8), player.hitbox.y);
+		collisionRay1 = collisionBuffer;
+		castCollisionLine(player.hitbox.x+player.hitbox.width, player.hitbox.y+player.hitbox.height, player.hitbox.x+(player.hitbox.width+8), player.hitbox.y + player.hitbox.height);
+		collisionRay2 = collisionBuffer;
 
-			// if (player.facing === "s" &&
-			// 	collisionMap[y][player.atTileX].y === ((player.y+player.collisionBox.y)+player.collisionBox.height)+1 ) {
-			// 	player.y -= 1;
-			// 	camera.y += 1;
-			// 	camera.ty += 1;
-			// }
-			// if (player.facing === "w" && collisionMap[player.atTileY][x].x+collisionMap[player.atTileY][x].width === (player.x+player.collisionBox.x) ) {
-			// 	player.x += 1;
-			// 	camera.x -= 1;
-			// 	camera.tx -= 1;
-			// }
-			// if (player.facing === "e" && collisionMap[player.atTileY][x].x === (player.x+player.collisionBox.x)+player.collisionBox.width ) {
-			// 	player.x -= 1;
-			// 	camera.x += 1;
-			// 	camera.tx += 1;
-			// }
-
+		if (collisionRay1 < 9 || Math.floor(collisionRay2) < 11 || player.x > (maps[currentMap][0].length*8)-8) {
+		 	player.x -= 1;
+		 	camera.x += 1;
+		 	camera.tx += 1;
 		}
-	}
+	};
+
 
 }
 
@@ -257,12 +240,13 @@ let render = () => {
 		for (let y = viewport.y.min; y < viewport.y.max; y++) {
 			
 			drawSprite(maps[currentMap][y][x],(x*spriteSize)+camera.x,(y*spriteSize)+camera.y);
-			ctx.strokeStyle = "blue";
-			ctx.strokeRect(
-				collisionMap[y][x].x + camera.x,
-				collisionMap[y][x].y + camera.y,
-				collisionMap[y][x].width,
-				collisionMap[y][x].height);
+			//map collision vizualisation
+			// ctx.strokeStyle = "blue";
+			// ctx.strokeRect(
+			// 	collisionMap[y][x].x + camera.x,
+			// 	collisionMap[y][x].y + camera.y,
+			// 	collisionMap[y][x].width,
+			// 	collisionMap[y][x].height);
 
 			if (torch.isNight) {
 				//torch.updateLight();
@@ -301,10 +285,11 @@ let render = () => {
 	 //player.atTileX*8-camera.tx, player.atTileY*8+camera.ty
 
 	 //players's tile position visualization
-	 ctx.strokeStyle = palette[8].hex;
-	 ctx.strokeRect(player.x+camera.x, player.y+camera.y, 8,8)
-	 ctx.fillStyle = "yellow";
-	 ctx.fillRect(player.x+camera.x,(player.y+camera.y)+8,1,1)
+	 // ctx.strokeStyle = palette[8].hex;
+	 // ctx.strokeRect(player.x+camera.x, player.y+camera.y, 8,8)
+	  ctx.steokeStyle = "yellow";
+	  ctx.strokeRect(player.hitbox.x+camera.x, player.hitbox.y+camera.y, player.hitbox.width, player.hitbox.height);
+	 // ctx.fillRect(player.x+camera.x,(player.y+camera.y)+8,1,1)
 	 // ctx.strokeRect( (player.x+camera.x)+player.hitbox.x,
 	 // 				 (player.y+camera.y)+player.hitbox.y,
 	 // 				  player.hitbox.width,
@@ -326,7 +311,8 @@ let render = () => {
 	 	raycast(player.atTileX,player.atTileY,(player.atTileX-7)+i,(player.atTileY-7)+15);
 	 }
 	 
-	 castLine(zombie.x+4,zombie.y+4, player.x+4,player.y+4);
+	 //castLine(zombie.x+4,zombie.y+4, player.x+4,player.y+4);
+	 
 
 
 	 drawHud(100,100,12*3,20);
@@ -576,6 +562,54 @@ let castLine = (x0,y0, x1,y1) => {
 			}
 };
 
+let castCollisionLine = (x0,y0, x1,y1) => {
+			let dx = Math.abs(x1-x0);
+			let dy = Math.abs(y1-y0);
+			let sx = (x0 < x1) ? 1 : -1;
+			let sy = (y0 < y1) ? 1 : -1;
+			let err = dx - dy;
+
+			while(true) {
+				let dotX = Math.floor(x0/8)
+				let dotY = Math.floor(y0/8);
+				if(player.facing === "n" && y0 > 0) {
+					if(y0 < collisionMap[dotY][dotX].y + collisionMap[dotY][dotX].height) {
+						collisionBuffer = dist(player.x, player.y, x0, y0);
+						break;
+					};
+				};
+
+				if(player.facing === "w" && x0 > 0) {
+					if(x0 < collisionMap[dotY][dotX].x + collisionMap[dotY][dotX].width) {
+						collisionBuffer = dist(player.x, player.y, x0, y0);
+						break;
+					};
+				};
+
+				if(player.facing === "s" && y0 < maps[currentMap].length*8) {
+					if(y0 === collisionMap[dotY][dotX].y) {
+						collisionBuffer = dist(player.x, player.y, x0, y0);
+						break;
+					};
+				};
+
+				if(player.facing === "e" && x0 < maps[currentMap][0].length*8) {
+					if(x0 === collisionMap[dotY][dotX].x) {
+						collisionBuffer = dist(player.x, player.y, x0, y0);
+						break;
+					};
+				};
+
+				//plot(x0+camera.x,y0+camera.y);
+				collisionBuffer = 500;
+
+				if((x0===x1) && (y0===y1)) break;
+				let e2 = 2*err;
+				if(e2 > -dy) {err -= dy; x0 += sx;}
+				if(e2 < dx) {err += dx; y0 += sy;}
+			}
+};
+
 //tilesetProperties.tiles[maps[currentMap][x][y]].properties[0].value
 let hitTheWall = (x,y) => (tilesetProperties.tiles[maps[currentMap][x][y]].properties[0].value === true) ? true : false;
 
@@ -602,9 +636,11 @@ let raycast = (x0,y0, x1,y1) => {
 		//if ( Math.floor(dist(player.atTileX,player.atTileY,x0,y0)) > LOSFOV ) break;
 
 		//plot(x0, y0,1);
-		alpha -= 0.01;
-		lightMap[y0][x0] = 11-light;
-		lightMap[player.atTileY][player.atTileX] = 11;
+			alpha -= 0.01;
+			lightMap[y0][x0] = 11-light;
+			lightMap[player.atTileY][player.atTileX] = 11;
+		
+		
 		//lightMap[y0][x0] = 0.6-(Math.floor(dist( player.atTileX,player.atTileY, x0,y0) )/8);
 
 		if((x0===x1) && (y0===y1)) break;
