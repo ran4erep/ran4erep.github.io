@@ -145,7 +145,7 @@ isCollided = (rect1, rect2) => {
 //функция логики игры
 let logic = () => {
 	
-	fullscreen();
+	//fullscreen();
 	//large maps optimization
 	mapSize = maps[currentMap].length;
 	(player.atTileX - viewDistance < 0)  ?
@@ -182,7 +182,7 @@ let logic = () => {
 		 castCollisionLine(player.hitbox.x+player.hitbox.width, player.hitbox.y, player.hitbox.x+player.hitbox.width, player.y-8);
 		 collisionRay2 = collisionBuffer;
 
-		 if (collisionRay1 === 2 || collisionRay2 === 6 || player.y < 0) {
+		 if (collisionRay1 <= 2 || collisionRay2 <= 6 || player.y < 0) {
 		 	player.y += 1;
 		 	camera.y -= 1;
 		 	camera.ty -= 1;
@@ -208,7 +208,7 @@ let logic = () => {
 		castCollisionLine(player.hitbox.x, player.hitbox.y+player.hitbox.height, player.hitbox.x-8, player.hitbox.y+player.hitbox.height);
 		collisionRay2 = collisionBuffer;
 
-		if (collisionRay1 === 2 || collisionRay2 === 7 || player.x < 0) {
+		if (collisionRay1 <= 2 || collisionRay2 <= 7 || player.x < 0) {
 		 	player.x += 1;
 		 	camera.x -= 1;
 		 	camera.xy -= 1;
@@ -221,7 +221,7 @@ let logic = () => {
 		castCollisionLine(player.hitbox.x+player.hitbox.width, player.hitbox.y+player.hitbox.height, player.hitbox.x+(player.hitbox.width+8), player.hitbox.y + player.hitbox.height);
 		collisionRay2 = collisionBuffer;
 
-		if (collisionRay1 < 9 || Math.floor(collisionRay2) < 11 || player.x > (maps[currentMap][0].length*8)-8) {
+		if (collisionRay1 <= 8 || Math.floor(collisionRay2) <= 10 || player.x > (maps[currentMap][0].length*8)-8) {
 		 	player.x -= 1;
 		 	camera.x += 1;
 		 	camera.tx += 1;
@@ -287,8 +287,8 @@ let render = () => {
 	 //players's tile position visualization
 	 // ctx.strokeStyle = palette[8].hex;
 	 // ctx.strokeRect(player.x+camera.x, player.y+camera.y, 8,8)
-	  ctx.steokeStyle = "yellow";
-	  ctx.strokeRect(player.hitbox.x+camera.x, player.hitbox.y+camera.y, player.hitbox.width, player.hitbox.height);
+	  // ctx.steokeStyle = "yellow";
+	  // ctx.strokeRect(player.hitbox.x+camera.x, player.hitbox.y+camera.y, player.hitbox.width, player.hitbox.height);
 	 // ctx.fillRect(player.x+camera.x,(player.y+camera.y)+8,1,1)
 	 // ctx.strokeRect( (player.x+camera.x)+player.hitbox.x,
 	 // 				 (player.y+camera.y)+player.hitbox.y,
@@ -628,6 +628,10 @@ let raycast = (x0,y0, x1,y1) => {
 	while(true) {
 		let light = Math.floor(dist( player.atTileX,player.atTileY, x0,y0) );
 		//if (maps[currentMap][y0][x0] === 41) break;
+		if ( hitTheWall(player.atTileY, player.atTileX) ) {
+			
+			break;
+		}
 		if ( hitTheWall(y0, x0) ) {
 			lightMap[y0][x0] = 11-light;
 			break;
