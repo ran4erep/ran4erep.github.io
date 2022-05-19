@@ -57,7 +57,7 @@ const animate = () => {
 const init = () => {
     c = document.getElementById("canvas");
     c.width = W = window.innerWidth;
-    c.height = H = window.innerHeight;
+    c.height = H = window.innerHeight-400;
     ctx = c.getContext("2d");
     flag()
     arrFlag();

@@ -14,8 +14,9 @@ body {
 	font-family:Arial;
 	font-size:13px;
 	font-weight:bold;
-	padding:6px 12px;
+	padding:4px 12px;
 	text-decoration:none;
+	margin-bottom: 1px;
 }
 .linkButton:hover {
 	background:linear-gradient(to bottom, #5972a7 5%, #637aad 100%);
