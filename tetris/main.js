@@ -131,16 +131,18 @@ let swipeEndX = 0;
 let swipeEndY = 0;
 let swipeDuration = 0;
 let swipedLeft = false, swipedRight = false;
-c.addEventListener("touchstart", function(e) {
+document.addEventListener("touchstart", function(e) {
+	e.preventDefault();
 	swipeStartX = e.touches[0].clientX;
 	swipeStartY = e.touches[0].clientY;
 });
-c.addEventListener("touchmove", function(e) {
+document.addEventListener("touchmove", function(e) {
+	e.preventDefault();
 	swipeEndX = e.touches[0].clientX;
 	swipeEndY = e.touches[0].clientY;
 	swipeDuration += 1;
 });
-c.addEventListener("touchend", function(e) {
+document.addEventListener("touchend", function(e) {
 	e.preventDefault();
 	if (!hardDrop && !isGameOver()) {
 	if (swipeEndX < swipeStartX-20 && swipeDuration> 1) {
