@@ -1,34 +1,217 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <title>My Projects</title>
+    <style>
+      /* CSS for the logo placeholder */
+      .logo {
+        display: inline-block;
+        width: 58px;
+        height: 58px;
+        background-color: #ccc;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+      /* CSS for a simple, elegant layout */
+      html, body {
+        height: 100%;
+        font-family: 'Roboto', sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+      #wrapper {
+        min-height: 100%;
+        position: relative;
+      }
+      #header {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+      }
+      #header h1 {
+        margin: 0 auto;
+      }
+      #projects {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        padding-bottom: 50px; /* Add bottom padding to make space for footer */
+      }
+      .project {
+        margin-bottom: 20px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .project a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: bold;
+        background-color: #333;
+        border-radius: 5px;
+        padding: 10px;
+        display: inline-block;
+        transition: background-color 0.2s;
+      }
+      .project a:hover {
+        background-color: #666;
+      }
+      .project h2 {
+        margin-top: 0;
+        margin-bottom: 10px;
+      }
+      /* CSS for the footer */
+      #footer {
+      background: linear-gradient(to right, #1d1f20, #424242);
+       /* background-color: #333;*/
+        color: #fff;
+        text-align: center; /* Align text to the right */
+        padding: 10px;
+        position: relative;
+        bottom: 0;
+        width: 95%;
+      }
+      #footer p {
+        margin: 0;
+        font-size: 14px;
+        font-family: 'Shantell Sans', cursive;  /* Add a fancy Google Font */
+      }
+      #footer span {
+        font-size: 20px;
+        margin-right: 5px;
+      }
+      #scroll-to-top-btn {
+       position: fixed; bottom: 20px; right: 20px; background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; display: none; 
+       }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Shantell+Sans&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="header">
+            <img class="logo" src="logo.png">
+        <h1>Мои проекты:</h1>
+      </div>
+      <div id="projects">
+        <div class="project">
+          <h2>Игра Opposite Reaction</h2>
+          <p>Простой раннер, который я сделал чтобы протестировать конструктор игр GDevelop.</p>
+          <a href="game.apk">Скачать *.apk файл</a>
+        </div>
+        <div class="project">
+          <h2>Игра Cradle of Death</h2>
+          <p>Мой личный долгострой. Игра по моему рассказу «Колыбель смерти», сделанная в конструкторе игр Construct 2. Это всего лишь демо, планов на релиз было очень много.</p>
+          <a href="https://ran4erep.itch.io/cod">Играть в браузере</a>
+        </div>
+        <div class="project">
+          <h2>Игра Тетрис</h2>
+          <p>Однажды мне захотелось сделать тетрис, но с первого раза ничего не получилось. И вот, со второго раза удалось написать тетрис. Управление полностью сенсорное, заодно научился делать свайпы.</p>
+          <a href="/tetris">Играть в браузере</a>
+        </div>
+        <div class="project">
+          <h2>Web IDE</h2>
+          <p>IDE для написания HTML, CSS и JavaScript кода. Делал для работы с кодом с планшета или телефона. Проверка на ошибки работает не идеально, также не работает кастомная сенсорная клавиатура, отключил её из-за багов.</p>
+          <a href="/ide">Открыть</a>
+        </div>
+        <div class="project">
+          <h2>Генератор дней рождения</h2>
+          <p>Генерирует огромный список дней рождения по диапазону годов. При помощи брут-форса (метода перебора) можно подобрать пароль, если его ввели в виде дня рождения.</p>
+          <a href="/bdgen">Открыть</a>
+        </div>
+        <div class="project">
+          <h2>Календарь</h2>
+          <p>Календарь написанный на JavaScript. У каждого времени года отдельная картинка с девочкой. &#x1f605;</p>
+          <a href="/calendar">Открыть</a>
+        </div>
+        <div class="project">
+          <h2>Игра Clash of Memory</h2>
+          <p>Игра на память, в которой нужно запоминать какие карты лежат на столе рубашкой вверх и переворачивать две одинаковые. Дизайн карт взят из игры Clash Royale.</p>
+          <a href="/cardgame">Играть в браузере</a>
+        </div>
+        <div class="project">
+          <h2>Игра угадайка</h2>
+          <p>Игра, в которой компьютер загадывает число, а вам нужно его угадать.</p>
+          <a href="/guess">Играть в браузере</a>
+        </div>
+        <div class="project">
+          <h2>Синтезатор</h2>
+          <p>Простой музыкальный синтезатор. Сделал чтобы понять как в JavaScript генерируется звук. То есть звуки нот генерируются прямо в коде, никаких аудиофайлов там нет.</p>
+          <a href="/piano">Открыть</a>
+        </div>
+        <div class="project">
+          <h2>Визуализатор частиц</h2>
+          <p>Сделал для того, чтобы в реальном времени видеть частицы перед добавлением их в конструктор игр Construct 2.</p>
+          <a href="/particles">Открыть</a>
+        </div>
+        <div class="project">
+          <h2>Игра Змейка</h2>
+          <p>Классическая Змейка на JavaScript, но отрисовка графики происходит не через canvas, а через сторонюю библиотеку для реализации консоли.</p>
+          <a href="/snake">Играть в браузере</a>
+        </div>
+        <div class="project">
+          <h2>Калькулятор</h2>
+          <p>«Портировал» калькулятор со своего старого телефона Lenovo Vibe p1ma40 на JavaScript.</p>
+          <a href="calc.html">Открыть</a>
+        </div>
+        <div class="project">
+          <h2>Генератор паролей</h2>
+          <p>Генерирует случайные пароли указанной длины со спецсимволами или без них, по желанию.</p>
+          <a href="password.html">Открыть</a>
+        </div>
+        <div class="project">
+          <h2>Пиксель-арт редактор</h2>
+          <p>Простой редактор, который позволяет рисовать пиксельные изображения размером 8х8. Выбор цвета ограничен палитрой фентезийной консоли Pico-8. Полученное изображение можно скачать. Именно с помощью него я нарисовал графику для своей игры Сокобан.</p>
+          <a href="pixel.html">Открыть</a>
+        </div>
+        <div class="project">
+          <h2>Игра Сокобан</h2>
+          <p>Классический Сокобан. В этой логической игре вы выступите в роли грузчика, которому нужно расставить ящики на складе в определённые места. Уровни для игры устроены в виде двумерных массивов, что делает их создание очень простым.</p>
+          <a href="sokoban.html">Играть в браузере</a>
+        </div>
+        <div class="project">
+          <h2>Конвертер раскладки</h2>
+          <p>Конвертирует русский текст, написанный в английской раскладке клавиатуры, в читаемый вид.</p>
+          <a href="qwerty.html">Открыть</a>
+        </div>
+        <div class="project">
+          <h2>Определитель скан-кодов</h2>
+          <p>Показывает скан-код любой нажатой клавиши на клавиатуре.</p>
+          <a href="scan.html">Открыть</a>
+        </div>
+        <div class="project">
+          <h2>Тест звуковых каналов</h2>
+          <p>Позволяет воспроизвести звук в левом, либо в правом канале. Писал для своих старых наушников, у которых не было маркировок L и R, чтобы понимать правильно ли я их надел."</p>
+          <a href="sound_test.html">Открыть</a>
+        </div>
+        
+      </div> 
+      
+      <div style="display: flex; justify-content: space-between;  background: linear-gradient(to right, #1d1f20, #424242);">
+  <div style="display: flex; align-items: center;">
+    <h2 style="margin: 1rem; margin-right: 1rem; color: #fff;">YouTube и Telegram:</h2>
+    <div style="display: flex; align-items: center;">
+      <a href="https://www.youtube.com/youran4erep" target="_blank" rel="noopener noreferrer">
+        <img src="https://img.icons8.com/color/48/000000/youtube-play.png" alt="YouTube">
+      </a>
+      <span style="margin: 0 0.5rem; color: #fff;">&nbsp;</span>
+      <a href="https://t.me/ran4erep" target="_blank" rel="noopener noreferrer">
+        <img src="https://img.icons8.com/color/48/000000/telegram-app.png" alt="Telegram">
+      </a>
+    
+   </div>
+  </div>
+</div>
 
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="style.css">
-	<title>ran4erep</title>
-</head>
-
-<body>
-	<script src="home.js"></script>
-	<canvas id="canvas"></canvas>
-	<center><h1>Мои проекты:</h1></center>
-        <a href="game.apk" class="linkButton"</a>Игра Opposite Reaction<br>
-	<a href="/tetris" class="linkButton">Игра Тетрис</a><br>
-	<a href="/ide" class="linkButton">Web IDE</a></br>
-	<a href="/bdgen" class="linkButton">Генератор словаря дней рождения</a></br>
-	<a href="/calendar" class="linkButton">Календарь</a></br>
-	<a href="/cardgame" class="linkButton">Игра Clash of Memory</a></br>
-	<a href="/guess" class="linkButton">Игра Угадайка</a></br>
-	<a href="/piano" class="linkButton">Простой музыкальный синтезатор</a></br>
-	<a href="/particles" class="linkButton">Визуальный конструктор частиц для Construct 2</a></br>
-	<a href="/snake" class="linkButton">Игра Змейка на символьном рендере</a></br>
-	<a href="calc.html" class="linkButton">Калькулятор</a></br>
-	<a href="password.html" class="linkButton">Генератор паролей</a></br>
-	<a href="pixel.html" class="linkButton">Пиксель-арт редактор</a></br>
-	<a href="qwerty.html" class="linkButton">Переводчик с QWERTY в ЙЦУКЕН</a></br>
-	<a href="scan.html" class="linkButton">Скан-коды нажатых клавиш</a></br>
-	<a href="sound_test.html" class="linkButton">Проверка каналов звука в наушниках</a></br>
-	<a href="sokoban.html" class="linkButton">Игра Сокобан</a>
-</body>
-
-</html>
+<button id="scroll-to-top-btn" onclick="scrollToTop()">В начало</button> 
+      
+      <div id="footer"><p> © by ran4erep and ChatGPT, 2023 <span>&#x1F1FA;&#x1F1E6;</span></p> </div> </div>
+      <script> 
+      function scrollToTop() { window.scrollTo({ top: 0, behavior: "smooth" }); } 
+      window.onscroll = function() { var btn = document.getElementById("scroll-to-top-btn"); if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) { btn.style.display = "block"; } else { btn.style.display = "none"; } } </script>
+          </body> </html>
