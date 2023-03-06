@@ -85,6 +85,15 @@
       #scroll-to-top-btn {
        position: fixed; bottom: 20px; right: 20px; background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; display: none; 
        }
+       #clock {
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+  color: #FFF;
+  background-color: #333;
+  padding: 0.3em 0.5em;
+  border-radius: 0.2em;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+}
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Shantell+Sans&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
@@ -94,6 +103,7 @@
       <div id="header">
             <img class="logo" src="logo.png">
         <h1>Мои проекты:</h1>
+        <div id="clock"></div>
       </div>
       <div id="projects">
         <div class="project">
@@ -210,5 +220,23 @@
       <div id="footer"><p> © by ran4erep and ChatGPT, 2023 <span>&#x1F1FA;&#x1F1E6;</span></p> </div> </div>
       <script> 
       function scrollToTop() { window.scrollTo({ top: 0, behavior: "smooth" }); } 
-      window.onscroll = function() { var btn = document.getElementById("scroll-to-top-btn"); if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) { btn.style.display = "block"; } else { btn.style.display = "none"; } } </script>
+      window.onscroll = function() { var btn = document.getElementById("scroll-to-top-btn"); if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) { btn.style.display = "block"; } else { btn.style.display = "none"; } }
+      
+      function updateClock() {
+      	// Make a request to the worldtimeapi.org API to get the current time in Ukraine
+      	fetch("https://worldtimeapi.org/api/timezone/Europe/Kiev")
+      		.then(response => response.json())
+      		.then(data => {
+      			const datetime = new Date(data.datetime);
+      			const hours = datetime.getHours().toString().padStart(2, '0');
+      			const minutes = datetime.getMinutes().toString().padStart(2, '0');
+      			const seconds = datetime.getSeconds().toString().padStart(2, '0');
+      			const timeString = `${hours}:${minutes}:${seconds}`;
+      			document.getElementById("clock").textContent = timeString;
+      		});
+      }
+      
+      // Update the clock every second
+      setInterval(updateClock, 1000);
+      </script>
           </body> </html>
