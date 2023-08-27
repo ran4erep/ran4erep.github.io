@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windows Tablet Wiki</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <div class="overlay" id="loadingOverlay">
+    <div class="loading-container">
+      <img class="loading-gif" src="loading.gif" alt="Loading">
+      <p>Загрузка...</p>
+    </div>
+  </div>
+<div class="sidebar">
+  <iframe frameborder="no" marginheight="0" marginwidth="0" id="myIframe" src="sidebar.html"></iframe>
+</div>
+
+  <div class="content">
+    <div class="header">
+      <h1>Добро пожаловать!</h1>
+    </div>
+    ну тип хэллоу ёпта sdkfnsldkfnsld/nfsldfnsdfnm;sd sd sdf hsEFH;osf h;sohf;sDF:DSnvsjdbv;ISVwbpv9c;ovcpuvt;psviyhwib sdkfnsldkfnsld/nfsldfnsdfnm;sd sd sdf hsEFH;osf h;sohf;sDF:DSnvsjdbv;ISVwbpv9c;ovcpuvt;psviyhwib sdkfnsldkfnsld/nfsldfnsdfnm;sd sd sdf hsEFH;osf h;sohf;sDF:DSnvsjdbv;ISVwbpv9c;ovcpuvt;psviyhwib sdkfnsldkfnsld/nfsldfnsdfnm;sd sd sdf hsEFH;osf h;sohf;sDF:DSnvsjdbv;ISVwbpv9c;ovcpuvt;psviyhwib sdkfnsldkfnsld/nfsldfnsdfnm;sd sd sdf hsEFH;osf h;sohf;sDF:DSnvsjdbv;ISVwbpv9c;ovcpuvt;psviyhwib
+
+  </div>
+  <script>
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadLinks = document.querySelectorAll('.load-link');
+
+    loadLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetHref = this.getAttribute('data-href');
+        loadingOverlay.style.display = 'flex';
+        window.location.href = targetHref;
+      });
+    });
+
+  </script>
+
+</body>
+</html>
