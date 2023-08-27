@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windows Tablet Wiki</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <div class="overlay" id="loadingOverlay">
+    <div class="loading-container">
+      <img class="loading-gif" src="loading.gif" alt="Loading">
+      <p>Загрузка...</p>
+    </div>
+  </div>
+  <div class="sidebar">
+    <iframe frameborder="no" marginheight="0" marginwidth="0" id="myIframe" src="sidebar.html"></iframe>
+  </div>
+
+  <div class="content">
+    <div class="header">
+      <h1>Добро пожаловать!</h1>
+    </div>
+
+    <p>В данной вики собрана вся полезная информация, которую вам нужно знать для комфортной игры на планшетах Microsoft
+      Surface либо на любом другом, основанном на процессоре Intel Atom. test</p>
+    <a href="#" class="load-link" data-href="article1.html">Тестовая ссылка 1</a>
+    <p>Windows is a series of operating systems developed by Microsoft. It is designed to run on personal computers,
+      servers, smartphones, and embedded devices. The most recent version of Windows is Windows 11, released in 2021.
+    </p>
+    <p>Windows provides a graphical user interface (GUI), multitasking capabilities, and support for various software
+      applications. It has played a significant role in shaping the modern computing landscape.</p>
+    <img src="https://images.wallpaperscraft.ru/image/single/siluet_luna_lodka_135277_300x168.jpg" alt="Windows Logo">
+    <p>Windows offers a wide range of features, including file management, networking, security, and multimedia support.
+      It has evolved over the years with updates and new versions that introduce improvements and new functionalities.
+    </p>
+    <p>Whether you're a casual user or a developer, Windows provides a platform that caters to a diverse set of needs,
+      making it one of the most widely used operating systems in the world.</p>
+    <img src="https://via.placeholder.com/500x300" alt="Windows Interface">
+    <h3>Sample Code Block:</h3>
+    <pre><code>// This is a sample code block-
+function greet(name) {
+  console.log(`Hello, ${name}!`);
+}
+
+greet("World");</code></pre>
+
+  </div>
+  <script>
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadLinks = document.querySelectorAll('.load-link');
+
+    loadLinks.forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetHref = this.getAttribute('data-href');
+        loadingOverlay.style.display = 'flex';
+        window.location.href = targetHref;
+      });
+    });
+
+  </script>
+
+</body>
+
+</html>
