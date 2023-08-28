@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <base target="_parent">
   <meta charset="UTF-8">
   <style>
-        .sidebar {
+    .sidebar {
       background-color: #0078d4;
       color: white;
       padding-top: 2px;
@@ -13,53 +14,57 @@
       box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
       flex: 0 0 300px;
     }
+
     .article-list {
       list-style-type: none;
       padding: 0;
       margin: 0;
     }
+
     .article-list li {
       margin-bottom: 1px;
     }
-/* Стили для всех ссылок */
-a {
-  display: inline-block;
-  padding: 3px 5px;
-  background-color: #0078d7;
-  color: #ffffff;
-  text-decoration: none;
-  border-radius: 4px;
-  transition: background-color 0.3s, color 0.3s;
-  max-width: 290px;
-  white-space: normal;
-  word-wrap: break-word;
-}
 
-a:hover {
-  background-color: #005ea6;
-  color: #ffffff;
-}
+    /* Стили для всех ссылок */
+    a {
+      display: inline-block;
+      padding: 3px 5px;
+      background-color: #0078d7;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.3s, color 0.3s;
+      max-width: 290px;
+      white-space: normal;
+      word-wrap: break-word;
+    }
 
-/* Стили для активной ссылки */
-a.active {
-  background-color: #005ea6;
-}
+    a:hover {
+      background-color: #005ea6;
+      color: #ffffff;
+    }
 
-/* Стили для посещенной ссылки */
-a.visited {
-  color: #6f6f6f;
-}
+    /* Стили для активной ссылки */
+    a.active {
+      background-color: #005ea6;
+    }
 
-/* Изменение стилей при фокусе */
-a:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.3);
-}
+    /* Стили для посещенной ссылки */
+    a.visited {
+      color: #6f6f6f;
+    }
+
+    /* Изменение стилей при фокусе */
+    a:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.3);
+    }
 
     .header {
       margin-bottom: 20px;
     }
-        .overlay {
+
+    .overlay {
       display: none;
       position: fixed;
       top: 0;
@@ -82,28 +87,29 @@ a:focus {
       width: 80px;
       height: 80px;
     }
+
     .logo {
       margin-right: 5px;
     }
 
     /* Стили для футера */
-.footer {
-  color: #f0f0f0;
-  text-align: center;
-  position: fixed;
-  bottom: 0;
-  width: 290px;
-  height: 20px;
-  font-size: 18px;
-}
+    .footer {
+      color: #f0f0f0;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 290px;
+      height: 20px;
+      font-size: 18px;
+    }
 
-/* Дополнительные стили для элементов внутри футера */
-.footer p {
-  margin: 0;
-}
-
+    /* Дополнительные стили для элементов внутри футера */
+    .footer p {
+      margin: 0;
+    }
   </style>
 </head>
+
 <body>
   <div class="overlay" id="loadingOverlay">
     <div class="loading-container">
@@ -119,26 +125,30 @@ a:focus {
     Содержание:<br><br>
     <ul class="article-list">
       <li><a href="#" class="load-link" data-href="index.html">Начальная страница</a></li>
-      <li><a href="#" class="load-link" data-href="two_windows_on_one_drive.html">Установка двух версий Windows на одном жёстком диске</a></li>
-      
+      <li><a href="#" class="load-link" data-href="two_windows_on_one_drive.html">Установка двух версий Windows на одном
+          жёстком диске</a></li>
+
       <!-- Add more article links here -->
     </ul>
-    <div class="footer"><p>by ran4erep, 2023</p></div>
+    <div class="footer">
+      <p>by ran4erep, 2023</p>
+    </div>
   </div>
   <script>
     const loadingOverlay = document.getElementById('loadingOverlay');
     const loadLinks = document.querySelectorAll('.load-link');
 
     loadLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
+      link.addEventListener('click', function (e) {
         e.preventDefault();
         const targetHref = this.getAttribute('data-href');
         loadingOverlay.style.display = 'flex';
-        window.open(targetHref,"_parent");
+        window.open(targetHref, "_parent");
         //window.location.href = targetHref;
       });
     });
 
   </script>
 </body>
+
 </html>
