@@ -28,7 +28,7 @@ body {
 }
 
 .article-list li {
-  margin-bottom: 10px;
+  margin-bottom: 1px;
 }
 
 a {
@@ -60,6 +60,7 @@ a:focus {
 }
 
 img {
+  border: 1px solid #000;
   max-width: 500px;
   max-height: 500px;
   height: auto;
