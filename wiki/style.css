@@ -1,7 +1,4 @@
-@font-face {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  src: url(SegoeUI.ttf);
-}
+@import url("font/stylesheet.css");
 
 body {
   margin: 0;
@@ -9,6 +6,7 @@ body {
   background-color: #f0f0f0;
   display: flex;
   min-height: 100vh;
+  font-family: 'Segoe UI'; font-weight: 300; font-style: normal;
 }
 
 .sidebar {
@@ -34,6 +32,8 @@ body {
 a {
   display: inline-block;
   padding: 3px 5px;
+  padding-top: 0px;
+  padding-bottom: 1px;
   background-color: #0078d7;
   color: #ffffff;
   text-decoration: none;
