@@ -60,6 +60,17 @@
       max-height: 500px;
       height: auto;
       margin-bottom: 10px;
+      transition: filter 0.3s, cursor 0.3s;
+    }
+    img:hover {
+      filter: brightness(70%);
+      cursor: pointer;
+    }
+    @media (hover: none) {
+      img:hover {
+        filter: brightness(70%);
+        cursor: pointer;
+      }
     }
 
     .content {

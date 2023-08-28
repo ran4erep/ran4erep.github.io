@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windows Tablet Wiki</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <div class="overlay" id="loadingOverlay">
+    <div class="loading-container">
+      <img class="loading-gif" src="loading.gif" alt="Loading">
+      <p>Загрузка...</p>
+    </div>
+  </div>
+  <div class="sidebar">
+    <iframe frameborder="no" marginheight="0" marginwidth="0" id="myIframe" src="sidebar.html"></iframe>
+  </div>
+
+  <div class="content">
+    <div class="header">
+      <h1>Установка двух версий Windows на одном жёстком диске</h1>
+    </div>
+
+    <p>Установка двух разных версий Windows на один жёсткий диск может быть полезной, например, для тестирования программного обеспечения или поддержания совместимости. В этой статье мы расскажем, как это сделать.</p>
+
+    <h2>Шаг 1: Подготовка</h2>
+    <p>Перед началом установки убедитесь, что у вас есть:</p>
+    <ul>
+      <li>Дистрибутивы Windows 8.1 и Windows 10</li>
+      <li>USB-накопитель или DVD с образами Windows</li>
+      <li>Ключи активации для обеих версий Windows</li>
+    </ul>
+  
+    <h2>Шаг 2: Создание разделов</h2>
+    <p>При установке Windows 8.1 создайте первый раздел для него. Затем, при установке Windows 10, создайте второй раздел для него.</p>
+  
+    <h2>Шаг 3: Установка Windows 8.1</h2>
+    <p>Загрузитесь с установочного носителя Windows 8.1 и следуйте инструкциям по установке. Выберите созданный для Windows 8.1 раздел.</p>
+  
+    <h2>Шаг 4: Установка Windows 10</h2>
+    <p>После установки Windows 8.1 загрузитесь с установочного носителя Windows 10 и выберите второй раздел для установки Windows 10.</p>
+  
+    <h2>Шаг 5: Завершение установки</h2>
+    <p>Завершите установку Windows 10 и дождитесь, пока система загрузится. После этого вы сможете выбирать, с какой операционной системой запустить компьютер при каждой перезагрузке.</p>
+  
+    <h2>Заключение</h2>
+    <p>Теперь у вас есть две разные версии Windows на одном жёстком диске. Вы можете переключаться между ними при загрузке системы, выбирая нужную операционную систему.</p>
+  
+    <p>Обратите внимание, что данная процедура может потребовать определенных знаний и опыта в установке операционных систем. Всегда делайте резервные копии данных перед изменениями на жёстком диске.</p>
+  </div>
+  <script>
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadLinks = document.querySelectorAll('.load-link');
+
+    loadLinks.forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetHref = this.getAttribute('data-href');
+        loadingOverlay.style.display = 'flex';
+        window.location.href = targetHref;
+      });
+    });
+
+  const images = document.getElementsByTagName('img');
+  for (const image of images) {
+    image.addEventListener('click', function() {
+      loadingOverlay.style.display = 'flex';
+      const originalImageURL = this.src;
+      window.open(originalImageURL, '_blank');
+    });
+  }
+  window.onfocus = function() {
+      loadingOverlay.style.display = "none";
+    }
+
+  </script>
+
+</body>
+
+</html>
