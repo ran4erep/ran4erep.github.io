@@ -4,19 +4,11 @@
 <head>
   <base target="_parent">
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
   <style>
     @import url("font/stylesheet.css");
     body {
       font-family: 'Segoe UI'; font-weight: 300; font-style: normal;
-    }
-    .sidebar {
-      background-color: #0078d4;
-      color: white;
-      padding-top: 2px;
-      padding-left: 5px;
-      width: 290px;
-      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-      flex: 0 0 300px;
     }
 
     .article-list {
@@ -27,41 +19,6 @@
 
     .article-list li {
       margin-bottom:1px;
-    }
-
-    a {
-      display: inline-block;
-      padding: 3px 5px;
-      background-color: #0078d7;
-      color: #ffffff;
-      text-decoration: none;
-      border-radius: 4px;
-      transition: background-color 0.3s, color 0.3s;
-      max-width:290px;
-      white-space: normal;
-      word-wrap: break-word;
-    }
-
-    a:hover {
-      background-color: #005ea6;
-      color: #ffffff;
-    }
-
-    a.active {
-      background-color: #005ea6;
-    }
-
-    a.visited {
-      color: #6f6f6f;
-    }
-
-    a:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.3);
-    }
-
-    .header {
-      margin-bottom: 20px;
     }
 
     .overlay {
@@ -93,7 +50,6 @@
     }
 
     .footer {
-      color: #f0f0f0;
       text-align: center;
       position: fixed;
       bottom: 0;
@@ -117,32 +73,40 @@
     </div>
   </div>
 
-  <div class="sidebar">
-    <div class="header">
-      <h2><img class="logo" src="logo.png" width="20" height="20">Windows Tablet Wiki</h2>
-    </div>
-    Содержание:<br><br>
-    <ul class="article-list">
-      <li><a href="#" class="load-link" data-href="index.html">&#127968; Начальная страница</a></li>
-      <hr>
-      <li><a href="#" class="load-link" data-href="gwg.html">Сенсорное управление в играх при помощи программы GestureWorks Gameplay</a></li>
-      <hr>
-      <li><a href="#" class="load-link" data-href="comfort_keys.html">Сенсорное управление в играх при помощи программы Comfort Keys Pro</a></li>
-      <hr>
-      <li><a href="#" class="load-link" data-href="dgvoodoo.html">Улучшаем старые игры при помощи DgVoodoo 2</a></li>
-      <hr>
-      <li><a href="#" class="load-link" data-href="touchmousepointer.html">Вся площадь экрана в качестве тачпада при помощи программы Touch Mouse Pointer</a></li>
-      <hr>
-      <li><a href="#" class="load-link" data-href="start_menu.html">Делаем меню Пуск красивее</a></li>
-      <hr>
-      <li><a href="#" class="load-link" data-href="mem_reduct.html">Увеличиваем количество свободной оперативной памяти при помощи программы MemReduct</a></li>
+  <!-- Sidebar Toggle Button -->
+  <button class="sidebar-toggle" onclick="toggleSidebar()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
 
-      <!-- Add more article links here -->
-    </ul>
-    <div class="footer">
-      <p>by ran4erep, 2023</p>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Windows Tablet Wiki</h2>
     </div>
-  </div>
+    <nav class="sidebar-nav">
+      <ul class="article-list">
+        <li><a href="#" class="load-link" data-href="https://ran4erep.github.io">&#128128; Вернуться на главную</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="index.html">&#127968; Начальная страница</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="gwg.html">Сенсорное управление в играх при помощи программы GestureWorks Gameplay</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="comfort_keys.html">Сенсорное управление в играх при помощи программы Comfort Keys Pro</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="dgvoodoo.html">Улучшаем старые игры при помощи DgVoodoo 2</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="touchmousepointer.html">Вся площадь экрана в качестве тачпада при помощи программы Touch Mouse Pointer</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="start_menu.html">Делаем меню Пуск красивее</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="mem_reduct.html">Увеличиваем количество свободной оперативной памяти при помощи программы MemReduct</a></li>
+      </ul>
+    </nav>
+  </aside>
   <script>
     const loadingOverlay = document.getElementById('loadingOverlay');
     const loadLinks = document.querySelectorAll('.load-link');

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Sitemap: https://ran4erep.github.io/sitemap.xml
+
+Disallow: /*.json$
+Disallow: /*.js$
+Disallow: /*.css$
+Disallow: /*.ico$ 

@@ -1,0 +1,24 @@
+{
+    "tracks": [
+        {
+            "title": "Меня больше нет",
+            "artist": "ran4erep",
+            "path": "music/ran4erep-im-gone.mp3"
+        },
+        {
+            "title": "Псих",
+            "artist": "Naked Death",
+            "path": "music/naked-death-psycho.mp3"
+        },
+        {
+            "title": "I Wanna Die",
+            "artist": "Remi & ran4erep",
+            "path": "music/remi-ran4erep-i-wanna-die.mp3"
+        },
+        {
+            "title": "Война (limil best edition)",
+            "artist": "ran4erep",
+            "path": "music/ran4erep-war.mp3"
+        }        
+    ]
+}
