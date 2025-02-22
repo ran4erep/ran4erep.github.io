@@ -102,27 +102,18 @@ class Gallery {
     
     async load() {
         try {
-            const response = await fetch('/gallery/');
-            if (!response.ok) throw new Error('Failed to load gallery');
+            const response = await fetch('/gallery/gallery.json'); // Загружаем JSON
+            if (!response.ok) throw new Error('Failed to load gallery data');
             
-            const text = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(text, 'text/html');
-            
-            this.images = Array.from(doc.querySelectorAll('a'))
-                .filter(a => {
-                    const ext = a.href.split('.').pop().toLowerCase();
-                    return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
-                })
-                .map(a => a.href.split('/').pop());
-            
+            this.images = await response.json(); // Получаем список файлов
+    
             this.render();
             this.updateNavigation();
-            
         } catch (error) {
             console.error('Error loading gallery:', error);
         }
     }
+    
     
     render() {
         if (!this.grid) return;
