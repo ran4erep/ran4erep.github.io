@@ -17,22 +17,14 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    cursor: var(--custom-cursor), auto !important;
-}
-
-*:hover {
-    cursor: var(--custom-cursor), auto !important;
+    cursor: var(--custom-cursor), auto;
 }
 
 html {
     scroll-behavior: smooth;
     scroll-padding-top: 2rem;
-    --scrollbar-width: 4px;
 }
 
-html:hover {
-    --scrollbar-width: 12px;
-}
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -67,7 +59,6 @@ body::before {
     overflow-x: hidden;
 }
 
-/* Sidebar */
 .sidebar {
     width: var(--sidebar-width);
     background: rgba(15, 17, 22, 0.95);
@@ -115,13 +106,27 @@ body::before {
     object-fit: cover;
 }
 
-.sidebar::-webkit-scrollbar {
+*::-webkit-scrollbar {
     width: 8px;
+    background: var(--scrollbar-bg);
 }
 
-.sidebar::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
+*::-webkit-scrollbar-thumb {
+    background: var(--primary);
     border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
+}
+
+*::-webkit-scrollbar-corner {
+    background: var(--scrollbar-bg);
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 2px;
+    background: var(--scrollbar-bg);
 }
 
 .sidebar::-webkit-scrollbar-thumb {
@@ -226,7 +231,6 @@ body::before {
     color: var(--text);
     padding: 0.5rem;
     border-radius: 0.5rem;
-    cursor: var(--custom-cursor), pointer !important;
     transition: all 0.3s ease;
 }
 
@@ -484,7 +488,6 @@ section {
     width: 3rem;
     height: 3rem;
     border-radius: 50%;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -528,7 +531,6 @@ section {
     display: none;
     align-items: center;
     justify-content: center;
-    cursor: var(--custom-cursor), pointer !important;
     transition: background-color 0.2s, transform 0.2s;
     z-index: 100;
 }
@@ -684,7 +686,6 @@ section {
     border: none;
     color: white;
     font-size: 2.5rem;
-    cursor: var(--custom-cursor), pointer !important;
     width: 45px;
     height: 45px;
     display: flex;
@@ -742,7 +743,6 @@ section {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -871,7 +871,6 @@ body.viewer-open {
     color: var(--text);
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
-    cursor: pointer;
     transition: all 0.2s;
     font-size: 0.9rem;
 }
@@ -897,105 +896,6 @@ body.viewer-open {
     }
 }
 
-/* Custom Cursor - Global Rules */
-* {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-*:hover {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-*:active,
-*:focus,
-*[draggable="true"],
-*[draggable="true"]:active,
-input,
-textarea,
-select,
-button,
-a,
-.clickable,
-.sidebar-toggle,
-.lang-btn,
-.viewer-nav,
-.viewer-close,
-#scroll-to-top-btn,
-.progress-bar,
-.control-btn,
-.gallery-nav,
-::-webkit-scrollbar,
-::-webkit-scrollbar-button,
-::-webkit-scrollbar-track,
-::-webkit-scrollbar-track-piece,
-::-webkit-scrollbar-thumb,
-::-webkit-scrollbar-corner,
-::-webkit-resizer {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-*::-webkit-scrollbar,
-*::-webkit-scrollbar-button,
-*::-webkit-scrollbar-track,
-*::-webkit-scrollbar-track-piece,
-*::-webkit-scrollbar-thumb,
-*::-webkit-scrollbar-corner,
-*::-webkit-resizer {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-*::-webkit-scrollbar:hover,
-*::-webkit-scrollbar-button:hover,
-*::-webkit-scrollbar-track:hover,
-*::-webkit-scrollbar-track-piece:hover,
-*::-webkit-scrollbar-thumb:hover,
-*::-webkit-scrollbar-corner:hover,
-*::-webkit-resizer:hover {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-*::-webkit-scrollbar:active,
-*::-webkit-scrollbar-button:active,
-*::-webkit-scrollbar-track:active,
-*::-webkit-scrollbar-track-piece:active,
-*::-webkit-scrollbar-thumb:active,
-*::-webkit-scrollbar-corner:active,
-*::-webkit-resizer:active {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-/* Firefox scrollbar */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
-}
-
-* {
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
-    cursor: var(--custom-cursor), auto !important;
-}
-
-*:hover {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-*:active {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-/* Remove old scrollbar rules */
-body::-webkit-scrollbar,
-body::-webkit-scrollbar-button,
-body::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track-piece,
-body::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-corner,
-body::-webkit-resizer {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-/* Site Header */
 .site-header {
     display: flex;
     justify-content: center;
@@ -1144,7 +1044,6 @@ body::-webkit-resizer {
     border: none;
     color: var(--text);
     padding: 0.5rem;
-    cursor: pointer;
     transition: all 0.2s ease;
     border-radius: 4px;
     display: flex;
@@ -1256,7 +1155,6 @@ body::-webkit-resizer {
     height: 4px;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 2px;
-    cursor: pointer;
     overflow: hidden;
     position: relative;
     z-index: 4;
@@ -1290,7 +1188,6 @@ body::-webkit-resizer {
     height: 4px;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 2px;
-    cursor: pointer;
     overflow: hidden;
 }
 
@@ -1318,7 +1215,6 @@ body::-webkit-resizer {
     border: none;
     color: var(--text-primary);
     padding: 0.25rem;
-    cursor: pointer;
     transition: all 0.2s ease;
     border-radius: 4px;
     display: flex;
@@ -1500,7 +1396,6 @@ body::-webkit-resizer {
         justify-content: center;
         border-radius: 50%;
         border: none;
-        cursor: pointer;
         transition: background-color 0.3s ease;
         -webkit-tap-highlight-color: transparent;
     }
@@ -1569,7 +1464,7 @@ body::-webkit-resizer {
     );
     border: 1px solid var(--card-border);
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 0.3rem;
     display: flex;
     flex-direction: column;
     max-height: 400px;
@@ -1642,6 +1537,10 @@ body::-webkit-resizer {
     max-height: 300px;
 }
 
+.recommendation-links::-webkit-scrollbar {
+    width: 6px;
+}
+
 .recommendation-link {
     display: flex;
     align-items: center;
@@ -1671,49 +1570,6 @@ body::-webkit-resizer {
     font-size: 0.9rem;
     opacity: 0.7;
     margin-top: 0.2rem;
-}
-
-/* Chrome-specific cursor rules */
-* {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-*::-webkit-scrollbar,
-*::-webkit-scrollbar-button,
-*::-webkit-scrollbar-track,
-*::-webkit-scrollbar-track-piece,
-*::-webkit-scrollbar-thumb,
-*::-webkit-scrollbar-corner,
-*::-webkit-scrollbar-resizer {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-*::-webkit-scrollbar:hover,
-*::-webkit-scrollbar-button:hover,
-*::-webkit-scrollbar-track:hover,
-*::-webkit-scrollbar-track-piece:hover,
-*::-webkit-scrollbar-thumb:hover,
-*::-webkit-scrollbar-corner:hover,
-*::-webkit-scrollbar-resizer:hover {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-*::-webkit-scrollbar:active,
-*::-webkit-scrollbar-button:active,
-*::-webkit-scrollbar-track:active,
-*::-webkit-scrollbar-track-piece:active,
-*::-webkit-scrollbar-thumb:active,
-*::-webkit-scrollbar-corner:active,
-*::-webkit-scrollbar-resizer:active {
-    cursor: var(--custom-cursor), auto !important;
-}
-
-/* Override any potential Chrome defaults */
-::-webkit-scrollbar-button:vertical:start:decrement,
-::-webkit-scrollbar-button:vertical:end:increment,
-::-webkit-scrollbar-button:horizontal:start:decrement,
-::-webkit-scrollbar-button:horizontal:end:increment {
-    cursor: var(--custom-cursor), auto !important;
 }
 
 .project {
@@ -1770,7 +1626,6 @@ body::-webkit-resizer {
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     z-index: 1000;
@@ -1830,7 +1685,6 @@ body::-webkit-resizer {
     border: none;
     color: var(--text-secondary);
     font-size: 1.5rem;
-    cursor: pointer;
     padding: 0;
     width: 24px;
     height: 24px;
@@ -1932,7 +1786,6 @@ body::-webkit-resizer {
     align-items: center;
     justify-content: center;
     color: white;
-    cursor: pointer;
     transition: all 0.2s;
     position: relative;
     padding: 2px;
@@ -1981,7 +1834,6 @@ body::-webkit-resizer {
     background: var(--primary-hover);
 }
 
-/* Scrollbar styles for chat messages */
 .chat-messages::-webkit-scrollbar {
     width: 4px;
 }
@@ -2040,7 +1892,6 @@ body::-webkit-resizer {
     align-items: center;
     justify-content: center;
     color: white;
-    cursor: pointer;
     transition: all 0.2s;
     position: relative;
     padding: 2px;
@@ -2133,7 +1984,6 @@ body::-webkit-resizer {
     padding: 0.5rem 2rem;
     border-radius: 6px;
     font-size: 1rem;
-    cursor: pointer;
     transition: all 0.2s ease;
     display: block;
     margin: 0 auto;
@@ -2202,6 +2052,194 @@ body::-webkit-resizer {
     50% {
         transform: scale(1.05);
         opacity: 0.4;
+    }
+}
+
+.snow-toggle {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    color: var(--text);
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.snow-toggle:hover {
+    transform: scale(1.1);
+    background: var(--primary-hover);
+}
+
+.snow-toggle:active {
+    transform: scale(0.3);
+    background: var(--primary-hover);
+}
+
+.snow-toggle svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+}
+
+@media (max-width: 768px) {
+    .snow-toggle {
+        bottom: 80px;
+        left: 20px;
+    }
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-flex;
+}
+
+.tooltip {
+    position: absolute;
+    top: -45px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.95);
+    background: linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(139, 92, 246, 0.15) 100%
+    );
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(139, 92, 246, 0.2) transparent transparent transparent;
+}
+
+*:hover > .tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+}
+
+.tooltip.bottom {
+    top: auto;
+    bottom: -45px;
+}
+
+.tooltip.bottom::after {
+    bottom: auto;
+    top: -6px;
+    border-color: transparent transparent rgba(139, 92, 246, 0.2) transparent;
+}
+
+.tooltip-left {
+    position: absolute;
+    right: calc(100% + 15px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.95);
+    background: linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(139, 92, 246, 0.15) 100%
+    );
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tooltip-left::after {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent transparent rgba(139, 92, 246, 0.2);
+}
+
+.tooltip-right {
+    position: absolute;
+    left: calc(100% + 15px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.95);
+    background: linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(139, 92, 246, 0.15) 100%
+    );
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tooltip-right::after {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent rgba(139, 92, 246, 0.2) transparent transparent;
+}
+
+*:hover > .tooltip-left {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) scale(1);
+}
+
+*:hover > .tooltip-right {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) scale(1);
+}
+
+@media (max-width: 768px) {
+    .tooltip,
+    .tooltip-left,
+    .tooltip-right {
+        font-size: 12px;
+        padding: 6px 12px;
     }
 }
 

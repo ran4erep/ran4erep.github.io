@@ -452,6 +452,7 @@ class MusicPlayer {
                 <svg viewBox="0 0 24 24" width="24" height="24">
                     <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
                 </svg>
+                <span data-lang-id="pause_tooltip" class="tooltip">Пауза</span>
             `;
             document.querySelector('.visualizer-container').classList.remove('paused');
         } else {
@@ -459,9 +460,13 @@ class MusicPlayer {
                 <svg viewBox="0 0 24 24" width="24" height="24">
                     <path fill="currentColor" d="M8 5v14l11-7z"/>
                 </svg>
+                <span data-lang-id="play_tooltip" class="tooltip">Воспроизвести</span>
             `;
             document.querySelector('.visualizer-container').classList.add('paused');
         }
+
+        const currentLang = localStorage.getItem('language') === 'en' ? 'en' : 'ru';
+        translatePage(currentLang === 'en');
     }
 
     togglePlay() {

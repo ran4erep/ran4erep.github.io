@@ -14,12 +14,45 @@ class SnowAnimation {
         
         this.particles = [];
         this.particleCount = 50;
+        this.isSnowing = localStorage.getItem('isSnowing') !== 'false';
         
         this.resize();
         window.addEventListener('resize', () => this.resize());
         
         this.createParticles();
+        this.setupToggleButton();
+        
+        if (!this.isSnowing) {
+            this.hideSnow();
+        }
+        
         this.animate();
+    }
+    
+    setupToggleButton() {
+        const toggleButton = document.getElementById('snow-toggle');
+        if (toggleButton) {
+            toggleButton.addEventListener('click', () => {
+                this.isSnowing = !this.isSnowing;
+                localStorage.setItem('isSnowing', this.isSnowing);
+                
+                if (this.isSnowing) {
+                    this.showSnow();
+                } else {
+                    this.hideSnow();
+                }
+            });
+        }
+    }
+    
+    showSnow() {
+        this.bgCanvas.style.display = 'block';
+        this.fgCanvas.style.display = 'block';
+    }
+    
+    hideSnow() {
+        this.bgCanvas.style.display = 'none';
+        this.fgCanvas.style.display = 'none';
     }
     
     resize() {
@@ -72,17 +105,19 @@ class SnowAnimation {
     }
     
     animate() {
-        this.bgCtx.clearRect(0, 0, this.bgCanvas.width, this.bgCanvas.height);
-        this.fgCtx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
-        
-        this.particles.forEach(particle => {
-            this.moveParticle(particle);
-            if (particle.isForeground) {
-                this.drawParticle(particle, this.fgCtx);
-            } else {
-                this.drawParticle(particle, this.bgCtx);
-            }
-        });
+        if (this.isSnowing) {
+            this.bgCtx.clearRect(0, 0, this.bgCanvas.width, this.bgCanvas.height);
+            this.fgCtx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
+            
+            this.particles.forEach(particle => {
+                this.moveParticle(particle);
+                if (particle.isForeground) {
+                    this.drawParticle(particle, this.fgCtx);
+                } else {
+                    this.drawParticle(particle, this.bgCtx);
+                }
+            });
+        }
         
         requestAnimationFrame(() => this.animate());
     }

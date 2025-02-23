@@ -58,16 +58,19 @@
                         <svg viewBox="0 0 24 24" width="24" height="24">
                             <path fill="currentColor" d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
                         </svg>
+                        <span data-lang-id="prev_track_tooltip" class="tooltip">Предыдущий трек</span>
                     </button>
                     <button id="play-btn" class="control-btn play-btn" aria-label="Play/Pause">
                         <svg viewBox="0 0 24 24" width="24" height="24">
                             <path fill="currentColor" d="M8 5v14l11-7z"/>
                         </svg>
+                        <span data-lang-id="play_tooltip" class="tooltip">Воспроизвести</span>
                     </button>
                     <button id="next-btn" class="control-btn" aria-label="Next track">
                         <svg viewBox="0 0 24 24" width="24" height="24">
                             <path fill="currentColor" d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
                         </svg>
+                        <span data-lang-id="next_track_tooltip" class="tooltip">Следующий трек</span>
                     </button>
                 </div>
             </div>
@@ -84,15 +87,19 @@
             <div class="social-links">
                 <a href="https://www.youtube.com/youran4erep" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="YouTube">
                     <img src="https://youtube.com/favicon.ico" alt="YouTube" width="24" height="24">
+                    <span data-lang-id="my_videos_tooltip" class="tooltip">Мои видосы</span>
                 </a>
                 <a href="https://buymeacoffee.com/ran4erep" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Buy me a coffee">
                     <img src="https://buymeacoffee.com/favicon.ico" alt="Buy me a coffee" width="24" height="24">
+                    <span data-lang-id="support_tooltip" class="tooltip">Купить мне чашечку кофе</span>
                 </a>
                 <a href="https://github.com/ran4erep" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub">
                     <img src="https://github.com/favicon.ico" alt="GitHub" width="24" height="24">
+                    <span data-lang-id="my_repos_tooltip" class="tooltip">Мои репозитории</span>
                 </a>
                 <a href="https://steamcommunity.com/id/ran4erep/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Steam">
                     <img src="https://steamcommunity.com/favicon.ico" alt="Steam" width="24" height="24">
+                    <span data-lang-id="my_games_tooltip" class="tooltip">Мои игры</span>
                 </a>
             </div>
 
@@ -103,8 +110,8 @@
             <header class="site-header">
                 <div id="clock" class="clock">18:30:30</div>
                 <div class="language-switcher">
-                    <button class="lang-btn ru-btn active" data-lang="ru">RU</button>
-                    <button class="lang-btn us-btn" data-lang="en">EN</button>
+                    <button class="lang-btn ru-btn active" data-lang="ru">&#127479;&#127482;</button>
+                    <button class="lang-btn us-btn" data-lang="en">&#127482;&#127480;</button>
                 </div>
                 <div class="logo-container">
                     <h1 class="logo-text" data-text="ran4erep's HUB">ran4erep's HUB</h1>
@@ -114,13 +121,17 @@
             <section id="gallery" aria-label="Gallery">
                 <h2 class="section-title" data-lang-id="nav_gallery">Галерея</h2>
                 <div class="gallery-container">
-                    <button id="gallery-prev" class="gallery-nav prev-button" aria-label="Previous images"><span>‹</span></button>
+                    <button id="gallery-prev" class="gallery-nav prev-button" aria-label="Previous images"><span>‹</span>
+                        <span data-lang-id="left_tooltip"class="tooltip-right">Влево</span>
+                    </button>
                     <div class="gallery-viewport">
                         <div id="gallery-grid" class="gallery-grid">
                             <!-- Images will be loaded here dynamically -->
                         </div>
                     </div>
-                    <button id="gallery-next" class="gallery-nav next-button" aria-label="Next images"><span>›</span></button>
+                    <button id="gallery-next" class="gallery-nav next-button" aria-label="Next images"><span>›</span>
+                        <span data-lang-id="right_tooltip" class="tooltip-left">Вправо</span>
+                    </button>
                 </div>
             </section>
 
@@ -442,12 +453,19 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="m18 15-6-6-6 6"/>
             </svg>
+            <span data-lang-id="ontop_tooltip" class="tooltip">Подняться наверх</span>
         </button>
 
         <div id="image-viewer" class="image-viewer hidden" role="dialog" aria-modal="true">
-            <button id="viewer-close" class="viewer-close" aria-label="Close viewer">×</button>
-            <button id="viewer-prev" class="viewer-nav prev-button" aria-label="Previous image"><span>‹</span></button>
-            <button id="viewer-next" class="viewer-nav next-button" aria-label="Next image"><span>›</span></button>
+            <button id="viewer-close" class="viewer-close" aria-label="Close viewer">×
+                <span data-lang-id="close_tooltip" class="tooltip-left">Закрыть</span>
+            </button>
+            <button id="viewer-prev" class="viewer-nav prev-button" aria-label="Previous image"><span>‹</span>
+                <span data-lang-id="back_tooltip" class="tooltip-right">Назад</span>
+            </button>
+            <button id="viewer-next" class="viewer-nav next-button" aria-label="Next image"><span>›</span>
+                <span data-lang-id="forward_tooltip" class="tooltip-left">Вперед</span>
+            </button>
             <img id="viewer-image" src="" alt="" loading="lazy">
         </div>
 
@@ -456,12 +474,21 @@
                 <span id="now-playing-text">Нет воспроизведения</span>
             </div>
         </div>
+
+        <button id="snow-toggle" class="snow-toggle" aria-label="Toggle snow effect">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 3v18M7.5 7.5l9 9M16.5 7.5l-9 9M3 12h18"/>
+                <circle cx="12" cy="12" r="1"/>
+            </svg>
+            <span data-lang-id="snow_tooltip" class="tooltip-right">Включить/выключить снег</span>
+        </button>
     </div>
 
     <button id="chat-button" class="chat-button">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         </svg>
+        <span data-lang-id="chat_tooltip" class="tooltip">Чилл-зона</span>
     </button>
 
     <div id="chat-modal" class="chat-modal hidden">
@@ -486,6 +513,7 @@
                         <circle cx="8.5" cy="8.5" r="1.5"/>
                         <polyline points="21 15 16 10 5 21"/>
                     </svg>
+                    <span data-lang-id="upload_image_tooltip"class="tooltip">Загрузить изображение</span>
                 </label>
                 <input type="file" id="image-upload" accept="image/*" style="display: none">
                 <button id="send-message">
@@ -493,6 +521,7 @@
                         <line x1="22" y1="2" x2="11" y2="13"></line>
                         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                     </svg>
+                    <span data-lang-id="send_message_tooltip"class="tooltip">Отправить</span>
                 </button>
             </div>
         </div>
@@ -683,14 +712,10 @@
             }
 
             try {
-                const response = await fetch('https://timeapi.io/api/Time/current/zone?timeZone=Europe/Kiev');
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                
                 const messageData = {
                     nickname: nickname,
                     message: message,
-                    timestamp: new Date(data.dateTime).getTime()
+                    timestamp: new Date().getTime()
                 };
                 
                 await push(messagesRef, messageData);
@@ -722,15 +747,11 @@
                 }
 
                 try {
-                    const response = await fetch('https://timeapi.io/api/Time/current/zone?timeZone=Europe/Kiev');
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    const data = await response.json();
-                    
                     const messageData = {
                         nickname: nickname,
                         message: '',
                         image: imageData,
-                        timestamp: new Date(data.dateTime).getTime()
+                        timestamp: new Date().getTime()
                     };
                     
                     await push(messagesRef, messageData);
@@ -851,7 +872,7 @@
                 
                 document.getElementById("clock").textContent = timeString;
             } catch (error) {
-                console.error('Error fetching time:', error);
+                console.error('Не удалось получить время: ', error);
 
                 document.getElementById("clock").textContent = "--:--:--";
             }

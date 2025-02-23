@@ -354,5 +354,77 @@
     "chat_notification_ok": {
         "en": "Got it",
         "ru": "Понял"
+    },
+    "snow_tooltip": {
+        "en": "Toggle snow effect",
+        "ru": "Включить снег"
+    },
+    "prev_track_tooltip": {
+        "en": "Previous track",
+        "ru": "Предыдущий трек"
+    },
+    "play_tooltip": {
+        "en": "Play",
+        "ru": "Воспроизвести"
+    },
+    "pause_tooltip": {
+        "en": "Pause",
+        "ru": "Пауза"
+    },
+    "next_track_tooltip": {
+        "en": "Next track",
+        "ru": "Следующий трек"
+    },
+    "my_videos_tooltip": {
+        "en": "My videos",
+        "ru": "Мои видосы"
+    },
+    "support_tooltip": {
+        "en": "Buy me a cup of coffee",
+        "ru": "Купить мне чашечку кофе"
+    },
+    "my_repos_tooltip": {
+        "en": "My repositories",
+        "ru": "Мои репозитории"
+    },
+    "my_games_tooltip": {
+        "en": "My games",
+        "ru": "Мои игры"
+    },
+    "left_tooltip": {
+        "en": "Left",
+        "ru": "Влево"
+    },
+    "right_tooltip": {
+        "en": "Right",
+        "ru": "Вправо"
+    },
+    "ontop_tooltip": {
+        "en": "To the top",
+        "ru": "Подняться наверх"
+    },
+    "back_tooltip": {
+        "en": "Back",
+        "ru": "Назад"
+    },
+    "close_tooltip": {
+        "en": "Close",
+        "ru": "Закрыть"
+    },
+    "forward_tooltip": {
+        "en": "Forward",
+        "ru": "Вперёд"
+    },
+    "chat_tooltip": {
+        "en": "Chill zone",
+        "ru": "Чилл-зона"
+    },
+    "upload_image_tooltip": {
+        "en": "Upload image",
+        "ru": "Загрузить изображение"
+    },
+    "send_message_tooltip": {
+        "en": "Send",
+        "ru": "Отправить"
     }
 }
