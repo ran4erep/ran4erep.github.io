@@ -186,16 +186,6 @@ class Gallery {
         img.classList.add('show');
         
         this.updateImageNavigation();
-
-        this.preloadImage(index + 1);
-        this.preloadImage(index - 1);
-    }
-
-    preloadImage(index) {
-        if (index >= 0 && index < this.images.length) {
-            const img = new Image();
-            img.src = `gallery/${this.images[index]}`;
-        }
     }
     
     hideImage() {
@@ -930,6 +920,7 @@ const languageIcons = {
     'godot': 'devicon-godot-plain',
     'msdos': 'devicon-msdos-plain',
     'powershell': 'devicon-powershell-plain',
+    'gimp': 'devicon-gimp-plain'
 };
 
 function initializeProjectLanguages() {

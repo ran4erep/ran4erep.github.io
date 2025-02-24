@@ -208,7 +208,6 @@ body::before {
     border-radius: 4px;
 }
 
-/* Специальный стиль для иконки GitHub */
 .social-link[aria-label="GitHub"] img {
     filter: invert(1);
 }
@@ -220,7 +219,6 @@ body::before {
     margin-top: 1rem;
 }
 
-/* Sidebar Toggle Button */
 .sidebar-toggle {
     position: fixed;
     top: 1rem;
@@ -242,7 +240,6 @@ body::before {
     left: calc(var(--sidebar-width) + 1rem);
 }
 
-/* Main Content */
 .main-content {
     flex: 1;
     padding: 1rem;
@@ -263,7 +260,6 @@ body::before {
     display: inline-block;
 }
 
-/* Logo and Clock */
 .site-header {
     display: flex;
     justify-content: center;
@@ -279,14 +275,6 @@ body::before {
     justify-content: center;
 }
 
-.language-switcher {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    display: flex;
-    gap: 0.5rem;
-    z-index: 1000;
-}
 
 .clock {
     position: absolute;
@@ -394,12 +382,12 @@ section {
 }
 
 .project.featured .video-container {
-    margin: 1rem -1.5rem -1.5rem;
+    margin: -1.1rem -1.1rem -1.1rem;
     position: relative;
     padding-bottom: 56.25%; /* 16:9 */
     height: 0;
     overflow: hidden;
-    border-radius: 0 0 1rem 1rem;
+    border-radius: 0.5rem 0.5rem 0.5rem 0.5rem;
 }
 
 .project.featured .video-container iframe {
@@ -646,8 +634,8 @@ section {
 }
 
 #viewer-image {
-    max-width: 90%;
-    max-height: 90vh;
+    max-width: 98%;
+    max-height: 98vh;
     width: auto;
     height: auto;
     min-width: min(90vw, 600px);
@@ -670,12 +658,12 @@ section {
 
 #viewer-image.slide-left {
     opacity: 0;
-    transform: translateX(-50px);
+    transform: translateX(-150px);
 }
 
 #viewer-image.slide-right {
     opacity: 0;
-    transform: translateX(50px);
+    transform: translateX(150px);
 }
 
 .viewer-nav {
@@ -857,7 +845,7 @@ body.viewer-open {
 
 /* Language Toggle Button */
 .language-switcher {
-    position: fixed;
+    position: absolute;
     top: 1rem;
     right: 1rem;
     display: flex;
@@ -887,13 +875,6 @@ body.viewer-open {
     color: white;
     border-color: var(--primary);
     pointer-events: none;
-}
-
-@media (max-width: 768px) {
-    .language-switcher {
-        top: auto;
-        bottom: 5rem;
-    }
 }
 
 .site-header {
@@ -988,13 +969,6 @@ body.viewer-open {
     animation: gradient 5s ease infinite reverse, glow 2s ease-in-out infinite 1s;
     text-shadow: 
         0 0 15px var(--primary);
-}
-
-.language-switcher {
-    position: absolute;
-    right: 1rem;
-    display: flex;
-    gap: 0.5rem;
 }
 
 /* Music Player */
@@ -1419,10 +1393,16 @@ body.viewer-open {
         background: rgba(0, 0, 0, 0.7);
     }
 
-    /* Fix language buttons position */
-    .language-switcher {
-        top: auto;
-        bottom: 5rem;
+    #scroll-to-top-btn {
+        bottom: 1rem;
+    }
+
+    #snow-toggle {
+        bottom: 1rem;
+    }
+
+    #chat-button {
+        bottom: 1rem;
     }
 }
 
@@ -2143,17 +2123,6 @@ body.viewer-open {
     transform: translateX(-50%) scale(1);
 }
 
-.tooltip.bottom {
-    top: auto;
-    bottom: -45px;
-}
-
-.tooltip.bottom::after {
-    bottom: auto;
-    top: -6px;
-    border-color: transparent transparent rgba(139, 92, 246, 0.2) transparent;
-}
-
 .tooltip-left {
     position: absolute;
     right: calc(100% + 15px);
@@ -2238,8 +2207,7 @@ body.viewer-open {
     .tooltip,
     .tooltip-left,
     .tooltip-right {
-        font-size: 12px;
-        padding: 6px 12px;
+        display: none;
     }
 }
 

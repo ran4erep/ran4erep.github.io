@@ -7,9 +7,9 @@
         "en": "AI Projects",
         "ru": "AI Проекты"
     },
-    "nav_info": {
-        "en": "Information",
-        "ru": "Информация"
+    "nav_misc": {
+        "en": "Miscellaneous",
+        "ru": "Разное"
     },
     "nav_games": {
         "en": "Games",
@@ -42,6 +42,14 @@
     "wiki_desc": {
         "en": "Here you will find all important information about using and gaming on Windows OS tablets",
         "ru": "Здесь вы найдёте всю важную информацию по эксплуатации и геймингу на планшетах под управлением ОС Windows"
+    },
+    "switch_theme_title": {
+        "en": "Skulls theme for Nintendo Switch",
+        "ru": "Тема Skulls для Nintendo Switch"
+    },
+    "switch_theme_desc": {
+        "en": "A theme for the Nintendo Switch console made in dark tones. It should look just gorgeous on the Switch OLED.",
+        "ru": "Тема для консоли Nintendo Switch выполненная в тёмных тонах. На Switch OLED должна смотреться просто шикарно."
     },
     "game_or_title": {
         "en": "Game Opposite Reaction",
