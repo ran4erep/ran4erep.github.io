@@ -105,7 +105,7 @@
                 </a>
             </div>
 
-            <div class="copyright">&#169; by ran4erep, 2023-2025</div>
+            <div class="copyright">&#169; by ran4erep, 2023-<span id="current-year"></span></div>
         </aside>
 
         <main class="main-content">
@@ -552,6 +552,8 @@
 
         updateClock();
         setInterval(updateClock, 1000);
+
+        document.getElementById('current-year').textContent = new Date().getFullYear();
 
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";

@@ -198,6 +198,14 @@ body::before {
     transition: transform 0.2s;
 }
 
+.copyright {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 0.8rem;
+}
+
 .social-link:hover {
     transform: scale(1.1);
 }
