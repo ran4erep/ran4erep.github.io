@@ -12,34 +12,4 @@
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
-    <url>
-        <loc>https://ran4erep.github.io/games/tetris/</loc>
-        <lastmod>2024-02-22</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    <url>
-        <loc>https://ran4erep.github.io/games/clash-of-memory/</loc>
-        <lastmod>2024-02-22</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    <url>
-        <loc>https://ran4erep.github.io/games/guess/</loc>
-        <lastmod>2024-02-22</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    <url>
-        <loc>https://ran4erep.github.io/games/snake/</loc>
-        <lastmod>2024-02-22</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    <url>
-        <loc>https://ran4erep.github.io/games/sokoban/</loc>
-        <lastmod>2024-02-22</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
 </urlset> 
