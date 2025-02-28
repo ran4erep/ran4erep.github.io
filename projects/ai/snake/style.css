@@ -1,0 +1,377 @@
+:root {
+    --background: #0f1116;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --text: #e5e7eb;
+    --text-secondary: #9ca3af;
+    --primary: #8b5cf6;
+    --primary-hover: #7c3aed;
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --scrollbar-bg: rgba(255, 255, 255, 0.05);
+    --scrollbar-thumb: rgba(139, 92, 246, 0.5);
+    --scrollbar-thumb-hover: rgba(139, 92, 246, 0.7);
+    --range-progress: 50%;
+    --custom-cursor: url('data:image/x-icon;base64,AAACAAEAICAAAAUAAQCoCAAAFgAAACgAAAAgAAAAQAAAAAEACAAAAAAAAAQAAAAAAAAAAAAAAAEAAAAAAAAAAAAABHA0AAAARABQVGgABGQwAAAsQAAMz1oAAABcABTb0QAAQBwACIA8ABigbAA0NEQAADQYAAwSzwBweIwAAFgoAGBkeAAAMFwAAEwkABSUXAAAACwAFBrbAEBEVAAATHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkAAAEQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAABBwEQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAQcHFRUQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAoHFhYWDg4NEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkBBxYWBwwXEQIQAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAcWBwcHDBEHDw0NAAAAAAAAAAAAAAAAAAAAAAAAABAHDg4XDwIMFw8XDQkAAAAAAAAAAAAAAAAAAAAAAAAAARUVAhEHDwcMFwINCQAAAAAAAAAAAAAAAAAAAAAAAAABCRUMFxEDFgIODgENAAAAAAAAAAAAAAAAAAAAAAANEwEJFQwVBgIHAhAVCg0AAAAAAAAAAAAAAAAAAAANDRMQARQJFQYGFQICCgIKAAAAAAAAAAAAAAAAAAAJEBMNEBABBhQJFAYVFRAKCQoAAAAAAAAAAAAAAAAJEAEBExABEBAKBgYUFAoJCgoKAAAAAAAAAAAAAAAACRAKARAQFBQKEAoUFBQUBhQUEAAAAAAAAAAAAAAAAAAJEAoBEAEGCgoKAQoUFBQUChAAAAAAAAAAAAAAAAAAChAQEAkJCgYLFBQUAQoKCgkAAAAAAAAAAAAAAAAAABISChAJCQkGFBQUChQKCgsLDQAAAAAAAAAAAAAAAAAAGAgQCQ0AExQUFBQKCgoUFAsAAAAAAAAAAAAAAAAAAAAIEgAAAA0ECgsUChQKFAsGFAAAAAAAAAAAAAAAAAAAAAgAAAAAEwoUFAoKCwoUCwsUAAAAAAAAAAAAAAAAAAAAEgAAAA0TFAYGCgoLCgQECwoAAAAAAAAAAAAAAAAAAAAAAAANCRMUBhQEFBQGChQGCgAAAAAAAAAAAAAAAAAAAAAADQkTBAoUCgkUBgYQCgYBAAAAAAAAAAAAAAAAAAAAAAAJExMTEwkJCgoQEBAJCQAAAAAAAAAAAAAAAAAAAAAADRMEBAQTAAkJAAkKCgkAAAAAAAAAAAAAAAAAAAAAAAATBBQUFAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQUEhIEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBIYGBMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFGAgSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgIEgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASCBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//7P///+h////gH///wA///4AP//+AB///AAf//wAH//8AB//8AAf/8AAP/8AAD/8AAB/+AAA//gAAf/wAAf/4AAH/+AAD//nAA//7wAP/+4AD//8AA//+AAP//gAH//wJD//8D////B////wf///8P////H////j/////////');
+}
+
+/* Стили для Webkit (Chrome, Safari, новые версии Edge) */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 4px 0;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    cursor: var(--custom-cursor), auto !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+/* Стили для Firefox */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    cursor: var(--custom-cursor), auto;
+}
+
+/* Скрываем стандартный скроллбар только для body */
+body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--background);
+    color: var(--text);
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 1200px;
+    width: 100%;
+    background: var(--card-bg);
+    border-radius: 1rem;
+    box-shadow: var(--card-shadow);
+    padding: 2rem;
+}
+
+.main-content {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.game-area {
+    flex: 0 0 auto;
+}
+
+#game-board {
+    display: grid;
+    width: 400px;
+    height: 400px;
+    border: 2px solid var(--card-border);
+    background-color: var(--card-bg);
+}
+
+.info-panel {
+    flex: 0 0 250px;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border-radius: 0.5rem;
+    box-shadow: var(--card-shadow);
+}
+
+.chart-panel {
+    flex: 1;
+    background: var(--card-bg);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    min-width: 300px;
+}
+
+.game-log-panel {
+    position: relative;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.game-log-container {
+    position: relative;
+    width: 100%;
+    height: 150px;
+}
+
+#game-log {
+    width: 100%;
+    height: 100%;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: var(--text);
+    font-family: monospace;
+    resize: none;
+    overflow-y: scroll;
+    outline: none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#game-log::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-track {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    bottom: 4px;
+    width: 6px;
+    background: var(--scrollbar-bg);
+    border-radius: 3px;
+}
+
+.scrollbar-thumb {
+    position: absolute;
+    width: 100%;
+    background: var(--primary);
+    border-radius: 3px;
+    cursor: var(--custom-cursor), auto;
+    transition: background-color 0.2s ease;
+    min-height: 30px;
+}
+
+.scrollbar-thumb:hover {
+    background: var(--primary-hover);
+}
+
+.snake-segment, .snake-head, .food {
+    border: 1px solid var(--card-bg);
+}
+
+.snake-segment, .snake-head {
+    background-color: var(--primary);
+}
+
+.snake-head {
+    background-color: var(--primary-hover);
+}
+
+.food {
+    background-color: #ef4444;
+}
+
+.log-header {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.icon-button {
+    position: absolute;
+    top: 8px;
+    right: 18px;
+    background: var(--card-bg);
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    z-index: 2;
+}
+
+.icon-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary-hover);
+}
+
+.icon-button:active {
+    transform: scale(0.95);
+}
+
+.copy-tooltip {
+    position: absolute;
+    top: 8px;
+    right: 40px;
+    background: var(--primary);
+    color: var(--text);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.copy-tooltip.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+h2 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.score-box, .stats {
+    margin-bottom: 1rem;
+}
+
+.speed-control {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.speed-control label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Стилизация слайдера для Chrome/Safari/Edge */
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: transparent;
+    border-radius: 2px;
+    outline: none;
+    position: relative;
+}
+
+input[type="range"]::before {
+    content: '';
+    position: absolute;
+    height: 4px;
+    left: 0;
+    right: 0;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: linear-gradient(to right, 
+        var(--primary) 0%, 
+        var(--primary) var(--range-progress), 
+        rgba(255, 255, 255, 0.1) var(--range-progress), 
+        rgba(255, 255, 255, 0.1) 100%
+    );
+    border-radius: 2px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--primary);
+    border-radius: 50%;
+    /* cursor: pointer; */
+    transition: all 0.2s ease;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+    margin-top: -6px;
+    position: relative;
+    z-index: 1;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.2);
+    transform: scale(1.1);
+}
+
+/* Стилизация слайдера для Firefox */
+input[type="range"]::-moz-range-track {
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, 
+        var(--primary) 0%, 
+        var(--primary) var(--range-progress), 
+        rgba(255, 255, 255, 0.1) var(--range-progress), 
+        rgba(255, 255, 255, 0.1) 100%
+    );
+    border-radius: 2px;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--primary);
+    border: none;
+    border-radius: 50%;
+    /* cursor: pointer; */
+    transition: all 0.2s ease;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.2);
+    transform: scale(1.1);
+}
+
+#speed-value {
+    font-family: 'Space Grotesk', monospace;
+    font-weight: 500;
+    color: var(--primary);
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+}
+
+.controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+button {
+    background-color: var(--primary);
+    color: var(--text);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--primary-hover);
+}
+
+#progress-chart {
+    width: 100% !important;
+    height: 200px !important;
+}

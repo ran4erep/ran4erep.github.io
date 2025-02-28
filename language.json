@@ -434,5 +434,9 @@
     "send_message_tooltip": {
         "en": "Send",
         "ru": "Отправить"
+    },
+    "snake_ai_desc": {
+        "en": "Simple self-written neural network that learns by Q-learning method to play the Snake game right in your browser. It doesn't work in the background, the page must be active. You can save and load the trained model. There is a chart that shows the success of the neural network training.",
+        "ru": "Простая самописная нейросеть, которая обучается методом Q-learning играть в игру Змейка прямо в вашем браузере. В фоне не работает, страница должна быть активна. Можно сохранять и загружать обученную модель. Есть график, который показывает успешность обучения нейросети."
     }
 }
