@@ -14,7 +14,19 @@ class SnowAnimation {
         
         this.particles = [];
         this.particleCount = 50;
-        this.isSnowing = localStorage.getItem('isSnowing') !== 'false';
+        
+        const currentMonth = new Date().getMonth();
+        const isWinterMonth = currentMonth === 11 || currentMonth === 0 || currentMonth === 1;
+        
+        if (!isWinterMonth) {
+            localStorage.setItem('isSnowing', 'false');
+            const toggleButton = document.getElementById('snow-toggle');
+            if (toggleButton) {
+                toggleButton.style.display = 'none';
+            }
+        }
+        
+        this.isSnowing = isWinterMonth && localStorage.getItem('isSnowing') !== 'false';
         
         this.resize();
         window.addEventListener('resize', () => this.resize());

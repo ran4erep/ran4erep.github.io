@@ -102,10 +102,10 @@ class Gallery {
     
     async load() {
         try {
-            const response = await fetch('/gallery/gallery.json'); // Загружаем JSON
+            const response = await fetch('/gallery/gallery.json');
             if (!response.ok) throw new Error('Failed to load gallery data');
             
-            this.images = await response.json(); // Получаем список файлов
+            this.images = await response.json();
     
             this.render();
             this.updateNavigation();
