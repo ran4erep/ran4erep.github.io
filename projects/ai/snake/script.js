@@ -79,15 +79,10 @@ class SnakeAI {
 
     async saveModel() {
         try {
-            // Получаем данные модели напрямую через toJSON
-            const modelData = this.brain.model.toJSON();
-            
-            // Получаем веса модели
-            const weights = await this.brain.model.getWeights();
-            const weightData = await tf.io.encodeWeights(weights);
-            
-            // Освобождаем память
-            weights.forEach(w => w.dispose());
+            // Получаем данные модели напрямую через save
+            const modelArtifacts = await this.brain.model.save(tf.io.withSaveHandler(async (artifacts) => {
+                return artifacts;
+            }));
             
             // Оптимизируем историю игр
             const compressedScores = [];
@@ -122,9 +117,12 @@ class SnakeAI {
             
             // Создаем объект с данными модели
             const saveData = {
-                modelTopology: modelData,
-                weightSpecs: weightData.specs,
-                weightData: Array.from(new Uint8Array(weightData.data)),
+                modelTopology: modelArtifacts.modelTopology,
+                weightSpecs: modelArtifacts.weightSpecs,
+                weightData: Array.from(new Uint8Array(modelArtifacts.weightData)),
+                format: modelArtifacts.format,
+                generatedBy: modelArtifacts.generatedBy,
+                convertedBy: modelArtifacts.convertedBy,
                 epsilon: Math.round(this.epsilon * 1000) / 1000, // Округляем epsilon
                 memory: compressedMemory,
                 stats: {
