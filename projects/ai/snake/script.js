@@ -79,8 +79,15 @@ class SnakeAI {
 
     async saveModel() {
         try {
-            // Получаем данные модели напрямую
-            const modelArtifacts = await this.brain.model.save('indexeddb://temp-model');
+            // Получаем данные модели напрямую через toJSON
+            const modelData = this.brain.model.toJSON();
+            
+            // Получаем веса модели
+            const weights = await this.brain.model.getWeights();
+            const weightData = await tf.io.encodeWeights(weights);
+            
+            // Освобождаем память
+            weights.forEach(w => w.dispose());
             
             // Оптимизируем историю игр
             const compressedScores = [];
@@ -115,9 +122,9 @@ class SnakeAI {
             
             // Создаем объект с данными модели
             const saveData = {
-                modelTopology: modelArtifacts.modelTopology,
-                weightSpecs: modelArtifacts.weightSpecs,
-                weightData: Array.from(new Uint8Array(modelArtifacts.weightData)),
+                modelTopology: modelData,
+                weightSpecs: weightData.specs,
+                weightData: Array.from(new Uint8Array(weightData.data)),
                 epsilon: Math.round(this.epsilon * 1000) / 1000, // Округляем epsilon
                 memory: compressedMemory,
                 stats: {
@@ -177,26 +184,19 @@ class SnakeAI {
             const saveData = JSON.parse(fileContent);
             
             // Создаем объект ModelArtifacts для загрузки
-            const artifacts = {
+            const modelArtifacts = {
                 modelTopology: saveData.modelTopology,
                 weightSpecs: saveData.weightSpecs,
-                weightData: saveData.weightData
+                weightData: new Uint8Array(saveData.weightData).buffer,
+                format: 'layers-model',
+                generatedBy: 'TensorFlow.js v4.2.0',
+                convertedBy: null
             };
             
-            // Создаем временное хранилище для модели
-            const tempModelPath = 'indexeddb://temp-model';
-            
-            // Сохраняем модель во временное хранилище
-            await tf.io.registerSaveRouter(async () => {
-                return {
-                    modelTopology: artifacts.modelTopology,
-                    weightSpecs: artifacts.weightSpecs,
-                    weightData: new Uint8Array(artifacts.weightData).buffer
-                };
-            });
-            
-            // Загружаем модель из временного хранилища
-            this.brain.model = await tf.loadLayersModel(tempModelPath);
+            // Загружаем модель напрямую из объекта ModelArtifacts
+            this.brain.model = await tf.loadLayersModel(
+                tf.io.fromMemory(modelArtifacts)
+            );
             
             // Компилируем модель
             this.brain.model.compile({
@@ -230,11 +230,7 @@ class SnakeAI {
             
             updateChart(); // Обновляем график с загруженными данными
             updateScore();
-            
-            // Обновляем отображение
-            updateScore();
             highScoreElement.textContent = highScore; // Явно обновляем элемент с рекордом
-            console.log('Model loaded from file');
             
             // Добавляем сообщение в лог
             logMessage(`Модель загружена из файла ${file.name}`);
