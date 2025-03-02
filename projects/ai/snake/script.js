@@ -342,6 +342,7 @@ let lastUpdateTime = 0;
 let GAME_SPEED = 15; // Frames per second - start slower for better training
 let isChartHovered = false;
 let lastVisibilityChange = 0;
+let movesSinceLastFood = 0; // Добавляем счетчик ходов с момента последней еды
 
 // DOM elements
 const gameBoard = document.getElementById('game-board');
@@ -364,7 +365,11 @@ let iterationRewards = {
     food: 0,
     collision: 0,
     distance: 0,
-    circling: 0
+    circling: 0,
+    averageImprovement: 0,
+    averageDecline: 0,
+    averageStagnation: 0,
+    noFood: 0 // Добавляем награду за отсутствие еды
 };
 
 function logMessage(message) {
@@ -377,10 +382,18 @@ function logMessage(message) {
 
 function logIterationSummary() {
     const total = iterationRewards.food + iterationRewards.collision + 
-                 iterationRewards.distance + iterationRewards.circling;
+                 iterationRewards.distance + iterationRewards.circling +
+                 (iterationRewards.averageImprovement || 0) +
+                 (iterationRewards.averageDecline || 0) +
+                 (iterationRewards.averageStagnation || 0) +
+                 (iterationRewards.noFood || 0);
     
     logMessage(`Итерация ${gamesPlayed}: Очки = ${score}, Средний показатель очков = ${(totalScore / gamesPlayed).toFixed(2)}, Эпсилон = ${ai.epsilon.toFixed(3)}`);
-    logMessage(`Награды: 🍎 ${iterationRewards.food >= 0 ? '+' : ''}${iterationRewards.food.toFixed(1)} | 📏 ${iterationRewards.distance >= 0 ? '+' : ''}${iterationRewards.distance.toFixed(2)} | 🔄 ${iterationRewards.circling.toFixed(1)} | 💥 ${iterationRewards.collision.toFixed(1)} | 📊 Итого: ${total.toFixed(2)}`);
+    logMessage(`Награды: 🍎 ${iterationRewards.food >= 0 ? '+' : ''}${iterationRewards.food.toFixed(1)} | 📏 ${iterationRewards.distance >= 0 ? '+' : ''}${iterationRewards.distance.toFixed(2)} | 🔄 ${iterationRewards.circling.toFixed(1)} | 💥 ${iterationRewards.collision.toFixed(1)}${
+        iterationRewards.averageImprovement ? ` | 📈 +${iterationRewards.averageImprovement.toFixed(2)}` : 
+        iterationRewards.averageDecline ? ` | 📉 ${iterationRewards.averageDecline.toFixed(2)}` :
+        iterationRewards.averageStagnation ? ` | 📊 ${iterationRewards.averageStagnation.toFixed(2)}` : ''
+    }${iterationRewards.noFood ? ` | ⏳ ${iterationRewards.noFood.toFixed(2)}` : ''} | 📊 Итого: ${total.toFixed(2)}`);
     logMessage('─'.repeat(70));
     
     // Сброс наград для следующей итерации
@@ -388,7 +401,11 @@ function logIterationSummary() {
         food: 0,
         collision: 0,
         distance: 0,
-        circling: 0
+        circling: 0,
+        averageImprovement: 0,
+        averageDecline: 0,
+        averageStagnation: 0,
+        noFood: 0
     };
 }
 
@@ -561,6 +578,7 @@ function initGame() {
     ];
     direction = 'right';
     score = 0;
+    movesSinceLastFood = 0; // Сбрасываем счетчик при начале новой игры
     generateFood();
     updateScore();
     lastUpdateTime = 0;
@@ -620,7 +638,31 @@ async function updateGame() {
 
         if (wallCollision || tailCollision) {
             gamesPlayed++;
+            
+            // Вычисляем старый средний показатель
+            const oldAverage = totalScore / (gamesPlayed - 1);
             totalScore += score;
+            // Вычисляем новый средний показатель
+            const newAverage = totalScore / gamesPlayed;
+            
+            // Награда/штраф за изменение среднего показателя
+            let averageChangeReward = 0;
+            if (gamesPlayed > 1) { // Начинаем учитывать только после первой игры
+                const averageChange = newAverage - oldAverage;
+                const STAGNATION_THRESHOLD = 0.001; // Порог для определения стагнации
+                
+                if (Math.abs(averageChange) < STAGNATION_THRESHOLD) {
+                    // Штраф за стагнацию, увеличивающийся с длиной змейки
+                    averageChangeReward = -0.5 - (snake.length - 3) * 0.1;
+                    iterationRewards.averageStagnation = averageChangeReward;
+                } else if (averageChange > 0) {
+                    averageChangeReward = averageChange * 2; // Умножаем на 2 для усиления эффекта
+                    iterationRewards.averageImprovement = averageChangeReward;
+                } else {
+                    averageChangeReward = averageChange * 2; // Умножаем на 2 для усиления эффекта
+                    iterationRewards.averageDecline = averageChangeReward;
+                }
+            }
             
             let collisionPenalty;
             if (tailCollision) {
@@ -638,7 +680,8 @@ async function updateGame() {
             updateChart();
 
             const nextState = ai.getState(snake, food);
-            ai.remember(state, action, collisionPenalty, nextState, true);
+            // Добавляем награду за изменение среднего показателя к общей награде
+            ai.remember(state, action, collisionPenalty + averageChangeReward, nextState, true);
             
             if (gamesPlayed % 10 === 0) {
                 setTimeout(() => ai.replay(), 0);
@@ -649,6 +692,7 @@ async function updateGame() {
         }
 
         snake.unshift(head);
+        movesSinceLastFood++; // Увеличиваем счетчик ходов
 
         // Calculate new distance to food
         const newDistance = Math.abs(head.x - food.x) + Math.abs(head.y - food.y);
@@ -659,6 +703,7 @@ async function updateGame() {
             score++;
             updateScore();
             generateFood();
+            movesSinceLastFood = 0; // Сбрасываем счетчик при съедании еды
             // Прогрессивная награда за еду: чем длиннее змейка, тем больше награда
             const foodReward = 1 + (snake.length - 3) * 0.5;
             reward = foodReward;
@@ -670,32 +715,49 @@ async function updateGame() {
             reward += distanceReward;
             iterationRewards.distance += distanceReward;
             
+            // Штраф за долгое отсутствие еды
+            const MAX_MOVES_WITHOUT_PENALTY = 50; // Максимальное количество ходов без штрафа
+            if (movesSinceLastFood > MAX_MOVES_WITHOUT_PENALTY) {
+                const noFoodPenalty = -0.01 * (movesSinceLastFood - MAX_MOVES_WITHOUT_PENALTY);
+                reward += noFoodPenalty;
+                iterationRewards.noFood += noFoodPenalty;
+            }
+            
             // Определение кружения в зависимости от размера змейки
             let circling = false;
             let circlingPenalty = 0;
             
-            if (snake.length < 8) {
-                // Для маленькой змейки проверяем последние 6 позиций
-                // и считаем кружением, если 4 из них повторяются
-                const lastPositions = snake.slice(0, Math.min(6, snake.length));
-                const uniquePositions = new Set(lastPositions.map(pos => `${pos.x},${pos.y}`));
-                const repeatedMoves = lastPositions.length - uniquePositions.size;
-                circling = repeatedMoves >= 3;
+            // Проверяем последние 20 позиций независимо от длины змейки
+            const lastPositions = snake.slice(0, Math.min(20, snake.length));
+            const positionHistory = lastPositions.map(pos => `${pos.x},${pos.y}`);
+            const uniquePositions = new Set(positionHistory);
+            
+            // Считаем повторения каждой позиции
+            const positionCounts = {};
+            positionHistory.forEach(pos => {
+                positionCounts[pos] = (positionCounts[pos] || 0) + 1;
+            });
+            
+            // Находим максимальное количество повторений одной позиции
+            const maxRepeats = Math.max(...Object.values(positionCounts));
+            
+            // Процент уникальных позиций
+            const uniqueRatio = uniquePositions.size / lastPositions.length;
+            
+            // Определяем кружение на основе нескольких факторов
+            if (maxRepeats >= 3 || uniqueRatio < 0.5) {
+                circling = true;
+                // Базовый штраф зависит от степени кружения
+                const baseCirclingPenalty = -0.5 * (1 - uniqueRatio) * (maxRepeats / 2);
+                // Дополнительный штраф за длину змейки
+                const lengthPenalty = (snake.length - 3) * 0.2;
+                // Дополнительный штраф за количество ходов без еды
+                const foodPenalty = Math.max(0, (movesSinceLastFood - 30) / 50);
                 
-                if (circling) {
-                    // Увеличенный штраф для маленькой змейки
-                    circlingPenalty = -1.0;
-                }
-            } else {
-                // Для длинной змейки используем существующую логику
-                const lastPositions = snake.slice(0, Math.min(12, snake.length));
-                const uniquePositions = new Set(lastPositions.map(pos => `${pos.x},${pos.y}`));
-                const repeatedMoves = lastPositions.length - uniquePositions.size;
-                circling = repeatedMoves >= 4;
+                circlingPenalty = baseCirclingPenalty - lengthPenalty - foodPenalty;
                 
-                if (circling) {
-                    circlingPenalty = -0.5 - (snake.length - 3) * 0.1;
-                }
+                // Ограничиваем минимальный штраф
+                circlingPenalty = Math.min(circlingPenalty, -0.5);
             }
             
             if (circling) {
