@@ -10,6 +10,16 @@
             "artist": "Naked Death",
             "path": "music/naked-death-psycho.mp3"
         },
+		 {
+            "title": "Cradle of Death",
+            "artist": "ran4erep",
+            "path": "music/ran4erep-cradle_of_death.mp3"
+        },
+		 {
+            "title": "Chiptune",
+            "artist": "ran4erep",
+            "path": "music/ran4erep-chiptune.mp3"
+        },
         {
             "title": "I Wanna Die",
             "artist": "Remi & ran4erep",
@@ -19,6 +29,6 @@
             "title": "Война (limil best edition)",
             "artist": "ran4erep",
             "path": "music/ran4erep-war.mp3"
-        }        
+        } 
     ]
 }
