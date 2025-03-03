@@ -15,10 +15,40 @@
             "artist": "ran4erep",
             "path": "music/ran4erep-cradle_of_death.mp3"
         },
+		{
+            "title": "А мне пох",
+            "artist": "Naked Death",
+            "path": "music/naked-death-fuckit.mp3"
+        },
+		{
+            "title": "D'n'B Playground",
+            "artist": "ran4erep",
+            "path": "music/ran4erep-dnb-playground.mp3"
+        },
+		{
+            "title": "Nirvana (Cover)",
+            "artist": "Naked Death",
+            "path": "music/naked-death-nirvana.mp3"
+        },
 		 {
             "title": "Chiptune",
             "artist": "ran4erep",
             "path": "music/ran4erep-chiptune.mp3"
+        },
+		{
+            "title": "Сука, ты оухел?",
+            "artist": "Naked Death",
+            "path": "music/naked-death-wtf.mp3"
+        },
+		{
+            "title": "Beauty of Frost",
+            "artist": "ran4erep",
+            "path": "music/ran4erep-beauty-of-frost.mp3"
+        },
+		{
+            "title": "Some hard shit",
+            "artist": "ran4erep",
+            "path": "music/ran4erep-some-hard-shit.mp3"
         },
         {
             "title": "I Wanna Die",
