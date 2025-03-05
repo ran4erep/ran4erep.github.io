@@ -63,18 +63,58 @@ class NeuralNetwork {
 class SnakeAI {
     constructor(gridSize) {
         this.gridSize = gridSize;
-        this.inputSize = 11;
+        this.inputSize = 15;  // 4 + 4 + 3 + 4 новых параметра
         this.hiddenSizes = [64, 32];
         this.outputSize = 3;  // Left, Forward, Right
         this.gamma = 0.99;
         this.epsilon = 1;
-        this.epsilonMin = 0.01;
-        this.epsilonDecay = 0.995;
+        this.epsilonMin = 0.1;  // Увеличиваем минимальное значение
+        this.epsilonDecay = 0.9995;  // Замедляем decay еще больше
         this.memorySize = 10000;
-        this.batchSize = 64;
+        this.batchSize = 64;  // Уменьшаем размер батча для более частого обучения
         this.memory = [];
+        this.priorityMemory = [];  // Память для важного опыта
+        this.maxPriorityMemory = 2000;  // Увеличиваем размер приоритетной памяти
+        this.lastScores = [];  // Хранение последних результатов
+        this.scoreWindow = 50;  // Размер окна для отслеживания прогресса
+        this.trainingInterval = 50;  // Уменьшаем интервал обучения
+        this.lastTrainingScore = 0;  // Последний результат перед обучением
 
+        // Создаем две нейронные сети для Double DQN
         this.brain = new NeuralNetwork(this.inputSize, this.hiddenSizes, this.outputSize);
+        this.targetBrain = new NeuralNetwork(this.inputSize, this.hiddenSizes, this.outputSize);
+        this.updateTargetNetwork();  // Копируем веса в целевую сеть
+        
+        // Добавляем параметры для нормализации
+        this.normalization = {
+            scoreMax: 1,
+            lengthMax: 1,
+            movesMax: 1
+        };
+    }
+
+    // Новый метод для обновления целевой сети
+    async updateTargetNetwork() {
+        const weights = this.brain.model.getWeights();
+        const targetWeights = weights.map(w => w.clone());
+        await this.targetBrain.model.setWeights(targetWeights);
+    }
+
+    // Обновляем метод нормализации состояния
+    normalizeState(state) {
+        const normalized = [...state];
+        // Нормализуем только новые параметры (последние 4)
+        normalized[11] = state[11] / this.normalization.scoreMax;  // scoreRatio
+        normalized[12] = state[12];  // foodProgress уже нормализован
+        normalized[13] = state[13] / this.normalization.lengthMax;  // snakeLengthRatio
+        normalized[14] = state[14];  // circlingDanger уже нормализован
+        return normalized;
+    }
+
+    // Обновляем метод обновления нормализации
+    updateNormalization(score, length) {
+        this.normalization.scoreMax = Math.max(this.normalization.scoreMax, score || 1);
+        this.normalization.lengthMax = Math.max(this.normalization.lengthMax, length || 1);
     }
 
     async saveModel() {
@@ -264,7 +304,30 @@ class SnakeAI {
         const dangerRight = this.checkCollision(head, this.rotateClockwise(direction));
         const dangerLeft = this.checkCollision(head, this.rotateCounterClockwise(direction));
 
-        return [...direction, ...foodDirection, dangerStraight, dangerRight, dangerLeft];
+        // Добавляем новые параметры состояния
+        const scoreRatio = score / (highScore || 1);
+        const foodProgress = movesSinceLastFood / 50;
+        const snakeLengthRatio = (snake.length - 3) / (highScore || 1);
+        const circlingDanger = this.calculateCirclingDanger(snake);
+
+        return [
+            ...direction,          // 4 значения
+            ...foodDirection,      // 4 значения
+            dangerStraight,       // 1 значение
+            dangerRight,          // 1 значение
+            dangerLeft,           // 1 значение
+            scoreRatio,           // Прогресс к рекорду
+            foodProgress,         // Прогресс к штрафу за отсутствие еды
+            snakeLengthRatio,     // Относительная длина
+            circlingDanger        // Опасность кружения
+        ];
+    }
+
+    calculateCirclingDanger(snake) {
+        const positions = snake.slice(0, Math.min(10, snake.length))
+            .map(pos => `${pos.x},${pos.y}`);
+        const uniquePositions = new Set(positions);
+        return Math.min(1, uniquePositions.size / positions.length);
     }
 
     checkCollision(point, direction) {
@@ -286,7 +349,8 @@ class SnakeAI {
     }
 
     getAction(state) {
-        if (Math.random() < this.epsilon) {
+        // Добавляем небольшую вероятность случайного действия даже при низком epsilon
+        if (Math.random() < this.epsilon || Math.random() < 0.05) {
             return Math.floor(Math.random() * this.outputSize);
         }
         const actions = this.brain.predict(state);
@@ -294,42 +358,128 @@ class SnakeAI {
     }
 
     remember(state, action, reward, nextState, done) {
-        this.memory.push([state, action, reward, nextState, done]);
+        const experience = [state, action, reward, nextState, done];
+        
+        // Добавляем в обычную память
+        this.memory.push(experience);
         if (this.memory.length > this.memorySize) {
             this.memory.shift();
         }
+
+        // Добавляем в приоритетную память если:
+        // 1. Получена большая награда (еда)
+        // 2. Это терминальное состояние с хорошим счётом
+        // 3. Это важное негативное состояние
+        if (reward > 0.5 || (done && score > 5) || reward < -1) {
+            this.priorityMemory.push(experience);
+            if (this.priorityMemory.length > this.maxPriorityMemory) {
+                this.priorityMemory.shift();
+            }
+        }
+
+        // Сохраняем счёт если это конец игры
+        if (done) {
+            this.lastScores.push(score);
+            if (this.lastScores.length > this.scoreWindow) {
+                this.lastScores.shift();
+            }
+        }
+    }
+
+    getRandomBatch() {
+        const batchSize = this.batchSize;
+        const regularSize = Math.floor(batchSize * 0.8);  // Увеличиваем долю обычной памяти
+        const prioritySize = batchSize - regularSize;
+        const batch = [];
+
+        // Оптимизированный выбор из обычной памяти
+        if (this.memory.length > 0) {
+            const indices = new Array(this.memory.length).fill(0).map((_, i) => i);
+            for (let i = 0; i < regularSize && indices.length > 0; i++) {
+                const randomIndex = Math.floor(Math.random() * indices.length);
+                const selectedIndex = indices[randomIndex];
+                indices.splice(randomIndex, 1);
+                batch.push(this.memory[selectedIndex]);
+            }
+        }
+
+        // Оптимизированный выбор из приоритетной памяти
+        if (this.priorityMemory.length > 0) {
+            const indices = new Array(this.priorityMemory.length).fill(0).map((_, i) => i);
+            for (let i = 0; i < prioritySize && indices.length > 0; i++) {
+                const randomIndex = Math.floor(Math.random() * indices.length);
+                const selectedIndex = indices[randomIndex];
+                indices.splice(randomIndex, 1);
+                batch.push(this.priorityMemory[selectedIndex]);
+            }
+        }
+
+        // Если батч неполный, добавляем из обычной памяти
+        while (batch.length < batchSize && this.memory.length > 0) {
+            batch.push(this.memory[Math.floor(Math.random() * this.memory.length)]);
+        }
+
+        return batch;
     }
 
     async replay() {
         if (this.memory.length < this.batchSize) return;
 
         const batch = this.getRandomBatch();
-        const states = batch.map(exp => exp[0]);
-        const targets = batch.map(exp => {
+        const states = [];
+        const targets = [];
+        
+        // Обрабатываем каждый опыт последовательно
+        for (const exp of batch) {
             const [state, action, reward, nextState, done] = exp;
-            const target = this.brain.predict(state);
+            const normalizedState = this.normalizeState(state);
+            const normalizedNextState = this.normalizeState(nextState);
+            const target = this.brain.predict(normalizedState);
+            
             if (done) {
-                target[action] = reward;
+                // Ограничиваем масштабирование терминальных наград
+                const scaleFactor = Math.min(1.5, 1 + Math.log10(snake.length) / 20);
+                target[action] = reward * scaleFactor;
             } else {
-                const nextQ = this.brain.predict(nextState);
-                target[action] = reward + this.gamma * Math.max(...nextQ);
+                // Используем Double DQN
+                const nextQ = this.brain.predict(normalizedNextState);
+                const nextAction = nextQ.indexOf(Math.max(...nextQ));
+                const futureQ = this.targetBrain.predict(normalizedNextState)[nextAction];
+                target[action] = reward + this.gamma * futureQ;
             }
-            return target;
-        });
+            
+            states.push(normalizedState);
+            targets.push(target);
+        }
 
         await this.brain.train(states, targets);
 
+        // Обновляем целевую сеть каждые 100 игр
+        if (gamesPlayed % 100 === 0) {
+            await this.updateTargetNetwork();
+        }
+
+        // Обновляем epsilon только после успешного обучения
+        this.updateEpsilon();
+    }
+
+    updateEpsilon() {
+        // Базовое уменьшение epsilon
         if (this.epsilon > this.epsilonMin) {
             this.epsilon *= this.epsilonDecay;
         }
-    }
 
-    getRandomBatch() {
-        const batchIndices = new Set();
-        while (batchIndices.size < this.batchSize) {
-            batchIndices.add(Math.floor(Math.random() * this.memory.length));
+        // Проверяем производительность
+        if (this.lastScores.length >= this.scoreWindow) {
+            const recentAvg = this.lastScores.slice(-10).reduce((a, b) => a + b, 0) / 10;
+            const windowAvg = this.lastScores.reduce((a, b) => a + b, 0) / this.lastScores.length;
+
+            // Если последние результаты хуже средних, увеличиваем epsilon
+            if (recentAvg < windowAvg * 0.8) {
+                this.epsilon = Math.min(1, this.epsilon * 1.5);
+                console.log('Epsilon increased to:', this.epsilon);
+            }
         }
-        return Array.from(batchIndices).map(index => this.memory[index]);
     }
 }
 
@@ -376,7 +526,7 @@ function logMessage(message) {
     const isScrolledToBottom = gameLog.scrollHeight - gameLog.clientHeight <= gameLog.scrollTop + 1;
     gameLog.value += message + '\n';
     if (isScrolledToBottom) {
-        gameLog.scrollTop = gameLog.scrollHeight;
+    gameLog.scrollTop = gameLog.scrollHeight;
     }
 }
 
@@ -647,30 +797,32 @@ async function updateGame() {
             
             // Награда/штраф за изменение среднего показателя
             let averageChangeReward = 0;
-            if (gamesPlayed > 1) { // Начинаем учитывать только после первой игры
+            if (gamesPlayed > 1) {
                 const averageChange = newAverage - oldAverage;
-                const STAGNATION_THRESHOLD = 0.001; // Порог для определения стагнации
+                const STAGNATION_THRESHOLD = 0.1; // Увеличиваем порог стагнации
                 
                 if (Math.abs(averageChange) < STAGNATION_THRESHOLD) {
-                    // Штраф за стагнацию, увеличивающийся с длиной змейки
-                    averageChangeReward = -0.5 - (snake.length - 3) * 0.1;
+                    // Уменьшаем штраф за стагнацию
+                    averageChangeReward = -0.2;
                     iterationRewards.averageStagnation = averageChangeReward;
                 } else if (averageChange > 0) {
-                    averageChangeReward = averageChange * 2; // Умножаем на 2 для усиления эффекта
+                    // Увеличиваем награду за улучшение
+                    averageChangeReward = averageChange * 3;
                     iterationRewards.averageImprovement = averageChangeReward;
                 } else {
-                    averageChangeReward = averageChange * 2; // Умножаем на 2 для усиления эффекта
+                    // Смягчаем штраф за ухудшение
+                    averageChangeReward = averageChange;
                     iterationRewards.averageDecline = averageChangeReward;
                 }
             }
             
             let collisionPenalty;
             if (tailCollision) {
-                // Более суровый штраф за столкновение с хвостом
-                collisionPenalty = -2 - (snake.length - 3) * 1.0;
+                // Делаем штраф за хвост зависимым от длины, но с ограничением
+                collisionPenalty = -1 - Math.min(2, (snake.length - 3) * 0.2);
             } else {
-                // Обычный штраф за столкновение со стеной
-                collisionPenalty = -1 - (snake.length - 3) * 0.5;
+                // Фиксированный штраф за стену
+                collisionPenalty = -1;
             }
             
             iterationRewards.collision += collisionPenalty;
@@ -680,11 +832,14 @@ async function updateGame() {
             updateChart();
 
             const nextState = ai.getState(snake, food);
-            // Добавляем награду за изменение среднего показателя к общей награде
             ai.remember(state, action, collisionPenalty + averageChangeReward, nextState, true);
             
-            if (gamesPlayed % 10 === 0) {
-                setTimeout(() => ai.replay(), 0);
+            // Обновляем нормализацию
+            ai.updateNormalization(score, snake.length);
+            
+            // Обучаем только каждые 5 игр на ранних этапах
+            if (gamesPlayed < 100 && gamesPlayed % 5 === 0 || gamesPlayed % 20 === 0) {
+                await ai.replay();
             }
             
             initGame();
@@ -692,75 +847,50 @@ async function updateGame() {
         }
 
         snake.unshift(head);
-        movesSinceLastFood++; // Увеличиваем счетчик ходов
+        movesSinceLastFood++;
 
-        // Calculate new distance to food
         const newDistance = Math.abs(head.x - food.x) + Math.abs(head.y - food.y);
-        
         let reward = 0;
         
         if (head.x === food.x && head.y === food.y) {
             score++;
             updateScore();
             generateFood();
-            movesSinceLastFood = 0; // Сбрасываем счетчик при съедании еды
-            // Прогрессивная награда за еду: чем длиннее змейка, тем больше награда
-            const foodReward = 1 + (snake.length - 3) * 0.5;
-            reward = foodReward;
-            iterationRewards.food += foodReward;
+            movesSinceLastFood = 0;
+            
+            // Базовая награда за еду
+            const baseReward = 1;
+            // Бонус за эффективность (меньше ходов - больше награда)
+            const efficiencyBonus = Math.max(0, (50 - movesSinceLastFood) / 50);
+            // Прогрессивная награда за длину
+            const lengthBonus = Math.min(0.5, (snake.length - 3) * 0.1);
+            
+            reward = baseReward + efficiencyBonus + lengthBonus;
+            iterationRewards.food += reward;
         } else {
             snake.pop();
-            // Уменьшаем награду за приближение к еде
-            const distanceReward = (oldDistance - newDistance) * 0.05;
+            
+            // Увеличиваем награду за приближение к еде
+            const distanceReward = (oldDistance - newDistance) * 0.1;
             reward += distanceReward;
             iterationRewards.distance += distanceReward;
             
-            // Штраф за долгое отсутствие еды
-            const MAX_MOVES_WITHOUT_PENALTY = 50; // Максимальное количество ходов без штрафа
-            if (movesSinceLastFood > MAX_MOVES_WITHOUT_PENALTY) {
-                const noFoodPenalty = -0.01 * (movesSinceLastFood - MAX_MOVES_WITHOUT_PENALTY);
+            // Штраф за отсутствие еды
+            if (movesSinceLastFood > 50) {
+                const noFoodPenalty = -0.005 * (movesSinceLastFood - 50);
                 reward += noFoodPenalty;
                 iterationRewards.noFood += noFoodPenalty;
             }
             
-            // Определение кружения в зависимости от размера змейки
-            let circling = false;
-            let circlingPenalty = 0;
-            
-            // Проверяем последние 20 позиций независимо от длины змейки
-            const lastPositions = snake.slice(0, Math.min(20, snake.length));
+            // Определение кружения
+            const lastPositions = snake.slice(0, Math.min(10, snake.length));
             const positionHistory = lastPositions.map(pos => `${pos.x},${pos.y}`);
             const uniquePositions = new Set(positionHistory);
-            
-            // Считаем повторения каждой позиции
-            const positionCounts = {};
-            positionHistory.forEach(pos => {
-                positionCounts[pos] = (positionCounts[pos] || 0) + 1;
-            });
-            
-            // Находим максимальное количество повторений одной позиции
-            const maxRepeats = Math.max(...Object.values(positionCounts));
-            
-            // Процент уникальных позиций
             const uniqueRatio = uniquePositions.size / lastPositions.length;
             
-            // Определяем кружение на основе нескольких факторов
-            if (maxRepeats >= 3 || uniqueRatio < 0.5) {
-                circling = true;
-                // Базовый штраф зависит от степени кружения
-                const baseCirclingPenalty = -0.5 * (1 - uniqueRatio) * (maxRepeats / 2);
-                // Дополнительный штраф за длину змейки
-                const lengthPenalty = (snake.length - 3) * 0.2;
-                // Дополнительный штраф за количество ходов без еды
-                const foodPenalty = Math.max(0, (movesSinceLastFood - 30) / 50);
-                
-                circlingPenalty = baseCirclingPenalty - lengthPenalty - foodPenalty;
-                
-                // Ограничиваем минимальный штраф
-                circlingPenalty = Math.min(circlingPenalty, -0.5);
-            }
-            
-            if (circling) {
+            // Смягчаем штраф за кружение
+            if (uniqueRatio < 0.7) {
+                const circlingPenalty = -0.1 * (1 - uniqueRatio);
                 reward += circlingPenalty;
                 iterationRewards.circling += circlingPenalty;
             }
@@ -769,10 +899,7 @@ async function updateGame() {
         const nextState = ai.getState(snake, food);
         ai.remember(state, action, reward, nextState, false);
 
-        if (gamesPlayed % 50 === 0) {
-            setTimeout(() => ai.replay(), 0);
-        }
-
+        // Убираем обучение во время игры
         renderGame();
     } finally {
         isProcessing = false;
