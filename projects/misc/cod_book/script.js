@@ -11,6 +11,32 @@ document.addEventListener('DOMContentLoaded', async function() {
     // DOM elements
     const bookElement = document.getElementById('book');
     
+    // Создаем контейнер для тултипов
+    const tooltipContainer = document.createElement('div');
+    tooltipContainer.className = 'tooltip-container';
+    document.body.appendChild(tooltipContainer);
+
+    // Добавляем обработчики для тултипов
+    document.addEventListener('mouseover', function(e) {
+        const footnote = e.target.closest('.footnote');
+        if (footnote) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = footnote.getAttribute('data-tooltip');
+            
+            const rect = footnote.getBoundingClientRect();
+            tooltip.style.position = 'fixed';
+            tooltip.style.left = rect.left + (rect.width / 2) + 'px';
+            tooltip.style.top = rect.top - 10 + 'px';
+            
+            tooltipContainer.appendChild(tooltip);
+            
+            footnote.addEventListener('mouseleave', function() {
+                tooltip.remove();
+            }, { once: true });
+        }
+    });
+    
     // Создаем невидимый элемент для измерения
     const testElement = document.createElement('div');
     testElement.className = 'page-content';
@@ -52,15 +78,20 @@ document.addEventListener('DOMContentLoaded', async function() {
             bookElement.appendChild(pageElement);
         });
 
+        // Получаем сохраненную страницу из localStorage
+        const savedPage = localStorage.getItem('bookmarkPage');
+        const startPage = savedPage ? parseInt(savedPage) : 1;
+
         // Initialize PageFlip
         pageFlip = new St.PageFlip(bookElement, {
-            width: bookElement.offsetWidth / 2, // Half of book width for each page
+            width: bookElement.offsetWidth / 2,
             height: bookElement.offsetHeight,
             showCover: false,
-            maxShadowOpacity: 0.2,
+            maxShadowOpacity: 0.75,
+            minShadowOpacity: 0.50,
             flippingTime: 500,
             usePortrait: false,
-            startPage: 1,
+            startPage: startPage,
             autoSize: true,
             drawShadow: true,
             mobileScrollSupport: true
@@ -90,6 +121,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Event listeners for PageFlip
         pageFlip.on('flip', (e) => {
             currentPage = e.data;
+            // Автоматически сохраняем текущую страницу
+            localStorage.setItem('bookmarkPage', currentPage);
         });
     }
     
@@ -121,10 +154,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Функция для определения количества слов на страницу
     function calculateCharsPerPage() {
-        // Это значение можно регулировать для изменения плотности текста на странице
-        // Чем меньше значение, тем меньше текста будет на странице
-        // Чем больше значение, тем больше текста будет на странице
-        const wordsPerPage = 120; // Регулируемый параметр - количество слов на страницу
+        // Уменьшаем количество слов на странице
+        const wordsPerPage = 120; // Было 120, уменьшаем до 100
         
         // Сохраняем значение в переменной charsPerPage для совместимости с остальным кодом
         charsPerPage = wordsPerPage;
@@ -143,81 +174,78 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Получаем следующий фрагмент текста для анализа
             const remainingText = bookContent.substring(position);
             
-            // Разбиваем текст на слова. Слово - это все символы до пробела.
-            // Только пробел является разделителем слов.
-            const words = remainingText.split(' ');
-            
-            // Определяем количество слов для текущей страницы
-            let wordCount = Math.min(charsPerPage, words.length);
-            
-            if (wordCount < words.length) {
-                // Собираем текст из выбранных слов, включая пробелы между ними
-                let pageText = words.slice(0, wordCount).join(' ');
+            // Проверяем, есть ли изображение в начале оставшегося текста
+            const imgMatch = remainingText.match(/^<img\/([^>]+)>/);
+            if (imgMatch) {
+                // Если нашли изображение, добавляем его на отдельную страницу как обложку
+                pages.push(`<div class="book-cover illustration-page"><img src="${imgMatch[1]}" alt="Иллюстрация"></div>`);
+                position += imgMatch[0].length;
                 
-                // Проверяем, не разрезаем ли мы заголовок
-                if (pageText.includes('---') && !pageText.match(/---\s+.*?\s+---/)) {
-                    // Ищем начало заголовка
-                    const titleStart = pageText.lastIndexOf('---');
-                    if (titleStart > 0) {
-                        // Обрезаем текст до начала заголовка
-                        pageText = pageText.substring(0, titleStart).trim();
-                        // Пересчитываем количество слов
-                        wordCount = pageText.split(' ').length;
-                    }
-                }
-                
-                // Проверяем, не разрезаем ли мы форматирование в квадратных скобках
-                let openBrackets = (pageText.match(/\[/g) || []).length;
-                let closeBrackets = (pageText.match(/\]/g) || []).length;
-                
-                if (openBrackets > closeBrackets) {
-                    // Ищем последнюю открывающую скобку без закрывающей
-                    const lastOpenBracket = pageText.lastIndexOf('[');
-                    if (lastOpenBracket > 0) {
-                        // Обрезаем текст до последней открывающей скобки
-                        pageText = pageText.substring(0, lastOpenBracket).trim();
-                        // Пересчитываем количество слов
-                        wordCount = pageText.split(' ').length;
-                    }
-                }
-                
-                // Проверяем, не обрывается ли предложение (если последний символ не точка, восклицательный или вопросительный знак)
-                const lastChar = pageText.trim().slice(-1);
-                if (lastChar && !'.!?'.includes(lastChar)) {
-                    // Ищем последнюю точку, восклицательный или вопросительный знак
-                    const lastSentenceEnd = Math.max(
-                        pageText.lastIndexOf('.'), 
-                        pageText.lastIndexOf('!'), 
-                        pageText.lastIndexOf('?')
-                    );
-                    
-                    // Если нашли конец предложения и он не в самом начале текста, обрезаем до него
-                    if (lastSentenceEnd > pageText.length * 0.5) {
-                        pageText = pageText.substring(0, lastSentenceEnd + 1).trim();
-                        // Пересчитываем количество слов
-                        wordCount = pageText.split(' ').length;
-                    }
-                }
-                
-                // Добавляем страницу
-                pages.push(pageText);
-                
-                // Обновляем позицию для следующей страницы
-                position += pageText.length;
-                
-                // Если мы не в конце текста, добавляем длину пробела
-                if (position < bookContent.length) {
-                    position++; // Пропускаем пробел после текста
-                }
-                
-                // Пропускаем дополнительные пробелы и переводы строк
+                // Пропускаем пробелы и переводы строк после изображения
                 while (position < bookContent.length && /[\s\n\r]/.test(bookContent[position])) {
-                position++;
+                    position++;
+                }
+                continue;
+            }
+            
+            // Разбиваем текст на строки
+            const lines = remainingText.split('\n');
+            let pageLines = [];
+            let currentLength = 0;
+            let hasImage = false;
+            let lastCompleteText = '';
+            
+            for (let line of lines) {
+                // Проверяем наличие маркера изображения
+                if (line.includes('<img/')) {
+                    hasImage = true;
+                    break;
+                }
+                
+                // Считаем количество слов в строке
+                const words = line.trim() ? line.split(' ').length : 1;
+                
+                // Проверяем, поместится ли вся строка
+                if (currentLength + words <= charsPerPage) {
+                    pageLines.push(line);
+                    currentLength += words;
+                    lastCompleteText = pageLines.join('\n');
+                } else {
+                    break;
+                }
+            }
+            
+            // Если нашли изображение в тексте, заканчиваем текущую страницу
+            if (hasImage) {
+                pageText = pageLines.join('\n');
+                const imgIndex = pageText.indexOf('<img/');
+                if (imgIndex !== -1) {
+                    pageText = pageText.substring(0, imgIndex).trim();
                 }
             } else {
-                // Добавляем оставшийся текст
-                pages.push(remainingText);
-                position = bookContent.length;
+                pageText = lastCompleteText || pageLines[0];
+            }
+            
+            // Проверяем, не разрезаем ли мы заголовок
+            const titleMatch = pageText.match(/---.*?---/);
+            if (titleMatch) {
+                const titleStart = pageText.indexOf('---');
+                if (titleStart > 0) {
+                    pageText = pageText.substring(0, titleStart).trim();
+                }
+            }
+            
+            // Добавляем страницу только если в ней есть текст
+            if (pageText.trim()) {
+                pages.push(pageText);
+            }
+            
+            // Обновляем позицию для следующей страницы
+            position += pageText.length;
+            
+            // Пропускаем дополнительные пробелы и переводы строк
+            while (position < bookContent.length && /[\s\n\r]/.test(bookContent[position])) {
+                position++;
             }
         }
         
@@ -233,60 +261,38 @@ document.addEventListener('DOMContentLoaded', async function() {
     function formatContent(content) {
         if (!content) return '';
         
+        // Если это страница с изображением, возвращаем как есть
+        if (content.startsWith('<div class="book-cover illustration-page">')) {
+            return content;
+        }
+        
         // Обрабатываем заголовки в строгом формате "--- Текст ---"
         content = content.replace(/---\s+(.+?)\s+---/g, '<h2>$1</h2>');
         
-        // Обрабатываем текст в квадратных скобках - делаем его подчеркнутым
+        // Обрабатываем текст в квадратных скобках - подчеркивание
         content = content.replace(/\[([^\]]+)\]/g, '<u>$1</u>');
         
-        // Обрабатываем теги изображений
-        content = content.replace(/<img\/([^>]+)>/g, function(match, imagePath) {
-            return `<div class="book-illustration"><img src="${imagePath}" alt="Иллюстрация"></div>`;
+        // Обрабатываем сноски (только слово без звездочки)
+        content = content.replace(/(\S+)\*\(([^)]+)\)/g, '<span class="footnote" data-tooltip="$2">$1</span>');
+        
+        // Разбиваем текст на строки
+        const lines = content.split('\n');
+        const formattedLines = lines.map(line => {
+            // Если строка пустая, возвращаем div для отступа
+            if (!line.trim()) {
+                return '<div class="empty-paragraph"></div>';
+            }
+            
+            // Если это заголовок или иллюстрация, возвращаем как есть
+            if (line.startsWith('<h2>') || line.startsWith('<div class="book-illustration">')) {
+                return line;
+            }
+            
+            // Обычная строка текста
+            return `<p>${line}</p>`;
         });
         
-        // Разбиваем на строки и обрабатываем каждую
-        const lines = content.split('\n');
-        const formattedLines = [];
-        
-        let inParagraph = false;
-        
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trim();
-            
-            // Пропускаем пустые строки
-            if (line === '') {
-                if (inParagraph) {
-                    formattedLines.push('</p>');
-                    inParagraph = false;
-                }
-                continue;
-            }
-            
-            if (line.match(/^<h2>/) || line.match(/^<div class="book-illustration">/)) {
-                if (inParagraph) {
-                    formattedLines.push('</p>');
-                    inParagraph = false;
-                }
-                
-                formattedLines.push(line);
-            } else {
-                if (!inParagraph) {
-                    formattedLines.push('<p>');
-                    inParagraph = true;
-                } else {
-                    // Добавляем пробел между строками вместо <br>, чтобы текст выглядел более естественно
-                    formattedLines.push(' ');
-                }
-                
-                formattedLines.push(line);
-            }
-        }
-        
-        if (inParagraph) {
-            formattedLines.push('</p>');
-        }
-        
-        return formattedLines.join('');
+        return formattedLines.join('\n');
     }
     
     // Initialize the book
@@ -305,16 +311,31 @@ document.addEventListener('DOMContentLoaded', async function() {
             line-height: 1.4 !important;
             font-family: Arial, sans-serif !important;
             background-color: #fffef8;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            cursor: pointer;
+            user-select: none;
+        }
+        .stf__parent {
+            background-color: #f0ebdf !important;
         }
         .stf__block {
             background-color: #fffef8 !important;
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
         .stf__item {
             background-color: #fffef8 !important;
             box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.1) !important;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
         .stf__wrapper {
             background-color: #fffef8 !important;
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
         }
         .page-number {
             position: absolute;
@@ -381,6 +402,85 @@ document.addEventListener('DOMContentLoaded', async function() {
         u {
             text-decoration: underline;
             text-underline-offset: 2px;
+        }
+        .book-illustration.full-page {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fffef8;
+        }
+        .book-illustration.full-page img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .book-cover.illustration-page {
+            width: 100%;
+            height: calc(100% - 4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: #fffef8;
+            padding: 0;
+            margin: 0;
+        }
+        .book-cover.illustration-page img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .bookmark-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s;
+            z-index: 1000;
+        }
+        .bookmark-button:hover {
+            transform: scale(1.1);
+        }
+        .bookmark-button:active {
+            transform: scale(0.95);
+        }
+        .bookmark-notification {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            animation: fadeOut 2s forwards;
+            z-index: 1000;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .empty-paragraph {
+            height: 0.6em;
+            margin: 0;
         }
     `;
     document.head.appendChild(style);
