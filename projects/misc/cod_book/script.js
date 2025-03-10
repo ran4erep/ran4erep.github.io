@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', async function() {
+    // Определяем, является ли устройство мобильным
+    const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isMobile = mobileUserAgent && window.innerWidth <= 768;
+    
+    // Для отладки
+    console.log('UserAgent:', navigator.userAgent);
+    console.log('Window width:', window.innerWidth);
+    console.log('Is mobile device:', mobileUserAgent);
+    console.log('Using mobile view:', isMobile);
+    
     // Variables for book content and pagination
     let bookContent = '';
     let currentPage = 0;
@@ -18,22 +28,24 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Добавляем обработчики для тултипов
     document.addEventListener('mouseover', function(e) {
-        const footnote = e.target.closest('.footnote');
-        if (footnote) {
-            const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip';
-            tooltip.textContent = footnote.getAttribute('data-tooltip');
-            
-            const rect = footnote.getBoundingClientRect();
-            tooltip.style.position = 'fixed';
-            tooltip.style.left = rect.left + (rect.width / 2) + 'px';
-            tooltip.style.top = rect.top - 10 + 'px';
-            
-            tooltipContainer.appendChild(tooltip);
-            
-            footnote.addEventListener('mouseleave', function() {
-                tooltip.remove();
-            }, { once: true });
+        if (!isMobile) {  // Отключаем тултипы на мобильных
+            const footnote = e.target.closest('.footnote');
+            if (footnote) {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = footnote.getAttribute('data-tooltip');
+                
+                const rect = footnote.getBoundingClientRect();
+                tooltip.style.position = 'fixed';
+                tooltip.style.left = rect.left + (rect.width / 2) + 'px';
+                tooltip.style.top = rect.top - 10 + 'px';
+                
+                tooltipContainer.appendChild(tooltip);
+                
+                footnote.addEventListener('mouseleave', function() {
+                    tooltip.remove();
+                }, { once: true });
+            }
         }
     });
     
@@ -126,39 +138,161 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
     
-    // Fetch book content from cod.txt
+    // Fetch book content from output.txt
     async function fetchBookContent() {
         try {
             const response = await fetch('cod.txt');
             if (!response.ok) {
-                throw new Error('Could not fetch book content');
+                throw new Error('Не удалось загрузить файл книги');
             }
             bookContent = await response.text();
             
             // Нормализуем переводы строк (CRLF -> LF)
             bookContent = bookContent.replace(/\r\n/g, '\n');
             
-            // Определяем количество символов на странице
-            calculateCharsPerPage();
-            
-            // Разбиваем текст на страницы
-            preparePages();
-            
-            // Initialize PageFlip after content is loaded
-            initPageFlip();
+            if (isMobile) {
+                initMobileView();
+            } else {
+                calculateCharsPerPage();
+                preparePages();
+                initPageFlip();
+            }
         } catch (error) {
-            console.error('Error loading book:', error);
-            alert('Не удалось загрузить книгу. Пожалуйста, проверьте, что файл cod.txt доступен.');
+            console.error('Ошибка загрузки книги:', error);
+            alert('Не удалось загрузить книгу. Пожалуйста, проверьте, что файл output.txt доступен.');
         }
+    }
+
+    // Инициализация мобильного представления
+    function initMobileView() {
+        // Очищаем контейнер книги
+        bookElement.innerHTML = '';
+        bookElement.className = 'mobile-book';
+        
+        // Добавляем обложку
+        bookElement.innerHTML = '<div class="mobile-cover"><img src="cover.jpg" alt="Обложка книги"></div>';
+        
+        // Обрабатываем изображения перед форматированием текста
+        let processedContent = bookContent.replace(/<img\/([^>]+)>/g, (match, src) => {
+            return `<div class="mobile-illustration"><img src="${src}" alt="Иллюстрация"></div>`;
+        });
+        
+        // Форматируем весь контент как одну длинную страницу
+        const formattedContent = formatContent(processedContent);
+        bookElement.innerHTML += formattedContent;
+        
+        // Восстанавливаем позицию скролла после того, как все изображения загружены
+        const images = bookElement.getElementsByTagName('img');
+        let loadedImages = 0;
+        
+        function tryRestoreScroll() {
+            loadedImages++;
+            if (loadedImages === images.length) {
+                const savedPosition = localStorage.getItem('bookmarkPosition');
+                if (savedPosition) {
+                    setTimeout(() => {
+                        window.scrollTo(0, parseInt(savedPosition));
+                    }, 100);
+                }
+            }
+        }
+        
+        // Если нет изображений, сразу восстанавливаем позицию
+        if (images.length === 0) {
+            const savedPosition = localStorage.getItem('bookmarkPosition');
+            if (savedPosition) {
+                setTimeout(() => {
+                    window.scrollTo(0, parseInt(savedPosition));
+                }, 100);
+            }
+        } else {
+            // Ждем загрузки всех изображений
+            Array.from(images).forEach(img => {
+                if (img.complete) {
+                    tryRestoreScroll();
+                } else {
+                    img.addEventListener('load', tryRestoreScroll);
+                    img.addEventListener('error', tryRestoreScroll);
+                }
+            });
+        }
+        
+        // Сохраняем позицию скролла при прокрутке
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(function() {
+                localStorage.setItem('bookmarkPosition', window.pageYOffset.toString());
+            }, 100);
+        });
+        
+        // Отключаем overflow: hidden на body и html
+        document.body.style.overflow = 'auto';
+        document.documentElement.style.overflow = 'auto';
     }
 
     // Функция для определения количества слов на страницу
     function calculateCharsPerPage() {
-        // Уменьшаем количество слов на странице
-        const wordsPerPage = 120; // Было 120, уменьшаем до 100
+        // Базовое количество слов для Full HD (1920x1080)
+        const baseWordsPerPage = 150;
         
-        // Сохраняем значение в переменной charsPerPage для совместимости с остальным кодом
+        // Получаем разрешение экрана
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        
+        // Рассчитываем коэффициент масштабирования на основе разрешения
+        const widthRatio = screenWidth / 1920;
+        const heightRatio = screenHeight / 1080;
+        const scaleFactor = Math.max(widthRatio, heightRatio);
+        
+        // Более агрессивное масштабирование для высоких разрешений
+        let wordsPerPage;
+        if (scaleFactor > 1) {
+            // Для разрешений выше Full HD используем более быстрый рост
+            wordsPerPage = Math.round(baseWordsPerPage * (1 + (scaleFactor - 1) * 1.5));
+        } else {
+            // Для разрешений ниже Full HD оставляем линейное масштабирование
+            wordsPerPage = Math.round(baseWordsPerPage * scaleFactor);
+        }
+        
+        // Устанавливаем минимальное и максимальное значения
+        wordsPerPage = Math.max(120, Math.min(400, wordsPerPage));
+        
+        // Сохраняем значение в переменной charsPerPage
         charsPerPage = wordsPerPage;
+        
+        // Увеличиваем шрифт только для разрешений выше Full HD
+        if (screenWidth > 1920 || screenHeight > 1080) {
+            // Создаем стиль только для увеличенного шрифта
+            const styleElement = document.createElement('style');
+            let fontSize;
+            
+            if (screenWidth >= 3840 || screenHeight >= 2160) {
+                // 4K
+                fontSize = 32;
+            } else {
+                // 2K
+                fontSize = 28;
+            }
+            
+            styleElement.textContent = `
+                .page-content {
+                    font-size: ${fontSize}px !important;
+                }
+                .page-content h2 {
+                    font-size: ${fontSize + 4}px !important;
+                }
+                .page-number {
+                    font-size: ${fontSize}px !important;
+                    bottom: 30px !important;
+                }
+            `;
+            document.head.appendChild(styleElement);
+            console.log(`Установлен размер шрифта: ${fontSize}px`);
+        }
+        
+        console.log(`Разрешение экрана: ${screenWidth}x${screenHeight}`);
+        console.log(`Коэффициент масштабирования: ${scaleFactor}`);
         console.log(`Установлено количество слов на странице: ${wordsPerPage}`);
     }
     
@@ -193,7 +327,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             let pageLines = [];
             let currentLength = 0;
             let hasImage = false;
-            let lastCompleteText = '';
+            let processedLength = 0;
             
             for (let line of lines) {
                 // Проверяем наличие маркера изображения
@@ -209,21 +343,21 @@ document.addEventListener('DOMContentLoaded', async function() {
                 if (currentLength + words <= charsPerPage) {
                     pageLines.push(line);
                     currentLength += words;
-                    lastCompleteText = pageLines.join('\n');
+                    processedLength += line.length + 1; // +1 для учета символа новой строки
                 } else {
                     break;
                 }
             }
             
-            // Если нашли изображение в тексте, заканчиваем текущую страницу
+            let pageText = pageLines.join('\n');
+            
+            // Если нашли изображение в тексте
             if (hasImage) {
-                pageText = pageLines.join('\n');
                 const imgIndex = pageText.indexOf('<img/');
                 if (imgIndex !== -1) {
                     pageText = pageText.substring(0, imgIndex).trim();
+                    processedLength = imgIndex;
                 }
-            } else {
-                pageText = lastCompleteText || pageLines[0];
             }
             
             // Проверяем, не разрезаем ли мы заголовок
@@ -232,18 +366,20 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const titleStart = pageText.indexOf('---');
                 if (titleStart > 0) {
                     pageText = pageText.substring(0, titleStart).trim();
+                    processedLength = titleStart;
                 }
             }
             
             // Добавляем страницу только если в ней есть текст
             if (pageText.trim()) {
                 pages.push(pageText);
+                position += processedLength;
+            } else {
+                // Если текст пустой, продвигаемся вперёд
+                position++;
             }
             
-            // Обновляем позицию для следующей страницы
-            position += pageText.length;
-            
-            // Пропускаем дополнительные пробелы и переводы строк
+            // Пропускаем пробелы и переводы строк
             while (position < bookContent.length && /[\s\n\r]/.test(bookContent[position])) {
                 position++;
             }

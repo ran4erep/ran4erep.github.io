@@ -215,4 +215,92 @@ body, html {
         opacity: 1;
         transform: translate(-50%, -100%);
     }
+}
+
+/* Mobile book styles */
+.mobile-book {
+    width: 100%;
+    height: auto;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fffef8;
+    box-shadow: none;
+    overflow-y: visible;
+    position: relative;
+    transform: none !important;
+}
+
+.mobile-book p {
+    margin: 0 0 1em 0;
+    line-height: 1.6;
+    font-size: 18px;
+    text-indent: 1.5em;
+}
+
+.mobile-book h2 {
+    margin: 1.5em 0;
+    text-align: center;
+    font-size: 24px !important;
+    color: #333;
+}
+
+.mobile-book .empty-paragraph {
+    height: 1em;
+}
+
+.mobile-illustration {
+    width: 100%;
+    margin: 2em 0;
+    text-align: center;
+}
+
+.mobile-illustration img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.mobile-cover {
+    width: 100%;
+    margin: 0 0 2em 0;
+    text-align: center;
+}
+
+.mobile-cover img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Adjust container for mobile */
+@media (max-width: 768px) {
+    body, html {
+        height: auto;
+        overflow-y: visible;
+        background-color: #fffef8;
+    }
+
+    .book-container {
+        padding: 0;
+        height: auto;
+        min-height: 100vh;
+        perspective: none;
+        background-color: #fffef8;
+        overflow-y: visible;
+    }
+
+    .stf__parent {
+        display: none;
+    }
+    
+    .tooltip {
+        display: none;
+    }
 } 
