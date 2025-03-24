@@ -1,0 +1,256 @@
+{
+    "wall": {
+        "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "UUUUAUUUUUAUUUUU",
+            "UUUUAUUUUUAUUUUU",
+            "UUUUAUUUUUAUUUUU",
+            "UUUUAUUUUUAUUUUU",
+            "AAAAAAAAAAAAAAAA",
+            "UUAUUUUAUUUUAUUU",
+            "UUAUUUUAUUUUAUUU",
+            "UUAUUUUAUUUUAUUU",
+            "UUAUUUUAUUUUAUUU",
+            "AAAAAAAAAAAAAAAA",
+            "UUUUAUUUUUAUUUAU",
+            "UUUUAUUUUUAUUUAU",
+            "UUUUAUUUUUAUUUAU",
+            "UUUUAUUUUUAUUUAU",
+            "AAAAAAAAAAAAAAAA"
+        ],
+        "colors": {
+            "A": "#000000",
+            "U": "#6c251e"
+        }
+    },
+    "floor": {
+        "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AXXXXXXXXXXXXXXA",
+            "AXXXXXXVVXXXXXXA",
+            "AXXXXXVVVVXXXXXA",
+            "AXXXXVVVVVVXXXXA",
+            "AXXXVVVVVVVVXXXA",
+            "AXXVVVVVVVVVVXXA",
+            "AXVVVVVVVVVVVVXA",
+            "AXVVVVVVVVVVVVXA",
+            "AXXVVVVVVVVVVXXA",
+            "AXXXVVVVVVVVXXXA",
+            "AXXXXVVVVVVXXXXA",
+            "AXXXXXVVVVXXXXXA",
+            "AXXXXXXVVXXXXXXA",
+            "AXXXXXXXXXXXXXXA",
+            "AAAAAAAAAAAAAAAA"
+        ],
+        "colors": {
+            "A": "#000000",
+            "X": "#161423",
+            "V": "#6a5fa0"
+        }
+    },
+    "player": {
+        "pixels": [
+            "-------A--------",
+            "-----AAGAA------",
+            "----AGIGIGA-----",
+            "--AAAAGGGAAAA---",
+            "--APPXXXXXPPA---",
+            "---AWPXPXPWA----",
+            "----AXUPUXA-----",
+            "---RRAPPPARR----",
+            "--RPJRAWARJPR---",
+            "-RJJAJIAIJAJJR--",
+            "-RJPAAIGIAAPJR--",
+            "-RJAIRAAARIAJR--",
+            "-RJAXRPJPRXAJR--",
+            "-RJARRPJPRRAJR--",
+            "-AAA-PAPAP-AAA--",
+            "------AAA-------"
+        ],
+        "colors": {
+            "A": "#000000",
+            "G": "#FFFF00",
+            "I": "#FF8000",
+            "P": "#808080",
+            "X": "#161423",
+            "W": "#f2c0a2",
+            "U": "#6c251e",
+            "R": "#98183c",
+            "J": "#800000"
+        }
+    },
+    "door": {
+        "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTUTATUTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "AAAAAAAAAAAAAAAA"
+        ],
+        "colors": {
+            "A": "#000000",
+            "T": "#934226",
+            "U": "#6c251e"
+        }
+    },
+    "openedDoor": {
+        "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "AUA----------AUA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "AAAAAAAAAAAAAAAA"
+        ],
+        "colors": {
+            "A": "#000000",
+            "T": "#934226",
+            "U": "#6c251e"
+        }
+    },
+    "barrel": {
+        "pixels": [
+            "----------------",
+            "----------------",
+            "----AAAAAAAA----",
+            "---AUUUUUUUUA---",
+            "---AAUUUUUUAA---",
+            "---ATAAAAAATA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "----AAAAAAAA----"
+        ],
+        "colors": {
+            "A": "#000000",
+            "U": "#6c251e",
+            "T": "#934226"
+        }
+    },
+    "zombie": {
+        "pixels": [
+            "----------KKJJJ-",
+            "----------KKKKJJ",
+            "----------KXKXKK",
+            "-----KKT--KKKKKK",
+            "-----KTTT--KJJK-",
+            "-------TTTTTKKTT",
+            "-----KK--TTTTTTT",
+            "-----KKTT-TTUTTT",
+            "------TTTUUUUTTT",
+            "--------TUUTTTTT",
+            "----------PPPPPP",
+            "----------PPPPPP",
+            "----------PX--PX",
+            "----------PX--PX",
+            "----------PX--PX",
+            "---------XXX-XXX"
+        ],
+        "colors": {
+            "K": "#008000",
+            "J": "#800000",
+            "X": "#161423",
+            "T": "#934226",
+            "U": "#6c251e",
+            "P": "#808080"
+        }
+    },
+    "bat": {
+        "pixels": [
+            "----------------",
+            "----------------",
+            "----------------",
+            "----------------",
+            "----------------",
+            "----------------",
+            "------X--X------",
+            "------XX-X------",
+            "XXX---XXXX-XXXXX",
+            "-JJXX-XXXXXXJJ--",
+            "--JJXXXUXUXJJ---",
+            "--JJXXXXXXJJJ---",
+            "---JJXXXXXJJ----",
+            "---J-XXXXX-J----",
+            "-----XXXXX------",
+            "------XXX-------"
+        ],
+        "colors": {
+            "X": "#161423",
+            "J": "#800000",
+            "U": "#6c251e"
+        }
+    },
+    "alert": {
+        "pixels": [
+            "----------------",
+            "----------------",
+            "-------JJ-------",
+            "-------JJ-------",
+            "-------JJ-------",
+            "-------JJ-------",
+            "-------JJ-------",
+            "-------JJ-------",
+            "----------------",
+            "----------------",
+            "-------JJ-------",
+            "-------JJ-------",
+            "----------------",
+            "----------------",
+            "----------------",
+            "----------------"
+        ],
+        "colors": {
+            "J": "#800000"
+        }
+    },
+    "question": {
+        "pixels": [
+            "----------------",
+            "------GGG-------",
+            "-----GGGGG------",
+            "----GG---GG-----",
+            "----G-----G-----",
+            "---------GG-----",
+            "--------GG------",
+            "-------GG-------",
+            "------GG--------",
+            "------G---------",
+            "----------------",
+            "------G---------",
+            "----------------",
+            "----------------",
+            "----------------",
+            "----------------"
+        ],
+        "colors": {
+            "G": "#FFFF00"
+        }
+    }
+} 
