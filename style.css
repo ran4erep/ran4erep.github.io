@@ -290,7 +290,7 @@ body::before {
     right: 9rem;
     font-family: var(--font-mono);
     font-size: 0.9rem;
-    color: var(--text-primary);
+    color: var(--text);
     padding: 0.35rem 0.75rem;
     background: rgba(15, 17, 22, 0.8);
     border: 1px solid var(--card-border);
@@ -2216,6 +2216,44 @@ body.viewer-open {
     .tooltip-left,
     .tooltip-right {
         display: none;
+    }
+}
+
+.weather {
+    position: absolute;
+    top: 1rem;
+    right: 15rem;
+    font-size: 0.9rem;
+    color: var(--text);
+    padding: 0.35rem 0.75rem;
+    background: rgba(15, 17, 22, 0.8);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.weather:hover {
+    transform: translateY(1px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .weather {
+        position: static;
+        display: block;
+        margin: 1rem auto 0;
+        text-align: center;
+        width: fit-content;
+    }
+    
+    .clock {
+        position: absolute;
+        top: 1rem;
+        right: 9rem;
     }
 }
 

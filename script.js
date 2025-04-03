@@ -945,3 +945,27 @@ function initializeProjectLanguages() {
         }
     });
 }
+
+async function updateWeather() {
+    try {
+        const response = await fetch('https://wttr.in/?format=%t|%C|%c|%l');
+        const weatherData = await response.text();
+        const [temp, condition, icon, location] = weatherData.split('|');
+        
+        // Переводим город
+        const city = location.replace('Location:', '').split(',')[0].trim();
+        
+        // Переводим состояние погоды
+        //const translatedCondition = weatherTranslations[condition.trim()] || condition;
+        
+        // Форматируем строку погоды (иконка, температура, город)
+        const weatherString = `${city} | ${condition} ${icon} ${temp}`;
+        document.getElementById('weather').textContent = weatherString;
+    } catch (error) {
+        document.getElementById('weather').textContent = 'Ошибка получения погоды';
+        console.error('Error fetching weather:', error);
+    }
+}
+
+updateWeather();
+//setInterval(updateWeather, 30 * 60 * 1000);
