@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arlade</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #000000;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            color: #fff;
+            font-family: 'Press Start 2P', monospace;
+            position: relative;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        /* Основной контейнер */
+        body {
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        /* Верхняя панель */
+        #topPanel {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            height: 48px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        /* Основной контейнер для игры и лога */
+        #mainContainer {
+            position: relative;
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* Игровой контейнер */
+        #gameContainer {
+            position: relative;
+            flex: 0 0 82%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Игровой лог */
+        #gameLog {
+            position: relative;
+            flex: 0 0 18%;
+            border-left: 1px solid #1a1a1a;
+            padding: 8px;
+            overflow-y: auto;
+            font-size: 10px;
+            line-height: 1.6;
+            height: 100%;
+        }
+
+        /* Стили для canvas */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        /* Стили для элементов HUD */
+        .hud-element {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px;
+            overflow: hidden;
+        }
+
+        .hud-element canvas {
+            position: static;
+            width: 36px;
+            height: 36px;
+        }
+
+        /* Стили для записей в логе */
+        .log-entry {
+            margin-bottom: 4px;
+            padding: 4px;
+            border-radius: 0;
+            color: #ffffff;
+            word-wrap: break-word;
+        }
+
+        .log-entry.attack {
+            background-color: rgba(255, 0, 0, 0.15);
+            color: #ffffff;
+        }
+
+        /* Стилизация скроллбара для лога */
+        #gameLog::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #gameLog::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        #gameLog::-webkit-scrollbar-thumb {
+            background: #3a3a3a;
+            border-radius: 0;
+        }
+
+        #gameLog::-webkit-scrollbar-thumb:hover {
+            background: #4a4a4a;
+        }
+    </style>
+</head>
+<body>
+    <div id="topPanel">
+        <!-- Здесь будут располагаться индикаторы -->
+    </div>
+    <div id="mainContainer">
+        <div id="gameContainer">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+        <div id="gameLog">
+            <!-- Здесь будут отображаться игровые события -->
+        </div>
+    </div>
+    <script src="src/rendering/glyphs.js"></script>
+    <script src="src/systems/vision.js"></script>
+    <script src="src/ui/HUD.js"></script>
+    <script src="src/ui/ContextMenu.js"></script>
+    <script src="src/ui/DebugMenu.js"></script>
+    <script src="src/ui/MainMenu.js"></script>
+    <script src="src/ui/GameOverScreen.js"></script>
+    <script src="src/systems/input.js"></script>
+    <script src="src/rendering/camera.js"></script>
+    <script src="src/rendering/renderer.js"></script>
+    <script src="src/systems/collision.js"></script>
+    <script src="src/systems/enemies.js"></script>
+    <script src="src/systems/combat.js"></script>
+    <script src="src/systems/damage_numbers.js"></script>
+    <script src="src/systems/InventorySystem.js"></script>
+    <script src="src/ui/StatsWindow.js"></script>
+    <script src="src/core/game.js"></script>
+</body>
+</html> 

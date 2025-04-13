@@ -1,0 +1,29 @@
+{
+  "items": {
+    "rusty_sword": {
+      "name": "Ржавый меч",
+      "type": "weapon",
+      "weaponType": "melee",
+      "description": "Старый ржавый меч. Не самое лучшее оружие, но лучше чем ничего.",
+      "damage": "1d4"
+    },
+    "leather_helmet": {
+      "name": "Кожаный шлем",
+      "type": "helmet",
+      "description": "Простой шлем из дублёной кожи. Защищает голову от лёгких ударов.",
+      "defense": 0
+    },
+    "leather_armor": {
+      "name": "Кожаная броня",
+      "type": "armor",
+      "description": "Кожаная броня. Почти не защищает от режущих ударов.",
+      "defense": 1
+    },
+    "leather_pants": {
+      "name": "Кожаные штаны",
+      "type": "legs",
+      "description": "Прочные штаны из кожи. Не сковывают движений.",
+      "defense": 0
+    }
+  }
+} 
