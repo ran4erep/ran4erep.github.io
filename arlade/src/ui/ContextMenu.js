@@ -4,6 +4,7 @@ class ContextMenu {
         this.isVisible = false;
         this.actions = [];
         this.selectedIndex = 0;
+        this.justOpened = false;
         
         // Создаем элемент меню
         this.element = document.createElement('div');
@@ -36,6 +37,7 @@ class ContextMenu {
         this.actions = actions;
         this.selectedIndex = 0;
         this.isVisible = true;
+        this.justOpened = true;
         this.element.style.display = 'block';
         
         // Позиционируем меню рядом с объектом
@@ -50,10 +52,16 @@ class ContextMenu {
         this.element.style.top = `${screenY}px`;
         
         this.render();
+        
+        // Сбрасываем флаг через небольшую задержку
+        setTimeout(() => {
+            this.justOpened = false;
+        }, 100);
     }
 
     hide() {
         this.isVisible = false;
+        this.justOpened = false;
         this.element.style.display = 'none';
         this.actions = [];
     }
@@ -80,21 +88,26 @@ class ContextMenu {
 
     handleKeyDown(e) {
         if (!this.isVisible) return;
+        
+        // Если меню только что открыто, игнорируем нажатие пробела
+        if (this.justOpened && e.code === 'Space') return;
 
-        switch (e.key) {
+        switch (e.code) {
             case 'ArrowUp':
+            case 'KeyW':
                 e.preventDefault();
                 this.selectedIndex = (this.selectedIndex - 1 + this.actions.length) % this.actions.length;
                 this.render();
                 break;
                 
             case 'ArrowDown':
+            case 'KeyS':
                 e.preventDefault();
                 this.selectedIndex = (this.selectedIndex + 1) % this.actions.length;
                 this.render();
                 break;
                 
-            case 'Enter':
+            case 'Space':
                 e.preventDefault();
                 const action = this.actions[this.selectedIndex];
                 if (action && action.handler) {

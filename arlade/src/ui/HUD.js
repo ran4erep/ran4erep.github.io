@@ -80,7 +80,7 @@ class HUD {
         // Отрисовываем сердце
         this.drawHeart();
 
-        // Добавляем стили для разделителя ходов
+        // Добавляем стили для разделителя ходов и сообщений об атаках
         const style = document.createElement('style');
         style.textContent = `
             .turn-separator {
@@ -93,8 +93,135 @@ class HUD {
                 );
                 margin: 15px 5px;
             }
+            .player-attack {
+                color: #ff3333; /* Более насыщенный красный для атак игрока */
+            }
+            .enemy-attack {
+                color: #cc0000; /* Тёмно-красный для атак врагов */
+            }
+            .dodge {
+                color: #999999; /* Серый для промахов */
+            }
+            .experience {
+                color: #ffd700; /* Золотой цвет для сообщений об опыте */
+            }
+            .level-up {
+                color: #ffd700; /* Золотой цвет для сообщений о новом уровне */
+                animation: glow 2s ease-in-out 6; /* 6 повторений анимации по 1 секунде */
+                font-weight: bold; /* Жирный текст */
+            }
+            @keyframes glow {
+                0% { text-shadow: 0 0 0 #ffd700; }
+                50% { 
+                    color: #fff7cc;
+                    text-shadow: 
+                        0 0 20px #ffd700,
+                        0 0 30px #ffd700,
+                        0 0 40px #ffd700,
+                        0 0 50px #ffd700;
+                }
+                100% { text-shadow: 0 0 0 #ffd700; }
+            }
+            @keyframes expGlow {
+                0% { 
+                    box-shadow: none;
+                    filter: brightness(100%);
+                }
+                50% { 
+                    box-shadow: 
+                        0 0 20px #ffd700,
+                        0 0 30px #ffd700,
+                        0 0 40px #ffd700,
+                        0 0 50px #ffd700;
+                    filter: brightness(150%);
+                }
+                100% { 
+                    box-shadow: none;
+                    filter: brightness(100%);
+                }
+            }
+            @keyframes borderGlow {
+                0% { 
+                    border-color: #ffffff;
+                    box-shadow: none;
+                }
+                50% { 
+                    border-color: #ffd700;
+                    box-shadow: 
+                        0 0 10px #ffd700,
+                        0 0 20px #ffd700,
+                        0 0 30px #ffd700;
+                }
+                100% { 
+                    border-color: #ffffff;
+                    box-shadow: none;
+                }
+            }
         `;
         document.head.appendChild(style);
+
+        // Опыт игрока
+        this.experienceDisplay = document.createElement('div');
+        this.experienceDisplay.className = 'hud-element';
+        this.experienceDisplay.style.display = 'flex';
+        this.experienceDisplay.style.alignItems = 'center';
+        this.experienceDisplay.style.gap = '10px';
+        this.experienceDisplay.style.marginLeft = '20px'; // Отступ от здоровья
+        
+        // Текст уровня
+        this.levelText = document.createElement('div');
+        this.levelText.style.color = '#ffffff';
+        this.levelText.style.fontSize = '12px';
+        this.levelText.style.fontFamily = '"Press Start 2P"';
+        this.levelText.style.textShadow = 
+            '-1px -1px 0 #000, ' +
+            '1px -1px 0 #000, ' +
+            '-1px 1px 0 #000, ' +
+            '1px 1px 0 #000, ' +
+            '2px 2px 0 #000';
+        
+        // Контейнер для полоски опыта
+        this.expBarContainer = document.createElement('div');
+        this.expBarContainer.style.width = '200px';
+        this.expBarContainer.style.height = '20px';
+        this.expBarContainer.style.border = '2px solid #ffffff';
+        this.expBarContainer.style.position = 'relative';
+        this.expBarContainer.style.overflow = 'hidden';
+        this.expBarContainer.style.transition = 'border-color 0.3s ease-out';
+        
+        // Полоска опыта
+        this.expBar = document.createElement('div');
+        this.expBar.style.width = '0%';
+        this.expBar.style.height = '100%';
+        this.expBar.style.backgroundColor = '#ffd700'; // Золотой цвет для полоски опыта
+        this.expBar.style.transition = 'width 0.3s ease-out';
+        this.expBar.isGlowing = false; // Флаг для отслеживания состояния анимации
+        
+        // Текст опыта поверх полоски
+        this.expText = document.createElement('div');
+        this.expText.style.position = 'absolute';
+        this.expText.style.left = '50%';
+        this.expText.style.top = '50%';
+        this.expText.style.transform = 'translate(-50%, -50%)';
+        this.expText.style.color = '#ffffff';
+        this.expText.style.fontSize = '12px';
+        this.expText.style.fontFamily = '"Press Start 2P"';
+        this.expText.style.textShadow = 
+            '-1px -1px 0 #000, ' +
+            '1px -1px 0 #000, ' +
+            '-1px 1px 0 #000, ' +
+            '1px 1px 0 #000, ' +
+            '2px 2px 0 #000';
+        this.expText.style.backgroundColor = 'transparent';
+        
+        // Собираем всё вместе
+        this.expBarContainer.appendChild(this.expBar);
+        this.expBarContainer.appendChild(this.expText);
+        this.experienceDisplay.appendChild(this.levelText);
+        this.experienceDisplay.appendChild(this.expBarContainer);
+        
+        // Добавляем индикатор опыта в верхнюю панель
+        document.getElementById('topPanel').appendChild(this.experienceDisplay);
     }
 
     // Добавление сообщения в лог
@@ -194,6 +321,68 @@ class HUD {
             
             // Обновляем текст здоровья
             this.healthText.textContent = `${game.playerHealth}`;
+        }
+
+        // Обновляем отображение опыта
+        if (game.experience !== undefined) {
+            // Вычисляем процент опыта
+            const expPercent = game.experience / game.experienceToNextLevel;
+            
+            // Если игрок получил новый уровень и анимация не активна
+            if (game.justLeveledUp && !this.expBar.isGlowing) {
+                // Устанавливаем флаг анимации
+                this.expBar.isGlowing = true;
+                
+                // Добавляем анимацию свечения для полоски и рамки
+                this.expBar.style.animation = 'expGlow 2s ease-in-out 6';
+                this.expBarContainer.style.animation = 'borderGlow 2s ease-in-out 6';
+                
+                // Форсируем перерисовку
+                this.expBar.offsetHeight;
+                this.expBarContainer.offsetHeight;
+                
+                // Сбрасываем анимацию через 12 секунд
+                setTimeout(() => {
+                    this.expBar.style.animation = 'none';
+                    this.expBarContainer.style.animation = 'none';
+                    this.expBar.offsetHeight;
+                    this.expBarContainer.offsetHeight;
+                    this.expBar.isGlowing = false;
+                }, 12000);
+                
+                // Сбрасываем флаг повышения уровня
+                game.justLeveledUp = false;
+            }
+            // Если игрок получил опыт и анимация не активна
+            else if (game.justGainedExp && !this.expBar.isGlowing) {
+                // Устанавливаем флаг анимации
+                this.expBar.isGlowing = true;
+                
+                // Добавляем анимацию свечения только для полоски
+                this.expBar.style.animation = 'expGlow 1s ease-in-out';
+                
+                // Форсируем перерисовку
+                this.expBar.offsetHeight;
+                
+                // Сбрасываем анимацию через 1 секунду
+                setTimeout(() => {
+                    this.expBar.style.animation = 'none';
+                    this.expBar.offsetHeight;
+                    this.expBar.isGlowing = false;
+                }, 1000);
+                
+                // Сбрасываем флаг получения опыта
+                game.justGainedExp = false;
+            }
+            
+            // Обновляем полоску опыта
+            this.expBar.style.width = `${expPercent * 100}%`;
+            
+            // Обновляем текст уровня
+            this.levelText.textContent = `LVL: ${game.level}`;
+            
+            // Обновляем текст опыта
+            this.expText.textContent = `${game.experience}/${game.experienceToNextLevel}`;
         }
     }
 

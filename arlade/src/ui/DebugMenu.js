@@ -11,15 +11,16 @@ class DebugMenu {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             color: #fff;
-            font-family: monospace;
-            padding: 10px;
-            border: 1px solid #666;
+            font-family: 'Press Start 2P', monospace;
+            padding: 20px;
+            border: 2px solid #666;
             display: none;
-            white-space: pre;
+            width: 400px;
             z-index: 9999;
             pointer-events: auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         `;
         document.getElementById('gameContainer').appendChild(this.element);
 
@@ -27,7 +28,8 @@ class DebugMenu {
         this.game.debugMode = {
             noFog: false,
             showEnemyPaths: false,
-            showEnemyVision: false
+            showEnemyVision: false,
+            godMode: false // Режим бессмертия
         };
 
         // Добавляем обработчики клавиш
@@ -49,7 +51,7 @@ class DebugMenu {
     getActions() {
         return [
             {
-                text: `[${this.game.debugMode.noFog ? 'x' : ' '}] Отключить туман войны`,
+                text: `${this.game.debugMode.noFog ? '☒' : '☐'} Отключить туман войны`,
                 handler: () => {
                     this.game.debugMode.noFog = !this.game.debugMode.noFog;
                     this.render();
@@ -57,7 +59,7 @@ class DebugMenu {
                 }
             },
             {
-                text: `[${this.game.debugMode.showEnemyPaths ? 'x' : ' '}] Показать пути врагов`,
+                text: `${this.game.debugMode.showEnemyPaths ? '☒' : '☐'} Показать пути врагов`,
                 handler: () => {
                     this.game.debugMode.showEnemyPaths = !this.game.debugMode.showEnemyPaths;
                     this.render();
@@ -65,11 +67,25 @@ class DebugMenu {
                 }
             },
             {
-                text: `[${this.game.debugMode.showEnemyVision ? 'x' : ' '}] Показать поле зрения врагов`,
+                text: `${this.game.debugMode.showEnemyVision ? '☒' : '☐'} Показать поле зрения врагов`,
                 handler: () => {
                     this.game.debugMode.showEnemyVision = !this.game.debugMode.showEnemyVision;
                     this.render();
                     this.game.renderer.render();
+                }
+            },
+            {
+                text: `${this.game.debugMode.godMode ? '☒' : '☐'} Режим бессмертия`,
+                handler: () => {
+                    this.game.debugMode.godMode = !this.game.debugMode.godMode;
+                    this.render();
+                }
+            },
+            {
+                text: `☆ Добавить 10 опыта`,
+                handler: () => {
+                    this.game.gainExperience(10);
+                    this.render();
                 }
             }
         ];
@@ -77,27 +93,63 @@ class DebugMenu {
 
     render() {
         const actions = this.getActions();
-        const width = Math.max(...actions.map(a => a.text.length)) + 4;
         
-        // Верхняя граница
-        let content = '╔' + '═'.repeat(width) + '╗\n';
+        // Создаём HTML-контент
+        let content = `
+            <div style="
+                text-align: center;
+                font-size: 16px;
+                color: #ffd700;
+                margin-bottom: 20px;
+                text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            ">ОТЛАДКА</div>
+            <div style="
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(to right, transparent, #666, transparent);
+                margin-bottom: 20px;
+            "></div>
+        `;
         
-        // Заголовок
-        content += '║' + ' Debug Menu '.padStart((width + 10) / 2).padEnd(width) + '║\n';
-        content += '╠' + '═'.repeat(width) + '╣\n';
-        
-        // Действия
+        // Добавляем действия
         actions.forEach((action, index) => {
             const isSelected = index === this.selectedIndex;
-            const prefix = isSelected ? '> ' : '  ';
-            const text = action.text.padEnd(width);
-            content += '║' + prefix + text + '  ║\n';
+            content += `
+                <div style="
+                    padding: 10px 20px;
+                    color: ${isSelected ? '#ffd700' : '#fff'};
+                    ${isSelected ? 'text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);' : ''}
+                    font-size: 12px;
+                    display: flex;
+                    align-items: center;
+                ">
+                    <span style="
+                        color: ${isSelected ? '#ffd700' : '#666'};
+                        margin-right: 10px;
+                    ">${isSelected ? '►' : ' '}</span>
+                    ${action.text}
+                </div>
+            `;
         });
         
-        // Нижняя граница
-        content += '╚' + '═'.repeat(width) + '╝';
+        // Добавляем подсказку внизу
+        content += `
+            <div style="
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(to right, transparent, #666, transparent);
+                margin-top: 20px;
+                margin-bottom: 10px;
+            "></div>
+            <div style="
+                text-align: center;
+                font-size: 8px;
+                color: #666;
+                margin-top: 10px;
+            ">Delete - закрыть | ↑↓ - выбор | Space - активировать</div>
+        `;
         
-        this.element.textContent = content;
+        this.element.innerHTML = content;
     }
 
     handleKeyDown(e) {
@@ -115,21 +167,23 @@ class DebugMenu {
 
         const actions = this.getActions();
 
-        switch (e.key) {
+        switch (e.code) {
             case 'ArrowUp':
+            case 'KeyW':
                 e.preventDefault();
                 this.selectedIndex = (this.selectedIndex - 1 + actions.length) % actions.length;
                 this.render();
                 break;
                 
             case 'ArrowDown':
+            case 'KeyS':
                 e.preventDefault();
                 this.selectedIndex = (this.selectedIndex + 1) % actions.length;
                 this.render();
                 break;
                 
+            case 'Space':
             case 'Enter':
-            case ' ':
                 e.preventDefault();
                 const action = actions[this.selectedIndex];
                 if (action && action.handler) {

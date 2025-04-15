@@ -90,22 +90,6 @@ class MainMenu {
         `;
         this.buttonContainer = buttonContainer;
         
-        // Создаем курсор как отдельный элемент
-        const menuCursor = document.createElement('div');
-        menuCursor.textContent = '►';
-        menuCursor.style.cssText = `
-            position: absolute;
-            left: -30px;
-            color: #fff;
-            font-size: 20px;
-            transition: top 0.2s ease;
-            height: 41px;
-            line-height: 41px;
-            top: 20px;
-        `;
-        buttonContainer.appendChild(menuCursor);
-        this.menuCursor = menuCursor;
-        
         // Создаем кнопки
         this.buttons = [
             { text: 'Начать заново', action: () => this.startNewGame() },
@@ -168,15 +152,18 @@ class MainMenu {
         
         switch (e.code) {
             case 'ArrowUp':
+            case 'KeyW':
                 e.preventDefault();
                 this.selectedIndex = (this.selectedIndex - 1 + this.buttons.length) % this.buttons.length;
                 this.updateSelection();
                 break;
             case 'ArrowDown':
+            case 'KeyS':
                 e.preventDefault();
                 this.selectedIndex = (this.selectedIndex + 1) % this.buttons.length;
                 this.updateSelection();
                 break;
+            case 'Space':
             case 'Enter':
                 e.preventDefault();
                 if (this.selectedIndex >= 0 && this.selectedIndex < this.buttons.length) {
@@ -197,8 +184,6 @@ class MainMenu {
             if (index === this.selectedIndex) {
                 btn.element.style.backgroundColor = '#ffffff20';
                 btn.element.style.borderColor = '#ffffff80';
-                // Перемещаем курсор к выбранной кнопке
-                this.menuCursor.style.top = `${20 + index * 61}px`; // 20px начальный отступ + (41px высота + 20px отступ) * index
             } else {
                 btn.element.style.backgroundColor = 'transparent';
                 btn.element.style.borderColor = '#ffffff40';
@@ -274,5 +259,40 @@ class MainMenu {
     openSettings() {
         // TODO: Добавить настройки
         console.log('Settings not implemented yet');
+    }
+
+    handleClick(x, y) {
+        if (!this.isVisible) return;
+
+        const buttonWidth = 200;
+        const buttonHeight = 40;
+        const buttonSpacing = 20;
+        const startX = (this.game.canvas.width - buttonWidth) / 2;
+        const startY = this.game.canvas.height / 2;
+
+        // Проверяем клик на каждой кнопке
+        this.buttons.forEach((button, index) => {
+            const buttonY = startY + (buttonHeight + buttonSpacing) * index;
+            if (x >= startX && x < startX + buttonWidth &&
+                y >= buttonY && y < buttonY + buttonHeight) {
+                switch (button.text) {
+                    case 'Новая игра':
+                        if (!this.isPauseMenu) {
+                            this.hide();
+                            this.game.startNewGame();
+                        }
+                        break;
+                    case 'Продолжить':
+                        if (this.isPauseMenu) {
+                            this.hide();
+                            this.game.isPaused = false;
+                        }
+                        break;
+                    case 'Помощь':
+                        this.game.helpWindow.toggle();
+                        break;
+                }
+            }
+        });
     }
 } 

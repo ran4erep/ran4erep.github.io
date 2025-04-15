@@ -57,6 +57,10 @@ class Game {
         // Массив для хранения трупов
         this.corpses = [];
         
+        // Экран загрузки
+        this.loadingScreen = new LoadingScreen(this);
+        this.isLoading = true;
+        
         // Флаг смерти игрока
         this.isDead = false;
         
@@ -69,6 +73,14 @@ class Game {
             wisdom: 10,       // Мудрость
             charisma: 10      // Харизма
         };
+        
+        // Система опыта
+        this.level = 1;
+        this.experience = 0;
+        this.experienceToNextLevel = 100; // Базовое значение для первого уровня
+        this.floorNumber = 1; // Текущий этаж подземелья
+        this.justLeveledUp = false; // Флаг для отслеживания повышения уровня
+        this.justGainedExp = false; // Флаг для отслеживания получения опыта
         
         // Инициализируем системы
         this.inputSystem = null;
@@ -97,19 +109,65 @@ class Game {
         
         // Инициализируем окно статов
         this.statsWindow = new StatsWindow(this);
+
+        // Инициализируем окно справки
+        this.helpWindow = new HelpWindow(this);
         
-        // Загрузка ресурсов и старт игры
-        Promise.all([
-            this.loadMaps(),
-            glyphSystem.loadGlyphs()
-        ]).then(() => {
-            if (this.enableMainMenu) {
-                this.mainMenu.isPauseMenu = false;
-                this.mainMenu.show();
-            } else {
-                this.startGame();
+        // Показываем главное меню
+        if (this.enableMainMenu) {
+            this.mainMenu.isPauseMenu = false;
+            this.mainMenu.show();
+        }
+    }
+
+    async startLoading() {
+        // Показываем экран загрузки
+        this.loadingScreen.show();
+
+        // Запускаем цикл отрисовки экрана загрузки
+        const renderLoadingScreen = () => {
+            if (this.isLoading) {
+                this.loadingScreen.render();
+                requestAnimationFrame(renderLoadingScreen);
             }
-        });
+        };
+        renderLoadingScreen();
+
+        try {
+            // Функция задержки
+            const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+            // Загрузка glyphs.json
+            this.loadingScreen.updateProgress(1);
+            await glyphSystem.loadGlyphs();
+
+            // Загрузка maps.json
+            this.loadingScreen.updateProgress(2);
+            await this.loadMaps();
+
+            // Загрузка items.json
+            this.loadingScreen.updateProgress(3);
+            await this.inventorySystem.loadItems();
+
+            // Загрузка файлов глифов
+            this.loadingScreen.updateProgress(4);
+            const glyphFiles = ['tiles', 'actors', 'ui'];
+            await Promise.all(glyphFiles.map(file => glyphSystem.loadGlyphFile(file)));
+
+            // Секундная пауза после загрузки
+            await delay(1000);
+
+            // Загрузка завершена
+            this.isLoading = false;
+            this.loadingScreen.hide();
+
+            // Запускаем игру
+            this.loadMap('test_map');
+            this.startGame();
+        } catch (error) {
+            console.error('Failed to load game resources:', error);
+            // Здесь можно добавить отображение ошибки на экране загрузки
+        }
     }
 
     async loadMaps() {
@@ -469,62 +527,90 @@ class Game {
     }
 
     processEnemyTurn() {
-        // Если есть анимации видимых врагов или игрока, ждем их завершения
-        if (this.isMoving || this.isPlayerAttacking || this.enemySystem.hasVisibleMovingEnemies()) {
+        // Если есть анимации игрока, ждем их завершения
+        if (this.isMoving || this.isPlayerAttacking) {
             return;
         }
 
-        // Ищем врага, у которого остались очки действий
-        const activeEnemy = this.enemySystem.enemies.find(enemy => enemy.movesLeft > 0);
+        // Если идёт анимация атаки какого-либо врага, ждём её завершения
+        if (this.enemySystem.enemies.some(enemy => enemy.isAttacking)) {
+            return;
+        }
 
-        if (activeEnemy) {
-            // Проверяем видимость врага
-            const isVisible = visionSystem.isTileVisible(activeEnemy.x, activeEnemy.y);
+        // Находим всех врагов, у которых остались очки действий
+        const activeEnemies = this.enemySystem.enemies.filter(enemy => enemy.movesLeft > 0);
 
-            // Сначала проверяем, не видит ли враг игрока
-            if (activeEnemy.canSeePlayer(this)) {
-                activeEnemy.lastKnownPlayerX = this.playerX;
-                activeEnemy.lastKnownPlayerY = this.playerY;
-                if (activeEnemy.state !== 'chase') {
-                    activeEnemy.statusGlyph = 'alert';
-                    activeEnemy.state = 'chase';
-                    activeEnemy.isChasing = true;
-                }
+        if (activeEnemies.length > 0) {
+            // Находим всех врагов, которые могут атаковать
+            const attackingEnemies = activeEnemies.filter(enemy => this.combatSystem.canEnemyAttack(enemy));
+            
+            // Если атакующих больше одного, обрабатываем их по очереди
+            if (attackingEnemies.length > 1) {
+                const attacker = attackingEnemies[0];
+                this.combatSystem.enemyAttack(attacker);
+                return;
             }
 
-            // Если враг может атаковать игрока, он это делает
-            if (this.combatSystem.canEnemyAttack(activeEnemy)) {
-                // Атакующий враг всегда виден (он рядом с игроком)
-                this.combatSystem.enemyAttack(activeEnemy);
-            } else {
+            // В остальных случаях обрабатываем всех врагов параллельно
+            let anyEnemyMoved = false;
+            
+            activeEnemies.forEach(enemy => {
+                // Если враг уже в процессе анимации, пропускаем его
+                if (enemy.isMoving || enemy.isAttacking) return;
+
+                // Сначала проверяем, не видит ли враг игрока
+                if (enemy.canSeePlayer(this)) {
+                    enemy.lastKnownPlayerX = this.playerX;
+                    enemy.lastKnownPlayerY = this.playerY;
+                    if (enemy.state !== 'chase') {
+                        enemy.statusGlyph = 'alert';
+                        enemy.state = 'chase';
+                        enemy.isChasing = true;
+                    }
+                }
+
+                // Если враг может атаковать, делаем это
+                if (this.combatSystem.canEnemyAttack(enemy)) {
+                    this.combatSystem.enemyAttack(enemy);
+                    anyEnemyMoved = true;
+                    return;
+                }
+
                 // Если не может атаковать, пытается двигаться
-                const oldX = activeEnemy.x;
-                const oldY = activeEnemy.y;
+                const oldX = enemy.x;
+                const oldY = enemy.y;
                 
-                activeEnemy.update(this);
+                enemy.update(this);
                 
                 // Если позиция изменилась
-                if (oldX !== activeEnemy.x || oldY !== activeEnemy.y) {
-                    if (isVisible || visionSystem.isTileVisible(activeEnemy.x, activeEnemy.y)) {
+                if (oldX !== enemy.x || oldY !== enemy.y) {
+                    const isVisible = visionSystem.isTileVisible(oldX, oldY) || visionSystem.isTileVisible(enemy.x, enemy.y);
+                    if (isVisible) {
                         // Если враг был виден в начальной или конечной позиции, анимируем движение
-                        activeEnemy.isMoving = true;
+                        enemy.isMoving = true;
+                        anyEnemyMoved = true;
                     } else {
                         // Если враг не виден, сразу обновляем его визуальную позицию
-                        activeEnemy.visualX = activeEnemy.x;
-                        activeEnemy.visualY = activeEnemy.y;
+                        enemy.visualX = enemy.x;
+                        enemy.visualY = enemy.y;
                     }
                 }
 
                 // После движения снова проверяем, не видит ли враг игрока
-                if (activeEnemy.canSeePlayer(this)) {
-                    activeEnemy.lastKnownPlayerX = this.playerX;
-                    activeEnemy.lastKnownPlayerY = this.playerY;
-                    if (activeEnemy.state !== 'chase') {
-                        activeEnemy.statusGlyph = 'alert';
-                        activeEnemy.state = 'chase';
-                        activeEnemy.isChasing = true;
+                if (enemy.canSeePlayer(this)) {
+                    enemy.lastKnownPlayerX = this.playerX;
+                    enemy.lastKnownPlayerY = this.playerY;
+                    if (enemy.state !== 'chase') {
+                        enemy.statusGlyph = 'alert';
+                        enemy.state = 'chase';
+                        enemy.isChasing = true;
                     }
                 }
+            });
+
+            // Если хотя бы один видимый враг двигался или атаковал, ждём завершения анимации
+            if (anyEnemyMoved) {
+                return;
             }
             
             // Обновляем видимость
@@ -619,6 +705,9 @@ class Game {
 
     showContextMenu() {
         if (this.contextMenu) {
+            // Если меню уже открыто, ничего не делаем
+            if (this.contextMenu.isVisible) return;
+            
             const actions = this.contextMenu.getAvailableActions(this.playerX, this.playerY);
             if (actions.length > 0) {
                 this.contextMenu.show(this.playerX, this.playerY, actions);
@@ -662,10 +751,21 @@ class Game {
         this.damageNumberSystem.update();
     }
 
-    startNewGame() {
-        // Сбрасываем здоровье игрока
+    async startNewGame() {
+        // Показываем экран загрузки
+        this.isLoading = true;
+        
+        // Сбрасываем здоровье
         this.playerHealth = 30;
         this.maxHealth = 30;
+        
+        // Сбрасываем опыт и уровень
+        this.level = 1;
+        this.experience = 0;
+        this.experienceToNextLevel = 100;
+        this.floorNumber = 1;
+        this.justLeveledUp = false;
+        this.justGainedExp = false;
         
         // Сбрасываем флаг смерти
         this.isDead = false;
@@ -673,16 +773,37 @@ class Game {
         // Очищаем массив трупов
         this.corpses = [];
         
-        // Сбрасываем инвентарь
+        // Очищаем лог
+        hud.clearLog();
+
+        // Загружаем все ресурсы
+        await this.startLoading();
+        
+        // Инициализируем стартовые предметы
         if (this.inventorySystem) {
-            this.inventorySystem = new InventorySystem(this);
+            this.inventorySystem.initStartingItems();
         }
-        
-        // Загружаем карту
-        this.loadMap('test_map');
-        
-        // Запускаем игровой цикл
-        this.startGame();
+    }
+
+    gainExperience(amount) {
+        this.experience += amount;
+        this.justGainedExp = true; // Устанавливаем флаг при получении опыта
+        while (this.experience >= this.experienceToNextLevel) {
+            this.levelUp();
+        }
+    }
+
+    levelUp() {
+        this.level++;
+        this.experience -= this.experienceToNextLevel;
+        // Каждый следующий уровень требует на 60% больше опыта
+        this.experienceToNextLevel = Math.floor(this.experienceToNextLevel * 1.6);
+        // Восстанавливаем здоровье при повышении уровня
+        this.playerHealth = this.maxHealth;
+        // Устанавливаем флаг повышения уровня
+        this.justLeveledUp = true;
+        // Добавляем сообщение в лог
+        hud.addLogMessage(`Вы достигли ${this.level} уровня!`, 'level-up');
     }
 }
 

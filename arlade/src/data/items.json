@@ -4,8 +4,25 @@
       "name": "Ржавый меч",
       "type": "weapon",
       "weaponType": "melee",
+      "hands": "one",
       "description": "Старый ржавый меч. Не самое лучшее оружие, но лучше чем ничего.",
       "damage": "1d4"
+    },
+    "dagger": {
+      "name": "Кинжал",
+      "type": "weapon",
+      "weaponType": "melee",
+      "hands": "one",
+      "description": "Простой кинжал. Очень маленький, но очень опасный.",
+      "damage": "2d3"
+    },
+    "battle_axe": {
+      "name": "Боевой топор",
+      "type": "weapon",
+      "weaponType": "melee",
+      "hands": "both",
+      "description": "Очень мощное оружие, но невозможно использовать одной рукой.",
+      "damage": "2d6"
     },
     "leather_helmet": {
       "name": "Кожаный шлем",
@@ -24,6 +41,11 @@
       "type": "legs",
       "description": "Прочные штаны из кожи. Не сковывают движений.",
       "defense": 0
+    },
+    "pile_of_gold": {
+      "name": "Куча золота",
+      "type": "misc",
+      "description": "Золотые монеты. Ценятся всеми и везде."
     }
   }
 } 

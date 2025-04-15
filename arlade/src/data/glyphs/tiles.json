@@ -1,0 +1,125 @@
+{
+    "wall": {
+        "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "UUUUAUUUUUAUUUUU",
+            "UUUUAUUUUUAUUUUU",
+            "UUUUAUUUUUAUUUUU",
+            "UUUUAUUUUUAUUUUU",
+            "AAAAAAAAAAAAAAAA",
+            "UUAUUUUAUUUUAUUU",
+            "UUAUUUUAUUUUAUUU",
+            "UUAUUUUAUUUUAUUU",
+            "UUAUUUUAUUUUAUUU",
+            "AAAAAAAAAAAAAAAA",
+            "UUUUAUUUUUAUUUAU",
+            "UUUUAUUUUUAUUUAU",
+            "UUUUAUUUUUAUUUAU",
+            "UUUUAUUUUUAUUUAU",
+            "AAAAAAAAAAAAAAAA"
+        ],
+        "colors": {
+            "A": "#000000",
+            "U": "#6c251e"
+        }
+    },
+    "floor": {
+        "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "AXXXXXXXXXXXXXXA",
+            "AXXXXXXVVXXXXXXA",
+            "AXXXXXVVVVXXXXXA",
+            "AXXXXVVVVVVXXXXA",
+            "AXXXVVVVVVVVXXXA",
+            "AXXVVVVVVVVVVXXA",
+            "AXVVVVVVVVVVVVXA",
+            "AXVVVVVVVVVVVVXA",
+            "AXXVVVVVVVVVVXXA",
+            "AXXXVVVVVVVVXXXA",
+            "AXXXXVVVVVVXXXXA",
+            "AXXXXXVVVVXXXXXA",
+            "AXXXXXXVVXXXXXXA",
+            "AXXXXXXXXXXXXXXA",
+            "AAAAAAAAAAAAAAAA"
+        ],
+        "colors": {
+            "A": "#000000",
+            "X": "#161423",
+            "V": "#6a5fa0"
+        }
+    },"door": {
+        "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTUTATUTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "ATTTTTTATTTTTTTA",
+            "AAAAAAAAAAAAAAAA"
+        ],
+        "colors": {
+            "A": "#000000",
+            "T": "#934226",
+            "U": "#6c251e"
+        }
+    },
+    "openedDoor": {
+        "pixels": [
+            "AAAAAAAAAAAAAAAA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "AUA----------AUA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "ATA----------ATA",
+            "AAAAAAAAAAAAAAAA"
+        ],
+        "colors": {
+            "A": "#000000",
+            "T": "#934226",
+            "U": "#6c251e"
+        }
+    },
+    "barrel": {
+        "pixels": [
+            "----------------",
+            "----------------",
+            "----AAAAAAAA----",
+            "---AUUUUUUUUA---",
+            "---AAUUUUUUAA---",
+            "---ATAAAAAATA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "---ATTTTTTTTA---",
+            "----AAAAAAAA----"
+        ],
+        "colors": {
+            "A": "#000000",
+            "U": "#6c251e",
+            "T": "#934226"
+        }
+    }
+}

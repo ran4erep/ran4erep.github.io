@@ -37,36 +37,45 @@ class InputSystem {
                 return;
             }
 
+            // Если открыто окно справки, обрабатываем только M и Escape
+            if (this.game.helpWindow && this.game.helpWindow.visible) {
+                if (e.code === 'KeyM' || e.code === 'Escape') {
+                    this.game.helpWindow.hide();
+                }
+                return;
+            }
+
             // Если открыто любое меню, обрабатываем только клавиши меню
             if ((this.game.contextMenu && this.game.contextMenu.isVisible) ||
                 (this.game.debugMenu && this.game.debugMenu.isVisible)) {
                 return;
             }
 
-            // Если открыт инвентарь, обрабатываем его клавиши
+            // Если открыт инвентарь
             if (this.game.inventorySystem.isOpen) {
-                // Escape и i всегда закрывают инвентарь
-                if (e.code === 'KeyI' || e.code === 'Escape') {
-                    this.game.inventorySystem.toggleInventory();
-                    return;
-                }
-
-                // Если открыто окно подробностей, обрабатываем только пробел
+                // Если открыто окно подробностей, обрабатываем только пробел и Escape
                 if (this.game.inventorySystem.showingDetails) {
-                    if (e.code === 'Space') {
+                    if (e.code === 'Space' || e.code === 'Escape') {
                         this.game.inventorySystem.handleKeyPress(' ');
                     }
                     return;
                 }
 
+                // Escape и i всегда закрывают инвентарь, но только если не открыто окно подробностей
+                if (e.code === 'KeyI' || e.code === 'Escape') {
+                    this.game.inventorySystem.toggleInventory();
+                    return;
+                }
+
+                // Передаём все клавиши в handleKeyPress для обработки меню выбора руки
                 switch (e.code) {
                     case 'ArrowUp':
                     case 'KeyW':
-                        this.game.inventorySystem.moveSelection(-1);
+                        this.game.inventorySystem.handleKeyPress('ArrowUp');
                         break;
                     case 'ArrowDown':
                     case 'KeyS':
-                        this.game.inventorySystem.moveSelection(1);
+                        this.game.inventorySystem.handleKeyPress('ArrowDown');
                         break;
                     case 'ArrowLeft':
                     case 'KeyA':
@@ -77,8 +86,13 @@ class InputSystem {
                         this.game.inventorySystem.handleKeyPress('ArrowRight');
                         break;
                     case 'Enter':
+                        this.game.inventorySystem.handleKeyPress('Enter');
+                        break;
                     case 'Space':
-                        this.game.inventorySystem.toggleActionMenu();
+                        this.game.inventorySystem.handleKeyPress(' ');
+                        break;
+                    case 'Escape':
+                        this.game.inventorySystem.handleKeyPress('Escape');
                         break;
                 }
                 return;
@@ -179,6 +193,13 @@ class InputSystem {
                 case 'Digit2':
                     if (e.shiftKey) {
                         this.game.statsWindow.toggle();
+                    }
+                    break;
+                case 'Slash':
+                    if (e.shiftKey) {
+                        this.game.helpWindow.toggle();
+                        e.preventDefault();
+                        return;
                     }
                     break;
             }

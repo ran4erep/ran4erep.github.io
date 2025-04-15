@@ -286,13 +286,18 @@ class Renderer {
             let isUnderAttack = false;
             let attackProgress = 0;
             let attackStartTime = 0;
-            let attackDuration = 0;
+            let attackDuration = 0; 
 
             // Если это враг и игрок атакует
             if (object.type === 'enemy' && this.game.isPlayerAttacking) {
                 // Сравниваем координаты вместо объектов
+                const enemy = this.game.enemySystem.enemies.find(e => 
+                    Math.floor(e.x) === Math.floor(object.x) && 
+                    Math.floor(e.y) === Math.floor(object.y)
+                );
                 isUnderAttack = Math.floor(object.x) === this.game.attackTarget.x && 
-                               Math.floor(object.y) === this.game.attackTarget.y;
+                               Math.floor(object.y) === this.game.attackTarget.y &&
+                               enemy && enemy.wasHit; // Добавляем проверку на попадание
                 if (isUnderAttack) {
                     attackStartTime = this.game.attackStartTime;
                     attackDuration = this.game.attackDuration;
@@ -300,7 +305,10 @@ class Renderer {
             }
             // Если это игрок и его атакует враг
             else if (object.type === 'player') {
-                const attackingEnemy = this.game.enemySystem.enemies.find(e => e.isAttacking && this.canEnemyAttack(e));
+                const attackingEnemy = this.game.enemySystem.enemies.find(e => 
+                    e.isAttacking && this.canEnemyAttack(e) && 
+                    e.pendingAttack && !e.pendingAttack.dodged // Добавляем проверку на попадание
+                );
                 isUnderAttack = !!attackingEnemy;
                 if (isUnderAttack && attackingEnemy) {
                     attackStartTime = attackingEnemy.attackStartTime;
@@ -575,26 +583,32 @@ class Renderer {
                     .find(obj => obj.type === 'player');
                 description = playerObject ? playerObject.description : 'Вы';
             } else {
-                // Затем проверяем, есть ли враг на этой позиции
-                const enemy = this.game.enemySystem.enemies.find(e => e.x === lookX && e.y === lookY);
-                
-                if (enemy) {
-                    // Получаем описание врага из ENEMY_TYPES
-                    description = ENEMY_TYPES[enemy.type].description;
+                // Проверяем, есть ли труп на этой позиции
+                const corpse = this.game.corpses.find(c => c.x === lookX && c.y === lookY);
+                if (corpse) {
+                    description = 'Груда костей';
                 } else {
-                    // Если врага нет, проверяем объект на карте
-                    const symbol = this.game.currentMap.layout[lookY][lookX];
-                    const object = this.game.currentMap.objects[symbol];
+                    // Затем проверяем, есть ли враг на этой позиции
+                    const enemy = this.game.enemySystem.enemies.find(e => e.x === lookX && e.y === lookY);
                     
-                    if (object) {
-                        if (object.type === 'door') {
-                            const door = this.game.doors.find(d => d.x === lookX && d.y === lookY);
-                            description = object.description + (door && door.isOpened ? ' (открыта)' : ' (закрыта)');
-                        } else {
-                            description = object.description;
-                        }
+                    if (enemy) {
+                        // Получаем описание врага из ENEMY_TYPES
+                        description = ENEMY_TYPES[enemy.type].description;
                     } else {
-                        description = 'Пустое место';
+                        // Если врага нет, проверяем объект на карте
+                        const symbol = this.game.currentMap.layout[lookY][lookX];
+                        const object = this.game.currentMap.objects[symbol];
+                        
+                        if (object) {
+                            if (object.type === 'door') {
+                                const door = this.game.doors.find(d => d.x === lookX && d.y === lookY);
+                                description = object.description + (door && door.isOpened ? ' (открыта)' : ' (закрыта)');
+                            } else {
+                                description = object.description;
+                            }
+                        } else {
+                            description = 'Пустое место';
+                        }
                     }
                 }
             }
