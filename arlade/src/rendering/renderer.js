@@ -214,6 +214,25 @@ class Renderer {
             }
         }
 
+        // Добавляем предметы на земле
+        this.game.floorItems.forEach(item => {
+            if (item.x >= visibleArea.startTileX && item.x < visibleArea.endTileX &&
+                item.y >= visibleArea.startTileY && item.y < visibleArea.endTileY) {
+                
+                // Проверяем видимость тайла
+                const visibility = visionSystem.visibilityMap[item.y][item.x];
+                if (this.game.debugMode?.noFog || visibility > 0) {
+                    renderQueue.push({
+                        x: item.x,
+                        y: item.y,
+                        type: 'loot',
+                        glyph: item.item.glyph || 'loot',
+                        z_index: 3
+                    });
+                }
+            }
+        });
+
         // Добавляем врагов в очередь отрисовки
         for (const enemy of this.game.enemySystem.enemies) {
             if (enemy.x >= visibleArea.startTileX && enemy.x < visibleArea.endTileX &&
@@ -577,37 +596,49 @@ class Renderer {
         if (visibility === 0) {
             description = 'Темнота';
         } else {
-            // Сначала проверяем, не игрок ли это
-            if (lookX === this.game.playerX && lookY === this.game.playerY) {
-                const playerObject = Object.values(this.game.currentMap.objects)
-                    .find(obj => obj.type === 'player');
-                description = playerObject ? playerObject.description : 'Вы';
-            } else {
-                // Проверяем, есть ли труп на этой позиции
-                const corpse = this.game.corpses.find(c => c.x === lookX && c.y === lookY);
-                if (corpse) {
-                    description = 'Груда костей';
+            // Проверяем, есть ли предметы на земле
+            const itemsOnTile = this.game.floorItems.filter(item => item.x === lookX && item.y === lookY);
+            if (itemsOnTile.length > 0) {
+                if (itemsOnTile.length === 1) {
+                    // Если один предмет, показываем его название
+                    description = `Здесь лежит ${itemsOnTile[0].item.name}`;
                 } else {
-                    // Затем проверяем, есть ли враг на этой позиции
-                    const enemy = this.game.enemySystem.enemies.find(e => e.x === lookX && e.y === lookY);
-                    
-                    if (enemy) {
-                        // Получаем описание врага из ENEMY_TYPES
-                        description = ENEMY_TYPES[enemy.type].description;
+                    // Если несколько предметов, по-прежнему показываем общую надпись
+                    description = 'Здесь лежат предметы';
+                }
+            } else {
+                // Сначала проверяем, не игрок ли это
+                if (lookX === this.game.playerX && lookY === this.game.playerY) {
+                    const playerObject = Object.values(this.game.currentMap.objects)
+                        .find(obj => obj.type === 'player');
+                    description = playerObject ? playerObject.description : 'Вы';
+                } else {
+                    // Проверяем, есть ли труп на этой позиции
+                    const corpse = this.game.corpses.find(c => c.x === lookX && c.y === lookY);
+                    if (corpse) {
+                        description = 'Груда костей';
                     } else {
-                        // Если врага нет, проверяем объект на карте
-                        const symbol = this.game.currentMap.layout[lookY][lookX];
-                        const object = this.game.currentMap.objects[symbol];
+                        // Затем проверяем, есть ли враг на этой позиции
+                        const enemy = this.game.enemySystem.enemies.find(e => e.x === lookX && e.y === lookY);
                         
-                        if (object) {
-                            if (object.type === 'door') {
-                                const door = this.game.doors.find(d => d.x === lookX && d.y === lookY);
-                                description = object.description + (door && door.isOpened ? ' (открыта)' : ' (закрыта)');
-                            } else {
-                                description = object.description;
-                            }
+                        if (enemy) {
+                            // Получаем описание врага из ENEMY_TYPES
+                            description = ENEMY_TYPES[enemy.type].description;
                         } else {
-                            description = 'Пустое место';
+                            // Если врага нет, проверяем объект на карте
+                            const symbol = this.game.currentMap.layout[lookY][lookX];
+                            const object = this.game.currentMap.objects[symbol];
+                            
+                            if (object) {
+                                if (object.type === 'door') {
+                                    const door = this.game.doors.find(d => d.x === lookX && d.y === lookY);
+                                    description = object.description + (door && door.isOpened ? ' (открыта)' : ' (закрыта)');
+                                } else {
+                                    description = object.description;
+                                }
+                            } else {
+                                description = 'Пустое место';
+                            }
                         }
                     }
                 }

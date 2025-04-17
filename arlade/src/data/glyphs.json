@@ -50,5 +50,9 @@
     "corpse": {
         "file": "actors",
         "name": "corpse"
+    },
+    "loot": {
+        "file": "ui",
+        "name": "loot"
     }
 } 

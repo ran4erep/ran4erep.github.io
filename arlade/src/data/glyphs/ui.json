@@ -46,9 +46,6 @@
         }
     },
     "frame": {
-        "colors": {
-            "x": "#ffffff"
-        },
         "pixels": [
             "x-x-x-x-x-x-x-x",
             "----------------",
@@ -66,7 +63,10 @@
             "----------------",
             "x--------------x",
             "x-x-x-x-x-x-x-x"
-        ]
+        ],
+        "colors": {
+            "x": "#ffffff"
+        }
     },
     "heart": {
         "pixels": [
@@ -89,6 +89,34 @@
         ],
         "colors": {
             "H": "#ff0000"
+        }
+    },
+    "loot": {
+        "pixels": [
+            "----------------",
+            "----------------",
+            "----------------",
+            "----------------",
+            "----------------",
+            "------XXXXX-----",
+            "-----XPUUUPX----",
+            "--XXXXXXXAAAAA--",
+            "-XWWPPXUTTTTTTA-",
+            "-XWTTTPUWTTTTWA-",
+            "-XPTTTTXUWWWWPA-",
+            "-XPTTTTPXXXUXXA-",
+            "-XTTTTTXXXXUXXA-",
+            "-XTTTTTXXXXXXXA-",
+            "-XUTTTUXXXXXXXA-",
+            "--XXXXXAAAAAAA--"
+        ],
+        "colors": {
+            "X": "#161423",
+            "P": "#808080",
+            "U": "#6c251e",
+            "A": "#000000",
+            "W": "#f2c0a2",
+            "T": "#934226"
         }
     }
 }

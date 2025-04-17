@@ -24,30 +24,22 @@ class InputSystem {
         this.lookX = 0;
         this.lookY = 0;
         
+        // Флаг возможности зажатия клавиш
+        this.canHoldKeys = true;
+        
         this.bindKeys();
     }
 
     bindKeys() {
         document.addEventListener('keydown', (e) => {
-            // Если открыто окно статов, обрабатываем только @ для закрытия
-            if (this.game.statsWindow && this.game.statsWindow.visible) {
-                if (e.code === 'Digit2' && e.shiftKey) {
-                    this.game.statsWindow.hide();
-                }
-                return;
-            }
+            // Проверяем видимость врагов для зажатия клавиш
+            const visibleEnemies = this.game.enemySystem.enemies.filter(enemy => {
+                const visibility = visionSystem.visibilityMap[enemy.y][enemy.x];
+                return visibility === 2;
+            });
 
-            // Если открыто окно справки, обрабатываем только M и Escape
-            if (this.game.helpWindow && this.game.helpWindow.visible) {
-                if (e.code === 'KeyM' || e.code === 'Escape') {
-                    this.game.helpWindow.hide();
-                }
-                return;
-            }
-
-            // Если открыто любое меню, обрабатываем только клавиши меню
-            if ((this.game.contextMenu && this.game.contextMenu.isVisible) ||
-                (this.game.debugMenu && this.game.debugMenu.isVisible)) {
+            // Если есть видимые враги и клавиша зажата - игнорируем
+            if (visibleEnemies.length > 0 && e.repeat) {
                 return;
             }
 
@@ -61,8 +53,8 @@ class InputSystem {
                     return;
                 }
 
-                // Escape и i всегда закрывают инвентарь, но только если не открыто окно подробностей
-                if (e.code === 'KeyI' || e.code === 'Escape') {
+                // i всегда закрывает инвентарь
+                if (e.code === 'KeyI') {
                     this.game.inventorySystem.toggleInventory();
                     return;
                 }
@@ -98,6 +90,35 @@ class InputSystem {
                 return;
             }
 
+            // Если открыто меню подбора предметов
+            if (this.game.lootWindow.isOpen) {
+                switch (e.code) {
+                    case 'ArrowUp':
+                    case 'KeyW':
+                        this.game.lootWindow.handleKeyPress('ArrowUp');
+                        break;
+                    case 'ArrowDown':
+                    case 'KeyS':
+                        this.game.lootWindow.handleKeyPress('ArrowDown');
+                        break;
+                    case 'ArrowLeft':
+                    case 'KeyA':
+                        this.game.lootWindow.handleKeyPress('ArrowLeft');
+                        break;
+                    case 'ArrowRight':
+                    case 'KeyD':
+                        this.game.lootWindow.handleKeyPress('ArrowRight');
+                        break;
+                    case 'Space':
+                        this.game.lootWindow.handleKeyPress('Space');
+                        break;
+                    case 'Escape':
+                        this.game.lootWindow.handleKeyPress('Escape');
+                        break;
+                }
+                return;
+            }
+
             switch (e.code) {
                 case 'KeyL':
                     if (!this.isLookMode) {
@@ -110,9 +131,17 @@ class InputSystem {
                         this.isLookMode = false;
                     }
                     break;
+                case 'KeyG':
+                    // Открываем меню подбора предметов
+                    this.game.lootWindow.open();
+                    break;
                 case 'Escape':
                     if (this.isLookMode) {
                         this.isLookMode = false;
+                    } else if (this.game.helpWindow.visible) {
+                        this.game.helpWindow.toggle();
+                    } else if (this.game.statsWindow.visible) {
+                        this.game.statsWindow.toggle();
                     } else if (!this.game.contextMenu?.isVisible && !this.game.debugMenu?.isVisible) {
                         this.game.mainMenu.isPauseMenu = true;
                         this.game.mainMenu.show();
@@ -126,30 +155,42 @@ class InputSystem {
                             hud.addLogMessage('Вы пропустили ход');
                             this.game.startEnemyTurn();
                         }
-                    } else {
+                    } else if (!this.game.statsWindow.visible && !this.game.helpWindow.visible && !this.game.contextMenu?.isVisible && !this.game.debugMenu?.isVisible) {
                         this.keys.up = true;
                     }
                     break;
                 case 'ArrowDown':
                 case 'KeyS':
-                    this.keys.down = true;
+                    if (!this.game.statsWindow.visible && !this.game.helpWindow.visible && !this.game.contextMenu?.isVisible && !this.game.debugMenu?.isVisible) {
+                        this.keys.down = true;
+                    }
                     break;
                 case 'ArrowLeft':
                 case 'KeyA':
-                    this.keys.left = true;
+                    if (!this.game.statsWindow.visible && !this.game.helpWindow.visible && !this.game.contextMenu?.isVisible && !this.game.debugMenu?.isVisible) {
+                        this.keys.left = true;
+                    }
                     break;
                 case 'ArrowRight':
                 case 'KeyD':
-                    this.keys.right = true;
+                    if (!this.game.statsWindow.visible && !this.game.helpWindow.visible && !this.game.contextMenu?.isVisible && !this.game.debugMenu?.isVisible) {
+                        this.keys.right = true;
+                    }
                     break;
                 case 'KeyQ':
-                    this.keys.upLeft = true;
+                    if (!this.game.statsWindow.visible && !this.game.helpWindow.visible && !this.game.contextMenu?.isVisible && !this.game.debugMenu?.isVisible) {
+                        this.keys.upLeft = true;
+                    }
                     break;
                 case 'KeyE':
-                    this.keys.upRight = true;
+                    if (!this.game.statsWindow.visible && !this.game.helpWindow.visible && !this.game.contextMenu?.isVisible && !this.game.debugMenu?.isVisible) {
+                        this.keys.upRight = true;
+                    }
                     break;
                 case 'KeyZ':
-                    this.keys.downLeft = true;
+                    if (!this.game.statsWindow.visible && !this.game.helpWindow.visible && !this.game.contextMenu?.isVisible && !this.game.debugMenu?.isVisible) {
+                        this.keys.downLeft = true;
+                    }
                     break;
                 case 'KeyC':
                     if (e.shiftKey) {
@@ -161,7 +202,7 @@ class InputSystem {
                                 this.game.toggleDoor();
                             }
                         }
-                    } else {
+                    } else if (!this.game.statsWindow.visible && !this.game.helpWindow.visible && !this.game.contextMenu?.isVisible && !this.game.debugMenu?.isVisible) {
                         this.keys.downRight = true;
                     }
                     break;
@@ -178,8 +219,9 @@ class InputSystem {
                     }
                     break;
                 case 'Space':
-                    e.preventDefault();
-                    this.game.showContextMenu();
+                    if (!this.game.inventorySystem.isOpen && !this.game.lootWindow.isOpen) {
+                        this.game.showContextMenu();
+                    }
                     break;
                 case 'Minus':
                     this.game.camera.zoomOut();
@@ -188,15 +230,18 @@ class InputSystem {
                     this.game.camera.zoomIn();
                     break;
                 case 'KeyI':
-                    this.game.inventorySystem.toggleInventory();
+                    // Не открываем инвентарь, если открыто контекстное меню
+                    if (!this.game.contextMenu?.isVisible) {
+                        this.game.inventorySystem.toggleInventory();
+                    }
                     break;
                 case 'Digit2':
-                    if (e.shiftKey) {
+                    if (e.shiftKey && !this.game.contextMenu?.isVisible) {
                         this.game.statsWindow.toggle();
                     }
                     break;
                 case 'Slash':
-                    if (e.shiftKey) {
+                    if (e.shiftKey && !this.game.contextMenu?.isVisible) {
                         this.game.helpWindow.toggle();
                         e.preventDefault();
                         return;

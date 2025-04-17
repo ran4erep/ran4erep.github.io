@@ -39,13 +39,14 @@ class InventorySystem {
         };
         
         // Добавляем стартовые предметы
-        this.addItem('rusty_sword');
+        this.addItem('rusty_sword', 2);
         this.addItem('leather_helmet');
         this.addItem('leather_armor');
         this.addItem('leather_pants');
         this.addItem('battle_axe');
         this.addItem('dagger');
-        this.addItem('pile_of_gold');
+        this.addItem('gold_coin', 5);
+        this.addItem('naked_pants');
         
         // Экипируем стартовые предметы
         this.equipItemToHand(0, 'right'); // Меч в правую руку
@@ -54,11 +55,21 @@ class InventorySystem {
         this.equipItem(3); // Штаны
     }
 
-    addItem(itemId) {
+    addItem(itemId, quantity = 1) {
         const itemData = this.itemsData[itemId];
-        if (itemData) {
+        if (!itemData) return;
+
+        // Ищем такой же предмет в инвентаре
+        const existingItem = this.items.find(item => item.id === itemId && !item.isEquipped);
+        
+        if (existingItem) {
+            // Если такой предмет уже есть, увеличиваем его количество
+            existingItem.quantity = (existingItem.quantity || 1) + quantity;
+        } else {
+            // Если предмета нет, добавляем новый
             this.items.push({
                 id: itemId,
+                quantity: quantity,
                 ...itemData
             });
         }
@@ -150,31 +161,90 @@ class InventorySystem {
     }
 
     dropItem(index) {
-        if (index >= 0 && index < this.items.length) {
-            const item = this.items[index];
-            if (item.isEquipped) {
-                this.unequipItem(index);
+        if (index < 0 || index >= this.items.length) return;
+        
+        const item = this.items[index];
+        
+        // Считаем, сколько экземпляров этого предмета экипировано
+        let equippedCount = 0;
+        if (item.isEquipped) {
+            if (item.type === 'weapon') {
+                if (this.equipped.leftHand === item) equippedCount++;
+                if (this.equipped.rightHand === item) equippedCount++;
+            } else {
+                equippedCount = 1;
             }
-            
-            // Сохраняем текущую страницу и количество предметов на странице
-            const itemsPerPage = this.getItemsPerPage();
-            const currentPageBefore = this.currentPage;
-            
-            // Удаляем предмет
+        }
+        
+        // Если предмет экипирован и количество предметов уменьшится до меньшего, чем экипировано
+        // Нужно снять лишние экземпляры
+        if (item.isEquipped && item.quantity <= equippedCount) {
+            // Если выбрасываем последний экземпляр, полностью снимаем предмет
+            if (item.quantity <= 1) {
+                if (item.type === 'weapon') {
+                    this.equipped.leftHand = null;
+                    this.equipped.rightHand = null;
+                } else if (item.type) {
+                    this.equipped[item.type] = null;
+                }
+                item.isEquipped = false;
+            } 
+            // Если после выбрасывания количество станет меньше, чем экипировано,
+            // снимаем предмет из одной руки (обычно левой как последней)
+            else if (item.type === 'weapon' && equippedCount > 1 && item.quantity <= equippedCount) {
+                // Снимаем с левой руки (считаем её последней)
+                if (this.equipped.leftHand === item) {
+                    this.equipped.leftHand = null;
+                }
+                // Если левой уже нет, снимаем с правой
+                else if (this.equipped.rightHand === item) {
+                    this.equipped.rightHand = null;
+                }
+
+                // Проверяем, остался ли предмет экипированным хотя бы в одной руке
+                if (this.equipped.leftHand !== item && this.equipped.rightHand !== item) {
+                    item.isEquipped = false;
+                }
+            }
+        }
+        
+        // Запоминаем, удаляем ли мы предмет полностью
+        const isRemovingItem = item.quantity <= 1;
+        
+        // Выбрасываем предмет
+        if (item.quantity > 1) {
+            item.quantity--;
+        } else {
+            // Если количество 1 или меньше, удаляем предмет полностью
             this.items.splice(index, 1);
-            
-            // Проверяем, был ли это последний предмет на странице
-            const totalPages = Math.ceil(this.items.length / itemsPerPage);
-            
-            // Если текущая страница больше не существует, переходим на предыдущую
-            if (this.currentPage >= totalPages && totalPages > 0) {
-                this.currentPage = totalPages - 1;
-                this.selectedItemIndex = this.currentPage * itemsPerPage; // Устанавливаем курсор на первый элемент страницы
-            } else if (this.selectedItemIndex >= this.items.length) {
-                // Если текущий индекс больше количества предметов, 
-                // устанавливаем его на последний предмет
+        }
+        
+        // Добавляем предмет на пол
+        this.game.floorItems.push({
+            x: this.game.playerX,
+            y: this.game.playerY,
+            item: {...item, quantity: 1, isEquipped: false} // Создаем копию предмета с количеством 1, не экипированную
+        });
+        
+        // Корректируем выбранный индекс, если мы полностью удалили предмет
+        if (isRemovingItem) {
+            // Если удалили последний предмет в списке, перемещаем курсор на предыдущий
+            if (this.selectedItemIndex >= this.items.length) {
                 this.selectedItemIndex = Math.max(0, this.items.length - 1);
             }
+        }
+        
+        // Проверяем наличие страниц
+        const itemsPerPage = this.getItemsPerPage();
+        const totalPages = Math.ceil(this.items.length / itemsPerPage);
+        
+        // Если текущая страница больше не существует, переходим на предыдущую
+        if (this.currentPage >= totalPages && totalPages > 0) {
+            this.currentPage = totalPages - 1;
+            this.selectedItemIndex = Math.min(
+                this.currentPage * itemsPerPage + itemsPerPage - 1, 
+                this.items.length - 1
+            );
         }
     }
 
@@ -182,6 +252,8 @@ class InventorySystem {
         this.isOpen = !this.isOpen;
         this.actionMenuOpen = false;
         this.showingDetails = false;
+        this.showHandSelectionMenu = false;
+        this.selectedHandIndex = 0;
         this.selectedItemIndex = 0;
         this.currentPage = 0;
     }
@@ -266,10 +338,9 @@ class InventorySystem {
                 
                 // Для предметов типа misc доступны только выброс и подробности
                 const isMisc = item.type === 'misc';
-                const actionIndex = isMisc ? this.selectedActionIndex : this.selectedActionIndex;
                 
                 if (isMisc) {
-                    switch (actionIndex) {
+                    switch (this.selectedActionIndex) {
                         case 0: // Выбросить
                             this.dropItem(this.selectedItemIndex);
                             this.actionMenuOpen = false;
@@ -280,18 +351,51 @@ class InventorySystem {
                             break;
                     }
                 } else {
-                    switch (actionIndex) {
-                        case 0: // Экипировать/Снять
-                            if (item.isEquipped) {
+                    // Получаем список действий
+                    const actions = [
+                        item.isEquipped ? 'Снять' : 'Экипировать',
+                        // Добавляем опцию "Экипировать" для оружия со стаком, если оно уже экипировано
+                        // но только для одноручного оружия и только если оно не экипировано в обе руки
+                        (item.type === 'weapon' && 
+                         item.quantity > 1 && 
+                         item.isEquipped && 
+                         item.hands !== 'both' && 
+                         !(this.equipped.leftHand === item && this.equipped.rightHand === item)) ? 
+                            'Экипировать' : null,
+                        'Выбросить',
+                        'Подробности'
+                    ].filter(action => action !== null);
+
+                    // Получаем выбранное действие
+                    const selectedAction = actions[this.selectedActionIndex];
+
+                    switch (selectedAction) {
+                        case 'Снять':
+                            if (item.type === 'weapon') {
+                                const leftEquipped = this.equipped.leftHand && this.equipped.leftHand.id === item.id;
+                                const rightEquipped = this.equipped.rightHand && this.equipped.rightHand.id === item.id;
+                                
+                                // Если это двуручное оружие или предмет экипирован только в одну руку, снимаем без меню
+                                if (item.hands === 'both' || !(leftEquipped && rightEquipped)) {
+                                    this.unequipItem(this.selectedItemIndex);
+                                    this.actionMenuOpen = false;
+                                } else {
+                                    // Только для одноручного оружия в обеих руках показываем меню выбора
+                                    this.showHandSelectionMenu = true;
+                                    this.selectedHandIndex = 0;
+                                    this.actionMenuOpen = false;
+                                }
+                            } else {
                                 this.unequipItem(this.selectedItemIndex);
                                 this.actionMenuOpen = false;
-                            } else if (item.type === 'weapon') {
+                            }
+                            break;
+                        case 'Экипировать':
+                            if (item.type === 'weapon') {
                                 if (item.hands === 'both') {
-                                    // Двуручное оружие сразу экипируется в обе руки
                                     this.equipItem(this.selectedItemIndex);
                                     this.actionMenuOpen = false;
                                 } else {
-                                    // Для одноручного оружия показываем меню выбора руки
                                     this.showHandSelectionMenu = true;
                                     this.selectedHandIndex = 0;
                                     this.actionMenuOpen = false;
@@ -301,11 +405,11 @@ class InventorySystem {
                                 this.actionMenuOpen = false;
                             }
                             break;
-                        case 1: // Выбросить
+                        case 'Выбросить':
                             this.dropItem(this.selectedItemIndex);
                             this.actionMenuOpen = false;
                             break;
-                        case 2: // Подробности
+                        case 'Подробности':
                             this.showingDetails = true;
                             this.actionMenuOpen = false;
                             break;
@@ -333,8 +437,12 @@ class InventorySystem {
     }
 
     render(ctx) {
-        if (!this.isOpen) return;
+        if (this.isOpen) {
+            this.renderInventory(ctx);
+        }
+    }
 
+    renderInventory(ctx) {
         // Базовые размеры окна
         let width = 500;
         const height = 500;
@@ -352,7 +460,7 @@ class InventorySystem {
         };
 
         // Минимальная ширина для слотов
-        const minSlotWidth = 120;  // Для названия слота
+        const minSlotWidth = 150;  // Увеличиваем для названия слота
         const minItemWidth = 200;  // Для названия предмета
         const minStatsWidth = 100; // Для характеристик
         const padding = 40;        // Отступы слева и справа
@@ -375,7 +483,9 @@ class InventorySystem {
         
         // Проверяем предметы в инвентаре
         this.items.forEach(item => {
-            const itemWidth = ctx.measureText(item.name + (item.isEquipped ? ' *' : '')).width;
+            const itemName = item.name + (item.isEquipped ? ' *' : '');
+            const quantityText = item.quantity > 1 ? ` x${item.quantity}` : '';
+            const itemWidth = ctx.measureText(itemName + quantityText).width;
             const stats = this.getItemStats(item);
             const statsWidth = stats ? ctx.measureText(stats).width : 0;
             
@@ -405,48 +515,43 @@ class InventorySystem {
         ctx.fillText('ИНВЕНТАРЬ', x + width/2, y + 40);
 
         // Отрисовка экипированных предметов
-        let equipY = y + 80;
-        const labelX = x + padding;
-        const valueX = x + padding + 160;
-        const statsX = x + width - padding * 2;
-
         ctx.font = '12px "Press Start 2P"';
         ctx.textAlign = 'left';
 
-        Object.entries(this.equipped).forEach(([slot, item]) => {
+        Object.entries(this.equipped).forEach(([slot, item], index) => {
+            const equipY = y + 80 + index * 30;  // Увеличиваем начальную Y-координату
+            
             // Название слота
             ctx.fillStyle = '#666';
-            ctx.fillText(slotNames[slot], labelX, equipY);
-
-            // Название предмета
+            ctx.fillText(slotNames[slot], x + padding, equipY);
+            
+            // Значение (название предмета)
+            ctx.fillStyle = item ? '#fff' : '#666';
+            const valueX = x + padding + minSlotWidth;
+            const itemName = item ? item.name : '(пусто)';
+            ctx.fillText(itemName, valueX, equipY);
+            
+            // Характеристики
             if (item) {
-                ctx.fillStyle = '#fff';
-                ctx.fillText(item.name, valueX, equipY);
-
-                // Характеристики предмета
                 const stats = this.getItemStats(item);
                 if (stats) {
-                    ctx.fillStyle = '#888';
+                    ctx.fillStyle = '#666';
                     ctx.textAlign = 'right';
-                    ctx.fillText(stats, statsX, equipY);
+                    ctx.fillText(stats, x + width - padding, equipY);
                     ctx.textAlign = 'left';
                 }
-            } else {
-                ctx.fillStyle = '#444';
-                ctx.fillText('(пусто)', valueX, equipY);
             }
-            equipY += 30;
         });
 
         // Разделитель
-        const dividerY = y + 230;
+        const dividerY = y + 250;  // Увеличиваем Y-координату разделителя
         ctx.strokeStyle = '#444';
         ctx.beginPath();
         ctx.moveTo(x + padding, dividerY);
         ctx.lineTo(x + width - padding, dividerY);
         ctx.stroke();
 
-        // Список предметов (убираем надпись "Предметы:")
+        // Список предметов
         const itemsStartY = dividerY + 30;
         const itemsPerPage = Math.floor((height - (itemsStartY - y) - 40) / 30);
         const startIndex = this.currentPage * itemsPerPage;
@@ -456,24 +561,25 @@ class InventorySystem {
         for (let i = startIndex; i < endIndex; i++) {
             const item = this.items[i];
             const itemY = itemsStartY + (i - startIndex) * 30;
-
+            
             // Стрелка выбора
             if (i === this.selectedItemIndex && !this.showHandSelectionMenu) {
                 ctx.fillStyle = '#fff';
                 ctx.fillText('>', x + padding - 15, itemY);
             }
-
+            
             // Название предмета
             ctx.fillStyle = '#fff';
             const itemName = (item.isEquipped ? '* ' : '') + item.name;
-            ctx.fillText(itemName, x + padding, itemY);
-
+            const quantityText = item.quantity > 1 ? ` x${item.quantity}` : '';
+            ctx.fillText(itemName + quantityText, x + padding, itemY);
+            
             // Характеристики предмета
             const stats = this.getItemStats(item);
             if (stats) {
                 ctx.fillStyle = '#888';
                 ctx.textAlign = 'right';
-                ctx.fillText(stats, statsX, itemY);
+                ctx.fillText(stats, x + width - padding, itemY);
                 ctx.textAlign = 'left';
             }
         }
@@ -491,15 +597,23 @@ class InventorySystem {
             const item = this.getSelectedItem();
             const isMisc = item.type === 'misc';
             
-            // Разные наборы действий для обычных предметов и предметов типа misc
+            // Получаем список действий
             const actions = isMisc ? [
                 'Выбросить',
                 'Подробности'
             ] : [
                 item.isEquipped ? 'Снять' : 'Экипировать',
+                // Добавляем опцию "Экипировать" для оружия со стаком, если оно уже экипировано
+                // но только для одноручного оружия и только если оно не экипировано в обе руки
+                (item.type === 'weapon' && 
+                 item.quantity > 1 && 
+                 item.isEquipped && 
+                 item.hands !== 'both' && 
+                 !(this.equipped.leftHand === item && this.equipped.rightHand === item)) ? 
+                    'Экипировать' : null,
                 'Выбросить',
                 'Подробности'
-            ];
+            ].filter(action => action !== null);
 
             // Вычисляем необходимую ширину меню
             let menuWidth = 160;
@@ -689,8 +803,8 @@ class InventorySystem {
             return;
         }
 
-        // Escape и i всегда закрывают инвентарь, но только если не открыто окно подробностей
-        if (key === 'Escape' || key === 'i') {
+        // i всегда закрывает инвентарь
+        if (key === 'i') {
             this.isOpen = false;
             this.actionMenuOpen = false;
             this.showingDetails = false;
@@ -710,7 +824,50 @@ class InventorySystem {
                 case ' ':
                 case 'Enter':
                     const hand = this.selectedHandIndex === 0 ? 'right' : 'left';
-                    this.equipItemToHand(this.selectedItemIndex, hand);
+                    const item = this.getSelectedItem();
+                    const handSlot = hand + 'Hand';
+                    
+                    // Двуручное оружие не должно попадать в это меню, но на всякий случай проверим
+                    if (item.hands === 'both') {
+                        // Для двуручного оружия просто снимаем его с обеих рук
+                        if (item.isEquipped) {
+                            this.unequipItem(this.selectedItemIndex);
+                        } else {
+                            this.equipItem(this.selectedItemIndex);
+                        }
+                        this.showHandSelectionMenu = false;
+                        return;
+                    }
+                    
+                    // Определяем, экипировать или снимать предмет
+                    if (item.isEquipped) {
+                        // Проверяем, не является ли текущий выбор попыткой экипировать уже экипированное
+                        // но в другую руку предмет (для предметов со стаком)
+                        const leftEquipped = this.equipped.leftHand === item;
+                        const rightEquipped = this.equipped.rightHand === item;
+                        const equipInOtherHand = item.quantity > 1 && 
+                                                 ((hand === 'left' && rightEquipped && !leftEquipped) || 
+                                                  (hand === 'right' && leftEquipped && !rightEquipped));
+                        
+                        if (equipInOtherHand) {
+                            // Экипируем предмет в выбранную руку
+                            this.equipped[handSlot] = item;
+                        } else {
+                            // Снимаем предмет с выбранной руки
+                            if (this.equipped[handSlot] === item) {
+                                this.equipped[handSlot] = null;
+                                
+                                // Если предмет больше не экипирован ни в одной руке, отмечаем его как неэкипированный
+                                if (this.equipped.leftHand !== item && this.equipped.rightHand !== item) {
+                                    item.isEquipped = false;
+                                }
+                            }
+                        }
+                    } else {
+                        // Экипируем предмет в выбранную руку
+                        this.equipItemToHand(this.selectedItemIndex, hand);
+                    }
+                    
                     this.showHandSelectionMenu = false;
                     return;
                 case 'Escape':
@@ -725,19 +882,37 @@ class InventorySystem {
         if (this.actionMenuOpen) {
             const item = this.getSelectedItem();
             const isMisc = item.type === 'misc';
-            const maxActions = isMisc ? 2 : 3; // 2 действия для misc, 3 для остальных
+            
+            // Получаем список действий
+            const actions = isMisc ? [
+                'Выбросить',
+                'Подробности'
+            ] : [
+                item.isEquipped ? 'Снять' : 'Экипировать',
+                // Добавляем опцию "Экипировать" для оружия со стаком, если оно уже экипировано
+                // но только для одноручного оружия и только если оно не экипировано в обе руки
+                (item.type === 'weapon' && 
+                 item.quantity > 1 && 
+                 item.isEquipped && 
+                 item.hands !== 'both' && 
+                 !(this.equipped.leftHand === item && this.equipped.rightHand === item)) ? 
+                    'Экипировать' : null,
+                'Выбросить',
+                'Подробности'
+            ].filter(action => action !== null);
 
             switch (key) {
                 case 'ArrowUp':
                 case 'ArrowDown':
                     this.selectedActionIndex = this.selectedActionIndex + (key === 'ArrowUp' ? -1 : 1);
                     if (this.selectedActionIndex < 0) {
-                        this.selectedActionIndex = maxActions - 1;
-                    } else if (this.selectedActionIndex >= maxActions) {
+                        this.selectedActionIndex = actions.length - 1;
+                    } else if (this.selectedActionIndex >= actions.length) {
                         this.selectedActionIndex = 0;
                     }
                     return;
                 case 'ArrowLeft':
+                case 'Escape':
                     this.actionMenuOpen = false;
                     return;
                 case ' ':
@@ -745,6 +920,15 @@ class InventorySystem {
                     this.toggleActionMenu();
                     return;
             }
+            return;
+        }
+
+        // Если нажат Escape и нет открытых меню - закрываем инвентарь
+        if (key === 'Escape') {
+            this.isOpen = false;
+            this.actionMenuOpen = false;
+            this.showingDetails = false;
+            this.showHandSelectionMenu = false;
             return;
         }
 
@@ -785,5 +969,24 @@ class InventorySystem {
         }
         lines.push(currentLine);
         return lines;
+    }
+
+    openInventory(x, y) {
+        // Проверяем, что инвентарь не открыт
+        if (this.isOpen) {
+            return;
+        }
+        
+        this.isOpen = true;
+        this.actionMenuOpen = false;
+        this.showingDetails = false;
+        this.showHandSelectionMenu = false;
+        this.selectedHandIndex = 0;
+        this.selectedItemIndex = 0;
+        this.currentPage = 0;
+        
+        // Сохраняем позицию для отображения
+        this.inventoryX = x;
+        this.inventoryY = y;
     }
 } 

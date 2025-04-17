@@ -13,16 +13,18 @@ class ContextMenu {
             background: rgba(0, 0, 0, 0.9);
             color: #fff;
             font-family: 'Press Start 2P', monospace;
-            font-size: 10px;
-            line-height: 1.5;
-            padding: 10px;
-            border: 1px solid #666;
+            font-size: 14px;
+            line-height: 1.8;
+            padding: 15px;
+            border: 2px solid #666;
             display: none;
             white-space: pre;
             z-index: 1000;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            min-width: 250px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         `;
         document.getElementById('gameContainer').appendChild(this.element);
 
@@ -126,6 +128,18 @@ class ContextMenu {
     getAvailableActions(x, y) {
         const actions = [];
         
+        // Проверяем, есть ли предметы на текущей клетке
+        const itemsOnCurrentTile = this.game.floorItems.filter(item => item.x === x && item.y === y);
+        if (itemsOnCurrentTile.length > 0) {
+            actions.push({
+                text: 'Подобрать предметы',
+                handler: () => {
+                    this.hide(); // Сначала закрываем меню
+                    this.game.lootWindow.open(); // Открываем окно подбора предметов
+                }
+            });
+        }
+        
         // Проверяем наличие двери рядом с игроком
         const doorPos = this.game.collisionSystem.canInteractWithDoor(x, y);
         if (doorPos) {
@@ -143,6 +157,15 @@ class ContextMenu {
                 });
             }
         }
+        
+        // Опция открытия инвентаря всегда доступна и всегда последняя
+        actions.push({
+            text: 'Открыть инвентарь',
+            handler: () => {
+                this.hide(); // Сначала закрываем меню
+                this.game.inventorySystem.toggleInventory(); // Используем toggleInventory вместо openInventory
+            }
+        });
         
         return actions;
     }

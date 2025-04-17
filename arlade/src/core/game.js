@@ -31,6 +31,9 @@ class Game {
         // Массив дверей с их состояниями
         this.doors = [];
         
+        // Массив предметов на земле
+        this.floorItems = [];
+        
         // Контекстное меню
         this.contextMenu = null;
         
@@ -112,6 +115,9 @@ class Game {
 
         // Инициализируем окно справки
         this.helpWindow = new HelpWindow(this);
+
+        // Инициализируем окно лута
+        this.lootWindow = new LootWindow(this);
         
         // Показываем главное меню
         if (this.enableMainMenu) {
@@ -454,6 +460,9 @@ class Game {
             this.mainMenu.render(this.ctx);
         }
 
+        // Отрисовываем окно лута
+        this.lootWindow.render(this.ctx);
+
         // Планируем следующий кадр
         this.gameLoopId = requestAnimationFrame(() => this.gameLoop());
     }
@@ -772,6 +781,9 @@ class Game {
         
         // Очищаем массив трупов
         this.corpses = [];
+        
+        // Очищаем массив предметов на земле
+        this.floorItems = [];
         
         // Очищаем лог
         hud.clearLog();
