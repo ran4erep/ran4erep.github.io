@@ -367,10 +367,28 @@ class Enemy {
         const newY = this.y + dy;
 
         if (this.canMoveTo(game, newX, newY)) {
+            // Проверяем, находится ли враг в поле зрения камеры
+            const visibleArea = game.camera.getVisibleArea();
+            const isInCameraView = !(
+                this.x < visibleArea.startTileX || this.x >= visibleArea.endTileX ||
+                this.y < visibleArea.startTileY || this.y >= visibleArea.endTileY
+            );
+
+            // Если враг в поле зрения камеры - анимируем движение
+            if (isInCameraView) {
+                this.isMoving = true;
+            }
+
+            // В любом случае обновляем позицию
             this.x = newX;
             this.y = newY;
-            // Начинаем анимацию движения
-            this.isMoving = true;
+            
+            // Если враг не в поле зрения - сразу обновляем визуальную позицию
+            if (!isInCameraView) {
+                this.visualX = this.x;
+                this.visualY = this.y;
+            }
+
             return true;
         }
 
@@ -623,11 +641,23 @@ class EnemySystem {
     }
 
     hasVisibleMovingEnemies() {
+        const visibleArea = this.game.camera.getVisibleArea();
+
         return this.enemies.some(enemy => {
-            const isVisible = visionSystem.isTileVisible(enemy.x, enemy.y);
+            // Проверяем, находится ли враг в поле зрения камеры
+            if (enemy.x < visibleArea.startTileX || enemy.x >= visibleArea.endTileX ||
+                enemy.y < visibleArea.startTileY || enemy.y >= visibleArea.endTileY) {
+                return false;
+            }
+
+            // Проверяем видимость врага (не в чёрном тумане войны)
+            const visibility = visionSystem.visibilityMap[enemy.y][enemy.x];
+            if (visibility === 0) {
+                return false;
+            }
+
             // Проверяем только реальное движение (атака или перемещение)
-            // Игнорируем эффект полёта
-            return isVisible && (enemy.isMoving || enemy.isAttacking);
+            return enemy.isMoving || enemy.isAttacking;
         });
     }
 } 

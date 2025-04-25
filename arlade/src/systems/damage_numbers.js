@@ -1,12 +1,13 @@
 class DamageNumber {
-    constructor(x, y, damage, isPlayerDamage, isDodged = false) {
+    constructor(x, y, damage, isPlayerDamage, isDodged = false, isLevelUp = false) {
         this.x = x;
         this.y = y;
         this.damage = damage;
         this.isPlayerDamage = isPlayerDamage;
         this.isDodged = isDodged;
+        this.isLevelUp = isLevelUp;
         this.startTime = performance.now();
-        this.duration = 1500; // 1.5 секунды на анимацию
+        this.duration = isLevelUp ? 3000 : 1500; // 3 секунды для нового уровня, 1.5 для урона
         
         // Случайные параметры для более интересной анимации
         this.angle = (Math.random() - 0.5) * 0.5; // Небольшой случайный угол для отклонения
@@ -24,6 +25,10 @@ class DamageNumberSystem {
     
     addNumber(x, y, damage, isPlayerDamage, isDodged = false) {
         this.numbers.push(new DamageNumber(x, y, damage, isPlayerDamage, isDodged));
+    }
+
+    addLevelUp(x, y) {
+        this.numbers.push(new DamageNumber(x, y, null, false, false, true));
     }
     
     update() {
@@ -72,17 +77,17 @@ class DamageNumberSystem {
             const alpha = fadeIn * fadeOut;
             
             // Формируем текст
-            const text = number.isDodged ? 'ПРОМАХ' : `-${number.damage}`;
+            const text = number.isLevelUp ? 'НОВЫЙ УРОВЕНЬ' : (number.isDodged ? 'ПРОМАХ' : `-${number.damage}`);
             
             // Рисуем тень
             ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.5})`;
             ctx.fillText(text, x + 1, y + 1);
             
-            // Рисуем текст (белым для промаха, красным для урона)
+            // Рисуем текст
             ctx.strokeStyle = `rgba(100, 0, 0, ${alpha})`;
-            ctx.fillStyle = number.isDodged ? 
-                `rgba(255, 255, 255, ${alpha})` : 
-                `rgba(255, 50, 50, ${alpha})`;
+            ctx.fillStyle = number.isLevelUp ? 
+                `rgba(255, 215, 0, ${alpha})` : // Золотой для нового уровня
+                (number.isDodged ? `rgba(255, 255, 255, ${alpha})` : `rgba(255, 50, 50, ${alpha})`);
             
             ctx.lineWidth = 3;
             ctx.strokeText(text, x, y);

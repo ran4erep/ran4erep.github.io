@@ -320,7 +320,7 @@ class HUD {
             this.healthBar.style.backgroundColor = color;
             
             // Обновляем текст здоровья
-            this.healthText.textContent = `${game.playerHealth}`;
+            this.healthText.textContent = `${game.playerHealth}/${game.maxHealth}`;
         }
 
         // Обновляем отображение опыта

@@ -88,6 +88,7 @@ class Game {
         // Инициализируем системы
         this.inputSystem = null;
         this.inventorySystem = null;
+        this.itemEffectsSystem = null;
     }
 
     // Инициализация всех систем
@@ -100,6 +101,8 @@ class Game {
         this.combatSystem = new CombatSystem(this);
         this.damageNumberSystem = new DamageNumberSystem(this);
         this.inventorySystem = new InventorySystem(this);
+        this.particleSystem = new ParticleSystem(this);
+        this.itemEffectsSystem = new ItemEffectsSystem(this);
         
         // Инициализируем контекстное меню
         this.contextMenu = new ContextMenu(this);
@@ -225,6 +228,9 @@ class Game {
         // Очищаем массив противников
         this.enemySystem.enemies = [];
 
+        // Очищаем массив предметов на полу
+        this.floorItems = [];
+
         // Вычисляем размеры карты из layout
         this.currentMap.height = this.currentMap.layout.length;
         this.currentMap.width = this.currentMap.layout[0].length;
@@ -247,6 +253,20 @@ class Game {
                         const floorSymbol = Object.entries(this.currentMap.objects).find(([_, obj]) => obj.type === 'floor')[0];
                         this.currentMap.layout[y] = this.currentMap.layout[y].substring(0, x) + floorSymbol + this.currentMap.layout[y].substring(x + 1);
                     }
+                }
+            }
+        }
+
+        // Загружаем предметы на пол
+        if (mapData.floor_items) {
+            for (const floorItem of mapData.floor_items) {
+                const itemData = this.inventorySystem.itemsData[floorItem.id];
+                if (itemData) {
+                    this.floorItems.push({
+                        x: floorItem.x,
+                        y: floorItem.y,
+                        item: {...itemData, id: floorItem.id, quantity: 1}
+                    });
                 }
             }
         }
@@ -440,6 +460,9 @@ class Game {
 
         // Проверяем завершение анимаций врагов и выполняем оставшиеся ходы
         this.checkEnemyAnimations();
+
+        // Обновляем все системы
+        this.update();
 
         // Обновляем видимость и рендерим
         visionSystem.update(this.playerX, this.playerY, this.currentMap.layout, this.lookDirection);
@@ -754,10 +777,14 @@ class Game {
     }
 
     update() {
-        // Обновляем системы
-        this.inputSystem.update();
-        this.enemySystem.update();
+        // Обновляем числа урона
         this.damageNumberSystem.update();
+        
+        // Обновляем частицы
+        this.particleSystem.update();
+        
+        // Обновляем анимации врагов
+        this.checkEnemyAnimations();
     }
 
     async startNewGame() {
@@ -810,12 +837,12 @@ class Game {
         this.experience -= this.experienceToNextLevel;
         // Каждый следующий уровень требует на 60% больше опыта
         this.experienceToNextLevel = Math.floor(this.experienceToNextLevel * 1.6);
-        // Восстанавливаем здоровье при повышении уровня
-        this.playerHealth = this.maxHealth;
         // Устанавливаем флаг повышения уровня
         this.justLeveledUp = true;
         // Добавляем сообщение в лог
         hud.addLogMessage(`Вы достигли ${this.level} уровня!`, 'level-up');
+        // Добавляем всплывающий текст
+        this.damageNumberSystem.addLevelUp(this.playerX, this.playerY);
     }
 }
 

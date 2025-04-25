@@ -54,5 +54,13 @@
     "loot": {
         "file": "ui",
         "name": "loot"
+    },
+    "brazier": {
+        "file": "tiles",
+        "name": "brazier"
+    },
+    "vase": {
+        "file": "tiles",
+        "name": "vase"
     }
 } 

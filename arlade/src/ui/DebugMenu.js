@@ -155,9 +155,19 @@ class DebugMenu {
     handleKeyDown(e) {
         if (e.code === 'Delete') {
             e.preventDefault();
+            
+            // Если меню уже открыто, закрываем его
             if (this.isVisible) {
                 this.hide();
-            } else {
+                return;
+            }
+            
+            // Проверяем, активно ли какое-то другое меню
+            const activeUI = this.game.inputSystem.getActiveUI();
+            
+            // Открываем отладочное меню только если мы в обычном режиме игры или в режиме осмотра
+            // И не открыто меню паузы
+            if (activeUI === 'gameControls' || activeUI === 'lookMode') {
                 this.show();
             }
             return;

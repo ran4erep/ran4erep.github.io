@@ -131,6 +131,9 @@ class CombatSystem {
                     false // это не уклонение
                 );
                 
+                // Создаём эффект крови
+                this.game.particleSystem.createBloodEffect(this.game.playerX, this.game.playerY);
+                
                 // Выводим сообщение в лог
                 hud.addLogMessage(`${enemy.pendingAttack.enemyName} ${enemy.pendingAttack.attackName} вас на ${enemy.pendingAttack.damage} единиц урона!`, 'enemy-attack');
                 
@@ -286,48 +289,53 @@ class CombatSystem {
         const enemy = this.game.attackTarget;
         if (!enemy) return;
 
-        // Если атака попала
-        if (enemy.wasHit) {
-            enemy.health -= enemy.pendingDamage;
+        if (enemy.pendingDamage !== undefined) {
+            if (enemy.wasHit) {
+                // Создаём эффект крови
+                this.game.particleSystem.createBloodEffect(enemy.x, enemy.y);
+                
+                // Наносим урон
+                enemy.health -= enemy.pendingDamage;
 
-            // Если враг погиб
-            if (enemy.health <= 0) {
-                // Добавляем сообщение о смерти противника
-                hud.addLogMessage(`${ENEMY_TYPES[enemy.type].description} погиб!`, 'enemy-death');
-                
-                // Рассчитываем опыт за убийство
-                const enemyType = ENEMY_TYPES[enemy.type];
-                const maxDamage = enemyType.attacks.reduce((max, attack) => {
-                    const [count, sides] = attack.damage.toLowerCase().split('d').map(Number);
-                    return Math.max(max, count * sides);
-                }, 0);
-                
-                // Рассчитываем множитель случайности
-                const randomFactor = 0.9 + (Math.random() * 0.2);
-                
-                // Формула: XP = (MaxDamage * 4) * (1 + 0.1 * FloorNumber) * RandomFactor
-                const xp = Math.floor((maxDamage * 4) * (1 + 0.1 * this.game.floorNumber) * randomFactor);
-                
-                // Добавляем сообщение о полученном опыте
-                hud.addLogMessage(`Вы получили ${xp} опыта!`, 'experience');
-                
-                // Начисляем опыт
-                this.game.gainExperience(xp);
+                // Если враг погиб
+                if (enemy.health <= 0) {
+                    // Добавляем сообщение о смерти противника
+                    hud.addLogMessage(`${ENEMY_TYPES[enemy.type].description} погиб!`, 'enemy-death');
+                    
+                    // Рассчитываем опыт за убийство
+                    const enemyType = ENEMY_TYPES[enemy.type];
+                    const maxDamage = enemyType.attacks.reduce((max, attack) => {
+                        const [count, sides] = attack.damage.toLowerCase().split('d').map(Number);
+                        return Math.max(max, count * sides);
+                    }, 0);
+                    
+                    // Рассчитываем множитель случайности
+                    const randomFactor = 0.9 + (Math.random() * 0.6);
+                    
+                    // Формула: XP = (MaxDamage * 4) * (1 + 0.1 * FloorNumber) * RandomFactor
+                    const xp = Math.floor((maxDamage * 4) * (1 + 0.1 * this.game.floorNumber) * randomFactor);
+                    
+                    // Добавляем сообщение о полученном опыте
+                    hud.addLogMessage(`Вы получили ${xp} опыта!`, 'experience');
+                    
+                    // Начисляем опыт
+                    this.game.gainExperience(xp);
 
-                // Создаём труп на месте врага
-                const corpse = {
-                    x: enemy.x,
-                    y: enemy.y,
-                    type: 'corpse',
-                    glyph: 'corpse',
-                    z_index: 3 // Отображаем под врагами, но над полом
-                };
-                this.game.corpses.push(corpse);
+                    // Создаём труп на месте врага
+                    const corpse = {
+                        x: enemy.x,
+                        y: enemy.y,
+                        type: 'corpse',
+                        glyph: 'corpse',
+                        z_index: 3 // Отображаем под врагами, но над полом
+                    };
+                    this.game.corpses.push(corpse);
 
-                // Удаляем врага из списка
-                const index = this.game.enemySystem.enemies.indexOf(enemy);
-                if (index !== -1) {
-                    this.game.enemySystem.enemies.splice(index, 1);
+                    // Удаляем врага из списка
+                    const index = this.game.enemySystem.enemies.indexOf(enemy);
+                    if (index !== -1) {
+                        this.game.enemySystem.enemies.splice(index, 1);
+                    }
                 }
             }
         }

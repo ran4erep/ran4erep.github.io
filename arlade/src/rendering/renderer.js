@@ -73,8 +73,7 @@ class Renderer {
     // Основной метод отрисовки
     render() {
         // Очищаем canvas
-        this.ctx.fillStyle = '#000000';
-        this.ctx.fillRect(0, 0, this.game.canvas.width, this.game.canvas.height);
+        this.ctx.clearRect(0, 0, this.game.canvas.width, this.game.canvas.height);
         
         // Получаем видимую область карты
         const visibleArea = this.game.camera.getVisibleArea();
@@ -89,6 +88,9 @@ class Renderer {
         
         // Отрисовываем числа урона
         this.game.damageNumberSystem.render(this.ctx, this.camera);
+        
+        // Отрисовываем частицы
+        this.game.particleSystem.render(this.ctx, this.camera);
         
         // Отрисовываем HUD поверх всего
         hud.render();
@@ -136,7 +138,7 @@ class Renderer {
                     x: corpse.x,
                     y: corpse.y,
                     glyph: corpse.glyph,
-                    z_index: corpse.z_index
+                    z_index: 4
                 });
             }
         });
@@ -167,7 +169,7 @@ class Renderer {
                                 y: y,
                                 type: 'floor',
                                 glyph: floorObject.glyph,
-                                z_index: 0
+                                z_index: 0  // Пол всегда снизу
                             });
                         }
 
@@ -177,14 +179,32 @@ class Renderer {
                             // Проверяем видимость тайла
                             const visibility = visionSystem.visibilityMap[y][x];
                             if (this.game.debugMode?.noFog || visibility > 0) {
+                                // Проверяем, есть ли на этой клетке дверь
+                                const door = this.game.doors.find(d => d.x === x && d.y === y);
                                 renderQueue.push({
                                     x: x,
                                     y: y,
                                     type: 'corpse',
                                     glyph: 'corpse',
-                                    z_index: 3
+                                    z_index: door && !door.isOpened ? 1 : 4  // Если есть закрытая дверь - труп под ней, иначе над полом
                                 });
                             }
+                        }
+
+                        // Определяем z-index в зависимости от типа объекта
+                        let objectZIndex;
+                        switch (object.type) {
+                            case 'wall':
+                                objectZIndex = 2;  // Стены
+                                break;
+                            case 'door':
+                                objectZIndex = 2;  // Двери на том же уровне что и стены
+                                break;
+                            case 'decoration':
+                                objectZIndex = 3;  // Декорации (бочки и т.д.)
+                                break;
+                            default:
+                                objectZIndex = 3;  // Все остальные объекты
                         }
 
                         // Специальная обработка для дверей
@@ -196,7 +216,7 @@ class Renderer {
                                     y: y,
                                     type: 'door',
                                     glyph: door.isOpened ? 'openedDoor' : 'door',
-                                    z_index: 1
+                                    z_index: objectZIndex
                                 });
                                 continue;
                             }
@@ -207,7 +227,7 @@ class Renderer {
                             y: y,
                             type: object.type,
                             glyph: object.glyph,
-                            z_index: object.type === 'wall' ? 1 : 2
+                            z_index: objectZIndex
                         });
                     }
                 }
@@ -249,7 +269,7 @@ class Renderer {
                         y: enemy.visualY,
                         type: 'enemy',
                         glyph: enemy.getGlyphName(),
-                        z_index: enemy.isAttacking ? 10 : ENEMY_TYPES[enemy.type].z_index // Атакующий враг отображается поверх всего
+                        z_index: enemy.isAttacking ? 10 : 4 // Атакующий враг отображается поверх всего
                     });
                     
                     // Если у врага есть глиф состояния, добавляем его над врагом

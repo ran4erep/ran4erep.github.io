@@ -9,16 +9,38 @@ class LootWindow {
         this.selectedActionIndex = 0;
         this.showingDetails = false;
         this.windowHeight = 0; // Сохраняем высоту окна
+        // Добавляем новые состояния для окна регулировки количества
+        this.showQuantityWindow = false;
+        this.pickupQuantity = 1;
     }
 
     open() {
         // Получаем все предметы на текущей позиции игрока
-        this.items = this.game.floorItems
+        const floorItems = this.game.floorItems
             .filter(item => 
                 item.x === this.game.playerX && 
                 item.y === this.game.playerY
-            )
-            .map(item => item.item);
+            );
+
+        // Группируем одинаковые предметы
+        const groupedItems = new Map();
+        floorItems.forEach(floorItem => {
+            const item = floorItem.item;
+            const key = item.id;
+            if (!groupedItems.has(key)) {
+                groupedItems.set(key, {
+                    ...item,
+                    quantity: 1,
+                    floorItems: [floorItem]  // Переименовываем originalItems в floorItems
+                });
+            } else {
+                const existingItem = groupedItems.get(key);
+                existingItem.quantity++;
+                existingItem.floorItems.push(floorItem);  // Используем floorItems вместо originalItems
+            }
+        });
+
+        this.items = Array.from(groupedItems.values());
 
         if (this.items.length > 0) {
             this.isOpen = true;
@@ -31,7 +53,7 @@ class LootWindow {
             const headerHeight = 60;
             const footerHeight = 40;
             const itemHeight = 25;
-            const itemsOnFirstPage = Math.min(this.items.length, 6); // Берём минимум между количеством предметов и 6
+            const itemsOnFirstPage = Math.min(this.items.length, 6);
             this.windowHeight = headerHeight + (itemsOnFirstPage * itemHeight) + footerHeight;
         }
     }
@@ -53,7 +75,12 @@ class LootWindow {
     moveSelection(direction) {
         if (this.actionMenuOpen) {
             // Перемещаем выбор в меню действий
-            const actions = ['Поднять', 'Подробности'];
+            const item = this.items[this.selectedIndex];
+            const actions = [
+                'Поднять',
+                item.quantity > 1 ? 'Поднять всё' : null,
+                'Подробнее'
+            ].filter(action => action !== null);
             
             this.selectedActionIndex += direction;
             if (this.selectedActionIndex < 0) {
@@ -126,11 +153,30 @@ class LootWindow {
             this.selectedActionIndex = 0;
         } else {
             const item = this.items[this.selectedIndex];
-            switch (this.selectedActionIndex) {
-                case 0: // Поднять
-                    this.pickupSelectedItem();
+            
+            // Получаем список действий
+            const actions = [
+                'Поднять',
+                item.quantity > 1 ? 'Поднять всё' : null,
+                'Подробнее'
+            ].filter(action => action !== null);
+
+            // Получаем выбранное действие
+            const selectedAction = actions[this.selectedActionIndex];
+
+            switch (selectedAction) {
+                case 'Поднять':
+                    if (item.quantity > 1) {
+                        this.showQuantityWindow = true;
+                        this.pickupQuantity = 1;
+                    } else {
+                        this.pickupSelectedItem(false);
+                    }
                     break;
-                case 1: // Подробности
+                case 'Поднять всё':
+                    this.pickupSelectedItem(true);
+                    break;
+                case 'Подробнее':
                     this.showingDetails = true;
                     // Устанавливаем максимальную высоту окна как в инвентаре
                     const headerHeight = 60;
@@ -161,6 +207,28 @@ class LootWindow {
             return;
         }
 
+        // Если открыто окно выбора количества
+        if (this.showQuantityWindow) {
+            const item = this.items[this.selectedIndex];
+            switch (key) {
+                case 'ArrowLeft':
+                    this.pickupQuantity = Math.max(1, this.pickupQuantity - 1);
+                    return;
+                case 'ArrowRight':
+                    this.pickupQuantity = Math.min(item.quantity, this.pickupQuantity + 1);
+                    return;
+                case 'Space':
+                    this.pickupSelectedItem(false, this.pickupQuantity);
+                    this.showQuantityWindow = false;
+                    return;
+                case 'Escape':
+                    this.showQuantityWindow = false;
+                    this.actionMenuOpen = true;
+                    return;
+            }
+            return;
+        }
+
         // Escape всегда закрывает окно, но только если не открыто окно подробностей
         if (key === 'Escape') {
             if (this.actionMenuOpen) {
@@ -181,7 +249,6 @@ class LootWindow {
                     this.actionMenuOpen = false;
                     return;
                 case 'Space':
-                case 'Enter':
                     this.toggleActionMenu();
                     return;
             }
@@ -207,47 +274,59 @@ class LootWindow {
         }
     }
 
-    pickupSelectedItem() {
+    pickupSelectedItem(pickupAll = false, quantity = 1) {
         const item = this.items[this.selectedIndex];
         if (item) {
+            // Определяем количество предметов для подбора
+            const quantityToPickup = pickupAll ? item.quantity : quantity;
+            
             // Добавляем предмет в инвентарь
-            this.game.inventorySystem.addItem(item.id);
+            this.game.inventorySystem.addItem(item.id, quantityToPickup);
             
-            // Находим индекс предмета в массиве floorItems
-            const floorItemIndex = this.game.floorItems.findIndex(
-                fi => fi.x === this.game.playerX && 
-                     fi.y === this.game.playerY && 
-                     fi.item === item
-            );
-            
-            // Удаляем предмет из массива floorItems
-            if (floorItemIndex !== -1) {
-                this.game.floorItems.splice(floorItemIndex, 1);
-            }
-            
-            // Сохраняем текущую страницу и количество предметов на странице
-            const itemsPerPage = this.getItemsPerPage();
-            const currentPageBefore = this.currentPage;
-            
-            // Удаляем предмет из списка
-            this.items.splice(this.selectedIndex, 1);
-            
-            // Проверяем, был ли это последний предмет на странице
-            const totalPages = Math.ceil(this.items.length / itemsPerPage);
-            
-            // Если текущая страница больше не существует, переходим на предыдущую
-            if (this.currentPage >= totalPages && totalPages > 0) {
-                this.currentPage = totalPages - 1;
-                this.selectedIndex = this.currentPage * itemsPerPage;
-            } else if (this.selectedIndex >= this.items.length) {
-                // Если текущий индекс больше количества предметов, 
-                // устанавливаем его на последний предмет
-                this.selectedIndex = Math.max(0, this.items.length - 1);
-            }
-            
-            // Если предметов больше нет, закрываем меню
-            if (this.items.length === 0) {
-                this.close();
+            // Если подбираем не все предметы, уменьшаем количество
+            if (!pickupAll && item.quantity > quantityToPickup) {
+                item.quantity -= quantityToPickup;
+                
+                // Удаляем нужное количество предметов с пола
+                for (let i = 0; i < quantityToPickup; i++) {
+                    const floorItem = item.floorItems[i];  // Используем floorItems
+                    const floorItemIndex = this.game.floorItems.indexOf(floorItem);
+                    if (floorItemIndex !== -1) {
+                        this.game.floorItems.splice(floorItemIndex, 1);
+                        item.floorItems.splice(i, 1);  // Удаляем из массива floorItems
+                    }
+                }
+            } else {
+                // Если подбираем все или остался последний предмет
+                // Удаляем все предметы с пола
+                item.floorItems.forEach(floorItem => {  // Используем floorItems
+                    const floorItemIndex = this.game.floorItems.indexOf(floorItem);
+                    if (floorItemIndex !== -1) {
+                        this.game.floorItems.splice(floorItemIndex, 1);
+                    }
+                });
+                
+                // Удаляем предмет из списка
+                this.items.splice(this.selectedIndex, 1);
+                
+                // Проверяем, был ли это последний предмет на странице
+                const itemsPerPage = this.getItemsPerPage();
+                const totalPages = Math.ceil(this.items.length / itemsPerPage);
+                
+                // Если текущая страница больше не существует, переходим на предыдущую
+                if (this.currentPage >= totalPages && totalPages > 0) {
+                    this.currentPage = totalPages - 1;
+                    this.selectedIndex = this.currentPage * itemsPerPage;
+                } else if (this.selectedIndex >= this.items.length) {
+                    // Если текущий индекс больше количества предметов, 
+                    // устанавливаем его на последний предмет
+                    this.selectedIndex = Math.max(0, this.items.length - 1);
+                }
+                
+                // Если предметов больше нет, закрываем меню
+                if (this.items.length === 0) {
+                    this.close();
+                }
             }
         }
     }
@@ -279,7 +358,8 @@ class LootWindow {
         
         // Находим максимальную ширину имён предметов и их характеристик
         this.items.forEach(item => {
-            const nameWidth = ctx.measureText(item.name).width;
+            const nameText = item.name + (item.quantity > 1 ? ` x${item.quantity}` : '');
+            const nameWidth = ctx.measureText(nameText).width;
             maxNameWidth = Math.max(maxNameWidth, nameWidth);
             
             const stats = this.getItemStats(item);
@@ -335,7 +415,8 @@ class LootWindow {
 
             // Название предмета
             ctx.fillStyle = '#fff';
-            ctx.fillText(item.name, x + padding, itemY);
+            const nameText = item.name + (item.quantity > 1 ? ` x${item.quantity}` : '');
+            ctx.fillText(nameText, x + padding, itemY);
 
             // Характеристики предмета
             const stats = this.getItemStats(item);
@@ -357,7 +438,12 @@ class LootWindow {
 
         // Меню действий
         if (this.actionMenuOpen && this.items.length > 0) {
-            const actions = ['Поднять', 'Подробности'];
+            const item = this.items[this.selectedIndex];
+            const actions = [
+                'Поднять',
+                item.quantity > 1 ? 'Поднять всё' : null,
+                'Подробнее'
+            ].filter(action => action !== null);
 
             // Вычисляем необходимую ширину меню
             let menuWidth = 160;
@@ -457,6 +543,53 @@ class LootWindow {
             ctx.fillStyle = '#fff';
             ctx.textAlign = 'center';
             ctx.fillText('Закрыть', x + width/2, buttonY + 20);
+        }
+
+        // Окно выбора количества
+        if (this.showQuantityWindow && this.items.length > 0) {
+            const item = this.items[this.selectedIndex];
+            
+            // Размеры окна
+            const windowWidth = 300;
+            const windowHeight = 150;
+            const windowX = x + (width - windowWidth) / 2;
+            const windowY = y + (height - windowHeight) / 2;
+            
+            // Фон окна
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+            ctx.fillRect(windowX, windowY, windowWidth, windowHeight);
+            
+            // Рамка окна
+            ctx.strokeStyle = '#666';
+            ctx.strokeRect(windowX, windowY, windowWidth, windowHeight);
+            
+            // Заголовок
+            ctx.font = '16px "Press Start 2P"';
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.fillText('КОЛИЧЕСТВО', windowX + windowWidth/2, windowY + 40);
+            
+            // Слайдер
+            const sliderWidth = 200;
+            const sliderX = windowX + (windowWidth - sliderWidth) / 2;
+            const sliderY = windowY + 80;
+            
+            // Фон слайдера
+            ctx.fillStyle = '#444';
+            ctx.fillRect(sliderX, sliderY, sliderWidth, 4);
+            
+            // Позиция ползунка
+            const handlePosition = Math.floor((this.pickupQuantity - 1) * (sliderWidth - 20) / (item.quantity - 1));
+            
+            // Ползунок
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(sliderX + handlePosition, sliderY - 8, 20, 20);
+            
+            // Текст количества
+            ctx.font = '12px "Press Start 2P"';
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${this.pickupQuantity} из ${item.quantity}`, windowX + windowWidth/2, windowY + 120);
         }
     }
 } 

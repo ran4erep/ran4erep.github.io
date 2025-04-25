@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arlade</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'Press Start 2P';
+            src: url('src/data/fonts/PressStart2P-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -163,6 +167,8 @@
     <script src="src/systems/combat.js"></script>
     <script src="src/systems/damage_numbers.js"></script>
     <script src="src/systems/InventorySystem.js"></script>
+    <script src="src/systems/particle_system.js"></script>
+    <script src="src/systems/ItemEffectsSystem.js"></script>
     <script src="src/ui/StatsWindow.js"></script>
     <script src="src/ui/HelpWindow.js"></script>
     <script src="src/ui/LoadingScreen.js"></script>

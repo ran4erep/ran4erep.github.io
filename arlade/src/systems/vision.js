@@ -10,6 +10,9 @@ class VisionSystem {
         
         // Временная карта для обработки видимости
         this.tempVisibility = [];
+
+        // Массив активных источников света
+        this.activeLightSources = [];
     }
 
     // Метод для получения точек круга по алгоритму Брезенхэма
@@ -123,7 +126,18 @@ class VisionSystem {
             }
         }
 
-        // Отмечаем все видимые клетки в радиусе видимости
+        // Отмечаем все видимые клетки в радиусе видимости игрока
+        this.updatePlayerVision(playerX, playerY, layout);
+
+        // Проверяем новые источники света в поле зрения игрока
+        this.checkForNewLightSources(layout);
+
+        // Обновляем освещение от активных источников света
+        this.updateLightSourcesVision(layout);
+    }
+
+    // Обновление видимости от игрока
+    updatePlayerVision(playerX, playerY, layout) {
         for (let dy = -this.VIEW_DISTANCE; dy <= this.VIEW_DISTANCE; dy++) {
             for (let dx = -this.VIEW_DISTANCE; dx <= this.VIEW_DISTANCE; dx++) {
                 const x = playerX + dx;
@@ -143,6 +157,60 @@ class VisionSystem {
                         else if (this.hasLineOfSight(playerX, playerY, x, y, layout)) {
                             this.tempVisibility[y][x] = true;
                             this.visibilityMap[y][x] = 2;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Проверка новых источников света
+    checkForNewLightSources(layout) {
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                // Если клетка видна сейчас
+                if (this.tempVisibility[y][x]) {
+                    const symbol = layout[y][x];
+                    const object = game.currentMap.objects[symbol];
+                    
+                    // Если это источник света и его ещё нет в активных
+                    if (object && object.type === 'lightSource') {
+                        const isNew = !this.activeLightSources.some(light => 
+                            light.x === x && light.y === y
+                        );
+                        
+                        if (isNew) {
+                            this.activeLightSources.push({
+                                x: x,
+                                y: y,
+                                radius: object.radius || 3
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Обновление освещения от источников света
+    updateLightSourcesVision(layout) {
+        for (const light of this.activeLightSources) {
+            for (let dy = -light.radius; dy <= light.radius; dy++) {
+                for (let dx = -light.radius; dx <= light.radius; dx++) {
+                    const x = light.x + dx;
+                    const y = light.y + dy;
+                    
+                    if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
+                        const manhattan = Math.abs(dx) + Math.abs(dy);
+                        
+                        if (manhattan <= light.radius + 1) {
+                            // Проверяем линию видимости от источника света
+                            if (this.hasLineOfSight(light.x, light.y, x, y, layout)) {
+                                // Если клетка исследована (серый туман)
+                                if (this.visibilityMap[y][x] === 1) {
+                                    this.visibilityMap[y][x] = 2;
+                                }
+                            }
                         }
                     }
                 }
