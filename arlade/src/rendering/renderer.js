@@ -619,11 +619,31 @@ class Renderer {
             // Проверяем, есть ли предметы на земле
             const itemsOnTile = this.game.floorItems.filter(item => item.x === lookX && item.y === lookY);
             if (itemsOnTile.length > 0) {
-                if (itemsOnTile.length === 1) {
-                    // Если один предмет, показываем его название
-                    description = `Здесь лежит ${itemsOnTile[0].item.name}`;
+                // Группируем одинаковые предметы
+                const groupedItems = new Map();
+                itemsOnTile.forEach(floorItem => {
+                    const item = floorItem.item;
+                    const key = item.id;
+                    if (!groupedItems.has(key)) {
+                        groupedItems.set(key, {
+                            ...item,
+                            quantity: 1
+                        });
+                    } else {
+                        const existingItem = groupedItems.get(key);
+                        existingItem.quantity++;
+                    }
+                });
+
+                // Преобразуем Map в массив
+                const items = Array.from(groupedItems.values());
+
+                if (items.length === 1) {
+                    // Если один тип предмета
+                    const item = items[0];
+                    description = `Здесь лежит ${item.name}${item.quantity > 1 ? ` (${item.quantity} шт.)` : ''}`;
                 } else {
-                    // Если несколько предметов, по-прежнему показываем общую надпись
+                    // Если несколько разных предметов
                     description = 'Здесь лежат предметы';
                 }
             } else {

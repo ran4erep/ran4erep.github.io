@@ -27,6 +27,10 @@ class InputSystem {
         // Флаг возможности зажатия клавиш
         this.canHoldKeys = true;
         
+        // Сохраняем ссылки на обработчики
+        this.keyDownHandler = null;
+        this.keyUpHandler = null;
+        
         this.bindKeys();
     }
 
@@ -34,7 +38,12 @@ class InputSystem {
     getActiveUI() {
         // Последовательность проверки важна - проверяем от "высших" к "низшим" по приоритету
         
-        // Главное меню и меню паузы имеют наивысший приоритет
+        // Экран окончания игры имеет наивысший приоритет
+        if (this.game.isDead) {
+            return 'gameOver';
+        }
+
+        // Главное меню и меню паузы имеют следующий приоритет
         if (this.game.mainMenu?.isVisible) {
             return this.game.mainMenu.isPauseMenu ? 'pauseMenu' : 'mainMenu';
         }
@@ -71,7 +80,8 @@ class InputSystem {
     }
 
     bindKeys() {
-        document.addEventListener('keydown', (e) => {
+        // Создаём обработчики и сохраняем на них ссылки
+        this.keyDownHandler = (e) => {
             // Проверяем видимость врагов для зажатия клавиш
             const visibleArea = this.game.camera.getVisibleArea();
             const visibleEnemies = this.game.enemySystem.enemies.filter(enemy => {
@@ -96,6 +106,13 @@ class InputSystem {
             
             // Обрабатываем ввод в зависимости от активного UI
             switch (activeUI) {
+                case 'gameOver':
+                    // На экране окончания игры обрабатываем только Space и Enter
+                    if (e.code === 'Space' || e.code === 'Enter') {
+                        gameOverScreen.handleKeyPress(e);
+                    }
+                    return;
+
                 case 'mainMenu':
                 case 'pauseMenu':
                     // В главном меню и меню паузы клавиши обрабатываются самим меню
@@ -183,6 +200,29 @@ class InputSystem {
                     // Закрытие окна статистики
                     if (e.code === 'Escape') {
                         this.game.statsWindow.toggle();
+                        return;
+                    }
+                    // Обработка клавиш для прокачки статов
+                    switch (e.code) {
+                        case 'ArrowUp':
+                        case 'KeyW':
+                            this.game.statsWindow.handleKeyPress('ArrowUp');
+                            break;
+                        case 'ArrowDown':
+                        case 'KeyS':
+                            this.game.statsWindow.handleKeyPress('ArrowDown');
+                            break;
+                        case 'ArrowLeft':
+                        case 'KeyA':
+                            this.game.statsWindow.handleKeyPress('ArrowLeft');
+                            break;
+                        case 'ArrowRight':
+                        case 'KeyD':
+                            this.game.statsWindow.handleKeyPress('ArrowRight');
+                            break;
+                        case 'Space':
+                            this.game.statsWindow.handleKeyPress('Space');
+                            break;
                     }
                     return;
                     
@@ -323,9 +363,9 @@ class InputSystem {
                     }
                     break;
             }
-        });
+        };
 
-        document.addEventListener('keyup', (e) => {
+        this.keyUpHandler = (e) => {
             // Освобождаем клавиши даже при активных UI элементах, 
             // чтобы избежать "залипания" при переключении между меню
             switch (e.code) {
@@ -360,7 +400,29 @@ class InputSystem {
                     }
                     break;
             }
-        });
+
+            const activeUI = this.getActiveUI();
+
+            // Если открыт инвентарь и окно выбора количества
+            if (activeUI === 'inventory' && this.game.inventorySystem.showQuantityWindow) {
+                // Очищаем интервал при отпускании клавиши
+                this.game.inventorySystem.clearKeyHoldInterval();
+            }
+        };
+
+        // Добавляем обработчики
+        document.addEventListener('keydown', this.keyDownHandler);
+        document.addEventListener('keyup', this.keyUpHandler);
+    }
+
+    // Метод для удаления обработчиков
+    unbindKeys() {
+        if (this.keyDownHandler) {
+            document.removeEventListener('keydown', this.keyDownHandler);
+        }
+        if (this.keyUpHandler) {
+            document.removeEventListener('keyup', this.keyUpHandler);
+        }
     }
 
     update() {

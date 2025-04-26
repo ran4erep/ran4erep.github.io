@@ -116,5 +116,29 @@
             "U": "#6c251e",
             "T": "#934226"
         }
+    },
+    "magic": {
+        "pixels": [
+            "----------------",
+            "-----------L----",
+            "-----LL---LLL---",
+            "----LSSL-LLSLL--",
+            "----LSSL--LLL---",
+            "---LSSSSL--L----",
+            "--LSSSSSSL------",
+            "-LSSSSSSSSL-----",
+            "-LSSSSSSSSL-L---",
+            "--LSSSSSSL-LSL--",
+            "---LSSSSL--LSL--",
+            "----LSSL-LSSSSSL",
+            "----LSSL-LSSSSSL",
+            "-----LL----LSL--",
+            "-----------LSL--",
+            "------------L---"
+        ],
+        "colors": {
+            "L": "#000080",
+            "S": "#1867a0"
+        }
     }
 }

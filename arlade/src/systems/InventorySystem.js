@@ -23,6 +23,11 @@ class InventorySystem {
         this.selectedAccessorySlotIndex = 0;
         this.showQuantityWindow = false;
         this.dropQuantity = 1;
+        this.keyHoldInterval = null;
+        this.keyHoldDelay = 100;
+        this.keyHoldStartTime = 0;
+        this.keyHoldAcceleration = 1;
+        this.maxAcceleration = 10;
         this.loadItems();
     }
 
@@ -53,7 +58,7 @@ class InventorySystem {
         this.addItem('leather_pants');
         this.addItem('battle_axe');
         this.addItem('dagger');
-        this.addItem('gold_coin', 5);
+        this.addItem('gold_coin', 53);
         this.addItem('naked_pants');
         this.addItem('dick_ring');
         this.addItem('healing_potion', 3);
@@ -435,6 +440,8 @@ class InventorySystem {
                         case 'Использовать':
                             // Применяем эффекты предмета
                             this.game.itemEffectsSystem.applyItemEffects(item);
+                            // Добавляем сообщение в лог
+                            hud.addLogMessage(`Вы использовали ${item.name}`, 'item-use');
                             // Уменьшаем количество предметов
                             if (item.quantity > 1) {
                                 item.quantity--;
@@ -1024,18 +1031,46 @@ class InventorySystem {
             switch (key) {
                 case 'ArrowLeft':
                     this.dropQuantity = Math.max(1, this.dropQuantity - 1);
+                    // Запускаем интервал для зажатой клавиши
+                    if (!this.keyHoldInterval) {
+                        this.keyHoldStartTime = Date.now();
+                        this.keyHoldAcceleration = 1;
+                        this.keyHoldInterval = setInterval(() => {
+                            // Вычисляем время удержания
+                            const holdTime = Date.now() - this.keyHoldStartTime;
+                            // Увеличиваем ускорение каждые 500мс
+                            this.keyHoldAcceleration = Math.min(this.maxAcceleration, 1 + Math.floor(holdTime / 500));
+                            // Изменяем количество с учетом ускорения
+                            this.dropQuantity = Math.max(1, this.dropQuantity - this.keyHoldAcceleration);
+                        }, this.keyHoldDelay);
+                    }
                     return;
                 case 'ArrowRight':
                     this.dropQuantity = Math.min(item.quantity, this.dropQuantity + 1);
+                    // Запускаем интервал для зажатой клавиши
+                    if (!this.keyHoldInterval) {
+                        this.keyHoldStartTime = Date.now();
+                        this.keyHoldAcceleration = 1;
+                        this.keyHoldInterval = setInterval(() => {
+                            // Вычисляем время удержания
+                            const holdTime = Date.now() - this.keyHoldStartTime;
+                            // Увеличиваем ускорение каждые 500мс
+                            this.keyHoldAcceleration = Math.min(this.maxAcceleration, 1 + Math.floor(holdTime / 500));
+                            // Изменяем количество с учетом ускорения
+                            this.dropQuantity = Math.min(item.quantity, this.dropQuantity + this.keyHoldAcceleration);
+                        }, this.keyHoldDelay);
+                    }
                     return;
                 case ' ':
                 case 'Enter':
                     this.dropItem(this.selectedItemIndex, false, this.dropQuantity);
                     this.showQuantityWindow = false;
+                    this.clearKeyHoldInterval();
                     return;
                 case 'Escape':
                     this.showQuantityWindow = false;
                     this.actionMenuOpen = true;
+                    this.clearKeyHoldInterval();
                     return;
             }
             return;
@@ -1266,5 +1301,14 @@ class InventorySystem {
         // Сохраняем позицию для отображения
         this.inventoryX = x;
         this.inventoryY = y;
+    }
+
+    // Добавляем метод для очистки интервала
+    clearKeyHoldInterval() {
+        if (this.keyHoldInterval) {
+            clearInterval(this.keyHoldInterval);
+            this.keyHoldInterval = null;
+            this.keyHoldAcceleration = 1;
+        }
     }
 } 

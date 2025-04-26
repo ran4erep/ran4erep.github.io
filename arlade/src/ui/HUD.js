@@ -11,20 +11,33 @@ class HUD {
         document.getElementById('gameContainer').appendChild(this.fpsCounter);
         this.fpsCounter.textContent = 'FPS: 0';
         
+        // Создаём объект для хранения UI иконок
+        this.uiIcons = {
+            heart: {
+                canvas: document.createElement('canvas'),
+                loaded: false
+            },
+            magic: {
+                canvas: document.createElement('canvas'),
+                loaded: false
+            }
+        };
+
+        // Инициализируем все иконки
+        Object.values(this.uiIcons).forEach(icon => {
+            icon.canvas.width = 32;
+            icon.canvas.height = 32;
+            icon.canvas.style.width = '32px';
+            icon.canvas.style.height = '32px';
+            icon.canvas.style.imageRendering = 'pixelated';
+        });
+        
         // Здоровье игрока (перемещаем в верхнюю панель)
         this.healthDisplay = document.createElement('div');
         this.healthDisplay.className = 'hud-element';
         this.healthDisplay.style.display = 'flex';
         this.healthDisplay.style.alignItems = 'center';
         this.healthDisplay.style.gap = '10px';
-        
-        // Создаём canvas для иконки сердца
-        this.heartIcon = document.createElement('canvas');
-        this.heartIcon.width = 32;
-        this.heartIcon.height = 32;
-        this.heartIcon.style.width = '32px';
-        this.heartIcon.style.height = '32px';
-        this.heartIcon.style.imageRendering = 'pixelated';
         
         // Создаём контейнер для полоски здоровья
         this.healthBarContainer = document.createElement('div');
@@ -61,12 +74,144 @@ class HUD {
         // Собираем всё вместе
         this.healthBarContainer.appendChild(this.healthBar);
         this.healthBarContainer.appendChild(this.healthText);
-        this.healthDisplay.appendChild(this.heartIcon);
+        this.healthDisplay.appendChild(this.uiIcons.heart.canvas);
         this.healthDisplay.appendChild(this.healthBarContainer);
         
         // Добавляем индикатор здоровья в верхнюю панель
         document.getElementById('topPanel').appendChild(this.healthDisplay);
+
+        // Создаём индикатор маны
+        this.manaDisplay = document.createElement('div');
+        this.manaDisplay.className = 'hud-element';
+        this.manaDisplay.style.display = 'flex';
+        this.manaDisplay.style.alignItems = 'center';
+        this.manaDisplay.style.gap = '10px';
+        this.manaDisplay.style.marginLeft = '10px';
+
+        // Создаём контейнер для полоски маны
+        this.manaBarContainer = document.createElement('div');
+        this.manaBarContainer.style.width = '200px';
+        this.manaBarContainer.style.height = '20px';
+        this.manaBarContainer.style.border = '2px solid #ffffff';
+        this.manaBarContainer.style.position = 'relative';
+        this.manaBarContainer.style.overflow = 'hidden';
+
+        // Создаём полоску маны
+        this.manaBar = document.createElement('div');
+        this.manaBar.style.width = '100%';
+        this.manaBar.style.height = '100%';
+        this.manaBar.style.backgroundColor = '#0000ff';
+        this.manaBar.style.transition = 'width 0.3s ease-out';
+
+        // Создаём текст маны поверх полоски
+        this.manaText = document.createElement('div');
+        this.manaText.style.position = 'absolute';
+        this.manaText.style.left = '50%';
+        this.manaText.style.top = '50%';
+        this.manaText.style.transform = 'translate(-50%, -50%)';
+        this.manaText.style.color = '#ffffff';
+        this.manaText.style.fontSize = '12px';
+        this.manaText.style.fontFamily = '"Press Start 2P"';
+        this.manaText.style.textShadow = 
+            '-1px -1px 0 #000, ' +
+            '1px -1px 0 #000, ' +
+            '-1px 1px 0 #000, ' +
+            '1px 1px 0 #000, ' +
+            '2px 2px 0 #000';
+        this.manaText.style.backgroundColor = 'transparent';
+
+        // Собираем всё вместе для маны
+        this.manaBarContainer.appendChild(this.manaBar);
+        this.manaBarContainer.appendChild(this.manaText);
+        this.manaDisplay.appendChild(this.uiIcons.magic.canvas);
+        this.manaDisplay.appendChild(this.manaBarContainer);
+
+        // Добавляем индикатор маны в верхнюю панель
+        document.getElementById('topPanel').appendChild(this.manaDisplay);
+
+        // Опыт игрока
+        this.experienceDisplay = document.createElement('div');
+        this.experienceDisplay.className = 'hud-element';
+        this.experienceDisplay.style.display = 'flex';
+        this.experienceDisplay.style.alignItems = 'center';
+        this.experienceDisplay.style.gap = '10px';
+        this.experienceDisplay.style.marginLeft = '10px';
         
+        // Текст уровня
+        this.levelText = document.createElement('div');
+        this.levelText.style.color = '#ffffff';
+        this.levelText.style.fontSize = '12px';
+        this.levelText.style.fontFamily = '"Press Start 2P"';
+        this.levelText.style.textShadow = 
+            '-1px -1px 0 #000, ' +
+            '1px -1px 0 #000, ' +
+            '-1px 1px 0 #000, ' +
+            '1px 1px 0 #000, ' +
+            '2px 2px 0 #000';
+        
+        // Контейнер для полоски опыта
+        this.expBarContainer = document.createElement('div');
+        this.expBarContainer.style.width = '200px';
+        this.expBarContainer.style.height = '20px';
+        this.expBarContainer.style.border = '2px solid #ffffff';
+        this.expBarContainer.style.position = 'relative';
+        this.expBarContainer.style.overflow = 'hidden';
+        this.expBarContainer.style.transition = 'border-color 0.3s ease-out';
+        
+        // Полоска опыта
+        this.expBar = document.createElement('div');
+        this.expBar.style.width = '0%';
+        this.expBar.style.height = '100%';
+        this.expBar.style.backgroundColor = '#ffd700';
+        this.expBar.style.transition = 'width 0.3s ease-out';
+        this.expBar.isGlowing = false;
+        
+        // Текст опыта поверх полоски
+        this.expText = document.createElement('div');
+        this.expText.style.position = 'absolute';
+        this.expText.style.left = '50%';
+        this.expText.style.top = '50%';
+        this.expText.style.transform = 'translate(-50%, -50%)';
+        this.expText.style.color = '#ffffff';
+        this.expText.style.fontSize = '12px';
+        this.expText.style.fontFamily = '"Press Start 2P"';
+        this.expText.style.textShadow = 
+            '-1px -1px 0 #000, ' +
+            '1px -1px 0 #000, ' +
+            '-1px 1px 0 #000, ' +
+            '1px 1px 0 #000, ' +
+            '2px 2px 0 #000';
+        this.expText.style.backgroundColor = 'transparent';
+        
+        // Собираем всё вместе для опыта
+        this.expBarContainer.appendChild(this.expBar);
+        this.expBarContainer.appendChild(this.expText);
+        this.experienceDisplay.appendChild(this.levelText);
+        this.experienceDisplay.appendChild(this.expBarContainer);
+        
+        // Добавляем индикатор опыта в верхнюю панель
+        document.getElementById('topPanel').appendChild(this.experienceDisplay);
+
+        // Создаём отображение денег
+        this.moneyDisplay = document.createElement('div');
+        this.moneyDisplay.className = 'hud-element';
+        this.moneyDisplay.style.display = 'flex';
+        this.moneyDisplay.style.alignItems = 'center';
+        this.moneyDisplay.style.marginLeft = 'auto'; // Прижимаем к правому краю
+        this.moneyDisplay.style.marginRight = '10px'; // Отступ справа
+        this.moneyDisplay.style.color = '#ffd700';
+        this.moneyDisplay.style.fontSize = '12px';
+        this.moneyDisplay.style.fontFamily = '"Press Start 2P"';
+        this.moneyDisplay.style.textShadow = 
+            '-1px -1px 0 #000, ' +
+            '1px -1px 0 #000, ' +
+            '-1px 1px 0 #000, ' +
+            '1px 1px 0 #000, ' +
+            '2px 2px 0 #000';
+
+        // Добавляем индикатор денег в верхнюю панель
+        document.getElementById('topPanel').appendChild(this.moneyDisplay);
+
         // Инициализируем игровой лог
         this.gameLog = document.getElementById('gameLog');
         this.maxLogEntries = 100; // Максимальное количество сообщений в логе
@@ -77,8 +222,8 @@ class HUD {
         // Флаг наличия сообщений в текущем ходу
         this.hasMessagesInCurrentTurn = false;
         
-        // Отрисовываем сердце
-        this.drawHeart();
+        // Флаг для отслеживания загрузки иконки сердца
+        this.heartIconLoaded = false;
 
         // Добавляем стили для разделителя ходов и сообщений об атаках
         const style = document.createElement('style');
@@ -159,69 +304,23 @@ class HUD {
             }
         `;
         document.head.appendChild(style);
+    }
 
-        // Опыт игрока
-        this.experienceDisplay = document.createElement('div');
-        this.experienceDisplay.className = 'hud-element';
-        this.experienceDisplay.style.display = 'flex';
-        this.experienceDisplay.style.alignItems = 'center';
-        this.experienceDisplay.style.gap = '10px';
-        this.experienceDisplay.style.marginLeft = '20px'; // Отступ от здоровья
+    drawUIIcon(canvas, iconName) {
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
         
-        // Текст уровня
-        this.levelText = document.createElement('div');
-        this.levelText.style.color = '#ffffff';
-        this.levelText.style.fontSize = '12px';
-        this.levelText.style.fontFamily = '"Press Start 2P"';
-        this.levelText.style.textShadow = 
-            '-1px -1px 0 #000, ' +
-            '1px -1px 0 #000, ' +
-            '-1px 1px 0 #000, ' +
-            '1px 1px 0 #000, ' +
-            '2px 2px 0 #000';
+        // Очищаем canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Контейнер для полоски опыта
-        this.expBarContainer = document.createElement('div');
-        this.expBarContainer.style.width = '200px';
-        this.expBarContainer.style.height = '20px';
-        this.expBarContainer.style.border = '2px solid #ffffff';
-        this.expBarContainer.style.position = 'relative';
-        this.expBarContainer.style.overflow = 'hidden';
-        this.expBarContainer.style.transition = 'border-color 0.3s ease-out';
+        // Проверяем, загружен ли файл с глифами
+        const glyphInfo = glyphSystem.glyphsMap[iconName];
+        if (!glyphInfo) {
+            return;
+        }
         
-        // Полоска опыта
-        this.expBar = document.createElement('div');
-        this.expBar.style.width = '0%';
-        this.expBar.style.height = '100%';
-        this.expBar.style.backgroundColor = '#ffd700'; // Золотой цвет для полоски опыта
-        this.expBar.style.transition = 'width 0.3s ease-out';
-        this.expBar.isGlowing = false; // Флаг для отслеживания состояния анимации
-        
-        // Текст опыта поверх полоски
-        this.expText = document.createElement('div');
-        this.expText.style.position = 'absolute';
-        this.expText.style.left = '50%';
-        this.expText.style.top = '50%';
-        this.expText.style.transform = 'translate(-50%, -50%)';
-        this.expText.style.color = '#ffffff';
-        this.expText.style.fontSize = '12px';
-        this.expText.style.fontFamily = '"Press Start 2P"';
-        this.expText.style.textShadow = 
-            '-1px -1px 0 #000, ' +
-            '1px -1px 0 #000, ' +
-            '-1px 1px 0 #000, ' +
-            '1px 1px 0 #000, ' +
-            '2px 2px 0 #000';
-        this.expText.style.backgroundColor = 'transparent';
-        
-        // Собираем всё вместе
-        this.expBarContainer.appendChild(this.expBar);
-        this.expBarContainer.appendChild(this.expText);
-        this.experienceDisplay.appendChild(this.levelText);
-        this.experienceDisplay.appendChild(this.expBarContainer);
-        
-        // Добавляем индикатор опыта в верхнюю панель
-        document.getElementById('topPanel').appendChild(this.experienceDisplay);
+        // Рисуем глиф
+        glyphSystem.drawGlyph(ctx, iconName, 0, 0, 32);
     }
 
     // Добавление сообщения в лог
@@ -257,34 +356,6 @@ class HUD {
         this.hasMessagesInCurrentTurn = false;
     }
 
-    drawHeart() {
-        const ctx = this.heartIcon.getContext('2d');
-        ctx.imageSmoothingEnabled = false;
-        
-        // Полностью очищаем canvas
-        ctx.clearRect(0, 0, this.heartIcon.width, this.heartIcon.height);
-        
-        // Масштабируем координаты под размер 32x32
-        const scale = this.heartIcon.width / 16; // 32/16 = 2
-        
-        // Рисуем красное сердце
-        ctx.fillStyle = '#ff0000';
-        ctx.beginPath();
-        ctx.moveTo(12 * scale, 6 * scale);
-        ctx.quadraticCurveTo(12 * scale, 4 * scale, 14 * scale, 4 * scale);
-        ctx.quadraticCurveTo(16 * scale, 4 * scale, 16 * scale, 6 * scale);
-        ctx.quadraticCurveTo(16 * scale, 8 * scale, 12 * scale, 12 * scale);
-        ctx.quadraticCurveTo(8 * scale, 8 * scale, 8 * scale, 6 * scale);
-        ctx.quadraticCurveTo(8 * scale, 4 * scale, 10 * scale, 4 * scale);
-        ctx.quadraticCurveTo(12 * scale, 4 * scale, 12 * scale, 6 * scale);
-        ctx.fill();
-        
-        // Добавляем обводку для лучшей видимости
-        ctx.strokeStyle = '#800000';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-    }
-
     update(deltaTime) {
         const currentTime = performance.now();
         this.frameCount++;
@@ -294,6 +365,16 @@ class HUD {
             this.fpsCounter.textContent = `FPS: ${fps}`;
             this.frameCount = 0;
             this.lastFpsUpdate = currentTime;
+        }
+
+        // Пробуем загрузить иконки если они ещё не загружены
+        if (Object.keys(glyphSystem.glyphsMap).length > 0) {
+            Object.entries(this.uiIcons).forEach(([name, icon]) => {
+                if (!icon.loaded) {
+                    this.drawUIIcon(icon.canvas, name);
+                    icon.loaded = true;
+                }
+            });
         }
 
         // Обновляем отображение здоровья
@@ -383,6 +464,20 @@ class HUD {
             
             // Обновляем текст опыта
             this.expText.textContent = `${game.experience}/${game.experienceToNextLevel}`;
+        }
+
+        // Обновляем отображение маны
+        if (game.playerMana !== undefined) {
+            const manaPercent = game.playerMana / game.maxMana;
+            this.manaBar.style.width = `${manaPercent * 100}%`;
+            this.manaText.textContent = `${game.playerMana}/${game.maxMana}`;
+        }
+
+        // Обновляем отображение денег
+        if (game.inventorySystem) {
+            const goldCoins = game.inventorySystem.items.find(item => item.id === 'gold_coin');
+            const amount = goldCoins ? goldCoins.quantity : 0;
+            this.moneyDisplay.textContent = `$ ${amount}`;
         }
     }
 

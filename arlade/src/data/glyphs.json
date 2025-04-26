@@ -62,5 +62,9 @@
     "vase": {
         "file": "tiles",
         "name": "vase"
+    },
+    "magic": {
+        "file": "ui",
+        "name": "magic"
     }
 } 

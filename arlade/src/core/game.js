@@ -7,6 +7,9 @@ class Game {
         // ID текущего игрового цикла
         this.gameLoopId = null;
         
+        // Очки опыта для прокачки статов
+        this.statPoints = 0;
+        
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d', { alpha: true });
         this.ctx.imageSmoothingEnabled = false;
@@ -20,6 +23,10 @@ class Game {
         // Здоровье игрока
         this.playerHealth = 30;
         this.maxHealth = 30;
+        
+        // Мана игрока
+        this.playerMana = 100;
+        this.maxMana = 100;
         
         // Направление взгляда игрока (в радианах)
         // Начинаем с направления вправо (0 градусов)
@@ -67,15 +74,11 @@ class Game {
         // Флаг смерти игрока
         this.isDead = false;
         
+        // Счётчик ходов
+        this.turnCount = 0;
+        
         // Характеристики игрока
-        this.playerStats = {
-            strength: 10,     // Сила
-            dexterity: 10,    // Ловкость
-            constitution: 10,  // Телосложение
-            intelligence: 10,  // Интеллект
-            wisdom: 10,       // Мудрость
-            charisma: 10      // Харизма
-        };
+        this.initPlayerStats();
         
         // Система опыта
         this.level = 1;
@@ -89,6 +92,15 @@ class Game {
         this.inputSystem = null;
         this.inventorySystem = null;
         this.itemEffectsSystem = null;
+
+        // Инициализируем главное меню
+        this.mainMenu = new MainMenu(this);
+        
+        // Показываем главное меню
+        if (this.enableMainMenu) {
+            this.mainMenu.isPauseMenu = false;
+            this.mainMenu.show();
+        }
     }
 
     // Инициализация всех систем
@@ -110,9 +122,6 @@ class Game {
         // Инициализируем дебаг-меню
         this.debugMenu = new DebugMenu(this);
 
-        // Инициализируем главное меню
-        this.mainMenu = new MainMenu(this);
-        
         // Инициализируем окно статов
         this.statsWindow = new StatsWindow(this);
 
@@ -121,12 +130,6 @@ class Game {
 
         // Инициализируем окно лута
         this.lootWindow = new LootWindow(this);
-        
-        // Показываем главное меню
-        if (this.enableMainMenu) {
-            this.mainMenu.isPauseMenu = false;
-            this.mainMenu.show();
-        }
     }
 
     async startLoading() {
@@ -507,9 +510,6 @@ class Game {
             if (dx !== 0 || dy !== 0) {
                 this.lookDirection = Math.atan2(dy, dx);
             }
-            
-            // Увеличиваем счетчик ходов
-            this.lastMoveTime++;
 
             // Начинаем ход противников
             this.startEnemyTurn();
@@ -534,9 +534,6 @@ class Game {
             if (dx !== 0 || dy !== 0) {
                 this.lookDirection = Math.atan2(dy, dx);
             }
-            
-            // Увеличиваем счетчик ходов
-            this.lastMoveTime++;
 
             // Проверяем видимость игрока для врагов
             this.enemySystem.checkPlayerVisibility();
@@ -551,6 +548,8 @@ class Game {
 
     startEnemyTurn() {
         this.isEnemyTurn = true;
+        // Увеличиваем счётчик ходов
+        this.turnCount++;
         // Сбрасываем ходы для всех врагов
         this.enemySystem.enemies.forEach(enemy => enemy.resetMoves());
         // Сбрасываем флаг сообщений для нового хода
@@ -788,33 +787,80 @@ class Game {
     }
 
     async startNewGame() {
-        // Показываем экран загрузки
-        this.isLoading = true;
+        // Удаляем старые обработчики событий
+        if (this.inputSystem) {
+            this.inputSystem.unbindKeys();
+        }
         
-        // Сбрасываем здоровье
+        // Инициализируем параметры игры
+        this.isPaused = false;
+        this.gameLoopId = null;
+        this.lastFrameTime = performance.now();
+        
+        // Очки опыта
+        this.statPoints = 0;
+        
+        // Позиция игрока
+        this.playerX = 0;
+        this.playerY = 0;
+        
+        // Здоровье игрока
         this.playerHealth = 30;
         this.maxHealth = 30;
         
-        // Сбрасываем опыт и уровень
+        // Мана игрока
+        this.playerMana = 100;
+        this.maxMana = 100;
+        
+        // Направление взгляда игрока
+        this.lookDirection = 0;
+        
+        // Игровые массивы
+        this.currentMap = null;
+        this.doors = [];
+        this.floorItems = [];
+        this.corpses = [];
+        
+        // Флаги
+        this.isEnemyTurn = false;
+        this.hasFirstFrameRendered = false;
+        this.lastMoveTime = 0;
+        this.isDead = false;
+        
+        // Анимация
+        this.visualX = 0;
+        this.visualY = 0;
+        this.isMoving = false;
+        this.moveStartTime = 0;
+        this.moveDuration = 150;
+        
+        // Счётчик ходов
+        this.turnCount = 0;
+        
+        // Характеристики игрока
+        this.initPlayerStats();
+        
+        // Система опыта
         this.level = 1;
         this.experience = 0;
         this.experienceToNextLevel = 100;
         this.floorNumber = 1;
         this.justLeveledUp = false;
         this.justGainedExp = false;
-        
-        // Сбрасываем флаг смерти
-        this.isDead = false;
-        
-        // Очищаем массив трупов
-        this.corpses = [];
-        
-        // Очищаем массив предметов на земле
-        this.floorItems = [];
-        
-        // Очищаем лог
-        hud.clearLog();
 
+        // Создаём все системы
+        const camera = new Camera(this);
+        const renderer = new Renderer(this, camera);
+        const collisionSystem = new CollisionSystem(this);
+        const inputSystem = new InputSystem(this);
+        
+        // Инициализируем системы
+        this.initSystems(inputSystem, camera, renderer, collisionSystem);
+        
+        // Создаём экран загрузки
+        this.loadingScreen = new LoadingScreen(this);
+        this.isLoading = true;
+        
         // Загружаем все ресурсы
         await this.startLoading();
         
@@ -822,6 +868,17 @@ class Game {
         if (this.inventorySystem) {
             this.inventorySystem.initStartingItems();
         }
+    }
+
+    initPlayerStats() {
+        this.playerStats = {
+            strength: 10,     // Сила
+            dexterity: 10,    // Ловкость
+            constitution: 10,  // Телосложение
+            intelligence: 10,  // Интеллект
+            wisdom: 10,       // Мудрость
+            charisma: 10      // Харизма
+        };
     }
 
     gainExperience(amount) {
@@ -839,19 +896,14 @@ class Game {
         this.experienceToNextLevel = Math.floor(this.experienceToNextLevel * 1.6);
         // Устанавливаем флаг повышения уровня
         this.justLeveledUp = true;
+        // Добавляем очко опыта
+        this.statPoints++;
         // Добавляем сообщение в лог
-        hud.addLogMessage(`Вы достигли ${this.level} уровня!`, 'level-up');
+        hud.addLogMessage(`Вы достигли ${this.level} уровня! Получено очко характеристики. Нажмите @ чтобы потратить его.`, 'level-up');
         // Добавляем всплывающий текст
         this.damageNumberSystem.addLevelUp(this.playerX, this.playerY);
     }
 }
 
 // Запуск игры
-const game = new Game();
-const camera = new Camera(game);
-const renderer = new Renderer(game, camera);
-const collisionSystem = new CollisionSystem(game);
-const inputSystem = new InputSystem(game);
-
-// Инициализация систем
-game.initSystems(inputSystem, camera, renderer, collisionSystem); 
+const game = new Game(); 

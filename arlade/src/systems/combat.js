@@ -156,16 +156,10 @@ class CombatSystem {
                         };
                         this.game.corpses.push(corpse);
                         
-                        hud.addLogMessage('Вы погибли!', 'attack');
+                        hud.addLogMessage(`Вы прожили жизнь длиной в ${this.game.turnCount} ходов, но ${enemy.pendingAttack.enemyName} оборвал её...`, 'player-death');
                         
                         // Показываем экран Game Over
-                        gameOverScreen.show(() => {
-                            // После окончания анимации показываем главное меню
-                            this.game.mainMenu.isPauseMenu = false;
-                            this.game.mainMenu.show();
-                            // Скрываем экран Game Over
-                            gameOverScreen.hide();
-                        });
+                        gameOverScreen.show();
                     }
                 }
             }
