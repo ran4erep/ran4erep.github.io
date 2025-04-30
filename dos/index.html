@@ -1,77 +1,393 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>ran4erep's DOS library</title>
-    <link rel="stylesheet" href="js-dos/js-dos.css">
-    <script src="js-dos/js-dos.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #dos {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-    </style>
+    <title>ran4erep's DOS Games Library</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="dos"></div>
+    <header>
+        <div class="header-top">
+            <h1>ran4erep's DOS Games Library</h1>
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <input type="text" id="searchInput" placeholder="Поиск игры по названию..." autocomplete="off">
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-menu">
+            <div class="reset-filters">
+                <button class="filter-button" onclick="resetAllFilters()">Сбросить фильтры</button>
+            </div>
+            <div class="alphabet-menu">
+                <button class="filter-button" onclick="toggleDropdown('alphabetDropdown')">A-Z</button>
+                <div id="alphabetDropdown" class="filter-dropdown">
+                    <button class="filter-item" onclick="filterGames('all', 'letter')">Все</button>
+                </div>
+            </div>
+            <div class="genre-menu">
+                <button class="filter-button" onclick="toggleDropdown('genreDropdown')">Жанры</button>
+                <div id="genreDropdown" class="filter-dropdown">
+                    <button class="filter-item" onclick="filterGames('all', 'genre')">Все</button>
+                </div>
+            </div>
+            <div class="favorites-menu">
+                <button class="filter-button" onclick="filterGames('favorites', 'favorites')">Избранные игры</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="games-grid" id="gamesContainer">
+            <!-- Здесь будут карточки игр -->
+        </div>
+        <div class="pagination" id="pagination">
+            <!-- Здесь будут кнопки пагинации -->
+        </div>
+    </main>
+
     <script>
-        Dos(document.getElementById("dos"), {
-            url: "udoom.jsdos",
-            background: "doom.jpg",
-            renderAspect: "16/9",
-            noCloud: true,
-            softKeyboardLayout: [
-                [
-                    [
-                        " w ",
-                        "a s d"
-                    ],
-                    [
-                        "{esc}"
-                    ],
-                    [
-                        "1 2 3 4 5 6 7"
-                    ],
-                    [
-                        "e {space} {shift}",
-                        "{left} {right}"
-                    ]
-                ],
-            ],
-            softKeyboardSymbols: [
-                {
-                    "w": "↑",
-                    "s": "↓",
-                    "a": "←",
-                    "d": "→",
-                    "{left}": "←",
-                    "{right}": "→",
-                    "e": "Use",
-                    "{space}": "Shoot",
-                    "{shift}": "Run",
-                    "{esc}": "Main menu",
-                }
-            ]
+        let gamesData = [];
+        let currentPage = 1;
+        const gamesPerPage = 15;
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        let currentFilter = { type: 'letter', value: 'all' };
+        let favorites = new Set(JSON.parse(localStorage.getItem('favorites') || '[]'));
+        
+        // Создаем кнопки с буквами
+        const alphabetDropdown = document.getElementById('alphabetDropdown');
+        
+        // Добавляем кнопку для цифр
+        const numberButton = document.createElement('button');
+        numberButton.className = 'filter-item';
+        numberButton.textContent = '0-9';
+        numberButton.onclick = () => filterGames('0-9', 'letter');
+        alphabetDropdown.appendChild(numberButton);
+        
+        alphabet.forEach(letter => {
+            const button = document.createElement('button');
+            button.className = 'filter-item';
+            button.textContent = letter;
+            button.onclick = () => filterGames(letter, 'letter');
+            alphabetDropdown.appendChild(button);
         });
+
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            
+            // Закрываем все открытые дропдауны
+            document.querySelectorAll('.filter-dropdown').forEach(d => {
+                if (d.id !== dropdownId && d.classList.contains('show')) {
+                    d.classList.remove('show');
+                }
+            });
+            
+            dropdown.classList.toggle('show');
+        }
+
+        function toggleFavorite(gameDir, button) {
+            if (favorites.has(gameDir)) {
+                favorites.delete(gameDir);
+                button.textContent = 'В избранное';
+            } else {
+                favorites.add(gameDir);
+                button.textContent = 'В избранном';
+            }
+            localStorage.setItem('favorites', JSON.stringify([...favorites]));
+            
+            // Обновляем все кнопки избранного на странице
+            document.querySelectorAll(`.favorite-button[data-dir="${gameDir}"]`).forEach(btn => {
+                btn.classList.toggle('active');
+                btn.textContent = favorites.has(gameDir) ? 'В избранном' : 'В избранное';
+            });
+
+            // Если мы находимся в режиме просмотра избранного, обновляем список
+            if (currentFilter.type === 'favorites') {
+                filterGames('favorites', 'favorites');
+            }
+        }
+
+        // Закрываем меню при клике вне его
+        window.onclick = function(event) {
+            if (!event.target.matches('.filter-button')) {
+                const dropdowns = document.getElementsByClassName('filter-dropdown');
+                for (const dropdown of dropdowns) {
+                    if (dropdown.classList.contains('show')) {
+                        dropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
+        function createPagination(totalGames) {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+
+            const totalPages = Math.ceil(totalGames / gamesPerPage);
+            
+            // Кнопка "Назад"
+            const prevButton = document.createElement('button');
+            prevButton.className = 'pagination-button';
+            prevButton.textContent = '←';
+            prevButton.disabled = currentPage === 1;
+            prevButton.onclick = () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    filterGames(currentFilter.value, currentFilter.type);
+                }
+            };
+            paginationContainer.appendChild(prevButton);
+
+            // Номера страниц
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.className = `pagination-button ${i === currentPage ? 'active' : ''}`;
+                pageButton.textContent = i;
+                pageButton.onclick = () => {
+                    currentPage = i;
+                    filterGames(currentFilter.value, currentFilter.type);
+                };
+                paginationContainer.appendChild(pageButton);
+            }
+
+            // Кнопка "Вперёд"
+            const nextButton = document.createElement('button');
+            nextButton.className = 'pagination-button';
+            nextButton.textContent = '→';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.onclick = () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    filterGames(currentFilter.value, currentFilter.type);
+                }
+            };
+            paginationContainer.appendChild(nextButton);
+        }
+
+        function resetAllFilters() {
+            // Закрываем выпадающие списки
+            document.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+
+            // Убираем активные классы со всех кнопок
+            document.querySelectorAll('.filter-item.active').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.filter-button.active').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Сбрасываем фильтр и обновляем отображение
+            currentFilter = { type: 'letter', value: 'all' };
+            filterGames('all', 'letter');
+        }
+
+        function filterGames(value, type) {
+            // Закрываем выпадающие списки при любой фильтрации
+            document.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+
+            currentFilter = { type, value };
+            const gamesContainer = document.getElementById('gamesContainer');
+            gamesContainer.innerHTML = '';
+
+            let filteredGames = gamesData;
+            
+            if (value !== 'all') {
+                if (type === 'letter') {
+                    if (value === '0-9') {
+                        filteredGames = gamesData.filter(game => /^[0-9]/.test(game.title));
+                    } else {
+                        filteredGames = gamesData.filter(game => 
+                            game.title.toUpperCase().startsWith(value)
+                        );
+                    }
+                } else if (type === 'genre') {
+                    filteredGames = gamesData.filter(game => 
+                        game.genre.toLowerCase() === value.toLowerCase()
+                    );
+                } else if (type === 'favorites') {
+                    filteredGames = gamesData.filter(game => favorites.has(game.dir));
+                }
+            }
+
+            // Сортируем игры по алфавиту
+            filteredGames.sort((a, b) => a.title.localeCompare(b.title));
+
+            // Обновляем активные фильтры
+            document.querySelectorAll('.filter-item').forEach(button => {
+                button.classList.remove('active');
+                if (
+                    (button.textContent === value) || 
+                    (value === 'all' && button.textContent === 'Все')
+                ) {
+                    button.classList.add('active');
+                }
+            });
+
+            // Обновляем активные состояния кнопок фильтров
+            document.querySelector('.alphabet-menu .filter-button').classList.toggle('active', type === 'letter' && value !== 'all');
+            document.querySelector('.genre-menu .filter-button').classList.toggle('active', type === 'genre' && value !== 'all');
+            document.querySelector('.favorites-menu .filter-button').classList.toggle('active', type === 'favorites');
+
+            // Если игр нет, показываем сообщение
+            if (filteredGames.length === 0) {
+                const message = document.createElement('div');
+                message.className = 'no-games-message';
+                message.textContent = 'Игр не найдено';
+                gamesContainer.appendChild(message);
+                // Скрываем пагинацию
+                document.getElementById('pagination').style.display = 'none';
+                return;
+            }
+
+            // Показываем пагинацию
+            document.getElementById('pagination').style.display = 'flex';
+
+            // Вычисляем игры для текущей страницы
+            const startIndex = (currentPage - 1) * gamesPerPage;
+            const endIndex = startIndex + gamesPerPage;
+            const currentGames = filteredGames.slice(startIndex, endIndex);
+
+            currentGames.forEach(gameInfo => {
+                const gameCard = createGameCard(gameInfo);
+                gamesContainer.appendChild(gameCard);
+            });
+
+            // Обновляем пагинацию
+            createPagination(filteredGames.length);
+
+            // Прокручиваем страницу наверх
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function createGameCard(gameInfo) {
+            const gameCard = document.createElement('div');
+            gameCard.className = 'game-card';
+            gameCard.innerHTML = `
+                <img src="games/${gameInfo.dir}/boxart.jpg" alt="${gameInfo.title}">
+                <div class="game-info">
+                    <div class="game-title">${gameInfo.title}</div>
+                    <div class="game-meta">${gameInfo.year} • ${gameInfo.developer} • ${gameInfo.genre}</div>
+                    <div class="game-description-wrapper">
+                        <div class="game-description">${gameInfo.description}</div>
+                        <div class="game-description-full">${gameInfo.description}</div>
+                    </div>
+                    <div class="button-container">
+                        <a href="games/${gameInfo.dir}/index.html" class="play-button">Играть</a>
+                        <button class="favorite-button ${favorites.has(gameInfo.dir) ? 'active' : ''}" 
+                                data-dir="${gameInfo.dir}"
+                                onclick="toggleFavorite('${gameInfo.dir}', this)">
+                            ${favorites.has(gameInfo.dir) ? 'В избранном' : 'В избранное'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            return gameCard;
+        }
+
+        function updateGenreFilters(games) {
+            const genreDropdown = document.getElementById('genreDropdown');
+            const genres = new Set(games.map(game => game.genre));
+            
+            genres.forEach(genre => {
+                const button = document.createElement('button');
+                button.className = 'filter-item';
+                button.textContent = genre;
+                button.onclick = () => filterGames(genre, 'genre');
+                genreDropdown.appendChild(button);
+            });
+        }
+
+        async function loadGames() {
+            try {
+                const response = await fetch('games.json');
+                const data = await response.json();
+                const games = data.games;
+
+                // Загружаем информацию о каждой игре
+                const gamePromises = games.map(async (gameDir) => {
+                    try {
+                        const gameInfoResponse = await fetch(`games/${gameDir}/info.json`);
+                        const gameInfo = await gameInfoResponse.json();
+                        return { ...gameInfo, dir: gameDir };
+                    } catch (error) {
+                        console.error(`Error loading game info for ${gameDir}:`, error);
+                        return null;
+                    }
+                });
+
+                // Ждем загрузки всех игр
+                gamesData = (await Promise.all(gamePromises)).filter(game => game !== null);
+                
+                // Создаем фильтры по жанрам
+                updateGenreFilters(gamesData);
+                
+                // Показываем первую страницу
+                filterGames('all', 'letter');
+            } catch (error) {
+                console.error('Error loading games list:', error);
+            }
+        }
+
+        // Загружаем игры при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadGames);
+
+        let searchTimeout;
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            const searchText = e.target.value.toLowerCase();
+            const searchResults = document.getElementById('searchResults');
+            
+            if (searchText.length < 1) {
+                searchResults.innerHTML = '';
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                const matches = gamesData
+                    .filter(game => game.title.toLowerCase().includes(searchText))
+                    .slice(0, 5);
+
+                if (matches.length > 0) {
+                    searchResults.innerHTML = matches
+                        .map(game => `
+                            <div class="search-result-item" onclick="goToGame('${game.dir}')">
+                                <img src="games/${game.dir}/boxart.jpg" alt="${game.title}">
+                                <div class="search-result-info">
+                                    <div class="search-result-title">${game.title}</div>
+                                    <div class="search-result-meta">${game.year} • ${game.genre}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    searchResults.style.display = 'block';
+                } else {
+                    searchResults.innerHTML = '<div class="search-no-results">Ничего не найдено</div>';
+                    searchResults.style.display = 'block';
+                }
+            }, 300);
+        });
+
+        document.addEventListener('click', function(e) {
+            const searchResults = document.getElementById('searchResults');
+            const searchInput = document.getElementById('searchInput');
+            
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        function goToGame(gameDir) {
+            window.location.href = `games/${gameDir}/index.html`;
+        }
     </script>
 </body>
 </html>
