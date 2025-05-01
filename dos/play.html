@@ -154,8 +154,8 @@
                 const settings = { ...defaultSettings, ...customSettings };
                 
                 // Путь к файлу игры и обложке
-                const gamefile = window.location.origin + `/games/${gamePath}/game.jsdos`;
-                const boxartfile = window.location.origin + `/games/${gamePath}/boxart.jpg`;
+                const gamefile = `games/${gamePath}/game.jsdos`;
+                const boxartfile = `games/${gamePath}/boxart.jpg`;
 
                 // Проверяем, существует ли обычный файл
                 const exists = await checkFileExists(gamefile);
