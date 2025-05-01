@@ -51,13 +51,26 @@
             border-radius: 10px;
             margin: 10px 0;
             overflow: hidden;
+            position: relative;
         }
 
         .progress-fill {
             height: 100%;
             width: 0%;
             background: #8b5cf6;
-            transition: width 0.3s ease;
+            transition: width 0.2s ease;
+            position: relative;
+        }
+
+        .progress-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            z-index: 1;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
@@ -67,6 +80,7 @@
         <div>Сборка файла игры...</div>
         <div class="progress-bar">
             <div id="progressFill" class="progress-fill"></div>
+            <div id="progressText" class="progress-text">0%</div>
         </div>
         <div id="status"></div>
     </div>
@@ -105,13 +119,15 @@
         async function assembleGameFile(basePath, fileName) {
             const loading = document.getElementById('loading');
             const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
             const status = document.getElementById('status');
             
             loading.style.display = 'block';
             
-            // Проверяем наличие разделённых файлов
+            // Сначала находим все части и их размеры
             let partIndex = 1;
-            const chunks = [];
+            const parts = [];
+            let totalSize = 0;
             
             while (true) {
                 const partUrl = `games/${basePath}/${fileName}_${partIndex}.jsdos`;
@@ -119,30 +135,84 @@
                 
                 if (!exists) break;
                 
-                status.textContent = `Загрузка части ${partIndex}...`;
-                const response = await fetch(partUrl);
-                const blob = await response.blob();
-                chunks.push(blob);
-                
-                progressFill.style.width = '0%';
+                const response = await fetch(partUrl, { method: 'HEAD' });
+                const size = parseInt(response.headers.get('content-length') || '0');
+                parts.push({ url: partUrl, size });
+                totalSize += size;
                 partIndex++;
             }
             
-            // Если нет разделённых файлов, возвращаем null
-            if (chunks.length === 0) {
+            // Если нет частей, возвращаем null
+            if (parts.length === 0) {
                 loading.style.display = 'none';
                 return null;
             }
+
+            // Загружаем все части
+            const chunks = [];
+            let loadedSize = 0;
             
-            // Собираем файл из частей
+            for (let i = 0; i < parts.length; i++) {
+                const part = parts[i];
+                status.textContent = `Загрузка части ${i + 1} из ${parts.length}...`;
+                
+                const response = await fetch(part.url);
+                const reader = response.body.getReader();
+                const partChunks = [];
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) break;
+                    
+                    partChunks.push(value);
+                    loadedSize += value.length;
+                    
+                    // Обновляем общий прогресс
+                    const progress = (loadedSize / totalSize) * 100;
+                    progressFill.style.width = `${progress}%`;
+                    progressText.textContent = `${Math.round(progress)}%`;
+                }
+                
+                const blob = new Blob(partChunks);
+                chunks.push(blob);
+            }
+            
+            // Собираем финальный файл
             status.textContent = 'Сборка файла...';
-            progressFill.style.width = '50%';
-            
             const assembledFile = new Blob(chunks, { type: 'application/octet-stream' });
-            progressFill.style.width = '100%';
             
             loading.style.display = 'none';
             return assembledFile;
+        }
+
+        // Функция для проверки наличия файла в кэше эмулятора
+        async function checkGameCache(gamePath) {
+            return new Promise((resolve) => {
+                const request = indexedDB.open('js-dos-cache (guest)');
+                
+                request.onerror = () => {
+                    console.error("Error opening cache database");
+                    resolve(false);
+                };
+
+                request.onsuccess = (event) => {
+                    const db = event.target.result;
+                    const transaction = db.transaction(['files'], 'readonly');
+                    const store = transaction.objectStore('files');
+                    
+                    const request = store.get(`games/${gamePath}/game.jsdos`);
+                    
+                    request.onsuccess = () => {
+                        resolve(request.result !== undefined);
+                    };
+                    
+                    request.onerror = () => {
+                        console.error("Error reading from cache");
+                        resolve(false);
+                    };
+                };
+            });
         }
 
         // Пытаемся загрузить пользовательские настройки
@@ -176,18 +246,15 @@
                         ...settings
                     });
                 } else {
-                    // Пробуем собрать файл из частей
-                    const assembledFile = await assembleGameFile(gamePath, 'game');
+                    // Проверяем наличие игры в кэше
+                    const inCache = await checkGameCache(gamePath);
                     
-                    if (assembledFile) {
-                        // Создаём URL для собранного файла
-                        const fileUrl = URL.createObjectURL(assembledFile);
-                        
-                        // Запускаем эмулятор с собранным файлом
+                    if (inCache) {
+                        // Если игра в кэше, запускаем эмулятор как обычно
                         const props = Dos(document.getElementById("dos"), {
                             pathPrefix: "js-dos/emulators/",
                             background: boxartfile,
-                            url: fileUrl,
+                            url: gamefile,
                             onEvent: (event, arg) => {
                                 if (event === "fullscreen-change") {
                                     if (arg === true) {
@@ -197,16 +264,50 @@
                             },
                             ...settings
                         });
-
-                        // Освобождаем URL после того как эмулятор загрузит файл
-                        props.onready = () => {
-                            setTimeout(() => {
-                                URL.revokeObjectURL(fileUrl);
-                            }, 1000);
-                        };
                     } else {
-                        document.body.innerHTML = 'Error: Game file not found';
-                        throw new Error('Game file not found');
+                        // Если игры нет в кэше, собираем файл из частей
+                        const assembledFile = await assembleGameFile(gamePath, 'game');
+                        
+                        if (assembledFile) {
+                            // Создаём URL для собранного файла
+                            const fileUrl = URL.createObjectURL(assembledFile);
+                            
+                            // Создаём Response с собранным файлом
+                            const response = new Response(assembledFile);
+                            
+                            // Перехватываем запросы к файлу игры
+                            const originalFetch = window.fetch;
+                            window.fetch = async function(url, options) {
+                                if (url === gamefile) {
+                                    return response.clone();
+                                }
+                                return originalFetch.apply(this, arguments);
+                            };
+                            
+                            // Запускаем эмулятор с правильным URL
+                            const props = Dos(document.getElementById("dos"), {
+                                pathPrefix: "js-dos/emulators/",
+                                background: boxartfile,
+                                url: gamefile,
+                                onEvent: (event, arg) => {
+                                    if (event === "fullscreen-change") {
+                                        if (arg === true) {
+                                            props.setThinSidebar(false);
+                                        }
+                                    }
+                                },
+                                ...settings
+                            });
+
+                            // Восстанавливаем оригинальный fetch и освобождаем URL
+                            props.onready = () => {
+                                window.fetch = originalFetch;
+                                URL.revokeObjectURL(fileUrl);
+                            };
+                        } else {
+                            document.body.innerHTML = 'Error: Game file not found';
+                            throw new Error('Game file not found');
+                        }
                     }
                 }
             });

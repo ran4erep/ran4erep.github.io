@@ -1,11 +1,4 @@
 {
-    "renderAspect": "16/9",
-    "noCloud": true,
-    "backend": "dosbox",
-    "renderBackend": "webgl",
-    "backendLocked": false,
-    "mouseCapture": false,
-    "noCursor": false,
     "softKeyboardLayout": [
         [
             [
