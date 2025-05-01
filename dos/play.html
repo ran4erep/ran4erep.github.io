@@ -44,6 +44,20 @@
             z-index: 1000;
         }
 
+        #loading-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            filter: blur(5px);
+            opacity: 0.3;
+            z-index: 999;
+            display: none;
+        }
+
         .progress-bar {
             width: 300px;
             height: 20px;
@@ -76,6 +90,7 @@
 </head>
 <body>
     <div id="dos"></div>
+    <div id="loading-background"></div>
     <div id="loading">
         <div>Сборка файла игры...</div>
         <div class="progress-bar">
@@ -118,11 +133,14 @@
         // Функция для сборки разделённых файлов
         async function assembleGameFile(basePath, fileName) {
             const loading = document.getElementById('loading');
+            const loadingBackground = document.getElementById('loading-background');
             const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
             const status = document.getElementById('status');
             
             loading.style.display = 'block';
+            loadingBackground.style.display = 'block';
+            loadingBackground.style.backgroundImage = `url('games/${basePath}/boxart.jpg')`;
             
             // Сначала находим все части и их размеры
             let partIndex = 1;
@@ -145,6 +163,7 @@
             // Если нет частей, возвращаем null
             if (parts.length === 0) {
                 loading.style.display = 'none';
+                loadingBackground.style.display = 'none';
                 return null;
             }
 
@@ -183,34 +202,56 @@
             const assembledFile = new Blob(chunks, { type: 'application/octet-stream' });
             
             loading.style.display = 'none';
+            loadingBackground.style.display = 'none';
             return assembledFile;
         }
 
         // Функция для проверки наличия файла в кэше эмулятора
         async function checkGameCache(gamePath) {
             return new Promise((resolve) => {
-                const request = indexedDB.open('js-dos-cache (guest)');
+                const request = indexedDB.open('js-dos-cache (guest)', 1);  // Добавляем версию базы данных
                 
                 request.onerror = () => {
                     console.error("Error opening cache database");
                     resolve(false);
                 };
 
+                // Обработчик создания/обновления базы данных
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains('files')) {
+                        db.createObjectStore('files');
+                    }
+                };
+
                 request.onsuccess = (event) => {
                     const db = event.target.result;
-                    const transaction = db.transaction(['files'], 'readonly');
-                    const store = transaction.objectStore('files');
                     
-                    const request = store.get(`games/${gamePath}/game.jsdos`);
-                    
-                    request.onsuccess = () => {
-                        resolve(request.result !== undefined);
-                    };
-                    
-                    request.onerror = () => {
-                        console.error("Error reading from cache");
+                    // Проверяем существует ли хранилище
+                    if (!db.objectStoreNames.contains('files')) {
+                        console.log("Cache store not found");
                         resolve(false);
-                    };
+                        return;
+                    }
+                    
+                    try {
+                        const transaction = db.transaction(['files'], 'readonly');
+                        const store = transaction.objectStore('files');
+                        
+                        const request = store.get(`games/${gamePath}/game.jsdos`);
+                        
+                        request.onsuccess = () => {
+                            resolve(request.result !== undefined);
+                        };
+                        
+                        request.onerror = () => {
+                            console.error("Error reading from cache");
+                            resolve(false);
+                        };
+                    } catch (error) {
+                        console.error("Error accessing cache:", error);
+                        resolve(false);
+                    }
                 };
             });
         }
