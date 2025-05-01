@@ -22,21 +22,53 @@
 :root {
     --primary-color: #2d2d2d;
     --secondary-color: #4a4a4a;
-    --accent-color: #ff6b6b;
-    --text-color: #ffffff;
+    --accent-color: #8b5cf6;
+    --text-color: #e5e7eb;
     --card-bg: #363636;
     --card-hover: #404040;
+    --custom-cursor: url('data:image/x-icon;base64,AAACAAEAICAAAAUAAQCoCAAAFgAAACgAAAAgAAAAQAAAAAEACAAAAAAAAAQAAAAAAAAAAAAAAAEAAAAAAAAAAAAABHA0AAAARABQVGgABGQwAAAsQAAMz1oAAABcABTb0QAAQBwACIA8ABigbAA0NEQAADQYAAwSzwBweIwAAFgoAGBkeAAAMFwAAEwkABSUXAAAACwAFBrbAEBEVAAATHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkAAAEQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAABBwEQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAQcHFRUQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAoHFhYWDg4NEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkBBxYWBwwXEQIQAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAcWBwcHDBEHDw0NAAAAAAAAAAAAAAAAAAAAAAAAABAHDg4XDwIMFw8XDQkAAAAAAAAAAAAAAAAAAAAAAAAAARUVAhEHDwcMFwINCQAAAAAAAAAAAAAAAAAAAAAAAAABCRUMFxEDFgIODgENAAAAAAAAAAAAAAAAAAAAAAANEwEJFQwVBgIHAhAVCg0AAAAAAAAAAAAAAAAAAAANDRMQARQJFQYGFQICCgIKAAAAAAAAAAAAAAAAAAAJEBMNEBABBhQJFAYVFRAKCQoAAAAAAAAAAAAAAAAJEAEBExABEBAKBgYUFAoJCgoKAAAAAAAAAAAAAAAACRAKARAQFBQKEAoUFBQUBhQUEAAAAAAAAAAAAAAAAAAJEAoBEAEGCgoKAQoUFBQUChAAAAAAAAAAAAAAAAAAChAQEAkJCgYLFBQUAQoKCgkAAAAAAAAAAAAAAAAAABISChAJCQkGFBQUChQKCgsLDQAAAAAAAAAAAAAAAAAAGAgQCQ0AExQUFBQKCgoUFAsAAAAAAAAAAAAAAAAAAAAIEgAAAA0ECgsUChQKFAsGFAAAAAAAAAAAAAAAAAAAAAgAAAAAEwoUFAoKCwoUCwsUAAAAAAAAAAAAAAAAAAAAEgAAAA0TFAYGCgoLCgQECwoAAAAAAAAAAAAAAAAAAAAAAAANCRMUBhQEFBQGChQGCgAAAAAAAAAAAAAAAAAAAAAADQkTBAoUCgkUBgYQCgYBAAAAAAAAAAAAAAAAAAAAAAAJExMTEwkJCgoQEBAJCQAAAAAAAAAAAAAAAAAAAAAADRMEBAQTAAkJAAkKCgkAAAAAAAAAAAAAAAAAAAAAAAATBBQUFAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQUEhIEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBIYGBMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFGAgSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgIEgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASCBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//7P///+h////gH///wA///4AP//+AB///AAf//wAH//8AB//8AAf/8AAP/8AAD/8AAB/+AAA//gAAf/wAAf/4AAH/+AAD//nAA//7wAP/+4AD//8AA//+AAP//gAH//wJD//8D////B////wf///8P////H////j/////////');
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    cursor: var(--custom-cursor), auto;
+}
+
+/* Стили для полосы прокрутки */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--primary-color);
+    cursor: var(--custom-cursor), auto;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 4px;
+    cursor: var(--custom-cursor), auto;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #7c3aed;
+    cursor: var(--custom-cursor), auto;
+}
+
+::-webkit-scrollbar-button {
+    display: none;
 }
 
 body {
     font-family: 'Roboto', sans-serif;
     background-color: var(--primary-color);
+    background-image: linear-gradient(rgba(45, 45, 45, 0.85), rgba(45, 45, 45, 0.99)), url('/bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-blend-mode: normal;
     color: var(--text-color);
     line-height: 1.6;
 }
@@ -110,6 +142,7 @@ header p {
     display: flex;
     flex-direction: column;
     height: calc(100% - 200px);
+    min-height: 200px;
 }
 
 .game-title {
@@ -126,7 +159,7 @@ header p {
 
 .game-description-wrapper {
     position: relative;
-    margin-bottom: 1rem;
+    margin-bottom: auto;
 }
 
 .game-description {
@@ -136,7 +169,6 @@ header p {
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    cursor: pointer;
 }
 
 .game-description:hover {
@@ -185,13 +217,12 @@ header p {
     transition: background-color 0.3s ease;
     font-family: 'Roboto', sans-serif;
     font-size: 1rem;
-    cursor: pointer;
     height: 32px;
 }
 
 .play-button:hover,
 .favorite-button:hover {
-    background-color: #ff8787;
+    background-color: #7c3aed;
 }
 
 .favorite-button.active {
@@ -229,7 +260,6 @@ header p {
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 5px;
-    cursor: pointer;
     font-family: 'Roboto', sans-serif;
     font-size: 1rem;
 }
@@ -265,7 +295,6 @@ header p {
     padding: 0.5rem;
     min-width: 2rem;
     border-radius: 3px;
-    cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
@@ -308,9 +337,25 @@ header p {
         width: auto;
     }
 
+    .alphabet-dropdown,
     .filter-dropdown {
-        min-width: 250px;
-        max-width: 90vw;
+        position: fixed !important;
+        min-width: unset !important;
+        width: 90vw !important;
+        max-width: 300px !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+    }
+
+    .alphabet-menu,
+    .filter-menu {
+        position: static;
+    }
+
+    .filter-dropdown.show,
+    .alphabet-dropdown.show {
+        display: flex;
     }
 }
 
@@ -338,13 +383,12 @@ header p {
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 5px;
-    cursor: pointer;
     transition: background-color 0.3s ease;
     font-family: 'Roboto', sans-serif;
 }
 
 .pagination-button:hover {
-    background-color: var(--accent-color);
+    background-color: #7c3aed;
 }
 
 .pagination-button.active {
@@ -353,7 +397,17 @@ header p {
 
 .pagination-button:disabled {
     background-color: var(--card-bg);
-    cursor: not-allowed;
+}
+
+.pagination-button:disabled:hover {
+    background-color: #7c3aed;
+}
+
+.pagination-dots {
+    color: white;
+    padding: 0.5rem;
+    font-family: 'Roboto', sans-serif;
+    opacity: 0.7;
 }
 
 /* Стили для меню фильтров */
@@ -376,7 +430,6 @@ header p {
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 5px;
-    cursor: pointer;
     font-family: 'Roboto', sans-serif;
     font-size: 1rem;
     transition: background-color 0.3s ease;
@@ -392,15 +445,14 @@ header p {
 
 .filter-dropdown {
     display: none;
-    position: fixed;
+    position: absolute;
     background-color: var(--card-bg);
     min-width: 300px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     border-radius: 5px;
     z-index: 100;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     padding: 0.5rem;
     flex-wrap: wrap;
     justify-content: center;
@@ -418,7 +470,6 @@ header p {
     padding: 0.5rem;
     min-width: 2rem;
     border-radius: 3px;
-    cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
@@ -508,7 +559,6 @@ header p {
     display: flex;
     align-items: center;
     padding: 0.8rem;
-    cursor: pointer;
     transition: background-color 0.2s ease;
     gap: 1rem;
 }

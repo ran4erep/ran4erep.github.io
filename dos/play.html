@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ran4erep's DOS library</title>
+    <link rel="stylesheet" href="js-dos/js-dos.css">
+    <script src="js-dos/js-dos.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #dos {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #8b5cf6;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div id="dos"></div>
+    <div id="loading">
+        <div>Сборка файла игры...</div>
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <div id="status"></div>
+    </div>
+    <script>
+        // Получаем путь к папке с игрой из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const gamePath = urlParams.get('game');
+        
+        if (!gamePath) {
+            document.body.innerHTML = 'Error: Game path not specified';
+            throw new Error('Game path not specified');
+        }
+
+        // Дефолтные настройки
+        const defaultSettings = {
+            renderAspect: "16/9",
+            noCloud: true,
+            backend: "dosbox",
+            renderBackend: "webgl",
+            backendLocked: false,
+            mouseCapture: false,
+            noCursor: false
+        };
+
+        // Функция для проверки наличия файла
+        async function checkFileExists(url) {
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                return response.ok;
+            } catch {
+                return false;
+            }
+        }
+
+        // Функция для сборки разделённых файлов
+        async function assembleGameFile(basePath, fileName) {
+            const loading = document.getElementById('loading');
+            const progressFill = document.getElementById('progressFill');
+            const status = document.getElementById('status');
+            
+            loading.style.display = 'block';
+            
+            // Проверяем наличие разделённых файлов
+            let partIndex = 1;
+            const chunks = [];
+            
+            while (true) {
+                const partUrl = `games/${basePath}/${fileName}_${partIndex}.jsdos`;
+                const exists = await checkFileExists(partUrl);
+                
+                if (!exists) break;
+                
+                status.textContent = `Загрузка части ${partIndex}...`;
+                const response = await fetch(partUrl);
+                const blob = await response.blob();
+                chunks.push(blob);
+                
+                progressFill.style.width = '0%';
+                partIndex++;
+            }
+            
+            // Если нет разделённых файлов, возвращаем null
+            if (chunks.length === 0) {
+                loading.style.display = 'none';
+                return null;
+            }
+            
+            // Собираем файл из частей
+            status.textContent = 'Сборка файла...';
+            progressFill.style.width = '50%';
+            
+            const assembledFile = new Blob(chunks, { type: 'application/octet-stream' });
+            progressFill.style.width = '100%';
+            
+            loading.style.display = 'none';
+            return assembledFile;
+        }
+
+        // Пытаемся загрузить пользовательские настройки
+        fetch(`games/${gamePath}/settings.json`)
+            .then(response => response.json())
+            .catch(() => defaultSettings)
+            .then(async customSettings => {
+                // Объединяем дефолтные настройки с пользовательскими
+                const settings = { ...defaultSettings, ...customSettings };
+                
+                // Путь к файлу игры и обложке
+                const gamefile = window.location.origin + `/games/${gamePath}/game.jsdos`;
+                const boxartfile = window.location.origin + `/games/${gamePath}/boxart.jpg`;
+
+                // Проверяем, существует ли обычный файл
+                const exists = await checkFileExists(gamefile);
+                
+                if (exists) {
+                    // Если файл существует, запускаем как обычно
+                    const props = Dos(document.getElementById("dos"), {
+                        pathPrefix: "js-dos/emulators/",
+                        background: boxartfile,
+                        url: gamefile,
+                        onEvent: (event, arg) => {
+                            if (event === "fullscreen-change") {
+                                if (arg === true) {
+                                    props.setThinSidebar(false);
+                                }
+                            }
+                        },
+                        ...settings
+                    });
+                } else {
+                    // Пробуем собрать файл из частей
+                    const assembledFile = await assembleGameFile(gamePath, 'game');
+                    
+                    if (assembledFile) {
+                        // Создаём URL для собранного файла
+                        const fileUrl = URL.createObjectURL(assembledFile);
+                        
+                        // Запускаем эмулятор с собранным файлом
+                        const props = Dos(document.getElementById("dos"), {
+                            pathPrefix: "js-dos/emulators/",
+                            background: boxartfile,
+                            url: fileUrl,
+                            onEvent: (event, arg) => {
+                                if (event === "fullscreen-change") {
+                                    if (arg === true) {
+                                        props.setThinSidebar(false);
+                                    }
+                                }
+                            },
+                            ...settings
+                        });
+
+                        // Освобождаем URL после того как эмулятор загрузит файл
+                        props.onready = () => {
+                            setTimeout(() => {
+                                URL.revokeObjectURL(fileUrl);
+                            }, 1000);
+                        };
+                    } else {
+                        document.body.innerHTML = 'Error: Game file not found';
+                        throw new Error('Game file not found');
+                    }
+                }
+            });
+    </script>
+</body>
+</html> 

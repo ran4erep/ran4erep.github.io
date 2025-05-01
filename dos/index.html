@@ -141,17 +141,62 @@
             };
             paginationContainer.appendChild(prevButton);
 
-            // Номера страниц
-            for (let i = 1; i <= totalPages; i++) {
+            // Функция для создания кнопки страницы
+            const createPageButton = (pageNum) => {
                 const pageButton = document.createElement('button');
-                pageButton.className = `pagination-button ${i === currentPage ? 'active' : ''}`;
-                pageButton.textContent = i;
+                pageButton.className = `pagination-button ${pageNum === currentPage ? 'active' : ''}`;
+                pageButton.textContent = pageNum;
                 pageButton.onclick = () => {
-                    currentPage = i;
+                    currentPage = pageNum;
                     filterGames(currentFilter.value, currentFilter.type);
                 };
-                paginationContainer.appendChild(pageButton);
+                return pageButton;
+            };
+
+            // Логика отображения номеров страниц
+            let pagesToShow = [];
+            
+            if (totalPages <= 20) {
+                // Если страниц меньше или равно 20, показываем все
+                pagesToShow = Array.from({length: totalPages}, (_, i) => i + 1);
+            } else {
+                // Всегда показываем первую страницу
+                pagesToShow.push(1);
+                
+                // Вычисляем диапазон страниц вокруг текущей
+                let start = Math.max(2, currentPage - 8);
+                let end = Math.min(totalPages - 1, currentPage + 8);
+                
+                // Добавляем многоточие после первой страницы, если нужно
+                if (start > 2) {
+                    pagesToShow.push('...');
+                }
+                
+                // Добавляем страницы из диапазона
+                for (let i = start; i <= end; i++) {
+                    pagesToShow.push(i);
+                }
+                
+                // Добавляем многоточие перед последней страницей, если нужно
+                if (end < totalPages - 1) {
+                    pagesToShow.push('...');
+                }
+                
+                // Всегда показываем последнюю страницу
+                pagesToShow.push(totalPages);
             }
+
+            // Создаем кнопки для всех номеров страниц
+            pagesToShow.forEach(pageNum => {
+                if (pageNum === '...') {
+                    const dots = document.createElement('span');
+                    dots.className = 'pagination-dots';
+                    dots.textContent = '...';
+                    paginationContainer.appendChild(dots);
+                } else {
+                    paginationContainer.appendChild(createPageButton(pageNum));
+                }
+            });
 
             // Кнопка "Вперёд"
             const nextButton = document.createElement('button');
@@ -250,17 +295,23 @@
             // Показываем пагинацию
             document.getElementById('pagination').style.display = 'flex';
 
-            // Вычисляем игры для текущей страницы
+            // Пагинация
             const startIndex = (currentPage - 1) * gamesPerPage;
             const endIndex = startIndex + gamesPerPage;
             const currentGames = filteredGames.slice(startIndex, endIndex);
 
+            // Создаём фрагмент для оптимизации производительности
+            const fragment = document.createDocumentFragment();
+            
+            // Создаём карточки только для текущей страницы
             currentGames.forEach(gameInfo => {
                 const gameCard = createGameCard(gameInfo);
-                gamesContainer.appendChild(gameCard);
+                fragment.appendChild(gameCard);
             });
 
-            // Обновляем пагинацию
+            // Добавляем все карточки за один раз
+            gamesContainer.appendChild(fragment);
+
             createPagination(filteredGames.length);
 
             // Прокручиваем страницу наверх
@@ -280,7 +331,7 @@
                         <div class="game-description-full">${gameInfo.description}</div>
                     </div>
                     <div class="button-container">
-                        <a href="games/${gameInfo.dir}/index.html" class="play-button">Играть</a>
+                        <a href="#" class="play-button" onclick="playGame('${gameInfo.dir}'); return false;">Играть</a>
                         <button class="favorite-button ${favorites.has(gameInfo.dir) ? 'active' : ''}" 
                                 data-dir="${gameInfo.dir}"
                                 onclick="toggleFavorite('${gameInfo.dir}', this)">
@@ -290,6 +341,10 @@
                 </div>
             `;
             return gameCard;
+        }
+
+        function playGame(gameDir) {
+            window.location.href = `play.html?game=${gameDir}`;
         }
 
         function updateGenreFilters(games) {
@@ -352,28 +407,25 @@
                 return;
             }
 
-            searchTimeout = setTimeout(() => {
-                const matches = gamesData
-                    .filter(game => game.title.toLowerCase().includes(searchText))
-                    .slice(0, 5);
+            const matches = gamesData
+                .filter(game => game.title.toLowerCase().includes(searchText));
 
-                if (matches.length > 0) {
-                    searchResults.innerHTML = matches
-                        .map(game => `
-                            <div class="search-result-item" onclick="goToGame('${game.dir}')">
-                                <img src="games/${game.dir}/boxart.jpg" alt="${game.title}">
-                                <div class="search-result-info">
-                                    <div class="search-result-title">${game.title}</div>
-                                    <div class="search-result-meta">${game.year} • ${game.genre}</div>
-                                </div>
+            if (matches.length > 0) {
+                searchResults.innerHTML = matches
+                    .map(game => `
+                        <div class="search-result-item" onclick="goToGame('${game.dir}')">
+                            <img src="games/${game.dir}/boxart.jpg" alt="${game.title}">
+                            <div class="search-result-info">
+                                <div class="search-result-title">${game.title}</div>
+                                <div class="search-result-meta">${game.year} • ${game.genre}</div>
                             </div>
-                        `).join('');
-                    searchResults.style.display = 'block';
-                } else {
-                    searchResults.innerHTML = '<div class="search-no-results">Ничего не найдено</div>';
-                    searchResults.style.display = 'block';
-                }
-            }, 300);
+                        </div>
+                    `).join('');
+                searchResults.style.display = 'block';
+            } else {
+                searchResults.innerHTML = '<div class="search-no-results">Ничего не найдено</div>';
+                searchResults.style.display = 'block';
+            }
         });
 
         document.addEventListener('click', function(e) {
@@ -386,7 +438,7 @@
         });
 
         function goToGame(gameDir) {
-            window.location.href = `games/${gameDir}/index.html`;
+            window.location.href = `play.html?game=${gameDir}`;
         }
     </script>
 </body>
