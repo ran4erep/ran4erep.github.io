@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ran4erep's DOS Games Library">
+    <meta name="keywords" content="ran4erep, игры, dos, дос, бесплатно, онлайн, играть, в браузере">
+    <meta name="author" content="ran4erep">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="ran4erep's DOS Games Library">
+    <meta property="og:description" content="Играйте в свои любимые DOS игры прямо в браузере">
+	<meta property="og:image" content="https://ran4erep.github.io/dos.png">
+	<meta property="og:url" content="https://ran4erep.github.io/dos">
+    <meta property="og:type" content="website">
     <title>ran4erep's DOS Games Library</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -35,7 +44,10 @@
                 </div>
             </div>
             <div class="favorites-menu">
-                <button class="filter-button" onclick="filterGames('favorites', 'favorites')">Избранные игры</button>
+                <button class="filter-button" onclick="toggleFavorites()">Избранные игры</button>
+            </div>
+            <div class="faq-menu">
+                <button class="filter-button" onclick="toggleFAQ()">F.A.Q.</button>
             </div>
         </div>
     </header>
@@ -49,12 +61,44 @@
         </div>
     </main>
 
+    <!-- Модальное окно FAQ -->
+    <div id="faqModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="toggleFAQ()">&times;</span>
+            <h2>Часто задаваемые вопросы</h2>
+            <div class="faq-item">
+                <h3>В полноэкранном режиме при нажатии на Escape происходит выход из полноэкранного режима, а не то действие которое должно выполняться в самой игре при нажатии на Escape.</h3>
+                <p>Это стандартное поведение браузера. Такова его политика по отношению к полноэкранному режиму. Но это можно исправить. Напишите в адресной строке вашего браузера <a href="chrome://flags">chrome://flags</a>, вы перейдёте в окно экспериментальных настроек. Найдите в поиске вот такую настройку:</p>
+                <img src="images/faq1.png"></img>
+                <p>Её нужно включить (Enabled), а затем перезагрузите браузер. Проблема решена. После этого выход из полноэкранного режима будет осуществляться либо при удерживании кнопки Escape, либо по нажатию F11.</p>
+            </div>
+            <div class="faq-item">
+                <h3>У меня спонтанно закрылась вкладка с эмулятором! Что произошло?</h3>
+                <p>Это такая старая особенность браузеров, которая тянется ещё с первых программ типа Netscape Navigator. На сочетание клавиш Ctrl + W происходит закрытие активной вкладки. Играйте в полноэкранном режиме, в нём эта комбинация не срабатывает.</p>
+            </div>
+            <div class="faq-item">
+                <h3>А на моём компьютере игры хорошо будут идти?</h3>
+                <p>Естественно всё зависит от характеристик вашего устройства. Я оптимизирую все игры под своё железо, это Windows планшет 2013-го года. Если у вас похожие характеристики, то будет хорошо идти.</p>
+                <br>
+                <ul>
+                    <li>Процессор Intel Core i5-4200U</li>
+                    <li>Видеокарта встроенная Intel HD 4400</li>
+                    <li>Объём ОЗУ 4 ГБ</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <script>
         let gamesData = [];
         let currentPage = 1;
         const gamesPerPage = 15;
         const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-        let currentFilter = { type: 'letter', value: 'all' };
+        let activeFilters = {
+            letter: 'all',
+            genre: 'all',
+            favorites: false
+        };
         let favorites = new Set(JSON.parse(localStorage.getItem('favorites') || '[]'));
         
         // Создаем кнопки с буквами
@@ -88,6 +132,22 @@
             dropdown.classList.toggle('show');
         }
 
+        function toggleFavorites() {
+            // Если режим избранного уже активен, выключаем его
+            if (activeFilters.favorites) {
+                activeFilters.favorites = false;
+            } else {
+                // Иначе включаем режим избранного
+                activeFilters.favorites = true;
+            }
+            
+            // Сбрасываем текущую страницу на первую
+            currentPage = 1;
+            
+            // Применяем фильтры
+            applyFilters();
+        }
+
         function toggleFavorite(gameDir, button) {
             if (favorites.has(gameDir)) {
                 favorites.delete(gameDir);
@@ -105,8 +165,8 @@
             });
 
             // Если мы находимся в режиме просмотра избранного, обновляем список
-            if (currentFilter.type === 'favorites') {
-                filterGames('favorites', 'favorites');
+            if (activeFilters.favorites) {
+                applyFilters();
             }
         }
 
@@ -128,18 +188,20 @@
 
             const totalPages = Math.ceil(totalGames / gamesPerPage);
             
-            // Кнопка "Назад"
-            const prevButton = document.createElement('button');
-            prevButton.className = 'pagination-button';
-            prevButton.textContent = '←';
-            prevButton.disabled = currentPage === 1;
-            prevButton.onclick = () => {
-                if (currentPage > 1) {
+            // Показываем пагинацию всегда
+            paginationContainer.style.display = 'flex';
+
+            // Кнопка "Назад" только если мы не на первой странице
+            if (currentPage > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.className = 'pagination-button';
+                prevButton.textContent = '←';
+                prevButton.onclick = () => {
                     currentPage--;
-                    filterGames(currentFilter.value, currentFilter.type);
-                }
-            };
-            paginationContainer.appendChild(prevButton);
+                    applyFilters();
+                };
+                paginationContainer.appendChild(prevButton);
+            }
 
             // Функция для создания кнопки страницы
             const createPageButton = (pageNum) => {
@@ -148,7 +210,7 @@
                 pageButton.textContent = pageNum;
                 pageButton.onclick = () => {
                     currentPage = pageNum;
-                    filterGames(currentFilter.value, currentFilter.type);
+                    applyFilters();
                 };
                 return pageButton;
             };
@@ -198,18 +260,17 @@
                 }
             });
 
-            // Кнопка "Вперёд"
-            const nextButton = document.createElement('button');
-            nextButton.className = 'pagination-button';
-            nextButton.textContent = '→';
-            nextButton.disabled = currentPage === totalPages;
-            nextButton.onclick = () => {
-                if (currentPage < totalPages) {
+            // Кнопка "Вперёд" только если мы не на последней странице
+            if (currentPage < totalPages) {
+                const nextButton = document.createElement('button');
+                nextButton.className = 'pagination-button';
+                nextButton.textContent = '→';
+                nextButton.onclick = () => {
                     currentPage++;
-                    filterGames(currentFilter.value, currentFilter.type);
-                }
-            };
-            paginationContainer.appendChild(nextButton);
+                    applyFilters();
+                };
+                paginationContainer.appendChild(nextButton);
+            }
         }
 
         function resetAllFilters() {
@@ -227,9 +288,13 @@
                 button.classList.remove('active');
             });
             
-            // Сбрасываем фильтр и обновляем отображение
-            currentFilter = { type: 'letter', value: 'all' };
-            filterGames('all', 'letter');
+            // Сбрасываем фильтры и обновляем отображение
+            activeFilters = {
+                letter: 'all',
+                genre: 'all',
+                favorites: false
+            };
+            applyFilters();
         }
 
         function filterGames(value, type) {
@@ -238,48 +303,74 @@
                 dropdown.classList.remove('show');
             });
 
-            currentFilter = { type, value };
+            // Обновляем активный фильтр
+            activeFilters[type] = value;
+            
+            // Сбрасываем текущую страницу на первую
+            currentPage = 1;
+            
+            applyFilters();
+        }
+        
+        function applyFilters() {
             const gamesContainer = document.getElementById('gamesContainer');
             gamesContainer.innerHTML = '';
 
-            let filteredGames = gamesData;
+            // Начинаем с полного списка игр
+            let filteredGames = [...gamesData];
             
-            if (value !== 'all') {
-                if (type === 'letter') {
-                    if (value === '0-9') {
-                        filteredGames = gamesData.filter(game => /^[0-9]/.test(game.title));
-                    } else {
-                        filteredGames = gamesData.filter(game => 
-                            game.title.toUpperCase().startsWith(value)
-                        );
-                    }
-                } else if (type === 'genre') {
-                    filteredGames = gamesData.filter(game => 
-                        game.genre.toLowerCase() === value.toLowerCase()
+            // Применяем фильтр по буквам
+            if (activeFilters.letter !== 'all') {
+                if (activeFilters.letter === '0-9') {
+                    filteredGames = filteredGames.filter(game => /^[0-9]/.test(game.title));
+                } else {
+                    filteredGames = filteredGames.filter(game => 
+                        game.title.toUpperCase().startsWith(activeFilters.letter)
                     );
-                } else if (type === 'favorites') {
-                    filteredGames = gamesData.filter(game => favorites.has(game.dir));
                 }
+            }
+            
+            // Применяем фильтр по жанрам
+            if (activeFilters.genre !== 'all') {
+                filteredGames = filteredGames.filter(game => 
+                    game.genre.toLowerCase() === activeFilters.genre.toLowerCase()
+                );
+            }
+            
+            // Применяем фильтр избранного
+            if (activeFilters.favorites) {
+                filteredGames = filteredGames.filter(game => favorites.has(game.dir));
             }
 
             // Сортируем игры по алфавиту
             filteredGames.sort((a, b) => a.title.localeCompare(b.title));
 
-            // Обновляем активные фильтры
-            document.querySelectorAll('.filter-item').forEach(button => {
+            // Обновляем активные фильтры буквы
+            document.querySelectorAll('#alphabetDropdown .filter-item').forEach(button => {
                 button.classList.remove('active');
                 if (
-                    (button.textContent === value) || 
-                    (value === 'all' && button.textContent === 'Все')
+                    (button.textContent === activeFilters.letter) || 
+                    (activeFilters.letter === 'all' && button.textContent === 'Все')
+                ) {
+                    button.classList.add('active');
+                }
+            });
+            
+            // Обновляем активные фильтры жанра
+            document.querySelectorAll('#genreDropdown .filter-item').forEach(button => {
+                button.classList.remove('active');
+                if (
+                    (button.textContent === activeFilters.genre) || 
+                    (activeFilters.genre === 'all' && button.textContent === 'Все')
                 ) {
                     button.classList.add('active');
                 }
             });
 
             // Обновляем активные состояния кнопок фильтров
-            document.querySelector('.alphabet-menu .filter-button').classList.toggle('active', type === 'letter' && value !== 'all');
-            document.querySelector('.genre-menu .filter-button').classList.toggle('active', type === 'genre' && value !== 'all');
-            document.querySelector('.favorites-menu .filter-button').classList.toggle('active', type === 'favorites');
+            document.querySelector('.alphabet-menu .filter-button').classList.toggle('active', activeFilters.letter !== 'all');
+            document.querySelector('.genre-menu .filter-button').classList.toggle('active', activeFilters.genre !== 'all');
+            document.querySelector('.favorites-menu .filter-button').classList.toggle('active', activeFilters.favorites);
 
             // Если игр нет, показываем сообщение
             if (filteredGames.length === 0) {
@@ -385,7 +476,7 @@
                 updateGenreFilters(gamesData);
                 
                 // Показываем первую страницу
-                filterGames('all', 'letter');
+                applyFilters();
             } catch (error) {
                 console.error('Error loading games list:', error);
             }
@@ -400,6 +491,9 @@
             clearTimeout(searchTimeout);
             const searchText = e.target.value.toLowerCase();
             const searchResults = document.getElementById('searchResults');
+            
+            // Иконка лупы должна оставаться, если в поле есть фокус
+            // Оставляем класс active неизменным, так как он добавляется при фокусе
             
             if (searchText.length < 1) {
                 searchResults.innerHTML = '';
@@ -428,6 +522,25 @@
             }
         });
 
+        // Добавляем обработчик события фокуса на поле поиска
+        document.getElementById('searchInput').addEventListener('focus', function() {
+            this.style.transform = 'scale(1.02)';
+            // Активируем стиль с лупой при фокусе
+            this.classList.add('active');
+            this.closest('.search-wrapper').classList.add('active');
+        });
+
+        // Добавляем обработчик события потери фокуса на поле поиска
+        document.getElementById('searchInput').addEventListener('blur', function() {
+            this.style.transform = '';
+            
+            // Если поле пустое, убираем иконку лупы
+            if (this.value.length === 0) {
+                this.classList.remove('active');
+                this.closest('.search-wrapper').classList.remove('active');
+            }
+        });
+
         document.addEventListener('click', function(e) {
             const searchResults = document.getElementById('searchResults');
             const searchInput = document.getElementById('searchInput');
@@ -440,6 +553,26 @@
         function goToGame(gameDir) {
             window.location.href = `play.html?game=${gameDir}`;
         }
+
+        function toggleFAQ() {
+            const modal = document.getElementById('faqModal');
+            modal.classList.toggle('show');
+            
+            // Если модальное окно открыто, блокируем прокрутку страницы
+            if (modal.classList.contains('show')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Закрываем модальное окно при клике вне его содержимого
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('faqModal');
+            if (event.target === modal) {
+                toggleFAQ();
+            }
+        });
     </script>
 </body>
 </html>
