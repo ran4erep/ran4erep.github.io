@@ -114,42 +114,49 @@
 
         // Проверяем, есть ли хоть один ремап
         if (Object.keys(keyMappings).length > 0) {
-            // Кэшируем события клавиатуры для каждой кнопки
+            // Кэшируем ссылку на document.dispatchEvent
+            const dispatchEvent = document.dispatchEvent.bind(document);
+
+            // Создаём кэш событий клавиатуры для всех маппингов
             const keyboardEvents = {};
-            for (const [buttonCode, keyCode] of Object.entries(keyMappings)) {
-                keyboardEvents[buttonCode] = {
+            
+            // Создаём события для каждой клавиши и её ремаппинга
+            for (const [sourceKey, targetKey] of Object.entries(keyMappings)) {
+                // Создаём события для исходной клавиши
+                keyboardEvents[sourceKey] = {
                     down: new KeyboardEvent('keydown', {
-                        code: keyCode,
-                        key: keyCode.replace('Key', '').toLowerCase(),
-                        keyCode: getKeyCode(keyCode),
-                        which: getKeyCode(keyCode),
+                        code: targetKey,
+                        key: targetKey.replace('Key', '').toLowerCase(),
+                        keyCode: getKeyCode(targetKey),
+                        which: getKeyCode(targetKey),
                         bubbles: true,
                         cancelable: true
                     }),
                     up: new KeyboardEvent('keyup', {
-                        code: keyCode,
-                        key: keyCode.replace('Key', '').toLowerCase(),
-                        keyCode: getKeyCode(keyCode),
-                        which: getKeyCode(keyCode),
+                        code: targetKey,
+                        key: targetKey.replace('Key', '').toLowerCase(),
+                        keyCode: getKeyCode(targetKey),
+                        which: getKeyCode(targetKey),
                         bubbles: true,
                         cancelable: true
                     })
                 };
             }
 
-            // Обработчик нажатия клавиш
+            // Оптимизированные обработчики клавиатуры
             document.addEventListener('keydown', (e) => {
-                if (keyMappings[e.code]) {
+                const events = keyboardEvents[e.code];
+                if (events) {
                     e.preventDefault();
-                    document.dispatchEvent(keyboardEvents[e.code].down);
+                    dispatchEvent(events.down);
                 }
             });
 
-            // Обработчик отпускания клавиш
             document.addEventListener('keyup', (e) => {
-                if (keyMappings[e.code]) {
+                const events = keyboardEvents[e.code];
+                if (events) {
                     e.preventDefault();
-                    document.dispatchEvent(keyboardEvents[e.code].up);
+                    dispatchEvent(events.up);
                 }
             });
 
@@ -157,9 +164,6 @@
             let isPolling = false;
             const pressedButtons = new Set();
             const STICK_THRESHOLD = 0.5;
-
-            // Кэшируем ссылку на document.dispatchEvent
-            const dispatchEvent = document.dispatchEvent.bind(document);
 
             // Оптимизированная функция для проверки стика
             function handleStickAxis(value, threshold, positiveKey, negativeKey) {
