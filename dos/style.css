@@ -111,7 +111,7 @@ header::before {
     margin-bottom: 1rem;
     padding: 0 1rem;
     min-height: 100px;
-    z-index: 2;
+    z-index: 1001;
 }
 
 h1 {
@@ -189,10 +189,37 @@ header p {
 .game-description {
     font-size: 0.9rem;
     display: -webkit-box;
-    /* stylelint-disable-next-line property-no-vendor-prefix */
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    margin-bottom: auto;
+    position: relative;
+}
+
+.description-popup {
+    display: none;
+    position: absolute;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    max-width: 400px;
+    pointer-events: none;
+}
+
+.description-popup::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid var(--card-bg);
 }
 
 .game-description:hover {
@@ -202,14 +229,16 @@ header p {
 .game-description-full {
     display: none;
     position: absolute;
-    left: 0;
+    left: 50%;
     bottom: 100%;
+    transform: translateX(-50%);
     background-color: var(--card-bg);
     padding: 1rem;
     border-radius: 5px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    width: 100%;
-    z-index: 10;
+    width: max-content;
+    max-width: 400px;
+    z-index: 1000;
     margin-bottom: 0.5rem;
 }
 
@@ -461,7 +490,7 @@ header p {
     justify-content: center;
     gap: 1rem;
     position: relative;
-    z-index: 9999;
+    z-index: 1000;
 }
 
 .alphabet-menu,
@@ -471,7 +500,7 @@ header p {
 .reset-filters {
     position: relative;
     display: inline-block;
-    z-index: 9999;
+    z-index: 100;
 }
 
 .filter-button {
@@ -510,31 +539,52 @@ header p {
     min-width: 300px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     border-radius: 5px;
-    z-index: 9999;
+    z-index: 101;
     left: 50%;
     transform: translateX(-50%);
     padding: 0.5rem;
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
 .filter-dropdown.show {
     display: flex;
+    opacity: 1;
+    visibility: visible;
+}
+
+#alphabetDropdown.show {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+}
+
+#alphabetDropdown {
+    min-width: 360px;
 }
 
 .filter-item {
     background-color: transparent;
     border: none;
     color: var(--text-color);
-    padding: 8px 12px;
+    padding: 8px 2px;
     border-radius: 4px;
     cursor: var(--custom-cursor), pointer;
-    transition: background-color 0.3s, transform 0.1s;
+    transition: all 0.3s ease;
+    height: 36px;
 }
 
-.filter-item:hover {
+#alphabetDropdown .filter-item:hover {
     background-color: #3d3d3d;
+    transform: scale(1.4);
+}
+
+#genreDropdown .filter-item:hover {
+    background-color: #3d3d3d;
+    transform: scale(1.1);
 }
 
 .filter-item:active {
@@ -579,6 +629,8 @@ header p {
 .search-container {
     width: 300px;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1002;
 }
 
 .search-wrapper {
@@ -593,11 +645,14 @@ header p {
     top: 50%;
     transform: translateY(-50%);
     font-size: 14px;
-    opacity: 0.6;
     pointer-events: none;
     z-index: 10;
     transition: opacity 0.3s ease;
     display: none;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3),
+                -1px -1px 1px rgba(0, 0, 0, 0.3),
+                1px -1px 1px rgba(0, 0, 0, 0.3),
+                -1px 1px 1px rgba(0, 0, 0, 0.3);
 }
 
 .search-wrapper.active::before {
@@ -654,7 +709,7 @@ header p {
     overflow-y: auto;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
-    z-index: 9999;
+    z-index: 1002;
 }
 
 .search-result-item {
@@ -714,7 +769,39 @@ header p {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Стили для модального окна */
+/* Стили для кнопки настроек */
+.settings-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--accent-color);
+    color: white;
+    padding: 0.4rem;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.1s;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    height: 32px;
+    width: 32px;
+}
+
+.settings-button:hover {
+    background-color: #7c3aed;
+}
+
+.settings-button:active {
+    transform: scale(0.95);
+    background-color: #6b21e0;
+}
+
+.settings-icon {
+    fill: white;
+    width: 20px;
+    height: 20px;
+}
+
+/* Общие стили для модальных окон */
 .modal {
     display: none;
     position: fixed;
@@ -722,167 +809,366 @@ header p {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 10000;
-    overflow-y: auto;
-    backdrop-filter: blur(3px);
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
 }
 
 .modal.show {
-    display: block;
-    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.modal-content {
+/* Стили для модального окна FAQ */
+#faqModal .modal-content {
     background-color: var(--card-bg);
-    margin: 50px auto;
     padding: 2rem;
     border-radius: 10px;
-    max-width: 700px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
     position: relative;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-    transform: translateY(-20px);
-    transition: transform 0.3s ease;
-    animation: modalAppear 0.3s forwards;
 }
 
-@keyframes modalAppear {
-    0% {
-        transform: translateY(-20px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.close-modal {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 2rem;
-    cursor: var(--custom-cursor), pointer;
-    color: var(--text-color);
-    opacity: 0.7;
-    transition: all 0.2s ease;
-}
-
-.close-modal:hover {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-.modal h2 {
+#faqModal h2 {
+    margin-bottom: 2rem;
     color: var(--accent-color);
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
+    text-align: center;
+    font-size: 1.5rem;
     font-family: 'Press Start 2P', cursive;
-    font-size: 1.4rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .faq-item {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.faq-item:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
 }
 
 .faq-item h3 {
+    margin-bottom: 1rem;
     color: var(--text-color);
-    margin-bottom: 0.7rem;
     font-size: 1.2rem;
+    line-height: 1.4;
 }
 
 .faq-item p {
-    color: #ccc;
+    margin-bottom: 1rem;
     line-height: 1.6;
-    font-size: 1rem;
-}
-
-.faq-item img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 10px 0;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #aaa;
 }
 
 .faq-item a {
     color: var(--accent-color);
     text-decoration: none;
-    position: relative;
-    transition: color 0.3s ease;
+    transition: color 0.3s;
+    border-bottom: 1px dashed var(--accent-color);
+    padding-bottom: 2px;
 }
 
 .faq-item a:hover {
     color: #7c3aed;
+    border-bottom-style: solid;
 }
 
-.faq-item a::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 1px;
-    bottom: -2px;
-    left: 0;
-    background-color: currentColor;
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.3s ease;
-}
-
-.faq-item a:hover::after {
-    transform: scaleX(1);
-    transform-origin: left;
+.faq-item img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 1rem 0;
+    border: 2px solid var(--accent-color);
 }
 
 .faq-item ul {
     list-style: none;
-    padding: 0.5rem 1rem;
-    margin: 0.5rem 0;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    border-left: 3px solid var(--accent-color);
-}
-
-.faq-item ul li {
-    padding: 0.5rem 0;
-    position: relative;
+    margin: 1rem 0;
     padding-left: 1.5rem;
 }
 
-.faq-item ul li::before {
-    content: '▹';
+.faq-item li {
+    margin: 0.8rem 0;
+    position: relative;
+    color: #aaa;
+}
+
+.faq-item li::before {
+    content: '►';
+    color: var(--accent-color);
     position: absolute;
-    left: 0;
+    left: -1.5rem;
+    top: 0;
+    font-size: 0.8rem;
+}
+
+/* Стили для модального окна настроек управления */
+#remapModal .modal-content {
+    background-color: var(--card-bg);
+    padding: 1rem;
+    border-radius: 10px;
+    width: 99%;
+    height: 99vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+#remapModal h2 {
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+    text-align: center;
+    font-size: 2rem;
+}
+
+/* Общие стили для кнопки закрытия */
+.close-modal {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    font-size: 2rem;
+    color: var(--text-color);
+    background: none;
+    border: none;
+    padding: 0.5rem;
+}
+
+.close-modal:hover {
     color: var(--accent-color);
 }
 
-.faq-item ul li:not(:last-child) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+/* Стили для виртуальной клавиатуры */
+.virtual-keyboard {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    width: fit-content;
+    margin: 0 auto;
+    position: relative;
 }
 
-/* Медиазапросы для модального окна на мобильных устройствах */
-@media (max-width: 768px) {
-    .modal-content {
-        margin: 20px;
-        padding: 1.5rem;
+.keyboard-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.keyboard-row {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-start;
+}
+
+.keyboard-row.system {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: fit-content;
+}
+
+.keyboard-row.arrows {
+    display: grid;
+    grid-template-areas:
+        ". up ."
+        "left down right";
+    gap: 8px;
+    margin-left: 40px;
+    width: fit-content;
+}
+
+.keyboard-row.arrows .key[data-code="ArrowUp"] { grid-area: up; }
+.keyboard-row.arrows .key[data-code="ArrowLeft"] { grid-area: left; }
+.keyboard-row.arrows .key[data-code="ArrowDown"] { grid-area: down; }
+.keyboard-row.arrows .key[data-code="ArrowRight"] { grid-area: right; }
+
+.keyboard-numpad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    align-self: flex-start;
+    margin-top: 32px;
+}
+
+.key {
+    background: #3a3a3a;
+    border: 1px solid #4a4a4a;
+    border-radius: 4px;
+    padding: 0.8rem;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    text-align: center;
+    user-select: none;
+    font-size: 1rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.key:hover {
+    background: #4a4a4a;
+}
+
+.key.active {
+    background: #5a5a5a;
+    border-color: #6a6a6a;
+}
+
+.key.wide { min-width: 5rem; }
+.key.tab { min-width: 4rem; }
+.key.caps { min-width: 4.5rem; }
+.key.shift { min-width: 6rem; }
+.key.ctrl { min-width: 3rem; }
+.key.space { min-width: 450px; }
+.key.enter { min-width: 4rem; }
+
+.keyboard-numpad .key[data-code="NumpadEnter"] {
+    grid-row: span 2;
+    height: auto;
+}
+
+.keyboard-numpad .key[data-code="Numpad0"] {
+    grid-column: span 2;
+}
+
+.keyboard-numpad .key[data-code="NumpadAdd"] {
+    grid-row: span 4;
+    height: auto;
+}
+
+.remap-list {
+    margin-top: 20px;
+    font-size: 16px;
+    color: white;
+}
+
+.remap-list div {
+    margin: 8px 0;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.remap-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--card-bg);
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.remap-item:last-child {
+    margin-bottom: 0;
+}
+
+.remap-item button {
+    background: none;
+    border: none;
+    color: #ef4444;
+    padding: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.remap-item button:hover {
+    color: #dc2626;
+}
+
+.remap-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: auto;
+    padding: 1rem;
+}
+
+.remap-add, .remap-cancel, .remap-cancel-key {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.remap-add {
+    background-color: #28a745;
+    color: white;
+}
+
+.remap-add:hover {
+    background-color: #218838;
+}
+
+.remap-add:disabled {
+    background-color: #6c757d;
+}
+
+.remap-cancel, .remap-cancel-key {
+    background-color: #dc3545;
+    color: white;
+}
+
+.remap-cancel:hover, .remap-cancel-key:hover {
+    background-color: #c82333;
+}
+
+@media (max-width: 1200px) {
+    .virtual-keyboard {
+        transform: scale(0.8);
+        transform-origin: top center;
     }
-    
-    .modal h2 {
-        font-size: 1.2rem;
+}
+
+@media (max-width: 900px) {
+    .virtual-keyboard {
+        transform: scale(0.6);
     }
-    
-    .faq-item h3 {
-        font-size: 1.1rem;
+}
+
+@media (max-width: 600px) {
+    .virtual-keyboard {
+        transform: scale(0.4);
     }
+}
+
+.keyboard-system {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.keyboard-row.system {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.keyboard-row.arrows {
+    display: grid;
+    grid-template-areas:
+        ". up ."
+        "left down right";
+    gap: 8px;
+}
+
+.keyboard-row.arrows .key[data-code="ArrowUp"] { grid-area: up; }
+.keyboard-row.arrows .key[data-code="ArrowLeft"] { grid-area: left; }
+.keyboard-row.arrows .key[data-code="ArrowDown"] { grid-area: down; }
+.keyboard-row.arrows .key[data-code="ArrowRight"] { grid-area: right; }
+
+.virtual-keyboard .key.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.virtual-keyboard .key.active-source {
+    background-color: #dc3545;
+    color: white;
+}
+
+.virtual-keyboard .key.active-target {
+    background-color: #28a745;
+    color: white;
 }
