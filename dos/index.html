@@ -14,27 +14,6 @@
     <meta property="og:type" content="website">
     <title>ran4erep's DOS Games Library</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .loading-spinner {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            z-index: 9999;
-        }
-
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -626,17 +605,14 @@
             const endIndex = startIndex + gamesPerPage;
             const currentGames = filteredGames.slice(startIndex, endIndex);
 
-            // Создаём фрагмент для оптимизации производительности
-            const fragment = document.createDocumentFragment();
-            
-            // Создаём карточки только для текущей страницы
-            currentGames.forEach(gameInfo => {
-                const gameCard = createGameCard(gameInfo);
-                fragment.appendChild(gameCard);
+            // Постепенно добавляем карточки с задержкой
+            currentGames.forEach((gameInfo, index) => {
+                setTimeout(() => {
+                    const gameCard = createGameCard(gameInfo);
+                    gameCard.style.animationDelay = `${index * 0.1}s`;
+                    gamesContainer.appendChild(gameCard);
+                }, index * 50);
             });
-
-            // Добавляем все карточки за один раз
-            gamesContainer.appendChild(fragment);
 
             createPagination(filteredGames.length);
 
