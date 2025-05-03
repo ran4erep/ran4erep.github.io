@@ -7,6 +7,7 @@
     <title>ran4erep's DOS library</title>
     <link rel="stylesheet" href="js-dos/js-dos.css">
     <script src="js-dos/js-dos.js"></script>
+    <script src="gdrive.js"></script>
     <style>
         * {
             margin: 0;
@@ -111,6 +112,53 @@
 
         // Загружаем настройки ремаппинга
         const keyMappings = JSON.parse(localStorage.getItem(`remap_${gamePath}`) || '{}');
+
+        // Функция для загрузки игры из Google Drive
+        async function loadGameFromDrive() {
+            try {
+                // Показываем экран загрузки
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('loading-background').style.display = 'block';
+
+                // Ищем файл игры
+                const gameFile = await window.gdrive.getFileByName(gamePath + '.jsdos') || 
+                                await window.gdrive.getFileByName(gamePath + '.zip');
+
+                if (!gameFile) {
+                    throw new Error('Game file not found');
+                }
+
+                // Получаем ссылку на скачивание
+                const downloadUrl = window.gdrive.getDownloadLink(gameFile.id);
+
+                // Создаём эмулятор
+                const ci = await Dos(document.getElementById("dos"), {
+                    wdosboxUrl: "js-dos/wdosbox.js",
+                    cycles: "auto",
+                    autolock: false
+                });
+
+                // Показываем прогресс загрузки
+                ci.ondosbox = (dosbox, instantiated) => {
+                    dosbox.onprogress = (stage, total, loaded) => {
+                        const percent = Math.floor((loaded / total) * 100);
+                        document.getElementById('progressFill').style.width = percent + '%';
+                        document.getElementById('progressText').textContent = percent + '%';
+                        document.getElementById('status').textContent = stage;
+                    };
+                };
+
+                // Загружаем игру
+                await ci.run(downloadUrl);
+
+                // Скрываем экран загрузки
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('loading-background').style.display = 'none';
+            } catch (error) {
+                console.error('Error loading game:', error);
+                document.getElementById('status').textContent = 'Error: ' + error.message;
+            }
+        }
 
         // Проверяем, есть ли хоть один ремап
         if (Object.keys(keyMappings).length > 0) {

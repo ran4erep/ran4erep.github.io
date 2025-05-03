@@ -226,6 +226,7 @@
         </div>
     </div>
 
+    <script src="gdrive.js"></script>
     <script>
         let gamesData = [];
         let currentPage = 1;
@@ -693,17 +694,26 @@
             });
         }
 
+        // Загружаем список игр
         async function loadGames() {
             try {
-                const response = await fetch('games.json');
-                const data = await response.json();
-                const games = data.games;
-
+                // Получаем список папок игр из Google Drive
+                const gameFolders = await window.gdrive.getGamesList();
+                
                 // Загружаем информацию о каждой игре
-                const gamePromises = games.map(async (gameDir) => {
+                const gamePromises = gameFolders.map(async (gameDir) => {
                     try {
-                        const gameInfoResponse = await fetch(`games/${gameDir}/info.json`);
-                        const gameInfo = await gameInfoResponse.json();
+                        // Получаем файлы из папки игры
+                        const gameFiles = await window.gdrive.getGameFiles(gameDir);
+                        
+                        // Ищем info.json
+                        const infoFile = gameFiles.find(file => file.name === 'info.json');
+                        if (!infoFile) return null;
+
+                        // Получаем содержимое info.json
+                        const infoResponse = await fetch(window.gdrive.getDownloadLink(infoFile.id));
+                        const gameInfo = await infoResponse.json();
+                        
                         return { ...gameInfo, dir: gameDir };
                     } catch (error) {
                         console.error(`Error loading game info for ${gameDir}:`, error);
@@ -713,7 +723,7 @@
 
                 // Ждем загрузки всех игр
                 gamesData = (await Promise.all(gamePromises)).filter(game => game !== null);
-                
+
                 // Создаем фильтры по жанрам
                 updateGenreFilters(gamesData);
                 
