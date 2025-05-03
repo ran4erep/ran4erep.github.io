@@ -699,65 +699,162 @@
                 // Показываем спиннер
                 document.getElementById('loadingSpinner').style.display = 'block';
 
+                // Функция для загрузки
+                async function fetchWithCORS(url) {
+                    return fetch(url);
+                }
+
                 // Пробуем загрузить из кэша
                 const cachedGames = localStorage.getItem('gamesData');
+                const failedGames = new Set(JSON.parse(localStorage.getItem('failedGames') || '[]'));
                 
                 // Если есть кэш - используем его
                 if (cachedGames) {
                     gamesData = JSON.parse(cachedGames);
+                    
+                    // Находим игры которых нет в кэше или которые не удалось загрузить в прошлый раз
+                    const gameFolders = await window.gdrive.getGamesList();
+                    const uncachedGames = gameFolders.filter(dir => 
+                        !gamesData.some(game => game.dir === dir) || failedGames.has(dir)
+                    );
+
+                    // Если есть незагруженные игры - загружаем их
+                    if (uncachedGames.length > 0) {
+                        for (const gameDir of uncachedGames) {
+                            try {
+                                const gameFiles = await window.gdrive.getGameFiles(gameDir);
+                                const infoFile = gameFiles.find(file => file.name === 'info.json');
+                                const boxartFile = gameFiles.find(file => file.name === 'boxart.jpg');
+                                
+                                if (!infoFile) {
+                                    failedGames.add(gameDir);
+                                    continue;
+                                }
+
+                                // Загружаем info.json
+                                const infoResponse = await fetchWithCORS(window.gdrive.getDownloadLink(infoFile.id));
+                                const gameInfo = await infoResponse.json();
+
+                                // Если есть обложка, кэшируем её
+                                if (boxartFile) {
+                                    const boxartUrl = window.gdrive.getDownloadLink(boxartFile.id);
+                                    const boxartResponse = await fetchWithCORS(boxartUrl);
+                                    const blob = await boxartResponse.blob();
+                                    const reader = new FileReader();
+                                    const boxartBase64 = await new Promise(resolve => {
+                                        reader.onloadend = () => resolve(reader.result);
+                                        reader.readAsDataURL(blob);
+                                    });
+                                    gameInfo.boxartBase64 = boxartBase64;
+                                }
+
+                                // Добавляем директорию к данным игры
+                                const fullGameInfo = { ...gameInfo, dir: gameDir };
+                                
+                                // Удаляем из списка неудачных загрузок
+                                failedGames.delete(gameDir);
+                                
+                                // Добавляем игру в общий массив
+                                gamesData.push(fullGameInfo);
+
+                                // Создаём и добавляем карточку игры
+                                const gameCard = createGameCard(fullGameInfo);
+                                gameCard.style.opacity = '0';
+                                document.getElementById('gamesContainer').appendChild(gameCard);
+                                
+                                // Запускаем анимацию появления
+                                requestAnimationFrame(() => {
+                                    gameCard.classList.add('show');
+                                });
+
+                            } catch (error) {
+                                console.error(`Error loading game info for ${gameDir}:`, error);
+                                failedGames.add(gameDir);
+                            }
+                        }
+
+                        // Сохраняем обновлённые данные в кэш
+                        localStorage.setItem('gamesData', JSON.stringify(gamesData));
+                    }
+
+                    // Применяем фильтры к уже загруженным играм
                     updateGenreFilters(gamesData);
                     applyFilters();
-                    document.getElementById('loadingSpinner').style.display = 'none';
-                    return;
+
+                } else {
+                    // Если кэша нет - загружаем все игры
+                    gamesData = [];
+                    const gameFolders = await window.gdrive.getGamesList();
+                    
+                    for (const gameDir of gameFolders) {
+                        try {
+                            const gameFiles = await window.gdrive.getGameFiles(gameDir);
+                            const infoFile = gameFiles.find(file => file.name === 'info.json');
+                            const boxartFile = gameFiles.find(file => file.name === 'boxart.jpg');
+                            
+                            if (!infoFile) {
+                                failedGames.add(gameDir);
+                                continue;
+                            }
+
+                            // Загружаем info.json
+                            const infoResponse = await fetchWithCORS(window.gdrive.getDownloadLink(infoFile.id));
+                            const gameInfo = await infoResponse.json();
+
+                            // Если есть обложка, кэшируем её
+                            if (boxartFile) {
+                                const boxartUrl = window.gdrive.getDownloadLink(boxartFile.id);
+                                const boxartResponse = await fetchWithCORS(boxartUrl);
+                                const blob = await boxartResponse.blob();
+                                const reader = new FileReader();
+                                const boxartBase64 = await new Promise(resolve => {
+                                    reader.onloadend = () => resolve(reader.result);
+                                    reader.readAsDataURL(blob);
+                                });
+                                gameInfo.boxartBase64 = boxartBase64;
+                            }
+
+                            // Добавляем директорию к данным игры
+                            const fullGameInfo = { ...gameInfo, dir: gameDir };
+                            
+                            // Удаляем из списка неудачных загрузок
+                            failedGames.delete(gameDir);
+                            
+                            // Добавляем игру в общий массив
+                            gamesData.push(fullGameInfo);
+
+                            // Создаём и добавляем карточку игры
+                            const gameCard = createGameCard(fullGameInfo);
+                            gameCard.style.opacity = '0';
+                            document.getElementById('gamesContainer').appendChild(gameCard);
+                            
+                            // Запускаем анимацию появления
+                            requestAnimationFrame(() => {
+                                gameCard.classList.add('show');
+                            });
+
+                            // Обновляем фильтры жанров после добавления каждой игры
+                            updateGenreFilters(gamesData);
+
+                        } catch (error) {
+                            console.error(`Error loading game info for ${gameDir}:`, error);
+                            failedGames.add(gameDir);
+                        }
+                    }
+
+                    // Сохраняем только успешно загруженные игры
+                    if (gamesData.length > 0) {
+                        localStorage.setItem('gamesData', JSON.stringify(gamesData));
+                    }
                 }
 
-                // Если кэша нет, загружаем с Google Drive
-                const gameFolders = await window.gdrive.getGamesList();
-                
-                const gamePromises = gameFolders.map(async (gameDir) => {
-                    try {
-                        const gameFiles = await window.gdrive.getGameFiles(gameDir);
-                        const infoFile = gameFiles.find(file => file.name === 'info.json');
-                        const boxartFile = gameFiles.find(file => file.name === 'boxart.jpg');
-                        
-                        if (!infoFile) return null;
+                // Сохраняем список неудачных загрузок
+                localStorage.setItem('failedGames', JSON.stringify([...failedGames]));
 
-                        // Загружаем info.json
-                        const infoResponse = await fetch(window.gdrive.getDownloadLink(infoFile.id));
-                        const gameInfo = await infoResponse.json();
-
-                        // Если есть обложка, кэшируем её
-                        if (boxartFile) {
-                            const boxartUrl = window.gdrive.getDownloadLink(boxartFile.id);
-                            // Загружаем обложку и конвертируем в base64
-                            const boxartResponse = await fetch(boxartUrl);
-                            const blob = await boxartResponse.blob();
-                            const reader = new FileReader();
-                            const boxartBase64 = await new Promise(resolve => {
-                                reader.onloadend = () => resolve(reader.result);
-                                reader.readAsDataURL(blob);
-                            });
-                            gameInfo.boxartBase64 = boxartBase64;
-                        }
-                        
-                        return { ...gameInfo, dir: gameDir };
-                    } catch (error) {
-                        console.error(`Error loading game info for ${gameDir}:`, error);
-                        return null;
-                    }
-                });
-
-                gamesData = (await Promise.all(gamePromises)).filter(game => game !== null);
-
-                // Сохраняем в кэш
-                localStorage.setItem('gamesData', JSON.stringify(gamesData));
-
-                updateGenreFilters(gamesData);
-                applyFilters();
             } catch (error) {
                 console.error('Error loading games list:', error);
             } finally {
-                // Скрываем спиннер в любом случае
+                // Скрываем спиннер
                 document.getElementById('loadingSpinner').style.display = 'none';
             }
         }

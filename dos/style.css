@@ -1206,7 +1206,7 @@ header p {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: var(--bg-color);
+    background-color: var(--primary-color);
     border-radius: 8px;
 }
 
@@ -1216,6 +1216,15 @@ header p {
 }
 
 /* Анимация появления карточек */
+.game-card {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.game-card.show {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
