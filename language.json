@@ -450,5 +450,21 @@
     "cod_book_desc": {
         "en": "Modern version of my book, which is completely rewritten taking into account the events of the film. With illustrations, including unused materials from the film.",
         "ru": "Современная версия моей книги, которая полностью переписана с учётом событий фильма. С иллюстрациями, среди которых есть неиспользованные в фильме материалы."
+    },
+	"dos_title": {
+        "en": "DOS Games Library",
+        "ru": "DOS Games Library"
+    },
+    "dos_desc": {
+        "en": "A catalog of DOS games with the ability to play them directly in your browser.",
+        "ru": "Каталог DOS игр с возможностью играть в них прямо в браузере."
+    },
+	"universe_desc": {
+        "en": "Simulation of bacterial life with simple rules: eat or be eaten. But with one nuance: each bacterium is controlled by a neural network that tries to learn how to survive in this harsh world.",
+        "ru": "Симуляция жизни бактерий с простыми правилами: ешь или будь съеденным. Но с одним нюансом: каждая бактерия управляется нейросетью, которая пытается научиться выжить в этом суровом мире."
+    },
+    "btn_watch": {
+        "en": "Watch on YouTube",
+        "ru": "Смотреть на YouTube"
     }
 }

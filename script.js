@@ -76,8 +76,8 @@ class Gallery {
         this.itemWidth = 316;
         
         this.grid = document.getElementById('gallery-grid');
-        this.prevButton = document.getElementById('gallery-prev');
-        this.nextButton = document.getElementById('gallery-next');
+        this.prevButton = document.getElementById('new-gallery-prev');
+        this.nextButton = document.getElementById('new-gallery-next');
         this.viewport = document.querySelector('.gallery-viewport');
         
         this.bindEvents();
@@ -114,7 +114,6 @@ class Gallery {
         }
     }
     
-    
     render() {
         if (!this.grid) return;
         
@@ -125,9 +124,22 @@ class Gallery {
             item.className = 'gallery-item';
             
             const img = document.createElement('img');
-            img.src = `gallery/${filename}`;
             img.alt = filename;
-            img.loading = 'lazy';
+            
+            // Предварительная загрузка изображения
+            const preloadImg = new Image();
+            preloadImg.src = `gallery/${filename}`;
+            
+            preloadImg.onload = () => {
+                img.src = preloadImg.src;
+                requestAnimationFrame(() => {
+                    item.classList.add('loaded');
+                });
+            };
+            
+            preloadImg.onerror = () => {
+                item.classList.add('error');
+            };
             
             item.addEventListener('click', () => this.showImage(filename, index));
             item.appendChild(img);
@@ -142,8 +154,12 @@ class Gallery {
         const viewportWidth = this.viewport.clientWidth;
         const maxScroll = totalWidth - viewportWidth;
         
-        this.prevButton?.classList.toggle('hidden', this.currentPosition <= 0);
-        this.nextButton?.classList.toggle('hidden', this.currentPosition >= maxScroll);
+        if (this.prevButton) {
+            this.prevButton.style.display = this.currentPosition <= 0 ? 'none' : 'flex';
+        }
+        if (this.nextButton) {
+            this.nextButton.style.display = this.currentPosition >= maxScroll ? 'none' : 'flex';
+        }
     }
     
     showPrevPage() {
@@ -172,6 +188,8 @@ class Gallery {
     showImage(filename, index) {
         const viewer = document.getElementById('image-viewer');
         const img = document.getElementById('viewer-image');
+        const prevBtn = document.getElementById('new-viewer-prev');
+        const nextBtn = document.getElementById('new-viewer-next');
         if (!viewer || !img) return;
         
         viewer.classList.remove('hidden');
@@ -185,20 +203,27 @@ class Gallery {
         void img.offsetWidth;
         img.classList.add('show');
         
+        if (prevBtn) prevBtn.style.display = 'flex';
+        if (nextBtn) prevBtn.style.display = 'flex';
+        
         this.updateImageNavigation();
     }
     
     hideImage() {
         const viewer = document.getElementById('image-viewer');
         const img = document.getElementById('viewer-image');
+        const prevBtn = document.getElementById('new-viewer-prev');
+        const nextBtn = document.getElementById('new-viewer-next');
         if (!viewer || !img) return;
         
         img.classList.remove('show');
         img.classList.add('fade-out');
         
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
+        
         setTimeout(() => {
             viewer.classList.add('hidden');
-            img.classList.remove('fade-out');
             document.body.style.overflow = '';
         }, 300);
     }
@@ -209,12 +234,10 @@ class Gallery {
         const img = document.getElementById('viewer-image');
         if (!img) return;
         
-        img.classList.remove('show');
-        img.classList.add('slide-left');
+        this.currentImageIndex++;
+        img.src = `gallery/${this.images[this.currentImageIndex]}`;
         
-        setTimeout(() => {
-            this.showImage(this.images[this.currentImageIndex + 1], this.currentImageIndex + 1);
-        }, 300);
+        this.updateImageNavigation();
     }
     
     showPreviousImage() {
@@ -223,21 +246,22 @@ class Gallery {
         const img = document.getElementById('viewer-image');
         if (!img) return;
         
-        img.classList.remove('show');
-        img.classList.add('slide-right');
+        this.currentImageIndex--;
+        img.src = `gallery/${this.images[this.currentImageIndex]}`;
         
-        setTimeout(() => {
-            this.showImage(this.images[this.currentImageIndex - 1], this.currentImageIndex - 1);
-        }, 300);
+        this.updateImageNavigation();
     }
     
     updateImageNavigation() {
-        const prevButton = document.getElementById('viewer-prev');
-        const nextButton = document.getElementById('viewer-next');
-        if (!prevButton || !nextButton) return;
+        const prevBtn = document.getElementById('new-viewer-prev');
+        const nextBtn = document.getElementById('new-viewer-next');
         
-        prevButton.classList.toggle('hidden', this.currentImageIndex <= 0);
-        nextButton.classList.toggle('hidden', this.currentImageIndex >= this.images.length - 1);
+        if (prevBtn) {
+            prevBtn.style.display = this.currentImageIndex <= 0 ? 'none' : 'flex';
+        }
+        if (nextBtn) {
+            nextBtn.style.display = this.currentImageIndex >= this.images.length - 1 ? 'none' : 'flex';
+        }
     }
 }
 
@@ -249,12 +273,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const viewer = document.getElementById('image-viewer');
     const closeBtn = viewer.querySelector('#viewer-close');
-    const prevBtn = viewer.querySelector('#viewer-prev');
-    const nextBtn = viewer.querySelector('#viewer-next');
+    const newPrevBtn = document.getElementById('new-viewer-prev');
+    const newNextBtn = document.getElementById('new-viewer-next');
 
     closeBtn.addEventListener('click', () => gallery.hideImage());
-    prevBtn.addEventListener('click', () => gallery.showPreviousImage());
-    nextBtn.addEventListener('click', () => gallery.showNextImage());
+    newPrevBtn.addEventListener('click', () => gallery.showPreviousImage());
+    newNextBtn.addEventListener('click', () => gallery.showNextImage());
 
     const faviconFrames = [
         'favicon1.ico',

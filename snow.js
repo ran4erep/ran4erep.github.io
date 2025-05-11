@@ -20,9 +20,14 @@ class SnowAnimation {
         
         if (!isWinterMonth) {
             localStorage.setItem('isSnowing', 'false');
-            const toggleButton = document.getElementById('snow-toggle');
+            const toggleButton = document.getElementById('new-snow-toggle');
             if (toggleButton) {
                 toggleButton.style.display = 'none';
+            }
+        } else {
+            const toggleButton = document.getElementById('new-snow-toggle');
+            if (toggleButton) {
+                toggleButton.style.display = 'flex';
             }
         }
         
@@ -42,7 +47,7 @@ class SnowAnimation {
     }
     
     setupToggleButton() {
-        const toggleButton = document.getElementById('snow-toggle');
+        const toggleButton = document.getElementById('new-snow-toggle');
         if (toggleButton) {
             toggleButton.addEventListener('click', () => {
                 this.isSnowing = !this.isSnowing;

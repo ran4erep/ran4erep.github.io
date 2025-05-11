@@ -124,29 +124,41 @@
             <section id="gallery" aria-label="Gallery">
                 <h2 class="section-title" data-lang-id="nav_gallery">Галерея</h2>
                 <div class="gallery-container">
-                    <button id="gallery-prev" class="gallery-nav prev-button" aria-label="Previous images"><span>‹</span>
-                        <span data-lang-id="back_tooltip"class="tooltip-right">Назад</span>
-                    </button>
                     <div class="gallery-viewport">
                         <div id="gallery-grid" class="gallery-grid">
                             <!-- Images will be loaded here dynamically -->
                         </div>
                     </div>
-                    <button id="gallery-next" class="gallery-nav next-button" aria-label="Next images"><span>›</span>
-                        <span data-lang-id="forward_tooltip" class="tooltip-left">Вперёд</span>
-                    </button>
+
+                    <!-- Новые кнопки для галереи -->
+                    <a href="javascript:void(0)" id="new-gallery-prev" style="position:absolute; left:-25px; top:50%; transform:translateY(-50%); width:50px; height:50px; background-color:#8b5cf6; color:white; text-decoration:none; border-radius:50%; font-size:24px; display:none; align-items:center; justify-content:center; z-index:100;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                    </a>
+                    <a href="javascript:void(0)" id="new-gallery-next" style="position:absolute; right:-25px; top:50%; transform:translateY(-50%); width:50px; height:50px; background-color:#8b5cf6; color:white; text-decoration:none; border-radius:50%; font-size:24px; display:none; align-items:center; justify-content:center; z-index:100;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </a>
                 </div>
             </section>
 
             <section id="ai-projects">
                 <h2 class="section-title" data-lang-id="nav_ai_projects">AI Проекты</h2>
                 <div class="projects-grid">
+				
+					<div class="project featured" data-lang="javascript">
+                        <h2>Universe A-Life</h2>
+                        <p data-lang-id="universe_desc">Симуляция жизни бактерий с простыми правилами: ешь или будь съеденным. Но с одним нюансом: каждая бактерия управляется нейросетью, которая пытается научиться выжить в этом суровом мире.</p>
+                        <a href="/projects/ai/universe/" class="project-link" data-lang-id="btn_go" target="_blank" rel="noopener noreferrer">Перейти</a>
+                    </div>
+				
                     <div class="project featured">
                         <h2 data-lang-id="film_cod_title">Короткометражный фильм Cradle of Death</h2>
                         <p data-lang-id="film_cod_desc">Фильм, созданный при помощи нейросетей. Видеоряд, частично музыка, озвучка персонажей - всё это сгенерировали нейросети.</p>
-                        <div class="video-container">
-                            <iframe width="1" height="1" src="https://www.youtube.com/embed/XS_UAkd24AQ?si=4KHXq9I2uI53krXp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                        </div>
+                        <img src="https://img.youtube.com/vi/XS_UAkd24AQ/sddefault.jpg" alt="Cradle of Death film">
+                        <a href="https://youtu.be/XS_UAkd24AQ?si=l7s4bjYZNNFb9NDO" class="project-link" data-lang-id="btn_watch" target="_blank" rel="noopener noreferrer">Посмотреть на YouTube</a>
                     </div>
 
                     <div class="project featured" data-lang="python">
@@ -187,6 +199,12 @@
             <section id="games">
                 <h2 class="section-title" data-lang-id="nav_games">Игры</h2>
                 <div class="projects-grid">
+                    <div class="project featured" data-lang="html">
+                        <h2 data-lang-id="dos_title">DOS Games Library</h2>
+                        <p data-lang-id="dos_desc">Каталог DOS игр с возможностью играть в них прямо в браузере.</p>
+                        <a href="https://r4dos.pages.dev" class="project-link" data-lang-id="btn_go" target="_blank" rel="noopener noreferrer">Перейти</a>
+                    </div>
+                    
                     <div class="project featured" data-lang="android">
                         <h2 data-lang-id="game_or_title">Игра Opposite Reaction</h2>
                         <p data-lang-id="game_or_desc">Простой раннер, который я сделал чтобы протестировать конструктор игр GDevelop.</p>
@@ -468,23 +486,36 @@
             </section>
         </main>
 
-        <button id="scroll-to-top-btn" onclick="scrollToTop()">
+        <button id="scroll-to-top-btn" onclick="scrollToTop()" style="display:none;">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="m18 15-6-6-6 6"/>
             </svg>
             <span data-lang-id="ontop_tooltip" class="tooltip">Подняться наверх</span>
         </button>
 
+        <!-- Новая кнопка скролла наверх с оригинальной иконкой -->
+        <a href="javascript:void(0)" id="new-scroll-top" style="position:fixed; bottom:40px; right:90px; width:50px; height:50px; background-color:#8b5cf6; color:white; text-decoration:none; border-radius:50%; font-size:24px; display:none; align-items:center; justify-content:center; z-index:100; ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                <path d="m18 15-6-6-6 6"/>
+            </svg>
+        </a>
+
         <div id="image-viewer" class="image-viewer hidden" role="dialog" aria-modal="true">
             <button id="viewer-close" class="viewer-close" aria-label="Close viewer">×
                 <span data-lang-id="close_tooltip" class="tooltip-left">Закрыть</span>
             </button>
-            <button id="viewer-prev" class="viewer-nav prev-button" aria-label="Previous image"><span>‹</span>
-                <span data-lang-id="back_tooltip" class="tooltip-right">Назад</span>
-            </button>
-            <button id="viewer-next" class="viewer-nav next-button" aria-label="Next image"><span>›</span>
-                <span data-lang-id="forward_tooltip" class="tooltip-left">Вперед</span>
-            </button>
+
+            <!-- Новые кнопки для просмотрщика -->
+            <a href="javascript:void(0)" id="new-viewer-prev" style="position:absolute; left:20px; top:50%; transform:translateY(-50%); width:50px; height:50px; background-color:#8b5cf6; color:white; text-decoration:none; border-radius:50%; font-size:24px; display:none; align-items:center; justify-content:center; z-index:100;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </a>
+            <a href="javascript:void(0)" id="new-viewer-next" style="position:absolute; right:20px; top:50%; transform:translateY(-50%); width:50px; height:50px; background-color:#8b5cf6; color:white; text-decoration:none; border-radius:50%; font-size:24px; display:none; align-items:center; justify-content:center; z-index:100;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </a>
             <img id="viewer-image" src="" alt="" loading="lazy">
         </div>
 
@@ -494,21 +525,36 @@
             </div>
         </div>
 
-        <button id="snow-toggle" class="snow-toggle" aria-label="Toggle snow effect">
+        <button id="snow-toggle" class="snow-toggle" aria-label="Toggle snow effect" style="display:none;">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M12 3v18M7.5 7.5l9 9M16.5 7.5l-9 9M3 12h18"/>
                 <circle cx="12" cy="12" r="1"/>
             </svg>
             <span data-lang-id="snow_tooltip" class="tooltip-right">Включить/выключить снег</span>
         </button>
+        
+        <!-- Новая кнопка снега с оригинальной иконкой -->
+        <a href="javascript:void(0)" id="new-snow-toggle" style="position:fixed; bottom:40px; left:20px; width:50px; height:50px; background-color:#8b5cf6; color:white; text-decoration:none; border-radius:50%; font-size:24px; display:flex; align-items:center; justify-content:center; z-index:100; ">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" style="pointer-events:none;">
+                <path d="M12 3v18M7.5 7.5l9 9M16.5 7.5l-9 9M3 12h18" stroke="currentColor" fill="none" stroke-width="2"/>
+                <circle cx="12" cy="12" r="1" stroke="currentColor" fill="none" stroke-width="2"/>
+            </svg>
+        </a>
     </div>
 
-    <button id="chat-button" class="chat-button">
+    <button id="chat-button" class="chat-button" style="display:none;">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         </svg>
         <span data-lang-id="chat_tooltip" class="tooltip">Чилл-зона</span>
     </button>
+    
+    <!-- Новая кнопка чата с оригинальной иконкой -->
+    <a href="javascript:void(0)" id="new-chat-button" style="position:fixed; bottom:40px; right:20px; width:50px; height:50px; background-color:#8b5cf6; color:white; text-decoration:none; border-radius:50%; font-size:24px; display:flex; align-items:center; justify-content:center; z-index:100; ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </a>
 
     <div id="chat-modal" class="chat-modal hidden">
         <div class="chat-container">
@@ -545,6 +591,60 @@
             </div>
         </div>
     </div>
+
+    <style>
+    /* Удаляем стили, которые могли бы влиять на новые кнопки */
+    #new-scroll-top:hover,
+    #new-chat-button:hover,
+    #new-snow-toggle:hover,
+    #new-gallery-prev:hover,
+    #new-gallery-next:hover,
+    #new-viewer-prev:hover,
+    #new-viewer-next:hover {
+        background-color: #7c3aed !important;
+        transform: translateY(calc(-50% - 2px)) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    #new-scroll-top:active,
+    #new-chat-button:active,
+    #new-snow-toggle:active,
+    #new-gallery-prev:active,
+    #new-gallery-next:active,
+    #new-viewer-prev:active,
+    #new-viewer-next:active {
+        transform: translateY(calc(-50% + 1px)) !important;
+        background-color: #6d28d9 !important;
+    }
+
+    #new-scroll-top,
+    #new-chat-button,
+    #new-snow-toggle,
+    #new-gallery-prev,
+    #new-gallery-next,
+    #new-viewer-prev,
+    #new-viewer-next {
+        transition: all 0.2s ease !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Отдельные стили для кнопок, которые не центрированы по вертикали */
+    #new-scroll-top:hover,
+    #new-chat-button:hover,
+    #new-snow-toggle:hover {
+        transform: translateY(-2px) !important;
+    }
+
+    #new-scroll-top:active,
+    #new-chat-button:active,
+    #new-snow-toggle:active {
+        transform: translateY(1px) !important;
+    }
+
+    .tooltip {
+        pointer-events: none !important;
+    }
+    </style>
 
     <script type="module">
          function updateClock() {
@@ -891,24 +991,122 @@
         }
 
         window.onscroll = function() {
-            const btn = document.getElementById("scroll-to-top-btn");
+            const btn = document.getElementById("new-scroll-top");
             if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-                btn.style.display = "block";
+                btn.style.display = "flex";
             } else {
                 btn.style.display = "none";
             }
         }
 
+        // Обработчики для новых кнопок
+        document.addEventListener('DOMContentLoaded', function() {
+            // Кнопка скролла
+            const newScrollBtn = document.getElementById('new-scroll-top');
+            newScrollBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
 
+            // Кнопка чата
+            const newChatBtn = document.getElementById('new-chat-button');
+            const chatModal = document.getElementById('chat-modal');
+            const chatMessages = document.getElementById('chat-messages');
+            const nicknameInput = document.getElementById('nickname');
+            const messageInput = document.getElementById('message');
+
+            newChatBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                chatModal.classList.toggle('hidden');
+                if (!chatModal.classList.contains('hidden')) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    if (typeof startChatUpdates === 'function') startChatUpdates();
+                    if (nicknameInput.disabled) {
+                        messageInput.focus();
+                    } else {
+                        nicknameInput.focus();
+                    }
+                } else {
+                    if (typeof stopChatUpdates === 'function') stopChatUpdates();
+                }
+            });
+
+            // Кнопка снега
+            const newSnowBtn = document.getElementById('new-snow-toggle');
+            newSnowBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Получаем состояние снега и инвертируем его
+                const isSnowing = localStorage.getItem('isSnowing') !== 'false';
+                localStorage.setItem('isSnowing', !isSnowing);
+                
+                // Показываем или скрываем снег
+                const snowCanvas1 = document.getElementById('snow-canvas-bg');
+                const snowCanvas2 = document.getElementById('snow-canvas-fg');
+                if (snowCanvas1 && snowCanvas2) {
+                    if (isSnowing) {
+                        snowCanvas1.style.display = 'none';
+                        snowCanvas2.style.display = 'none';
+                    } else {
+                        snowCanvas1.style.display = 'block';
+                        snowCanvas2.style.display = 'block';
+                    }
+                }
+            });
+
+            // Обработчики для кнопок просмотрщика
+            const newViewerPrev = document.getElementById('new-viewer-prev');
+            const newViewerNext = document.getElementById('new-viewer-next');
+            const newViewerClose = document.getElementById('viewer-close');
+
+            if (newViewerPrev) {
+                newViewerPrev.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof gallery !== 'undefined') {
+                        gallery.showPreviousImage();
+                    }
+                });
+            }
+
+            if (newViewerNext) {
+                newViewerNext.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof gallery !== 'undefined') {
+                        gallery.showNextImage();
+                    }
+                });
+            }
+
+            if (newViewerClose) {
+                newViewerClose.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof gallery !== 'undefined') {
+                        gallery.hideImage();
+                    }
+                });
+            }
+        });
+
+        // Восстанавливаем обработчики якорных ссылок
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
+                // Пропускаем пустые ссылки и наши новые кнопки
+                if (this.getAttribute('href') === '#' || 
+                    this.id === 'new-scroll-top' || 
+                    this.id === 'new-chat-button' || 
+                    this.id === 'new-snow-toggle') {
+                    return;
+                }
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
+                const href = this.getAttribute('href');
+                // Проверяем, что href - это валидный селектор
+                if (href && href !== '#') {
+                    const target = document.querySelector(href);
                 if (target) {
                     target.scrollIntoView({
                         behavior: 'smooth',
                         block: 'start'
                     });
+                    }
                 }
             });
         });

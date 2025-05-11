@@ -250,13 +250,16 @@ body::before {
 
 .main-content {
     flex: 1;
-    padding: 1rem;
+    padding: 1rem 2rem;
     margin-left: 0;
+    width: 100%;
     transition: margin-left 0.3s ease-in-out;
+    overflow-x: hidden;
 }
 
 .sidebar:not(.hidden) ~ .main-content {
     margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
 }
 
 .section-title {
@@ -277,12 +280,27 @@ body::before {
 }
 
 .logo-container {
-    display: flex;
-    align-items: center;
     position: relative;
-    justify-content: center;
+    text-align: center;
+    margin: 1rem 0;
+    width: 100%;
+    overflow: hidden;
 }
 
+.logo-text {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--primary), #9932cc, #ff1493, var(--primary));
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient 5s ease infinite;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    display: block;
+}
 
 .clock {
     position: absolute;
@@ -314,26 +332,25 @@ section {
 
 .projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    width: 100%;
+    max-width: 100%;
 }
 
 .project {
-    background: linear-gradient(135deg, 
-        var(--card-bg) 0%,
-        rgba(139, 92, 246, 0.05) 100%
-    );
+    background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 1rem;
+    border-radius: 8px;
     padding: 1.5rem;
     transition: all 0.3s ease;
-    height: 100%;
     display: flex;
     flex-direction: column;
-    position: relative;
+    gap: 0;
+    width: 100%;
+    max-width: 100%;
     overflow: hidden;
-    backdrop-filter: blur(5px);
 }
 
 .project:hover {
@@ -354,8 +371,17 @@ section {
 
 .project p {
     color: var(--text-secondary);
-    margin-bottom: 1.5rem;
+    margin-bottom: 6px;
     flex-grow: 1;
+}
+
+.project img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    margin: 0;
+    padding: 0;
 }
 
 .project-link {
@@ -408,24 +434,28 @@ section {
 }
 
 @media (max-width: 768px) {
-    .project.featured {
-        margin-bottom: 1.25rem;
+    :root {
+        --sidebar-width: 80%;
     }
-
-    .project.featured .video-container {
-        margin: 1rem -1.25rem -1.25rem;
-    }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
+    
     .projects-grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        padding: 0.5rem;
     }
-
+    
     .project {
-        padding: 1.25rem;
+        margin: 0.5rem 0;
+    }
+    
+    .main-content {
+        width: 100%;
+        margin-left: 0;
+        padding: 1rem;
+    }
+    
+    .sidebar:not(.hidden) + .main-content {
+        margin-left: 0;
+        width: 100%;
     }
 }
 
@@ -461,6 +491,7 @@ section {
     display: flex;
     align-items: center;
     justify-content: center;
+    will-change: transform;
 }
 
 .gallery-item:hover {
@@ -468,11 +499,45 @@ section {
     border-color: var(--primary);
 }
 
+.gallery-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        var(--card-bg) 0%,
+        var(--primary) 20%,
+        var(--card-bg) 40%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+    will-change: background-position, opacity;
+}
+
+.gallery-item.loaded::before {
+    opacity: 0;
+}
+
 .gallery-item img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
     background: #000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    position: relative;
+    z-index: 2;
+    will-change: opacity;
+}
+
+.gallery-item.loaded img {
+    opacity: 1;
 }
 
 .gallery-nav {
@@ -1340,7 +1405,7 @@ body.viewer-open {
 /* Mobile Fixes */
 @media (max-width: 768px) {
     :root {
-        --sidebar-width: 80vw;
+        --sidebar-width: 80%;
     }
 
     .sidebar {
@@ -2254,6 +2319,15 @@ body.viewer-open {
         position: absolute;
         top: 1rem;
         right: 9rem;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
     }
 }
 
