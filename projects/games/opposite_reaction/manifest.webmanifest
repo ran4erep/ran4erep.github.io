@@ -1,0 +1,33 @@
+{
+  "name": "Opposite Reaction",
+  "short_name": "Opposite Reaction",
+  "id": "ua.ran4erep.oppreact",
+  "description": "Just run through the forest and enjoy this simple infinite runner game :)",
+  "orientation": "landscape",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "black",
+  "categories": ["games", "entertainment"],
+  "icons": [{
+        "src": "iconLarge.png",
+        "sizes": "36x36"
+      },{
+        "src": "iconLarge.png",
+        "sizes": "48x48"
+      },{
+        "src": "iconLarge.png",
+        "sizes": "72x72"
+      },{
+        "src": "iconLarge.png",
+        "sizes": "96x96"
+      },{
+        "src": "iconLarge.png",
+        "sizes": "144x144"
+      },{
+        "src": "iconLarge.png",
+        "sizes": "192x192"
+      },{
+        "src": "iconLarge.png",
+        "sizes": "512x512"
+      }]
+}
