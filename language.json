@@ -466,5 +466,21 @@
     "btn_watch": {
         "en": "Watch on YouTube",
         "ru": "Смотреть на YouTube"
-    }
+    },
+	"faggots_hunter_title": {
+		"en": "Hunting for faggots",
+		"ru": "Охота на пидоров"
+	},
+	"faggots_hunter_desc": {
+		"en": "A good old (🙃) Flash game about a brave hunter who went on a safari for faggots. Your ass is at stake, so be as vigilant as possible, they can be waiting for you in every bush... I launched the game on the website using the Ruffle library and added simple touch controls so that you can FEEL all the pain of defeat in this game while sitting on the toilet. 😄",
+		"ru": "Старая добрая (🙃) Flash игра про отважного охотника, который отправился на сафари на пидоров. На кону стоит ваша жопа, будьте максимально бдительны, они могут поджидать вас в каждом кусту... Собственно запустил игру на сайте через библиотеку Ruffle, сверху добавил простое сенсорное управление, чтобы сидя в туалете можно было ПРОЧУВСТВОВАТЬ всю боль поражения в этой игре. 😄"
+	},
+	"arlade_title": {
+		"en": "Roguelike game Arlade",
+		"ru": "Roguelike игра Arlade"
+	},
+	"arlade_desc": {
+		"en": "The bagel is not yet finished (I switched to another project), but many of the typical mechanics of such games are fully implemented. I'll finish it someday, but for now it's sitting in a drawer, waiting for its moment to shine.",
+		"ru": "Пока что не доделанный до конца рогалик (пересел с него на другой проект), но многие типичные механики подобных игр полностью реализованы. Когда-нибудь доделаю, а пока что он лежит в долгом ящике и ждёт свой час."
+	}
 }
