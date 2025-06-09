@@ -456,8 +456,8 @@
         "ru": "DOS Games Library"
     },
     "dos_desc": {
-        "en": "A catalog of DOS games with the ability to play them directly in your browser.",
-        "ru": "Каталог DOS игр с возможностью играть в них прямо в браузере."
+        "en": "A catalog of DOS games with the ability to play them directly in your browser. It uses a JS-DOS emulator that supports multiplayer via IPX. It all runs on a different hosting service, as they provide 20 gigabytes of storage.",
+        "ru": "Каталог DOS игр с возможностью играть в них прямо в браузере. Используется эмулятор JS-DOS, который поддерживает мультиплеер через IPX. Крутится это всё на другом хостинге, так как там дают 20 гигов."
     },
 	"universe_desc": {
         "en": "Simulation of bacterial life with simple rules: eat or be eaten. But with one nuance: each bacterium is controlled by a neural network that tries to learn how to survive in this harsh world.",
