@@ -1,5 +1,0 @@
-{
-  "name": "React Roguelike Dungeon Crawler",
-  "description": "A simple roguelike game built with React and TypeScript. Explore procedurally generated dungeons, fight monsters, and try to survive. Features a main menu, a dungeon generation system, and a turn-based combat and movement system.",
-  "requestFramePermissions": []
-}
