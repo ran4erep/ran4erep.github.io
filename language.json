@@ -482,5 +482,13 @@
 	"arlade_desc": {
 		"en": "The bagel is not yet finished (I switched to another project), but many of the typical mechanics of such games are fully implemented. I'll finish it someday, but for now it's sitting in a drawer, waiting for its moment to shine.",
 		"ru": "Пока что не доделанный до конца рогалик (пересел с него на другой проект), но многие типичные механики подобных игр полностью реализованы. Когда-нибудь доделаю, а пока что он лежит в долгом ящике и ждёт свой час."
+	},
+    "passgen_title": {
+		"en": "Number based password generator",
+		"ru": "Digital password generator"
+	},
+	"passgen_desc": {
+		"en": "A utility for generating .txt files containing numeric passwords.",
+		"ru": "Утилита для генерации .txt файлов содержащих цифровые пароли."
 	}
 }
