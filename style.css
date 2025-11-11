@@ -71,7 +71,7 @@ body::before {
     top: 0;
     bottom: 0;
     left: 0;
-    transform: translateX(-100%);
+    transform: translateX(0); /* visible by default */
     transition: transform 0.3s ease-in-out;
     z-index: 100;
     overflow-y: auto;
@@ -79,67 +79,8 @@ body::before {
     overscroll-behavior: contain;
 }
 
-.sidebar-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-    position: relative;
-    padding: 2px;
-    background: linear-gradient(90deg, 
-        var(--primary),
-        #9932cc,
-        #ff1493,
-        var(--primary),
-        #8a2be2,
-        #ff69b4,
-        var(--primary)
-    );
-    background-size: 300% 100%;
-    animation: gradient 5s ease infinite;
-}
-
-.sidebar-avatar img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-*::-webkit-scrollbar {
-    width: 8px;
-    background: var(--scrollbar-bg);
-}
-
-*::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 4px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-hover);
-}
-
-*::-webkit-scrollbar-corner {
-    background: var(--scrollbar-bg);
-}
-
-.sidebar::-webkit-scrollbar {
-    width: 2px;
-    background: var(--scrollbar-bg);
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 4px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-hover);
-}
-
-.sidebar:not(.hidden) {
-    transform: translateX(0);
+.sidebar.hidden {
+    transform: translateX(-100%); /* hide when .hidden class is applied */
 }
 
 .sidebar-header {
@@ -244,22 +185,18 @@ body::before {
     background: var(--primary);
 }
 
-.sidebar:not(.hidden) ~ .sidebar-toggle {
-    left: calc(var(--sidebar-width) + 1rem);
-}
-
 .main-content {
     flex: 1;
     padding: 1rem 2rem;
-    margin-left: 0;
-    width: 100%;
+    margin-left: var(--sidebar-width); /* shift right when sidebar is visible by default */
+    width: calc(100% - var(--sidebar-width));
     transition: margin-left 0.3s ease-in-out;
     overflow-x: hidden;
 }
 
-.sidebar:not(.hidden) ~ .main-content {
-    margin-left: var(--sidebar-width);
-    width: calc(100% - var(--sidebar-width));
+.sidebar.hidden ~ .main-content {
+    margin-left: 0;
+    width: 100%;
 }
 
 .section-title {
@@ -453,7 +390,7 @@ section {
         padding: 1rem;
     }
     
-    .sidebar:not(.hidden) + .main-content {
+    .sidebar.hidden ~ .main-content {
         margin-left: 0;
         width: 100%;
     }
@@ -1695,10 +1632,11 @@ body.viewer-open {
 
 .chat-modal {
     position: fixed;
-    top: 47%;
-    right: 8px;
-    transform: translateY(-50%);
-    width: 400px;
+    top: 48%;
+    left: 77%;
+    transform: translate(-50%, -50%);
+    width: 45%;
+    max-width: 90%;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 12px;
@@ -1709,6 +1647,17 @@ body.viewer-open {
     backdrop-filter: blur(10px);
 }
 
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -48%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
 .chat-modal.hidden {
     opacity: 0;
     pointer-events: none;
@@ -1717,7 +1666,7 @@ body.viewer-open {
 .chat-container {
     display: flex;
     flex-direction: column;
-    height: 400px;
+    height: 80vh;
 }
 
 .chat-header {
@@ -1906,11 +1855,18 @@ body.viewer-open {
 
 @media (max-width: 768px) {
     .chat-modal {
-        width: 90%;
-        max-width: 400px;
-        right: 50%;
-        top: 45%;
-        transform: translate(50%, -50%);
+        width: 95%;
+        max-width: 100%;
+        max-height: 80vh;
+        top: 50%;
+        left: 50%;
+        right: auto;
+        transform: translate(-50%, -50%);
+        border-radius: 12px;
+    }
+
+    .chat-container {
+        max-height: 80vh;
     }
 
     .chat-button {
@@ -1920,6 +1876,7 @@ body.viewer-open {
 
     .chat-input {
         flex-wrap: wrap;
+        padding: 1rem;
     }
 
     #nickname {
@@ -2284,41 +2241,12 @@ body.viewer-open {
     }
 }
 
-.weather {
-    position: absolute;
-    top: 1rem;
-    right: 15rem;
-    font-size: 0.9rem;
-    color: var(--text);
-    padding: 0.35rem 0.75rem;
-    background: rgba(15, 17, 22, 0.8);
-    border: 1px solid var(--card-border);
-    border-radius: 20px;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    z-index: 1000;
-}
-
-.weather:hover {
-    transform: translateY(1px);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-    border-color: var(--primary);
-}
-
 @media (max-width: 768px) {
-    .weather {
-        position: static;
-        display: block;
-        margin: 1rem auto 0;
-        text-align: center;
-        width: fit-content;
-    }
-    
     .clock {
         position: absolute;
         top: 1rem;
-        right: 9rem;
+        left: 40%;
+        right: auto;
     }
 }
 
@@ -2330,4 +2258,33 @@ body.viewer-open {
         background-position: 200% 0;
     }
 }
+
+/* Disable animated glow / gradient motion for logo and sidebar avatar
+   Minimal override: stops animations and removes glow-related filters
+   Keeps static visuals but avoids CPU/GPU work. */
+.logo-text,
+.logo-text::before,
+.logo-text::after {
+    animation: none !important;
+    transition: none !important;
+    filter: none !important;
+    text-shadow: none !important;
+    will-change: auto !important;
+}
+
+.sidebar-avatar {
+    animation: none !important;
+    will-change: auto !important;
+    /* keep gradient border visible */
+}
+
+.sidebar-avatar img {
+    transition: none !important;
+    will-change: auto !important;
+}
+
+/* If you later want to enable motion selectively, add a class to body:
+   body.enable-logo-motion .logo-text { animation: gradient 5s ease infinite; }
+   body.enable-logo-motion .sidebar-avatar { animation: gradient 5s ease infinite; }
+*/
 
