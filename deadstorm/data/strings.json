@@ -1,0 +1,119 @@
+
+{
+  "ui": {
+    "loading": {
+      "connection": "Соединение...",
+      "init": "Инициализация...",
+      "items_db": "Загрузка базы предметов...",
+      "gear": "Подготовка снаряжения...",
+      "geometry": "Сборка геометрии...",
+      "textures": "Загрузка текстур окружения...",
+      "sprites": "Обработка спрайтов...",
+      "level_load": "Загрузка: Уровень {level} - Сектор {sector}...",
+      "error_book": "Ошибка загрузки книги."
+    },
+    "header": {
+      "status": "Здоровье",
+      "objective": "Текущая задача",
+      "weapon": "Активное оружие",
+      "damage": "УРОН",
+      "loading_title": "Загрузка...",
+      "fists": "Кулаки"
+    },
+    "menu": {
+      "title": "DEAD STORM",
+      "btn_start": "НАЧАТЬ ОПЕРАЦИЮ"
+    },
+    "modal": {
+      "close": "Закрыть",
+      "objective_title": "ТЕКУЩАЯ ЗАДАЧА",
+      "no_data": "Данные отсутствуют.",
+      "intel_title": "РАЗВЕДДАННЫЕ",
+      "objective_label": "ОСНОВНАЯ ЗАДАЧА",
+      "tap_to_close": "НАЖМИТЕ ЧТОБЫ ЗАКРЫТЬ"
+    },
+    "controls": {
+      "btn_shoot_dummy": "СТРЕЛЯТЬ",
+      "btn_action": "ДЕЙСТВИЕ"
+    },
+    "victory": {
+      "title": "ЭВАКУАЦИЯ УСПЕШНА",
+      "subtitle": "КОНЕЦ ОПЕРАЦИИ",
+      "button": "В ГЛАВНОЕ МЕНЮ"
+    },
+    "game_over": {
+      "title": "ПОТРАЧЕНО",
+      "subtitle": "СВЯЗЬ ПОТЕРЯНА",
+      "button": "В ГЛАВНОЕ МЕНЮ"
+    }
+  },
+  "inventory": {
+    "title": "ИНВЕНТАРЬ",
+    "empty": "Карманы пусты.",
+    "equipped": "В РУКАХ",
+    "damage_short": "Урон",
+    "heal_short": "Леч",
+    "btn_equip": "Взять",
+    "btn_use": "Использовать",
+    "btn_close": "Закрыть"
+  },
+  "combat": {
+    "target_lost": "ЦЕЛИ НЕ НАЙДЕНЫ",
+    "btn_fire": "ОГОНЬ",
+    "btn_escape": "ПОБЕГ",
+    "btn_run": "БЕЖАТЬ",
+    "hit": "ЕСТЬ!",
+    "crit": "КРИТ!",
+    "miss": "ПРОМАХ",
+    "enemy_turn": "ХОД ПРОТИВНИКА...",
+    "nowhere_to_run": "БЕЖАТЬ НЕКУДА"
+  },
+  "logs": {
+    "system_load": "СИСТЕМА: Локация загружена: \"{location}\"",
+    "objective": "ЦЕЛЬ: {objective}",
+    "wall_hit": "Вы ударились в стену.",
+    "blocking": "{name} мешает пройти.",
+    "door_locked": "Дверь заперта.",
+    "door_open": "Вы открыли дверь.",
+    "door_close": "Вы закрыли дверь.",
+    "door_blocked_player": "Нельзя закрыть дверь отсюда.",
+    "item_found": "На земле лежит {name}.",
+    "item_in_front": "Перед вами лежит {name}.",
+    "item_under_feet": "У вас под ногами {name}.",
+    "decor_found": "Перед вами {name}.",
+    "evac_found": "Зона эвакуации обнаружена! Вызываю транспорт...",
+    "nothing_here": "Здесь нет ничего полезного.",
+    "picked_up": "Подобрано: {name}.",
+    "combat_start": "ВНИМАНИЕ! {name} замечен по курсу!",
+    "combat_multiple": "КОНТАКТ: Группа противников!",
+    "attack_hit": "Вы атакуете ({weapon}) -> {enemy}: -{damage} HP",
+    "attack_crit": " (КРИТ!)",
+    "attack_crit_fail": " (Не удалось критануть)",
+    "attack_miss": "Вы промахнулись.",
+    "enemy_destroyed": "{name} уничтожен.",
+    "enemy_hit": "{name} атакует вас: -{damage} HP!",
+    "enemy_miss": "{name} промахивается по вам.",
+    "evaded": "Вы увернулись от атаки {name}.",
+    "equipped": "Экипировано: {name}",
+    "used_heal": "{name} использовано: +{heal} HP.",
+    "escape_success": "Удалось сбежать!",
+    "escape_fail": "Не удалось сбежать!",
+    "escape_blocked": "Путь к отступлению перекрыт!",
+    "data_error": "Ошибка загрузки данных уровня.",
+    "system_fail": "Сбой системы данных."
+  },
+  "initial_items": {
+    "knife": {
+      "name": "Боевой нож",
+      "desc": "Тяжелый армейский нож. Надежный инструмент выживания."
+    },
+    "pistol": {
+      "name": "Пистолет M9",
+      "desc": "Стандартный пистолет калибра 9мм."
+    },
+    "medkit": {
+      "name": "Армейская аптечка",
+      "desc": "Набор для оказания первой помощи."
+    }
+  }
+}

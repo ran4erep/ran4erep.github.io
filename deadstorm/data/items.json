@@ -1,0 +1,20 @@
+{
+  "knife": {
+    "type": "WEAPON",
+    "damageDice": "1d6",
+    "accuracy": 20,
+    "assetId": "WEAPON"
+  },
+  "pistol": {
+    "type": "WEAPON",
+    "damageDice": "1d8",
+    "accuracy": 1,
+    "assetId": "WEAPON"
+  },
+  "medkit": {
+    "type": "CONSUMABLE",
+    "healDice": "2d6",
+    "accuracy": 10,
+    "assetId": "CONSUMABLE"
+  }
+}
