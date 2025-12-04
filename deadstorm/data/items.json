@@ -1,20 +1,40 @@
+
 {
   "knife": {
     "type": "WEAPON",
     "damageDice": "1d6",
-    "accuracy": 20,
-    "assetId": "WEAPON"
+    "accuracy": 15,
+    "range": 1,
+    "assetId": "KNIFE",
+    "handAsset": "HAND_KNIFE",
+    "handScale": 0.8,
+    "handOffset": { "x": 20, "y": 20 },
+    "attackAnimation": [
+      { "duration": 80, "x": 30, "y": 30, "scale": 1.0 },
+      { "duration": 60, "x": -80, "y": -80, "scale": 1.1 },
+      { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
+    ]
   },
   "pistol": {
     "type": "WEAPON",
     "damageDice": "1d8",
-    "accuracy": 1,
-    "assetId": "WEAPON"
+    "accuracy": 25,
+    "range": 5,
+    "assetId": "PISTOL",
+    "handAsset": "HAND_PISTOL",
+    "handScale": 1.0,
+    "handOffset": { "x": 20, "y": 20 },
+    "attackAnimation": [
+      { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
+      { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
+      { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
+    ]
   },
   "medkit": {
     "type": "CONSUMABLE",
     "healDice": "2d6",
     "accuracy": 10,
+    "range": 0,
     "assetId": "CONSUMABLE"
   }
 }

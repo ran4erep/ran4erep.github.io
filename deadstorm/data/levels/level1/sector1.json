@@ -1,17 +1,31 @@
+
 {
   "locationName": "Склад ГСМ",
   "locationDescription": "Заброшенный склад горюче-смазочных материалов. В воздухе висит тяжелый запах бензина. Повсюду разбросаны пустые бочки и строительный мусор.",
   "objective": "Найти синюю ключ-карту и добраться до грузового лифта.",
+  "globalLight": 0.3,
+  "ceilingType": "OUTDOOR",
   "grid": [
-    "################",
-    "#S..........MMM#",
-    "#.##.ZZO...#####",
-    "#.#B...K...3..K#",
-    "#.##...R...#####",
-    "#....Z.....2...#",
-    "####..###1######",
-    "#M.4.##........#",
-    "####X###########"
+    "#######################",
+    "#S..........MMM#.ZZZ..#",
+    "#.##.ZZO...#####ZZ.ZZ.#",
+    "#.#B...K...3........Z.#",
+    "#.##...R...###.##...Z.#",
+    "#....Z.....2.W.#......#",
+    "####..###1######......#",
+    "#M.4.##........#..O...#",
+    "####X##################"
+  ],
+  "gridLight": [
+    ".......................",
+    ".......................",
+    "...7........7.....5....",
+    ".......................",
+    ".......................",
+    ".......................",
+    "...7........7.....5....",
+    ".......................",
+    "......................."
   ],
   "doorDefinitions": {
     "1": { "type": "HINGE", "dir": "LEFT" },
@@ -19,6 +33,13 @@
     "3": { "type": "SLIDE" },
     "4": { "type": "LIFT" }
   },
+  "exits": [
+    {
+      "symbol": "X",
+      "destination": "./data/levels/level1/sector2.json",
+      "assetId": "EXIT"
+    }
+  ],
   "legend": [
     { "char": "#", "description": "Бетонная стена" },
     { "char": ".", "description": "Грязный бетонный пол" },
@@ -37,12 +58,14 @@
       "maxHp": 12,
       "damageDice": "1d4",
       "accuracy": 1,
+      "attackRange": 1,
       "assets": {
         "map": "ZOMBIE2",
         "portrait": "ZOMBIE2_PORTRAIT",
         "attack": "ZOMBIE2_ATTACK_PORTRAIT"
       },
-      "description": "Бывший сотрудник склада, теперь лишь оболочка."
+      "description": "Бывший сотрудник склада, теперь лишь оболочка.",
+      "baseXP": 15
     },
     {
       "symbol": "O",
@@ -51,12 +74,15 @@
       "maxHp": 18,
       "damageDice": "1d6",
       "accuracy": 5,
+      "attackRange": 5,
       "assets": {
         "map": "SOLDIER",
         "portrait": "SOLDIER_PORTRAIT",
-        "attack": "SOLDIER_ATTACK_PORTRAIT"
+        "attack": "SOLDIER_ATTACK_PORTRAIT",
+        "distanceAttack": "SOLDIER_ATTACK_SPRITE"
       },
-      "description": "Вооруженный охранник комплекса."
+      "description": "Вооруженный охранник комплекса.",
+      "baseXP": 30
     }
   ],
   "items": [
@@ -64,7 +90,7 @@
       "symbol": "M",
       "name": "Бинт",
       "type": "CONSUMABLE",
-      "assetId": "CONSUMABLE",
+      "assetId": "BANDAGE",
       "description": "Грязный, но стерильный бинт.",
       "scale": 0.2,
       "healDice": "1d4"
@@ -76,6 +102,25 @@
       "assetId": "KEY",
       "description": "Синяя карта доступа.",
       "scale": 0.1
+    },
+    {
+      "symbol": "W",
+      "name": "Дробовик",
+      "type": "WEAPON",
+      "assetId": "SHOTGUN",
+      "description": "Стандартный помповый дробовик используемый полицией.",
+      "scale": 0.2,
+      "damageDice": "3d4",
+      "accuracy": 17,
+      "range": 3,
+      "handAsset": "HAND_SHOTGUN",
+      "handScale": 1.0,
+      "handOffset": { "x": 20, "y": 40 },
+      "attackAnimation": [
+        { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
+        { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
+        { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
+      ]
     }
   ],
   "decorations": [
@@ -91,9 +136,9 @@
       "symbol": "R",
       "name": "Строительный мусор",
       "description": "Куча обломков бетона и арматуры.",
-      "assetId": "RUBBLE",
+      "assetId": "DEBRIS",
       "scale": 0.5,
-      "blocking": false
+      "blocking": true
     }
   ]
 }

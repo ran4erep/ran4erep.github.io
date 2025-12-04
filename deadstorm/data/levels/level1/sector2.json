@@ -1,7 +1,9 @@
+
 {
   "locationName": "Технический Коридор",
   "locationDescription": "Узкие коридоры, заполненные паром и мигающими лампами аварийного освещения.",
   "objective": "Пробиться через охрану к панели управления.",
+  "ceilingType": "INDOOR",
   "grid": [
     "############",
     "#S...R.....#",
@@ -12,6 +14,13 @@
     "#.#.##.###.#",
     "#M..#W...X.#",
     "############"
+  ],
+  "exits": [
+    {
+      "symbol": "X",
+      "destination": "./data/levels/level1/sector1.json",
+      "assetId": "EXIT"
+    }
   ],
   "legend": [
     { "char": "#", "description": "Стена" },
@@ -27,12 +36,15 @@
       "maxHp": 10,
       "damageDice": "1d6",
       "accuracy": 5,
+      "attackRange": 5,
       "assets": {
         "map": "SOLDIER",
         "portrait": "SOLDIER_PORTRAIT",
-        "attack": "SOLDIER_ATTACK_PORTRAIT"
+        "attack": "SOLDIER_ATTACK_PORTRAIT",
+        "distanceAttack": "SOLDIER_ATTACK_SPRITE"
       },
-      "description": "Вооруженный охранник комплекса."
+      "description": "Вооруженный охранник комплекса.",
+      "baseXP": 25
     }
   ],
   "items": [
@@ -42,18 +54,19 @@
       "type": "CONSUMABLE",
       "assetId": "CONSUMABLE",
       "description": "Армейская аптечка.",
-      "scale": 0.3,
+      "scale": 0.2,
       "healDice": "2d4"
     },
     {
       "symbol": "W",
       "name": "Дробовик",
       "type": "WEAPON",
-      "assetId": "WEAPON",
+      "assetId": "SHOTGUN",
       "description": "Помповый дробовик.",
-      "scale": 0.4,
+      "scale": 0.2,
       "damageDice": "2d6",
-      "accuracy": 5
+      "accuracy": 20,
+      "range": 3
     }
   ],
   "decorations": [
@@ -61,9 +74,9 @@
       "symbol": "R",
       "name": "Трубы",
       "description": "Протекающие трубы.",
-      "assetId": "RUBBLE",
-      "scale": 0.6,
-      "blocking": false
+      "assetId": "PIPES",
+      "scale": 0.4,
+      "blocking": true
     }
   ]
 }

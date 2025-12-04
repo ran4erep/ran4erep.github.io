@@ -1,5 +1,3 @@
-
-
 {
   "ui": {
     "loading": {
@@ -15,6 +13,7 @@
     },
     "header": {
       "status": "Здоровье",
+      "level": "Уровень",
       "objective": "Текущая задача",
       "weapon": "Активное оружие",
       "damage": "УРОН",
@@ -36,7 +35,11 @@
     "controls": {
       "btn_shoot_dummy": "СТРЕЛЯТЬ",
       "btn_action": "ДЕЙСТВИЕ",
-      "btn_strafe": "СТРЕЙФ"
+      "btn_strafe": "СТРЕЙФ",
+      "btn_attack": "АТАКА",
+      "btn_cancel": "ОТМЕНА",
+      "btn_prev": "<",
+      "btn_next": ">"
     },
     "victory": {
       "title": "ЭВАКУАЦИЯ УСПЕШНА",
@@ -54,10 +57,16 @@
     "empty": "Карманы пусты.",
     "equipped": "В РУКАХ",
     "damage_short": "Урон",
-    "heal_short": "Леч",
+    "heal_short": "Лечение",
+    "accuracy": "Точность",
     "btn_equip": "Взять",
-    "btn_use": "Использовать",
-    "btn_close": "Закрыть"
+    "btn_use": "Исп.",
+    "btn_close": "Закрыть",
+    "full_health": "Вам это не требуется.",
+    "btn_info": "ИНФО",
+    "range": "Дальность",
+    "details_title": "ХАРАКТЕРИСТИКИ",
+    "type_label": "Тип"
   },
   "combat": {
     "target_lost": "ЦЕЛИ НЕ НАЙДЕНЫ",
@@ -68,7 +77,9 @@
     "crit": "КРИТ!",
     "miss": "ПРОМАХ",
     "enemy_turn": "ХОД ПРОТИВНИКА...",
-    "nowhere_to_run": "БЕЖАТЬ НЕКУДА"
+    "enemy_turn_plural": "ХОД ПРОТИВНИКОВ...",
+    "nowhere_to_run": "БЕЖАТЬ НЕКУДА",
+    "timeout": "Враги перехватывают инициативу!"
   },
   "logs": {
     "system_load": "СИСТЕМА: Локация загружена: \"{location}\"",
@@ -102,7 +113,11 @@
     "escape_fail": "Не удалось сбежать!",
     "escape_blocked": "Путь к отступлению перекрыт!",
     "data_error": "Ошибка загрузки данных уровня.",
-    "system_fail": "Сбой системы данных."
+    "system_fail": "Сбой системы данных.",
+    "too_far": "Враг слишком далеко для этого оружия.",
+    "no_targets": "Цели не обнаружены.",
+    "xp_gain": "Получено опыта: {xp}.",
+    "level_up": "ПОВЫШЕНИЕ УРОВНЯ! Текущий уровень: {level}."
   },
   "initial_items": {
     "knife": {
