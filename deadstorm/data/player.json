@@ -1,0 +1,15 @@
+
+{
+  "hp": 30,
+  "maxHp": 30,
+  "xp": 0,
+  "maxXp": 300,
+  "level": 1,
+  "availablePoints": 0,
+  "stats": {
+    "str": 0,
+    "agi": 0,
+    "spd": 0,
+    "vit": 0
+  }
+}

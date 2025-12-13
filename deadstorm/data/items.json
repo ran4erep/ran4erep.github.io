@@ -6,9 +6,14 @@
     "accuracy": 15,
     "range": 1,
     "assetId": "KNIFE",
+    "dollAssetId": "KNIFE_DOLL",
     "handAsset": "HAND_KNIFE",
     "handScale": 0.8,
     "handOffset": { "x": 20, "y": 20 },
+    "zIndex": 5,
+    "slot": "weapon",
+    "name": "Боевой нож/Combat Knife",
+    "description": "Тяжелый армейский нож. Надежный инструмент выживания./Heavy military knife. Reliable survival tool.",
     "attackAnimation": [
       { "duration": 80, "x": 30, "y": 30, "scale": 1.0 },
       { "duration": 60, "x": -80, "y": -80, "scale": 1.1 },
@@ -21,9 +26,17 @@
     "accuracy": 25,
     "range": 5,
     "assetId": "PISTOL",
+    "dollAssetId": "PISTOL_DOLL",
     "handAsset": "HAND_PISTOL",
     "handScale": 1.0,
     "handOffset": { "x": 20, "y": 20 },
+    "zIndex": 5,
+    "slot": "weapon",
+    "magazineMax": 9,
+    "currentAmmo": 9,
+    "ammoType": "9mm",
+    "name": "Пистолет M9/M9 Pistol",
+    "description": "Стандартный пистолет калибра 9мм./Standard 9mm sidearm.",
     "attackAnimation": [
       { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
       { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
@@ -35,6 +48,59 @@
     "healDice": "2d6",
     "accuracy": 10,
     "range": 0,
-    "assetId": "CONSUMABLE"
+    "assetId": "CONSUMABLE",
+    "name": "Армейская аптечка/Field Medkit",
+    "description": "Набор для оказания первой помощи./First aid supplies."
+  },
+  "ammo_9mm": {
+    "type": "AMMO",
+    "assetId": "PISTOL_AMMO",
+    "scale": 0.12,
+    "ammoType": "9mm",
+    "count": 11,
+    "name": "Патроны 9мм/9mm Ammo",
+    "description": "Коробка с патронами калибра 9мм./Box of 9mm ammunition."
+  },
+  "helmet": {
+    "type": "ARMOR",
+    "protection": 1,
+    "zIndex": 4,
+    "slot": "helmet",
+    "assetId": "HELMET_ICON",
+    "dollAssetId": "HELMET",
+    "name": "Военный шлем/Military Helmet",
+    "description": "Смягчает удары в голову./Softens blows to the head."
+  },
+  "vest": {
+    "type": "ARMOR",
+    "protection": 2,
+    "inventorySlots": 4,
+    "zIndex": 3,
+    "slot": "vest",
+    "assetId": "VEST_ICON",
+    "dollAssetId": "VEST",
+    "name": "Бронежилет/Body Armor",
+    "description": "Армейский бронежилет. Надежная защита торса./Military body armor. Reliable torso protection."
+  },
+  "pants": {
+    "type": "ARMOR",
+    "protection": 0,
+    "inventorySlots": 2,
+    "zIndex": 2,
+    "slot": "pants",
+    "assetId": "PANTS_ICON",
+    "dollAssetId": "PANTS",
+    "name": "Тактические штаны/Tactical Pants",
+    "description": "Прочные и функциональные./Durable and functional."
+  },
+  "boots": {
+    "type": "ARMOR",
+    "protection": 0,
+    "zIndex": 1,
+    "slot": "boots",
+    "assetId": "BOOTS_ICON",
+    "dollAssetId": "BOOTS",
+    "name": "Армейские берцы/Combat Boots",
+    "description": "Защищают голеностоп./Protects the ankle."
   }
 }

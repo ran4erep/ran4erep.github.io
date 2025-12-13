@@ -1,8 +1,8 @@
 
 {
-  "locationName": "Склад ГСМ/Fuel Depot",
-  "locationDescription": "Заброшенный склад горюче-смазочных материалов. В воздухе висит тяжелый запах бензина. Повсюду разбросаны пустые бочки и строительный мусор./An abandoned fuel and lubricant warehouse. The air hangs heavy with the smell of gasoline. Empty barrels and construction debris are scattered everywhere.",
-  "objective": "Найти синюю ключ-карту и добраться до грузового лифта./Find the blue keycard and reach the cargo elevator.",
+  "locationName": "Fuel Depot",
+  "locationDescription": "An abandoned fuel and lubricant warehouse. The air hangs heavy with the smell of gasoline. Empty barrels and construction debris are scattered everywhere.",
+  "objective": "Find the blue keycard and reach the cargo elevator.",
   "globalLight": 0.3,
   "ceilingType": "OUTDOOR",
   "playerStart": {
@@ -44,19 +44,19 @@
     }
   ],
   "legend": [
-    { "char": "#", "description": "Бетонная стена/Concrete Wall" },
-    { "char": ".", "description": "Грязный бетонный пол/Dirty Concrete Floor" },
-    { "char": "S", "description": "Точка входа/Entry Point" },
-    { "char": "X", "description": "Двери лифта (Выход)/Elevator Doors (Exit)" },
-    { "char": "1", "description": "Дверь (Петли Лев)/Door (Hinge Left)" },
-    { "char": "2", "description": "Дверь (Петли Прав)/Door (Hinge Right)" },
-    { "char": "3", "description": "Дверь (Слайд)/Door (Slide)" },
-    { "char": "4", "description": "Дверь (Лифт)/Door (Lift)" }
+    { "char": "#", "description": "Concrete Wall" },
+    { "char": ".", "description": "Dirty Concrete Floor" },
+    { "char": "S", "description": "Entry Point" },
+    { "char": "X", "description": "Elevator Doors (Exit)" },
+    { "char": "1", "description": "Door (Hinge Left)" },
+    { "char": "2", "description": "Door (Hinge Right)" },
+    { "char": "3", "description": "Door (Slide)" },
+    { "char": "4", "description": "Door (Lift)" }
   ],
   "enemies": [
     {
       "symbol": "Z",
-      "name": "Зараженный техник/Infected Technician",
+      "name": "Infected Technician",
       "hp": 12,
       "maxHp": 12,
       "damageDice": "1d4",
@@ -67,12 +67,12 @@
         "portrait": "ZOMBIE2_PORTRAIT",
         "attack": "ZOMBIE2_ATTACK_PORTRAIT"
       },
-      "description": "Бывший сотрудник склада, теперь лишь оболочка./Former warehouse employee, now just a shell.",
+      "description": "Former warehouse employee, now just a shell.",
       "baseXP": 15
     },
     {
       "symbol": "O",
-      "name": "Охранник/Security Guard",
+      "name": "Security Guard",
       "hp": 18,
       "maxHp": 18,
       "damageDice": "1d6",
@@ -84,40 +84,38 @@
         "attack": "SOLDIER_ATTACK_PORTRAIT",
         "distanceAttack": "SOLDIER_ATTACK_SPRITE"
       },
-      "description": "Вооруженный охранник комплекса./Armed complex security guard.",
+      "description": "Armed complex security guard.",
       "baseXP": 30
     }
   ],
   "items": [
     {
       "symbol": "M",
-      "name": "Бинт/Bandage",
+      "name": "Bandage",
       "type": "CONSUMABLE",
       "assetId": "BANDAGE",
-      "description": "Грязный, но стерильный бинт./Dirty but sterile bandage.",
+      "description": "Dirty but sterile bandage.",
       "scale": 0.2,
       "healDice": "1d4"
     },
     {
       "symbol": "K",
-      "name": "Ключ-карта/Keycard",
+      "name": "Keycard",
       "type": "KEY",
       "assetId": "KEY",
-      "description": "Синяя карта доступа./Blue access card.",
+      "description": "Blue access card.",
       "scale": 0.1
     },
     {
       "symbol": "W",
-      "name": "Дробовик/Shotgun",
+      "name": "Shotgun",
       "type": "WEAPON",
       "assetId": "SHOTGUN",
-      "dollAssetId": "SHOTGUN_DOLL",
-      "description": "Стандартный помповый дробовик используемый полицией./Standard pump-action shotgun used by police.",
+      "description": "Standard pump-action shotgun used by police.",
       "scale": 0.2,
       "damageDice": "3d4",
       "accuracy": 17,
       "range": 3,
-      "zIndex": 5,
       "magazineMax": 4,
       "currentAmmo": 4,
       "ammoType": "12g",
@@ -132,38 +130,38 @@
     },
     {
       "symbol": "9",
-      "name": "Патроны 9мм/9mm Ammo",
+      "name": "9mm Ammo",
       "type": "AMMO",
       "assetId": "PISTOL_AMMO",
       "scale": 0.12,
       "ammoType": "9mm",
       "count": 30,
-      "description": "Коробка с патронами калибра 9мм (30 шт)./Box of 9mm ammunition (30 rounds)."
+      "description": "Box of 9mm ammunition (30 rounds)."
     },
     {
       "symbol": "G",
-      "name": "Патроны 12 калибра/12-Gauge Shells",
+      "name": "12-Gauge Shells",
       "type": "AMMO",
       "assetId": "SHOTGUN_AMMO",
       "scale": 0.12,
       "ammoType": "12g",
       "count": 12,
-      "description": "Коробка с патронами для дробовика (12 шт)./Box of shotgun shells (12 rounds)."
+      "description": "Box of shotgun shells (12 rounds)."
     }
   ],
   "decorations": [
     {
       "symbol": "B",
-      "name": "Бочка с маслом/Oil Barrel",
-      "description": "Ржавая бочка с остатками топлива./Rusty barrel with fuel residue.",
+      "name": "Oil Barrel",
+      "description": "Rusty barrel with fuel residue.",
       "assetId": "BARREL",
       "scale": 0.7,
       "blocking": true
     },
     {
       "symbol": "R",
-      "name": "Строительный мусор/Debris",
-      "description": "Куча обломков бетона и арматуры./Pile of concrete and rebar.",
+      "name": "Debris",
+      "description": "Pile of concrete and rebar.",
       "assetId": "DEBRIS",
       "scale": 0.5,
       "blocking": true

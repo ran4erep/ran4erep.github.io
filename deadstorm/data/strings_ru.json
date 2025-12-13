@@ -1,3 +1,4 @@
+
 {
   "ui": {
     "loading": {
@@ -22,7 +23,22 @@
     },
     "menu": {
       "title": "DEAD STORM",
-      "btn_start": "НАЧАТЬ ОПЕРАЦИЮ"
+      "btn_start": "НАЧАТЬ ОПЕРАЦИЮ",
+      "btn_settings": "НАСТРОЙКИ"
+    },
+    "settings": {
+      "title": "НАСТРОЙКИ",
+      "vibration": "ВИБРАЦИЯ",
+      "language": "ЯЗЫК",
+      "on": "ВКЛ",
+      "off": "ВЫКЛ",
+      "btn_close": "ЗАКРЫТЬ"
+    },
+    "pause": {
+      "title": "ПАУЗА",
+      "btn_resume": "ПРОДОЛЖИТЬ",
+      "btn_settings": "НАСТРОЙКИ",
+      "btn_quit": "ВЫЙТИ"
     },
     "modal": {
       "close": "Закрыть",
@@ -35,6 +51,7 @@
     "controls": {
       "btn_shoot_dummy": "АТАКА",
       "btn_action": "ДЕЙСТВИЕ",
+      "btn_reload": "ПЕРЕЗАРЯДКА",
       "btn_strafe": "СТРЕЙФ",
       "btn_attack": "АТАКА",
       "btn_cancel": "ОТМЕНА",
@@ -59,14 +76,36 @@
     "damage_short": "Урон",
     "heal_short": "Лечение",
     "accuracy": "Точность",
+    "protection_short": "Броня",
     "btn_equip": "Взять",
-    "btn_use": "Исп.",
+    "btn_unequip": "Снять",
+    "btn_use": "Использовать",
     "btn_close": "Закрыть",
     "full_health": "Вам это не требуется.",
     "btn_info": "ИНФО",
     "range": "Дальность",
     "details_title": "ХАРАКТЕРИСТИКИ",
-    "type_label": "Тип"
+    "type_label": "Тип",
+    "capacity": "Занято",
+    "quantity_label": "Количество"
+  },
+  "equipment": {
+    "title": "СНАРЯЖЕНИЕ",
+    "primary_weapon": "ОРУЖИЕ",
+    "helmet": "ШЛЕМ",
+    "vest": "ЖИЛЕТ",
+    "pants": "ШТАНЫ",
+    "boots": "ОБУВЬ",
+    "no_weapon": "ПУСТО",
+    "available_gear": "ДОСТУПНО ДЛЯ ЭКИПИРОВКИ",
+    "btn_equip": "Экипировать",
+    "btn_unequip": "Снять",
+    "btn_close": "Закрыть",
+    "status_equipped": "Экипировано",
+    "damage_full": "УРОН",
+    "protection_full": "БРОНЯ",
+    "total_armor": "ВСЕГО БРОНИ",
+    "capacity": "Занято"
   },
   "stats": {
     "title": "ПРОКАЧКА",
@@ -84,15 +123,23 @@
   "combat": {
     "target_lost": "ЦЕЛИ НЕ НАЙДЕНЫ",
     "btn_fire": "ОГОНЬ",
+    "btn_reload": "ПЕРЕЗАРЯДКА",
     "btn_escape": "ПОБЕГ",
     "btn_run": "БЕЖАТЬ",
     "hit": "ЕСТЬ!",
     "crit": "КРИТ!",
     "miss": "ПРОМАХ",
+    "reload_success": "УСПЕШНО",
+    "reload_fail": "ОСЕЧКА",
+    "escape_success": "УСПЕШНО",
+    "escape_fail_msg": "НЕ УДАЛОСЬ",
     "enemy_turn": "ХОД ПРОТИВНИКА...",
     "enemy_turn_plural": "ХОД ПРОТИВНИКОВ...",
     "nowhere_to_run": "БЕЖАТЬ НЕКУДА",
-    "timeout": "Враги перехватывают инициативу!"
+    "timeout": "Враги перехватывают инициативу!",
+    "dist_unit_1": "метр",
+    "dist_unit_2_4": "метра",
+    "dist_unit_5_plus": "метров"
   },
   "logs": {
     "system_load": "СИСТЕМА: Локация загружена: \"{location}\"",
@@ -130,7 +177,12 @@
     "too_far": "Враг слишком далеко для этого оружия.",
     "no_targets": "Цели не обнаружены.",
     "xp_gain": "Получено опыта: {xp}.",
-    "level_up": "ПОВЫШЕНИЕ УРОВНЯ! Текущий уровень: {level}."
+    "level_up": "ПОВЫШЕНИЕ УРОВНЯ! Текущий уровень: {level}.",
+    "enemy_approaches": "{name} приближается...",
+    "inventory_full": "Рюкзак переполнен! Некуда положить.",
+    "unequip_fail_space": "Нет места в рюкзаке, чтобы снять предмет!",
+    "reload": "Перезарядка: {name} ({count} шт.)",
+    "reload_fail": "Перезарядка провалена! Оружие заклинило."
   },
   "initial_items": {
     "knife": {

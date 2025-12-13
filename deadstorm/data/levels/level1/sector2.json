@@ -1,8 +1,8 @@
 
 {
-  "locationName": "Технический Коридор",
-  "locationDescription": "Узкие коридоры, заполненные паром и мигающими лампами аварийного освещения.",
-  "objective": "Пробиться через охрану к панели управления.",
+  "locationName": "Технический Коридор/Tech Corridor",
+  "locationDescription": "Узкие коридоры, заполненные паром и мигающими лампами аварийного освещения./Narrow corridors filled with steam and flashing emergency lights.",
+  "objective": "Пробиться через охрану к панели управления./Break through security to the control panel.",
   "ceilingType": "INDOOR",
   "grid": [
     "############",
@@ -10,7 +10,7 @@
     "###.####.#.#",
     "#...Z....#.#",
     "#.####.###.#",
-    "#.#..Z...Z.#",
+    "#.#.##.###.#",
     "#.#.##.###.#",
     "#M..#W...X.#",
     "############"
@@ -23,15 +23,15 @@
     }
   ],
   "legend": [
-    { "char": "#", "description": "Стена" },
-    { "char": ".", "description": "Пол" },
-    { "char": "S", "description": "Старт" },
-    { "char": "X", "description": "Переход" }
+    { "char": "#", "description": "Стена/Wall" },
+    { "char": ".", "description": "Пол/Floor" },
+    { "char": "S", "description": "Старт/Start" },
+    { "char": "X", "description": "Переход/Transition" }
   ],
   "enemies": [
     {
       "symbol": "Z",
-      "name": "Охранник",
+      "name": "Охранник/Security Guard",
       "hp": 10,
       "maxHp": 10,
       "damageDice": "1d6",
@@ -43,26 +43,26 @@
         "attack": "SOLDIER_ATTACK_PORTRAIT",
         "distanceAttack": "SOLDIER_ATTACK_SPRITE"
       },
-      "description": "Вооруженный охранник комплекса.",
+      "description": "Вооруженный охранник комплекса./Armed complex security guard.",
       "baseXP": 25
     }
   ],
   "items": [
     {
       "symbol": "M",
-      "name": "Аптечка",
+      "name": "Аптечка/Medkit",
       "type": "CONSUMABLE",
       "assetId": "CONSUMABLE",
-      "description": "Армейская аптечка.",
+      "description": "Армейская аптечка./Military medical kit.",
       "scale": 0.2,
       "healDice": "2d4"
     },
     {
       "symbol": "W",
-      "name": "Дробовик",
+      "name": "Дробовик/Shotgun",
       "type": "WEAPON",
       "assetId": "SHOTGUN",
-      "description": "Помповый дробовик.",
+      "description": "Помповый дробовик./Pump-action shotgun.",
       "scale": 0.2,
       "damageDice": "2d6",
       "accuracy": 20,
@@ -72,8 +72,8 @@
   "decorations": [
     {
       "symbol": "R",
-      "name": "Трубы",
-      "description": "Протекающие трубы.",
+      "name": "Трубы/Pipes",
+      "description": "Протекающие трубы./Leaking pipes.",
       "assetId": "PIPES",
       "scale": 0.4,
       "blocking": true

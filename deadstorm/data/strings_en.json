@@ -1,0 +1,203 @@
+
+{
+  "ui": {
+    "loading": {
+      "connection": "Connecting...",
+      "init": "Initializing...",
+      "items_db": "Loading Item Database...",
+      "gear": "Preparing Gear...",
+      "geometry": "Building Geometry...",
+      "textures": "Loading Environment Textures...",
+      "sprites": "Processing Sprites...",
+      "level_load": "Loading: Level {level} - Sector {sector}...",
+      "error_book": "Error loading book content."
+    },
+    "header": {
+      "status": "Health",
+      "level": "Level",
+      "objective": "Objective",
+      "weapon": "Weapon",
+      "damage": "DMG",
+      "loading_title": "Loading...",
+      "fists": "Fists"
+    },
+    "menu": {
+      "title": "DEAD STORM",
+      "btn_start": "START OPERATION",
+      "btn_settings": "SETTINGS"
+    },
+    "settings": {
+      "title": "SETTINGS",
+      "vibration": "VIBRATION",
+      "language": "LANGUAGE",
+      "on": "ON",
+      "off": "OFF",
+      "btn_close": "CLOSE"
+    },
+    "pause": {
+      "title": "PAUSE",
+      "btn_resume": "RESUME",
+      "btn_settings": "SETTINGS",
+      "btn_quit": "QUIT"
+    },
+    "modal": {
+      "close": "Close",
+      "objective_title": "CURRENT OBJECTIVE",
+      "no_data": "No data available.",
+      "intel_title": "INTEL",
+      "objective_label": "PRIMARY OBJECTIVE",
+      "tap_to_close": "TAP TO CLOSE"
+    },
+    "controls": {
+      "btn_shoot_dummy": "ATTACK",
+      "btn_action": "ACTION",
+      "btn_reload": "RELOAD",
+      "btn_stats": "STATS",
+      "btn_equip": "GEAR",
+      "btn_strafe": "STRAFE",
+      "btn_attack": "FIRE",
+      "btn_cancel": "CANCEL",
+      "btn_prev": "<",
+      "btn_next": ">"
+    },
+    "victory": {
+      "title": "EVAC SUCCESSFUL",
+      "subtitle": "OPERATION COMPLETE",
+      "button": "MAIN MENU"
+    },
+    "game_over": {
+      "title": "W A S T E D",
+      "subtitle": "SIGNAL LOST",
+      "button": "MAIN MENU"
+    }
+  },
+  "inventory": {
+    "title": "INVENTORY",
+    "empty": "Pockets are empty.",
+    "equipped": "EQUIPPED",
+    "damage_short": "Damage",
+    "heal_short": "Healing",
+    "accuracy": "Accuracy",
+    "protection_short": "Armor",
+    "btn_equip": "Equip",
+    "btn_unequip": "Unequip",
+    "btn_use": "Use",
+    "btn_close": "Close",
+    "full_health": "Not needed right now.",
+    "btn_info": "INFO",
+    "range": "Range",
+    "details_title": "DETAILS",
+    "type_label": "Type",
+    "capacity": "Used",
+    "quantity_label": "Quantity"
+  },
+  "equipment": {
+    "title": "EQUIPMENT",
+    "primary_weapon": "PRIMARY WEAPON",
+    "helmet": "HELMET",
+    "vest": "VEST",
+    "pants": "PANTS",
+    "boots": "BOOTS",
+    "no_weapon": "EMPTY",
+    "available_gear": "AVAILABLE GEAR",
+    "btn_equip": "Equip",
+    "btn_unequip": "Unequip",
+    "btn_close": "Close",
+    "status_equipped": "Equipped",
+    "damage_full": "DAMAGE",
+    "protection_full": "ARMOR",
+    "total_armor": "TOTAL ARMOR",
+    "capacity": "Used"
+  },
+  "stats": {
+    "title": "UPGRADES",
+    "available_points": "SKILL POINTS",
+    "str": "STRENGTH",
+    "str_desc": "Increases damage dealt (+1/lvl).",
+    "agi": "AGILITY",
+    "agi_desc": "Increases dodge chance against attacks.",
+    "spd": "SPEED",
+    "spd_desc": "Slows down aim slider and extends turn time.",
+    "vit": "VITALITY",
+    "vit_desc": "Increases Max HP (+5/lvl).",
+    "btn_confirm": "CONFIRM"
+  },
+  "combat": {
+    "target_lost": "NO TARGETS",
+    "btn_fire": "FIRE",
+    "btn_reload": "RELOAD",
+    "btn_escape": "ESCAPE",
+    "btn_run": "RUN",
+    "hit": "HIT!",
+    "crit": "CRIT!",
+    "miss": "MISS",
+    "reload_success": "SUCCESS",
+    "reload_fail": "JAMMED",
+    "escape_success": "SUCCESS",
+    "escape_fail_msg": "FAILED",
+    "enemy_turn": "ENEMY TURN...",
+    "enemy_turn_plural": "ENEMY TURN...",
+    "nowhere_to_run": "NOWHERE TO RUN",
+    "timeout": "Enemies seize the initiative!",
+    "dist_unit_1": "meter",
+    "dist_unit_2_4": "meters",
+    "dist_unit_5_plus": "meters"
+  },
+  "logs": {
+    "system_load": "SYSTEM: Location loaded: \"{location}\"",
+    "objective": "GOAL: {objective}",
+    "wall_hit": "Blocked by wall.",
+    "blocking": "{name} blocks the way.",
+    "door_locked": "Door is locked.",
+    "door_open": "You opened the door.",
+    "door_close": "You closed the door.",
+    "door_blocked_player": "Cannot close door from here.",
+    "item_found": "{name} lies on the ground.",
+    "item_in_front": "{name} lies ahead.",
+    "item_under_feet": "You are standing on {name}.",
+    "decor_found": "{name} is in front of you.",
+    "evac_found": "Extraction point found! Signaling transport...",
+    "nothing_here": "Nothing useful here.",
+    "picked_up": "Acquired: {name}.",
+    "combat_start": "ALERT! {name} spotted!",
+    "combat_multiple": "CONTACT: Multiple hostiles!",
+    "attack_hit": "You attack ({weapon}) -> {enemy}: -{damage} HP",
+    "attack_crit": " (CRITICAL!)",
+    "attack_crit_fail": " (Crit failed)",
+    "attack_miss": "You missed.",
+    "enemy_destroyed": "{name} destroyed.",
+    "enemy_hit": "{name} attacks you: -{damage} HP!",
+    "enemy_miss": "{name} misses you.",
+    "evaded": "You dodged {name}'s attack.",
+    "equipped": "Equipped: {name}",
+    "used_heal": "Used {name}: +{heal} HP.",
+    "escape_success": "Escaped successfully!",
+    "escape_fail": "Escape failed!",
+    "escape_blocked": "Escape route blocked!",
+    "data_error": "Level data load error.",
+    "system_fail": "System data failure.",
+    "too_far": "Target out of range.",
+    "no_targets": "No valid targets.",
+    "xp_gain": "XP Gained: {xp}.",
+    "level_up": "LEVEL UP! Current Level: {level}.",
+    "enemy_approaches": "{name} approaches...",
+    "inventory_full": "Backpack full! Cannot pick up.",
+    "unequip_fail_space": "Not enough space in backpack to unequip!",
+    "reload": "Reloaded {name}: {count} rounds.",
+    "reload_fail": "Reload failed! Weapon jammed."
+  },
+  "initial_items": {
+    "knife": {
+      "name": "Combat Knife",
+      "desc": "Heavy military knife. Reliable survival tool."
+    },
+    "pistol": {
+      "name": "M9 Pistol",
+      "desc": "Standard 9mm sidearm."
+    },
+    "medkit": {
+      "name": "Field Medkit",
+      "desc": "First aid supplies."
+    }
+  }
+}
