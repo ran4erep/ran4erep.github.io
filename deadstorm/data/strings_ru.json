@@ -30,6 +30,10 @@
       "title": "НАСТРОЙКИ",
       "vibration": "ВИБРАЦИЯ",
       "language": "ЯЗЫК",
+      "debug": "ОТЛАДКА",
+      "debug_textures": "ТЕКСТУРЫ",
+      "debug_godmode": "БЕССМЕРТИЕ",
+      "debug_timer": "ТАЙМЕР ХОДА",
       "on": "ВКЛ",
       "off": "ВЫКЛ",
       "btn_close": "ЗАКРЫТЬ"
@@ -79,7 +83,7 @@
     "protection_short": "Броня",
     "btn_equip": "Взять",
     "btn_unequip": "Снять",
-    "btn_use": "Использовать",
+    "btn_use": "Исп.",
     "btn_close": "Закрыть",
     "full_health": "Вам это не требуется.",
     "btn_info": "ИНФО",
@@ -182,7 +186,9 @@
     "inventory_full": "Рюкзак переполнен! Некуда положить.",
     "unequip_fail_space": "Нет места в рюкзаке, чтобы снять предмет!",
     "reload": "Перезарядка: {name} ({count} шт.)",
-    "reload_fail": "Перезарядка провалена! Оружие заклинило."
+    "reload_fail": "Перезарядка провалена! Оружие заклинило.",
+    "reload_not_required": "Перезарядка не требуется.",
+    "no_ammo_spare": "Нет патронов."
   },
   "initial_items": {
     "knife": {

@@ -30,6 +30,10 @@
       "title": "SETTINGS",
       "vibration": "VIBRATION",
       "language": "LANGUAGE",
+      "debug": "DEBUG",
+      "debug_textures": "TEXTURES",
+      "debug_godmode": "GOD MODE",
+      "debug_timer": "TURN TIMER",
       "on": "ON",
       "off": "OFF",
       "btn_close": "CLOSE"
@@ -155,7 +159,7 @@
     "item_found": "{name} lies on the ground.",
     "item_in_front": "{name} lies ahead.",
     "item_under_feet": "You are standing on {name}.",
-    "decor_found": "{name} is in front of you.",
+    "coordinator_found": "{name} is in front of you.",
     "evac_found": "Extraction point found! Signaling transport...",
     "nothing_here": "Nothing useful here.",
     "picked_up": "Acquired: {name}.",
@@ -184,7 +188,9 @@
     "inventory_full": "Backpack full! Cannot pick up.",
     "unequip_fail_space": "Not enough space in backpack to unequip!",
     "reload": "Reloaded {name}: {count} rounds.",
-    "reload_fail": "Reload failed! Weapon jammed."
+    "reload_fail": "Reload failed! Weapon jammed.",
+    "reload_not_required": "Reload not required.",
+    "no_ammo_spare": "No ammo."
   },
   "initial_items": {
     "knife": {
