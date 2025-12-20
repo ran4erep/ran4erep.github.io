@@ -3,17 +3,29 @@
   "locationName": "Технический Коридор/Tech Corridor",
   "locationDescription": "Узкие коридоры, заполненные паром и мигающими лампами аварийного освещения./Narrow corridors filled with steam and flashing emergency lights.",
   "objective": "Пробиться через охрану к панели управления./Break through security to the control panel.",
+  "globalLight": 0.3,
   "ceilingType": "INDOOR",
   "grid": [
     "############",
     "#S...R.....#",
     "###.####.#.#",
-    "#...Z....#.#",
+    "#...O....#.#",
     "#.####.###.#",
-    "#.#.##.###.#",
-    "#.#.##.###.#",
+    "#.#...O..#.#",
+    "#.#.#O.###.#",
     "#M..#W...X.#",
     "############"
+  ],
+  "gridLight": [
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............"
   ],
   "exits": [
     {
@@ -30,7 +42,7 @@
   ],
   "enemies": [
     {
-      "symbol": "Z",
+      "symbol": "O",
       "name": "Охранник/Security Guard",
       "hp": 10,
       "maxHp": 10,
@@ -41,19 +53,20 @@
         "map": "SOLDIER",
         "portrait": "SOLDIER_PORTRAIT",
         "attack": "SOLDIER_ATTACK_PORTRAIT",
-        "distanceAttack": "SOLDIER_ATTACK_SPRITE"
+        "distanceAttack": "SOLDIER_ATTACK_SPRITE",
+        "dead": "SOLDIER_DEAD"
       },
-      "description": "Вооруженный охранник комплекса./Armed complex security guard.",
+      "description": "Вооружённый охранник комплекса./Armed complex security guard.",
       "baseXP": 25
     }
   ],
   "items": [
     {
       "symbol": "M",
-      "name": "Аптечка/Medkit",
+      "name": "Армейская аптечка/Field Medkit",
       "type": "CONSUMABLE",
       "assetId": "CONSUMABLE",
-      "description": "Армейская аптечка./Military medical kit.",
+      "description": "Набор для оказания первой помощи./First aid supplies.",
       "scale": 0.2,
       "healDice": "2d4"
     },
@@ -62,11 +75,24 @@
       "name": "Дробовик/Shotgun",
       "type": "WEAPON",
       "assetId": "SHOTGUN",
-      "description": "Помповый дробовик./Pump-action shotgun.",
+      "dollAssetId": "SHOTGUN_DOLL",
+      "description": "Стандартный помповый дробовик используемый полицией./Standard pump-action shotgun used by police.",
       "scale": 0.2,
-      "damageDice": "2d6",
-      "accuracy": 20,
-      "range": 3
+      "damageDice": "3d4",
+      "accuracy": 17,
+      "range": 3,
+      "zIndex": 2,
+      "magazineMax": 4,
+      "currentAmmo": 4,
+      "ammoType": "12g",
+      "handAsset": "HAND_SHOTGUN",
+      "handScale": 1.0,
+      "handOffset": { "x": 20, "y": 40 },
+      "attackAnimation": [
+        { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
+        { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
+        { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
+      ]
     }
   ],
   "decorations": [

@@ -13,7 +13,7 @@
     "zIndex": 5,
     "slot": "weapon",
     "name": "Боевой нож/Combat Knife",
-    "description": "Тяжелый армейский нож. Надежный инструмент выживания./Heavy military knife. Reliable survival tool.",
+    "description": "Тяжелый армейский нож. Надёжный инструмент выживания./Heavy military knife. Reliable survival tool.",
     "attackAnimation": [
       { "duration": 80, "x": 30, "y": 30, "scale": 1.0 },
       { "duration": 60, "x": -80, "y": -80, "scale": 1.1 },
@@ -35,8 +35,8 @@
     "magazineMax": 9,
     "currentAmmo": 9,
     "ammoType": "9mm",
-    "name": "Пистолет M9/M9 Pistol",
-    "description": "Стандартный пистолет калибра 9мм./Standard 9mm sidearm.",
+    "name": "Пистолет Beretta M9/Beretta M9 Pistol",
+    "description": "Пистолет калибра 9мм./9mm sidearm.",
     "attackAnimation": [
       { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
       { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
@@ -59,7 +59,7 @@
     "ammoType": "9mm",
     "count": 11,
     "name": "Патроны 9мм/9mm Ammo",
-    "description": "Коробка с патронами калибра 9мм./Box of 9mm ammunition."
+    "description": "Патроны калибра 9мм./9mm ammunition."
   },
   "helmet": {
     "type": "ARMOR",
@@ -80,7 +80,7 @@
     "assetId": "VEST_ICON",
     "dollAssetId": "VEST",
     "name": "Бронежилет/Body Armor",
-    "description": "Армейский бронежилет. Надежная защита торса./Military body armor. Reliable torso protection."
+    "description": "Армейский бронежилет. Надёжная защита торса./Military body armor. Reliable torso protection."
   },
   "pants": {
     "type": "ARMOR",

@@ -23,7 +23,7 @@
     },
     "menu": {
       "title": "DEAD STORM",
-      "btn_start": "START OPERATION",
+      "btn_start": "GAME START",
       "btn_settings": "SETTINGS"
     },
     "settings": {
@@ -34,6 +34,7 @@
       "debug_textures": "TEXTURES",
       "debug_godmode": "GOD MODE",
       "debug_timer": "TURN TIMER",
+      "debug_fps": "SHOW FPS",
       "on": "ON",
       "off": "OFF",
       "btn_close": "CLOSE"
@@ -49,12 +50,16 @@
       "objective_title": "CURRENT OBJECTIVE",
       "no_data": "No data available.",
       "intel_title": "INTEL",
+      "actions_title": "ACTIONS",
       "objective_label": "PRIMARY OBJECTIVE",
       "tap_to_close": "TAP TO CLOSE"
     },
     "controls": {
-      "btn_shoot_dummy": "ATTACK",
+      "btn_shoot_dummy": "AIM",
       "btn_action": "ACTION",
+      "btn_open": "OPEN",
+      "btn_close_door": "CLOSE",
+      "btn_pickup": "PICK UP",
       "btn_reload": "RELOAD",
       "btn_stats": "STATS",
       "btn_equip": "GEAR",
@@ -70,7 +75,7 @@
       "button": "MAIN MENU"
     },
     "game_over": {
-      "title": "W A S T E D",
+      "title": "You are dead...",
       "subtitle": "SIGNAL LOST",
       "button": "MAIN MENU"
     }
@@ -148,8 +153,8 @@
     "dist_unit_5_plus": "meters"
   },
   "logs": {
-    "system_load": "SYSTEM: Location loaded: \"{location}\"",
-    "objective": "GOAL: {objective}",
+    "system_load": "Location loaded: \"{location}\"",
+    "objective": "Goal: {objective}",
     "wall_hit": "Blocked by wall.",
     "blocking": "{name} blocks the way.",
     "door_locked": "Door is locked.",
@@ -162,19 +167,20 @@
     "coordinator_found": "{name} is in front of you.",
     "evac_found": "Extraction point found! Signaling transport...",
     "nothing_here": "Nothing useful here.",
+    "no_actions": "No actions available.",
     "picked_up": "Acquired: {name}.",
-    "combat_start": "ALERT! {name} spotted!",
-    "combat_multiple": "CONTACT: Multiple hostiles!",
-    "attack_hit": "You attack ({weapon}) -> {enemy}: -{damage} HP",
+    "combat_start": "you have entered into battle with {name}",
+    "combat_multiple": "Multiple hostiles approaching!",
+    "attack_hit": "You dealt {damage} damage to {enemy}",
     "attack_crit": " (CRITICAL!)",
     "attack_crit_fail": " (Crit failed)",
     "attack_miss": "You missed.",
     "enemy_destroyed": "{name} destroyed.",
-    "enemy_hit": "{name} attacks you: -{damage} HP!",
+    "enemy_hit": "{name} attacked you for {damage} damage!",
     "enemy_miss": "{name} misses you.",
     "evaded": "You dodged {name}'s attack.",
     "equipped": "Equipped: {name}",
-    "used_heal": "Used {name}: +{heal} HP.",
+    "used_heal": "You used {name} and healed {heal} health points.",
     "escape_success": "Escaped successfully!",
     "escape_fail": "Escape failed!",
     "escape_blocked": "Escape route blocked!",
@@ -187,7 +193,7 @@
     "enemy_approaches": "{name} approaches...",
     "inventory_full": "Backpack full! Cannot pick up.",
     "unequip_fail_space": "Not enough space in backpack to unequip!",
-    "reload": "Reloaded {name}: {count} rounds.",
+    "reload": "You reloaded {name} using {count} rounds.",
     "reload_fail": "Reload failed! Weapon jammed.",
     "reload_not_required": "Reload not required.",
     "no_ammo_spare": "No ammo."

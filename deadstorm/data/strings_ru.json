@@ -23,7 +23,7 @@
     },
     "menu": {
       "title": "DEAD STORM",
-      "btn_start": "НАЧАТЬ ОПЕРАЦИЮ",
+      "btn_start": "НАЧАТЬ ИГРУ",
       "btn_settings": "НАСТРОЙКИ"
     },
     "settings": {
@@ -34,6 +34,7 @@
       "debug_textures": "ТЕКСТУРЫ",
       "debug_godmode": "БЕССМЕРТИЕ",
       "debug_timer": "ТАЙМЕР ХОДА",
+      "debug_fps": "СЧЁТЧИК FPS",
       "on": "ВКЛ",
       "off": "ВЫКЛ",
       "btn_close": "ЗАКРЫТЬ"
@@ -49,12 +50,16 @@
       "objective_title": "ТЕКУЩАЯ ЗАДАЧА",
       "no_data": "Данные отсутствуют.",
       "intel_title": "РАЗВЕДДАННЫЕ",
+      "actions_title": "ДЕЙСТВИЯ",
       "objective_label": "ОСНОВНАЯ ЗАДАЧА",
       "tap_to_close": "НАЖМИТЕ ЧТОБЫ ЗАКРЫТЬ"
     },
     "controls": {
-      "btn_shoot_dummy": "АТАКА",
+      "btn_shoot_dummy": "ПРИЦЕЛИТЬСЯ",
       "btn_action": "ДЕЙСТВИЕ",
+      "btn_open": "ОТКРЫТЬ",
+      "btn_close_door": "ЗАКРЫТЬ",
+      "btn_pickup": "ПОДОБРАТЬ",
       "btn_reload": "ПЕРЕЗАРЯДКА",
       "btn_strafe": "СТРЕЙФ",
       "btn_attack": "АТАКА",
@@ -68,7 +73,7 @@
       "button": "В ГЛАВНОЕ МЕНЮ"
     },
     "game_over": {
-      "title": "ПОТРАЧЕНО",
+      "title": "Ты умер...",
       "subtitle": "СВЯЗЬ ПОТЕРЯНА",
       "button": "В ГЛАВНОЕ МЕНЮ"
     }
@@ -119,7 +124,7 @@
     "agi": "ЛОВКОСТЬ",
     "agi_desc": "Повышает шанс уклонения от атак врага.",
     "spd": "СКОРОСТЬ",
-    "spd_desc": "Замедляет прицел и увеличивает время хода.",
+    "spd_desc": "Замедляет слайдер и увеличивает время хода.",
     "vit": "ЗДОРОВЬЕ",
     "vit_desc": "Увеличивает максимальный запас здоровья (+5/ур).",
     "btn_confirm": "ПОДТВЕРДИТЬ"
@@ -130,7 +135,7 @@
     "btn_reload": "ПЕРЕЗАРЯДКА",
     "btn_escape": "ПОБЕГ",
     "btn_run": "БЕЖАТЬ",
-    "hit": "ЕСТЬ!",
+    "hit": "ПОПАЛ!",
     "crit": "КРИТ!",
     "miss": "ПРОМАХ",
     "reload_success": "УСПЕШНО",
@@ -146,8 +151,8 @@
     "dist_unit_5_plus": "метров"
   },
   "logs": {
-    "system_load": "СИСТЕМА: Локация загружена: \"{location}\"",
-    "objective": "ЦЕЛЬ: {objective}",
+    "system_load": "Локация загружена: \"{location}\"",
+    "objective": "Цель: {objective}",
     "wall_hit": "Стена мешает.",
     "blocking": "{name} мешает пройти.",
     "door_locked": "Дверь заперта.",
@@ -160,19 +165,20 @@
     "decor_found": "Перед вами {name}.",
     "evac_found": "Зона эвакуации обнаружена! Вызываю транспорт...",
     "nothing_here": "Здесь нет ничего полезного.",
+    "no_actions": "Нет доступных действий.",
     "picked_up": "Подобрано: {name}.",
-    "combat_start": "ВНИМАНИЕ! {name} замечен по курсу!",
-    "combat_multiple": "КОНТАКТ: Группа противников!",
-    "attack_hit": "Вы атакуете ({weapon}) -> {enemy}: -{damage} HP",
+    "combat_start": "Вы вступили в бой с {name}",
+    "combat_multiple": "Приближается группа противников!",
+    "attack_hit": "Вы нанесли {enemy} {damage} урона",
     "attack_crit": " (КРИТ!)",
     "attack_crit_fail": " (Не удалось критануть)",
     "attack_miss": "Вы промахнулись.",
     "enemy_destroyed": "{name} уничтожен.",
-    "enemy_hit": "{name} атакует вас: -{damage} HP!",
+    "enemy_hit": "{name} атаковал вас на {damage} урона!",
     "enemy_miss": "{name} промахивается по вам.",
     "evaded": "Вы увернулись от атаки {name}.",
     "equipped": "Экипировано: {name}",
-    "used_heal": "{name} использовано: +{heal} HP.",
+    "used_heal": "Вы использовали {name} и вылечились на {heal} единиц здоровья.",
     "escape_success": "Удалось сбежать!",
     "escape_fail": "Не удалось сбежать!",
     "escape_blocked": "Путь к отступлению перекрыт!",
@@ -185,7 +191,7 @@
     "enemy_approaches": "{name} приближается...",
     "inventory_full": "Рюкзак переполнен! Некуда положить.",
     "unequip_fail_space": "Нет места в рюкзаке, чтобы снять предмет!",
-    "reload": "Перезарядка: {name} ({count} шт.)",
+    "reload": "Вы перезарядили {name} использовав {count} патронов.",
     "reload_fail": "Перезарядка провалена! Оружие заклинило.",
     "reload_not_required": "Перезарядка не требуется.",
     "no_ammo_spare": "Нет патронов."

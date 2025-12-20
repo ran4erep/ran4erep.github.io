@@ -1,7 +1,7 @@
 
 {
   "locationName": "Склад ГСМ/Fuel Depot",
-  "locationDescription": "Заброшенный склад горюче-смазочных материалов. В воздухе висит тяжелый запах бензина. Повсюду разбросаны пустые бочки и строительный мусор./An abandoned fuel and lubricant warehouse. The air hangs heavy with the smell of gasoline. Empty barrels and construction debris are scattered everywhere.",
+  "locationDescription": "Заброшенный склад горюче-смазочных материалов. В воздухе висит тяжёлый запах бензина. Повсюду разбросаны пустые бочки и строительный мусор./An abandoned fuel and lubricant warehouse. The air hangs heavy with the smell of gasoline. Empty barrels and construction debris are scattered everywhere.",
   "objective": "Найти синюю ключ-карту и добраться до грузового лифта./Find the blue keycard and reach the cargo elevator.",
   "globalLight": 0.3,
   "ceilingType": "OUTDOOR",
@@ -56,7 +56,7 @@
   "enemies": [
     {
       "symbol": "Z",
-      "name": "Зараженный техник/Infected Technician",
+      "name": "Заражённый техник/Infected Technician",
       "hp": 12,
       "maxHp": 12,
       "damageDice": "1d4",
@@ -65,7 +65,8 @@
       "assets": {
         "map": "ZOMBIE2",
         "portrait": "ZOMBIE2_PORTRAIT",
-        "attack": "ZOMBIE2_ATTACK_PORTRAIT"
+        "attack": "ZOMBIE2_ATTACK_PORTRAIT",
+        "dead": "ZOMBIE_DEAD"
       },
       "description": "Бывший сотрудник склада, теперь лишь оболочка./Former warehouse employee, now just a shell.",
       "baseXP": 15
@@ -82,9 +83,10 @@
         "map": "SOLDIER",
         "portrait": "SOLDIER_PORTRAIT",
         "attack": "SOLDIER_ATTACK_PORTRAIT",
-        "distanceAttack": "SOLDIER_ATTACK_SPRITE"
+        "distanceAttack": "SOLDIER_ATTACK_SPRITE",
+        "dead": "SOLDIER_DEAD"
       },
-      "description": "Вооруженный охранник комплекса./Armed complex security guard.",
+      "description": "Вооружённый охранник комплекса./Armed complex security guard.",
       "baseXP": 30
     }
   ],
@@ -94,7 +96,7 @@
       "name": "Бинт/Bandage",
       "type": "CONSUMABLE",
       "assetId": "BANDAGE",
-      "description": "Грязный, но стерильный бинт./Dirty but sterile bandage.",
+      "description": "Немного грязный, но всё ещё стерильный бинт./Slightly dirty but still sterile bandage.",
       "scale": 0.2,
       "healDice": "1d4"
     },
@@ -117,7 +119,7 @@
       "damageDice": "3d4",
       "accuracy": 17,
       "range": 3,
-      "zIndex": 5,
+      "zIndex": 2,
       "magazineMax": 4,
       "currentAmmo": 4,
       "ammoType": "12g",
@@ -138,7 +140,7 @@
       "scale": 0.12,
       "ammoType": "9mm",
       "count": 30,
-      "description": "Коробка с патронами калибра 9мм (30 шт)./Box of 9mm ammunition (30 rounds)."
+      "description": "Коробка с патронами калибра 9мм./Box of 9mm ammunition."
     },
     {
       "symbol": "G",
@@ -148,7 +150,7 @@
       "scale": 0.12,
       "ammoType": "12g",
       "count": 12,
-      "description": "Коробка с патронами для дробовика (12 шт)./Box of shotgun shells (12 rounds)."
+      "description": "Коробка с патронами для дробовика./Box of shotgun shells."
     }
   ],
   "decorations": [
