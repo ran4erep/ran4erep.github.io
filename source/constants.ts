@@ -39,6 +39,7 @@ export const projects: { [key: string]: Project[] } = {
         { titleKey: 'cod_book_title', descriptionKey: 'cod_book_desc', link: '/projects/misc/cod_book/', linkTypeKey: 'btn_read' },
     ],
     games: [
+		{ titleKey: 'scraper_title', descriptionKey: 'scraper_desc', link: '/projects/games/scraper/', linkTypeKey: 'btn_go', tech: 'react' },
         { titleKey: 'dos_title', descriptionKey: 'dos_desc', link: 'https://r4dos.pages.dev', linkTypeKey: 'btn_go', tech: 'msdos' },
         { titleKey: 'faggots_hunter_title', descriptionKey: 'faggots_hunter_desc', link: '/projects/games/hunter', linkTypeKey: 'btn_play', tech: 'html' },
         { titleKey: 'arlade_title', descriptionKey: 'arlade_desc', link: '/arlade', linkTypeKey: 'btn_play', tech: 'javascript' },
@@ -171,6 +172,8 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "cod_book_desc": { "ru": "Современная версия моей книги, которая полностью переписана с учётом событий фильма. С иллюстрациями, среди которых есть неиспользованные в фильме материалы.", "en": "A modern version of my book, which has been completely rewritten to take into account the events of the film. With illustrations, among which there are materials not used in the film." },
     
     // Games
+    "scraper_title": { "ru": "Скрапер для игровых ромов", "en": "Game ROMs scraper" },
+    "scraper_desc": { "ru": "Ищет обложки для ромов через API сервиса Libretro Thumbnails. Для работы использует регулярные выражения.", "en": "Searches covers for ROMs through Libretro Thumbnails service's API. Uses regular expressions." },
     "dos_title": { "ru": "DOS Games Library", "en": "DOS Games Library" },
     "dos_desc": { "ru": "Каталог DOS игр с возможностью играть в них прямо в браузере. Используется эмулятор JS-DOS, который поддерживает мультиплеер через IPX. Крутится это всё на другом хостинге, так как там дают 20 гигов.", "en": "A catalog of DOS games with the ability to play them directly in the browser. It uses the JS-DOS emulator, which supports multiplayer via IPX. This is all running on another hosting, as they provide 20 gigs of space." },
     "faggots_hunter_title": { "ru": "Охота на пидоров", "en": "Faggot Hunt" },
