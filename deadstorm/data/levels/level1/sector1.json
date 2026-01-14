@@ -151,7 +151,7 @@
         { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
       ],
       "sounds": {
-      "attack": "SHOTHUN_SHOT"
+      "attack": "SHOTGUN_SHOT"
     },
       "shootType": "shotgun",
       "muzzleFlash": true
