@@ -1,0 +1,23 @@
+
+{
+  "MENU_THEME": {
+    "assetId": "MENU_THEME",
+    "looped": true,
+    "allowOverlap": false
+  },
+  "PISTOL_SHOT": {
+    "assetId": "PISTOL_SHOT",
+    "looped": false,
+    "allowOverlap": true
+  },
+  "SHOTGUN_SHOT": {
+    "assetId": "SHOTGUN_SHOT",
+    "looped": false,
+    "allowOverlap": true
+  },
+  "KNIFE_HIT": {
+    "assetId": "KNIFE_HIT",
+    "looped": false,
+    "allowOverlap": true
+  }
+}

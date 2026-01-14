@@ -3,6 +3,7 @@
   "knife": {
     "type": "WEAPON",
     "damageDice": "1d6",
+    "throwDamage": "1d3",
     "accuracy": 15,
     "range": 1,
     "assetId": "KNIFE",
@@ -18,11 +19,17 @@
       { "duration": 80, "x": 30, "y": 30, "scale": 1.0 },
       { "duration": 60, "x": -80, "y": -80, "scale": 1.1 },
       { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
-    ]
+    ],
+    "sounds": {
+      "attack": "KNIFE_HIT"
+    },
+    "shootType": "default",
+    "muzzleFlash": false
   },
   "pistol": {
     "type": "WEAPON",
     "damageDice": "1d8",
+    "throwDamage": "1d1",
     "accuracy": 25,
     "range": 5,
     "assetId": "PISTOL",
@@ -41,11 +48,17 @@
       { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
       { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
       { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
-    ]
+    ],
+    "sounds": {
+      "attack": "PISTOL_SHOT"
+    },
+    "shootType": "default",
+    "muzzleFlash": true
   },
   "medkit": {
     "type": "CONSUMABLE",
     "healDice": "2d6",
+    "throwDamage": "0",
     "accuracy": 10,
     "range": 0,
     "assetId": "CONSUMABLE",
@@ -58,12 +71,14 @@
     "scale": 0.12,
     "ammoType": "9mm",
     "count": 11,
+    "throwDamage": "0",
     "name": "Патроны 9мм/9mm Ammo",
     "description": "Патроны калибра 9мм./9mm ammunition."
   },
   "helmet": {
     "type": "ARMOR",
     "protection": 1,
+    "throwDamage": "1d1",
     "zIndex": 4,
     "slot": "helmet",
     "assetId": "HELMET_ICON",
@@ -74,6 +89,7 @@
   "vest": {
     "type": "ARMOR",
     "protection": 2,
+    "throwDamage": "1d1",
     "inventorySlots": 4,
     "zIndex": 3,
     "slot": "vest",
@@ -85,17 +101,20 @@
   "pants": {
     "type": "ARMOR",
     "protection": 0,
+    "throwDamage": "1d1",
     "inventorySlots": 2,
     "zIndex": 2,
     "slot": "pants",
     "assetId": "PANTS_ICON",
     "dollAssetId": "PANTS",
     "name": "Тактические штаны/Tactical Pants",
-    "description": "Прочные и функциональные./Durable and functional."
+    "description": "Прочные и функциональные./Durable and functional.",
+    "femaleOffsetX": -1
   },
   "boots": {
     "type": "ARMOR",
     "protection": 0,
+    "throwDamage": "1d1",
     "zIndex": 1,
     "slot": "boots",
     "assetId": "BOOTS_ICON",

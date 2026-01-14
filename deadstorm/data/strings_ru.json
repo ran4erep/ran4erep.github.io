@@ -9,8 +9,11 @@
       "geometry": "Сборка геометрии...",
       "textures": "Загрузка текстур окружения...",
       "sprites": "Обработка спрайтов...",
+      "sounds": "Инициализация звуковой системы...",
       "level_load": "Загрузка: Уровень {level} - Сектор {sector}...",
-      "error_book": "Ошибка загрузки книги."
+      "error_book": "Ошибка загрузки книги.",
+      "tap_to_continue": "НАЖМИТЕ ДЛЯ ПРОДОЛЖЕНИЯ...",
+      "music": "Загрузка фоновой музыки..."
     },
     "header": {
       "status": "Здоровье",
@@ -24,7 +27,16 @@
     "menu": {
       "title": "DEAD STORM",
       "btn_start": "НАЧАТЬ ИГРУ",
-      "btn_settings": "НАСТРОЙКИ"
+      "btn_settings": "НАСТРОЙКИ",
+      "audio_prompt": "ВКЛЮЧИТЬ ЗВУК?",
+      "audio_yes": "ДА",
+      "audio_no": "НЕТ"
+    },
+    "char_select": {
+      "title": "ВЫБОР ПЕРСОНАЖА",
+      "btn_select": "ВЫБРАТЬ",
+      "male_name": "ДЖОН МЕЙСОН",
+      "female_name": "ЛИЛИТ ВЕЙН"
     },
     "settings": {
       "title": "НАСТРОЙКИ",
@@ -63,6 +75,7 @@
       "btn_reload": "ПЕРЕЗАРЯДКА",
       "btn_strafe": "СТРЕЙФ",
       "btn_attack": "АТАКА",
+      "btn_throw": "БРОСИТЬ",
       "btn_cancel": "ОТМЕНА",
       "btn_prev": "<",
       "btn_next": ">"
@@ -80,14 +93,17 @@
   },
   "inventory": {
     "title": "ИНВЕНТАРЬ",
+    "loot_title": "ПРЕДМЕТЫ НА ПОЛУ",
     "empty": "Карманы пусты.",
     "equipped": "В РУКАХ",
     "damage_short": "Урон",
+    "throw_damage_short": "Бросок",
     "heal_short": "Лечение",
     "accuracy": "Точность",
     "protection_short": "Броня",
     "btn_equip": "Взять",
     "btn_unequip": "Снять",
+    "btn_throw": "Бросить",
     "btn_use": "Исп.",
     "btn_close": "Закрыть",
     "full_health": "Вам это не требуется.",
@@ -109,12 +125,17 @@
     "available_gear": "ДОСТУПНО ДЛЯ ЭКИПИРОВКИ",
     "btn_equip": "Экипировать",
     "btn_unequip": "Снять",
+    "btn_throw": "Бросить",
     "btn_close": "Закрыть",
     "status_equipped": "Экипировано",
     "damage_full": "УРОН",
     "protection_full": "БРОНЯ",
     "total_armor": "ВСЕГО БРОНИ",
-    "capacity": "Занято"
+    "capacity": "Слотов",
+    "throw_damage_short": "Урон от броска",
+    "accuracy": "Точность",
+    "range": "Дальность",
+    "details_title": "ПОДРОБНОСТИ"
   },
   "stats": {
     "title": "ПРОКАЧКА",
@@ -153,14 +174,18 @@
   "logs": {
     "system_load": "Локация загружена: \"{location}\"",
     "objective": "Цель: {objective}",
-    "wall_hit": "Стена мешает.",
+    "wall_hit": "Стена мешает пройти.",
     "blocking": "{name} мешает пройти.",
-    "door_locked": "Дверь заперта.",
+    "door_hit": "Дверь мешает пройти.",
+    "door_locked": "Дверь закрыта.",
     "door_open": "Вы открыли дверь.",
     "door_close": "Вы закрыли дверь.",
     "door_blocked_player": "Нельзя закрыть дверь отсюда.",
+    "door_unlocked": "Использован {key}. Дверь открыта.",
+    "key_needed": "Требуется: {key}.",
     "item_found": "На земле лежит {name}.",
     "item_in_front": "Перед вами лежит {name}.",
+    "multiple_items_in_front": "Перед вами лежит несколько предметов.",
     "item_under_feet": "У вас под ногами {name}.",
     "decor_found": "Перед вами {name}.",
     "evac_found": "Зона эвакуации обнаружена! Вызываю транспорт...",
@@ -194,7 +219,9 @@
     "reload": "Вы перезарядили {name} использовав {count} патронов.",
     "reload_fail": "Перезарядка провалена! Оружие заклинило.",
     "reload_not_required": "Перезарядка не требуется.",
-    "no_ammo_spare": "Нет патронов."
+    "no_ammo_spare": "Нет патронов.",
+    "item_thrown": "Вы бросили {name}.",
+    "throw_hit": "{enemy} получает урон от {item}: -{damage} HP"
   },
   "initial_items": {
     "knife": {

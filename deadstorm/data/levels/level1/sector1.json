@@ -5,6 +5,7 @@
   "objective": "Найти синюю ключ-карту и добраться до грузового лифта./Find the blue keycard and reach the cargo elevator.",
   "globalLight": 0.3,
   "ceilingType": "OUTDOOR",
+  "weather": "rain",
   "playerStart": {
     "dir": "E"
   },
@@ -16,7 +17,7 @@
     "#.##...R...###.##...Z.#",
     "#....Z.....2.W.#..9...#",
     "####..###1######..G...#",
-    "#M.4.##........#..O...#",
+    "#M.4.##L.......#..O...#",
     "####X##################"
   ],
   "gridLight": [
@@ -34,7 +35,7 @@
     "1": { "type": "HINGE", "dir": "LEFT" },
     "2": { "type": "HINGE", "dir": "RIGHT" },
     "3": { "type": "SLIDE" },
-    "4": { "type": "LIFT" }
+    "4": { "type": "LIFT", "keyId": "BLUE_CARD" }
   },
   "exits": [
     {
@@ -52,6 +53,18 @@
     { "char": "2", "description": "Дверь (Петли Прав)/Door (Hinge Right)" },
     { "char": "3", "description": "Дверь (Слайд)/Door (Slide)" },
     { "char": "4", "description": "Дверь (Лифт)/Door (Lift)" }
+  ],
+  "NPCs": [
+    {
+      "symbol": "L",
+      "name": "Лана",
+      "hp": 1,
+      "assets": {
+        "map": "LANA",
+        "dead": "LANA_DEAD"
+      },
+      "description": "Журналистка из другой игровой вселенной./Journalistt from another game universe."
+    }
   ],
   "enemies": [
     {
@@ -79,6 +92,7 @@
       "damageDice": "1d6",
       "accuracy": 5,
       "attackRange": 5,
+      "muzzleFlash": true,
       "assets": {
         "map": "SOLDIER",
         "portrait": "SOLDIER_PORTRAIT",
@@ -86,6 +100,9 @@
         "distanceAttack": "SOLDIER_ATTACK_SPRITE",
         "dead": "SOLDIER_DEAD"
       },
+      "sounds": {
+      "attack": "PISTOL_SHOT"
+    },
       "description": "Вооружённый охранник комплекса./Armed complex security guard.",
       "baseXP": 30
     }
@@ -106,7 +123,8 @@
       "type": "KEY",
       "assetId": "KEY",
       "description": "Синяя карта доступа./Blue access card.",
-      "scale": 0.1
+      "scale": 0.1,
+      "keyId": "BLUE_CARD"
     },
     {
       "symbol": "W",
@@ -117,6 +135,7 @@
       "description": "Стандартный помповый дробовик используемый полицией./Standard pump-action shotgun used by police.",
       "scale": 0.2,
       "damageDice": "3d4",
+      "throwDamage": "1d1",
       "accuracy": 17,
       "range": 3,
       "zIndex": 2,
@@ -130,7 +149,12 @@
         { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
         { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
         { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
-      ]
+      ],
+      "sounds": {
+      "attack": "SHOTHUN_SHOT"
+    },
+      "shootType": "shotgun",
+      "muzzleFlash": true
     },
     {
       "symbol": "9",
@@ -169,6 +193,16 @@
       "assetId": "DEBRIS",
       "scale": 0.5,
       "blocking": true
+    }
+  ],
+  "construction": [
+    {
+      "symbol": ".",
+      "assetId": "FLOOR"
+    },
+    {
+      "symbol": "#",
+      "assetId": "WALL"
     }
   ]
 }

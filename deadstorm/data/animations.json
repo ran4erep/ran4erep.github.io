@@ -1,0 +1,7 @@
+
+{
+  "ANIM_TEST": {
+    "frames": ["WALL", "FLOOR"],
+    "fps": 4
+  }
+}

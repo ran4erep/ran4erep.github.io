@@ -9,8 +9,11 @@
       "geometry": "Building Geometry...",
       "textures": "Loading Environment Textures...",
       "sprites": "Processing Sprites...",
+      "sounds": "Initializing Sound System...",
       "level_load": "Loading: Level {level} - Sector {sector}...",
-      "error_book": "Error loading book content."
+      "error_book": "Error loading book content.",
+      "tap_to_continue": "TAP TO CONTINUE...",
+      "music": "Buffering background music..."
     },
     "header": {
       "status": "Health",
@@ -24,7 +27,16 @@
     "menu": {
       "title": "DEAD STORM",
       "btn_start": "GAME START",
-      "btn_settings": "SETTINGS"
+      "btn_settings": "SETTINGS",
+      "audio_prompt": "ENABLE SOUND?",
+      "audio_yes": "YES",
+      "audio_no": "NO"
+    },
+    "char_select": {
+      "title": "CHARACTER SELECT",
+      "btn_select": "SELECT",
+      "male_name": "JOHN MASON",
+      "female_name": "LILITH VANE"
     },
     "settings": {
       "title": "SETTINGS",
@@ -65,6 +77,7 @@
       "btn_equip": "GEAR",
       "btn_strafe": "STRAFE",
       "btn_attack": "FIRE",
+      "btn_throw": "THROW",
       "btn_cancel": "CANCEL",
       "btn_prev": "<",
       "btn_next": ">"
@@ -82,14 +95,17 @@
   },
   "inventory": {
     "title": "INVENTORY",
+    "loot_title": "ITEMS ON GROUND",
     "empty": "Pockets are empty.",
     "equipped": "EQUIPPED",
     "damage_short": "Damage",
+    "throw_damage_short": "Throw DMG",
     "heal_short": "Healing",
     "accuracy": "Accuracy",
     "protection_short": "Armor",
     "btn_equip": "Equip",
     "btn_unequip": "Unequip",
+    "btn_throw": "Throw",
     "btn_use": "Use",
     "btn_close": "Close",
     "full_health": "Not needed right now.",
@@ -111,12 +127,17 @@
     "available_gear": "AVAILABLE GEAR",
     "btn_equip": "Equip",
     "btn_unequip": "Unequip",
+    "btn_throw": "Throw",
     "btn_close": "Close",
     "status_equipped": "Equipped",
     "damage_full": "DAMAGE",
     "protection_full": "ARMOR",
     "total_armor": "TOTAL ARMOR",
-    "capacity": "Used"
+    "capacity": "Used",
+    "throw_damage_short": "Throw Damage",
+    "accuracy": "Accuracy",
+    "range": "Range",
+    "details_title": "DETAILS"
   },
   "stats": {
     "title": "UPGRADES",
@@ -155,16 +176,20 @@
   "logs": {
     "system_load": "Location loaded: \"{location}\"",
     "objective": "Goal: {objective}",
-    "wall_hit": "Blocked by wall.",
+    "wall_hit": "The wall blocks the way.",
     "blocking": "{name} blocks the way.",
-    "door_locked": "Door is locked.",
+    "door_hit": "The door blocks the way.",
+    "door_locked": "The door is locked.",
     "door_open": "You opened the door.",
     "door_close": "You closed the door.",
     "door_blocked_player": "Cannot close door from here.",
+    "door_unlocked": "Used {key}. Door unlocked.",
+    "key_needed": "Requires {key}.",
     "item_found": "{name} lies on the ground.",
     "item_in_front": "{name} lies ahead.",
+    "multiple_items_in_front": "There are several items in front of you.",
     "item_under_feet": "You are standing on {name}.",
-    "coordinator_found": "{name} is in front of you.",
+    "decor_found": "{name} is in front of you.",
     "evac_found": "Extraction point found! Signaling transport...",
     "nothing_here": "Nothing useful here.",
     "no_actions": "No actions available.",
@@ -196,7 +221,9 @@
     "reload": "You reloaded {name} using {count} rounds.",
     "reload_fail": "Reload failed! Weapon jammed.",
     "reload_not_required": "Reload not required.",
-    "no_ammo_spare": "No ammo."
+    "no_ammo_spare": "No ammo.",
+    "item_thrown": "You threw {name}.",
+    "throw_hit": "{enemy} hit by {item}! -{damage} HP"
   },
   "initial_items": {
     "knife": {

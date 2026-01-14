@@ -5,6 +5,7 @@
   "objective": "Пробиться через охрану к панели управления./Break through security to the control panel.",
   "globalLight": 0.3,
   "ceilingType": "INDOOR",
+  "weather": "none",
   "grid": [
     "############",
     "#S...R.....#",
@@ -49,6 +50,7 @@
       "damageDice": "1d6",
       "accuracy": 5,
       "attackRange": 5,
+      "muzzleFlash": true,
       "assets": {
         "map": "SOLDIER",
         "portrait": "SOLDIER_PORTRAIT",
@@ -56,6 +58,9 @@
         "distanceAttack": "SOLDIER_ATTACK_SPRITE",
         "dead": "SOLDIER_DEAD"
       },
+      "sounds": {
+      "attack": "PISTOL_SHOT"
+    },
       "description": "Вооружённый охранник комплекса./Armed complex security guard.",
       "baseXP": 25
     }
@@ -92,7 +97,11 @@
         { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
         { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
         { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
-      ]
+      ],
+      "sounds": {
+      "attack": "SHOTHUN_SHOT"
+    },
+      "shootType": "shotgun"
     }
   ],
   "decorations": [
