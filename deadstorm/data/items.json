@@ -7,6 +7,7 @@
     "accuracy": 15,
     "range": 1,
     "assetId": "KNIFE",
+    "scale": 0.1,
     "dollAssetId": "KNIFE_DOLL",
     "handAsset": "HAND_KNIFE",
     "handScale": 0.8,
@@ -50,7 +51,8 @@
       { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
     ],
     "sounds": {
-      "attack": "PISTOL_SHOT"
+      "attack": "PISTOL_SHOT",
+      "reload": "PISTOL_RELOAD"
     },
     "shootType": "default",
     "muzzleFlash": true
@@ -82,6 +84,7 @@
     "zIndex": 4,
     "slot": "helmet",
     "assetId": "HELMET_ICON",
+    "scale": 0.2,
     "dollAssetId": "HELMET",
     "name": "Военный шлем/Military Helmet",
     "description": "Смягчает удары в голову./Softens blows to the head."
@@ -94,6 +97,7 @@
     "zIndex": 3,
     "slot": "vest",
     "assetId": "VEST_ICON",
+    "scale": 0.4,
     "dollAssetId": "VEST",
     "name": "Бронежилет/Body Armor",
     "description": "Армейский бронежилет. Надёжная защита торса./Military body armor. Reliable torso protection."
@@ -106,6 +110,7 @@
     "zIndex": 2,
     "slot": "pants",
     "assetId": "PANTS_ICON",
+    "scale": 0.4,
     "dollAssetId": "PANTS",
     "name": "Тактические штаны/Tactical Pants",
     "description": "Прочные и функциональные./Durable and functional.",

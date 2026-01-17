@@ -3,21 +3,190 @@
   "MENU_THEME": {
     "assetId": "MENU_THEME",
     "looped": true,
-    "allowOverlap": false
+    "allowOverlap": false,
+    "streaming": true,
+    "randomizePitch": false
+  },
+  "AMBIENT": {
+    "assetId": "AMBIENT",
+    "looped": true,
+    "allowOverlap": false,
+    "streaming": true,
+    "randomizePitch": false
+  },
+  "BATTLE": {
+    "assetId": "BATTLE",
+    "looped": true,
+    "allowOverlap": false,
+    "streaming": true,
+    "randomizePitch": false
   },
   "PISTOL_SHOT": {
     "assetId": "PISTOL_SHOT",
     "looped": false,
-    "allowOverlap": true
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
   },
   "SHOTGUN_SHOT": {
     "assetId": "SHOTGUN_SHOT",
     "looped": false,
-    "allowOverlap": true
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
   },
   "KNIFE_HIT": {
     "assetId": "KNIFE_HIT",
     "looped": false,
-    "allowOverlap": true
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "ZOMBIE_ATTACK": {
+    "assetId": "ZOMBIE_ATTACK",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "ZOMBIE_DAMAGE": {
+    "assetId": "ZOMBIE_DAMAGE",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "ZOMBIE_DIES": {
+    "assetId": "ZOMBIE_DIES",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "SOLDIER_DAMAGE": {
+    "assetId": "SOLDIER_DAMAGE",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "SOLDIER_DIES": {
+    "assetId": "SOLDIER_DIES",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "DAMAGE": {
+    "assetId": "DAMAGE",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "BUMP": {
+    "assetId": "BUMP",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "CLICK": {
+    "assetId": "CLICK",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "DOOR_HINGED_OPEN": {
+    "assetId": "DOOR_HINGED_OPEN",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "DOOR_HINGED_CLOSE": {
+    "assetId": "DOOR_HINGED_CLOSE",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "DOOR_SLIDE_OPEN": {
+    "assetId": "DOOR_SLIDE_OPEN",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "DOOR_SLIDE_CLOSE": {
+    "assetId": "DOOR_SLIDE_CLOSE",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "EXPLOSION": {
+    "assetId": "EXPLOSION",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "HEARTBEAT": {
+    "assetId": "HEARTBEAT",
+    "looped": true,
+    "allowOverlap": false,
+    "streaming": false,
+    "randomizePitch": false
+  },
+  "INVENTORY_OPEN": {
+    "assetId": "INVENTORY_OPEN",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "INVENTORY_CLOSE": {
+    "assetId": "INVENTORY_CLOSE",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "PICKUP": {
+    "assetId": "PICKUP",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "PISTOL_RELOAD": {
+    "assetId": "PISTOL_RELOAD",
+    "looped": false,
+    "allowOverlap": false,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "SHOTGUN_RELOAD": {
+    "assetId": "SHOTGUN_RELOAD",
+    "looped": false,
+    "allowOverlap": false,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "THROW": {
+    "assetId": "THROW",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "UNLOCK": {
+    "assetId": "UNLOCK",
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
   }
 }

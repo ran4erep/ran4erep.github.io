@@ -59,8 +59,10 @@
         "dead": "SOLDIER_DEAD"
       },
       "sounds": {
-      "attack": "PISTOL_SHOT"
-    },
+        "attack": "PISTOL_SHOT",
+        "damage": "SOLDIER_DAMAGE",
+        "death": "SOLDIER_DIES"
+      },
       "description": "Вооружённый охранник комплекса./Armed complex security guard.",
       "baseXP": 25
     }
@@ -99,7 +101,8 @@
         { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
       ],
       "sounds": {
-      "attack": "SHOTGUN_SHOT"
+      "attack": "SHOTGUN_SHOT",
+      "reload": "SHOTGUN_RELOAD"
     },
       "shootType": "shotgun"
     }

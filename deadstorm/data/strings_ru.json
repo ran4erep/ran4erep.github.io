@@ -1,4 +1,3 @@
-
 {
   "ui": {
     "loading": {
@@ -42,6 +41,10 @@
       "title": "НАСТРОЙКИ",
       "vibration": "ВИБРАЦИЯ",
       "language": "ЯЗЫК",
+      "audio_title": "АУДИО",
+      "volume_master": "ОБЩАЯ ГРОМКОСТЬ",
+      "volume_music": "МУЗЫКА",
+      "volume_sound": "ЗВУКИ",
       "debug": "ОТЛАДКА",
       "debug_textures": "ТЕКСТУРЫ",
       "debug_godmode": "БЕССМЕРТИЕ",

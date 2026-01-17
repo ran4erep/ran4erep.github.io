@@ -3,6 +3,7 @@
   "locationName": "Склад ГСМ/Fuel Depot",
   "locationDescription": "Заброшенный склад горюче-смазочных материалов. В воздухе висит тяжёлый запах бензина. Повсюду разбросаны пустые бочки и строительный мусор./An abandoned fuel and lubricant warehouse. The air hangs heavy with the smell of gasoline. Empty barrels and construction debris are scattered everywhere.",
   "objective": "Найти синюю ключ-карту и добраться до грузового лифта./Find the blue keycard and reach the cargo elevator.",
+  "soundtrack": "AMBIENT",
   "globalLight": 0.3,
   "ceilingType": "OUTDOOR",
   "weather": "rain",
@@ -81,6 +82,11 @@
         "attack": "ZOMBIE2_ATTACK_PORTRAIT",
         "dead": "ZOMBIE_DEAD"
       },
+      "sounds": {
+        "attack": "ZOMBIE_ATTACK",
+        "damage": "ZOMBIE_DAMAGE",
+        "death": "ZOMBIE_DIES"
+      },
       "description": "Бывший сотрудник склада, теперь лишь оболочка./Former warehouse employee, now just a shell.",
       "baseXP": 15
     },
@@ -101,8 +107,10 @@
         "dead": "SOLDIER_DEAD"
       },
       "sounds": {
-      "attack": "PISTOL_SHOT"
-    },
+        "attack": "PISTOL_SHOT",
+        "damage": "SOLDIER_DAMAGE",
+        "death": "SOLDIER_DIES"
+      },
       "description": "Вооружённый охранник комплекса./Armed complex security guard.",
       "baseXP": 30
     }
@@ -151,7 +159,8 @@
         { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
       ],
       "sounds": {
-      "attack": "SHOTGUN_SHOT"
+      "attack": "SHOTGUN_SHOT",
+      "reload": "SHOTGUN_RELOAD"
     },
       "shootType": "shotgun",
       "muzzleFlash": true

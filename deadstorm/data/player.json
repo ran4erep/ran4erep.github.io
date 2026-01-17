@@ -11,5 +11,9 @@
     "agi": 0,
     "spd": 0,
     "vit": 0
+  },
+  "sounds": {
+    "damage": "DAMAGE",
+    "death": "SOLDIER_DIES"
   }
 }

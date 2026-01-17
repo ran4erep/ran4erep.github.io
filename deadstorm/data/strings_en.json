@@ -1,4 +1,3 @@
-
 {
   "ui": {
     "loading": {
@@ -42,6 +41,10 @@
       "title": "SETTINGS",
       "vibration": "VIBRATION",
       "language": "LANGUAGE",
+      "audio_title": "AUDIO",
+      "volume_master": "MASTER VOLUME",
+      "volume_music": "MUSIC",
+      "volume_sound": "SOUND FX",
       "debug": "DEBUG",
       "debug_textures": "TEXTURES",
       "debug_godmode": "GOD MODE",
