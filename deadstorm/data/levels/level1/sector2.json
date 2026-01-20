@@ -3,6 +3,7 @@
   "locationName": "Технический Коридор/Tech Corridor",
   "locationDescription": "Узкие коридоры, заполненные паром и мигающими лампами аварийного освещения./Narrow corridors filled with steam and flashing emergency lights.",
   "objective": "Пробиться через охрану к панели управления./Break through security to the control panel.",
+  "soundtrack": "AMBIENT",
   "globalLight": 0.3,
   "ceilingType": "INDOOR",
   "weather": "none",
@@ -115,6 +116,17 @@
       "assetId": "PIPES",
       "scale": 0.4,
       "blocking": true
+    }
+  ],
+  "construction": [
+    {
+      "symbol": ".",
+      "assetId": "FLOOR",
+      "footstepSound": "CONCRETE"
+    },
+    {
+      "symbol": "#",
+      "assetId": "WALL"
     }
   ]
 }

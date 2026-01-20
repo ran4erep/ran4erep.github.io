@@ -12,13 +12,13 @@
   },
   "grid": [
     "#######################",
-    "#S..........MMM#.ZZZ..#",
+    "#S..........BBB#.ZZZ..#",
     "#.##.ZZO...#####ZZ.ZZ.#",
-    "#.#B...K...3........Z.#",
+    "#.#0...K...3........Z.#",
     "#.##...R...###.##...Z.#",
     "#....Z.....2.W.#..9...#",
     "####..###1######..G...#",
-    "#M.4.##L.......#..O...#",
+    "#BN4.##L.....M.#..O...#",
     "####X##################"
   ],
   "gridLight": [
@@ -117,12 +117,36 @@
   ],
   "items": [
     {
+      "symbol": "N",
+      "name": "Граната/Grenade",
+      "description": "Осколочная граната./Frag grenade.",
+      "type": "THROWABLE_WEAPON",
+      "assetId": "GRENADE",
+      "throwId": "GRENADE_ARMED",
+      "scale": 0.16,
+      "damageDice": "4d4",
+      "throwDamage": "1d1"
+    },
+    {
       "symbol": "M",
+      "name": "Карта/Map",
+      "type": "MAP",
+      "assetId": "MAP",
+      "handAsset": "HAND_MAP",
+      "maskAsset": "HAND_MAP_MASK",
+      "description": "Карта локации: {sector}./Map of {sector}.",
+      "handScale": 2.2,
+      "handOffset": { "x": 0, "y": 80 },
+      "drawScale": 0.5,
+      "scale": 0.15
+    },
+    {
+      "symbol": "B",
       "name": "Бинт/Bandage",
       "type": "CONSUMABLE",
       "assetId": "BANDAGE",
       "description": "Немного грязный, но всё ещё стерильный бинт./Slightly dirty but still sterile bandage.",
-      "scale": 0.2,
+      "scale": 0.15,
       "healDice": "1d4"
     },
     {
@@ -188,7 +212,7 @@
   ],
   "decorations": [
     {
-      "symbol": "B",
+      "symbol": "0",
       "name": "Бочка с маслом/Oil Barrel",
       "description": "Ржавая бочка с остатками топлива./Rusty barrel with fuel residue.",
       "assetId": "BARREL",
@@ -207,7 +231,13 @@
   "construction": [
     {
       "symbol": ".",
-      "assetId": "FLOOR"
+      "assetId": "FLOOR",
+      "footstepSound": "CONCRETE"
+    },
+    {
+      "symbol": "S",
+      "assetId": "FLOOR",
+      "footstepSound": "CONCRETE"
     },
     {
       "symbol": "#",

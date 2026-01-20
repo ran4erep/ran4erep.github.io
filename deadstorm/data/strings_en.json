@@ -1,3 +1,4 @@
+
 {
   "ui": {
     "loading": {
@@ -41,6 +42,7 @@
       "title": "SETTINGS",
       "vibration": "VIBRATION",
       "language": "LANGUAGE",
+      "fullscreen": "FULLSCREEN",
       "audio_title": "AUDIO",
       "volume_master": "MASTER VOLUME",
       "volume_music": "MUSIC",
@@ -83,7 +85,8 @@
       "btn_throw": "THROW",
       "btn_cancel": "CANCEL",
       "btn_prev": "<",
-      "btn_next": ">"
+      "btn_next": ">",
+      "btn_hide_map": "HIDE MAP"
     },
     "victory": {
       "title": "EVAC SUCCESSFUL",
@@ -220,7 +223,8 @@
     "level_up": "LEVEL UP! Current Level: {level}.",
     "enemy_approaches": "{name} approaches...",
     "inventory_full": "Backpack full! Cannot pick up.",
-    "unequip_fail_space": "Not enough space in backpack to unequip!",
+    "unequip_fail_space": "Not enough space in backpack!",
+    "unequip_drop": "Backpack full. Dropped {name} on the ground.",
     "reload": "You reloaded {name} using {count} rounds.",
     "reload_fail": "Reload failed! Weapon jammed.",
     "reload_not_required": "Reload not required.",

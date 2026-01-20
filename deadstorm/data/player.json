@@ -14,6 +14,7 @@
   },
   "sounds": {
     "damage": "DAMAGE",
+    "damage_female": "DAMAGE_FEMALE",
     "death": "SOLDIER_DIES"
   }
 }

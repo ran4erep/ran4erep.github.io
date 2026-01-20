@@ -1,3 +1,4 @@
+
 {
   "ui": {
     "loading": {
@@ -41,6 +42,7 @@
       "title": "НАСТРОЙКИ",
       "vibration": "ВИБРАЦИЯ",
       "language": "ЯЗЫК",
+      "fullscreen": "ПОЛНЫЙ ЭКРАН",
       "audio_title": "АУДИО",
       "volume_master": "ОБЩАЯ ГРОМКОСТЬ",
       "volume_music": "МУЗЫКА",
@@ -81,7 +83,8 @@
       "btn_throw": "БРОСИТЬ",
       "btn_cancel": "ОТМЕНА",
       "btn_prev": "<",
-      "btn_next": ">"
+      "btn_next": ">",
+      "btn_hide_map": "СПРЯТАТЬ КАРТУ"
     },
     "victory": {
       "title": "ЭВАКУАЦИЯ УСПЕШНА",
@@ -218,7 +221,8 @@
     "level_up": "ПОВЫШЕНИЕ УРОВНЯ! Текущий уровень: {level}.",
     "enemy_approaches": "{name} приближается...",
     "inventory_full": "Рюкзак переполнен! Некуда положить.",
-    "unequip_fail_space": "Нет места в рюкзаке, чтобы снять предмет!",
+    "unequip_fail_space": "Нет места в рюкзаке!",
+    "unequip_drop": "Рюкзак переполнен. {name} брошен под ноги.",
     "reload": "Вы перезарядили {name} использовав {count} патронов.",
     "reload_fail": "Перезарядка провалена! Оружие заклинило.",
     "reload_not_required": "Перезарядка не требуется.",
