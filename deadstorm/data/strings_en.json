@@ -47,11 +47,17 @@
       "volume_master": "MASTER VOLUME",
       "volume_music": "MUSIC",
       "volume_sound": "SOUND FX",
+      "volume_voice": "VOICE",
       "debug": "DEBUG",
       "debug_textures": "TEXTURES",
+      "debug_textures_desc": "TOGGLE ENVIRONMENT MAPPING",
       "debug_godmode": "GOD MODE",
+      "debug_godmode_desc": "PREVENT ALL DAMAGE",
       "debug_timer": "TURN TIMER",
+      "debug_timer_desc": "DISABLE TURN LIMITS",
       "debug_fps": "SHOW FPS",
+      "debug_fps_desc": "REALTIME PERFORMANCE",
+      "debug_levelup": "LEVEL UP",
       "on": "ON",
       "off": "OFF",
       "btn_close": "CLOSE"
@@ -86,7 +92,8 @@
       "btn_cancel": "CANCEL",
       "btn_prev": "<",
       "btn_next": ">",
-      "btn_hide_map": "HIDE MAP"
+      "btn_hide_map": "HIDE MAP",
+      "btn_talk": "TALK"
     },
     "victory": {
       "title": "EVAC SUCCESSFUL",
@@ -105,7 +112,7 @@
     "empty": "Pockets are empty.",
     "equipped": "EQUIPPED",
     "damage_short": "Damage",
-    "throw_damage_short": "Throw DMG",
+    "throw_damage_short": "Throw damage",
     "heal_short": "Healing",
     "accuracy": "Accuracy",
     "protection_short": "Armor",
@@ -120,7 +127,8 @@
     "details_title": "DETAILS",
     "type_label": "Type",
     "capacity": "Used",
-    "quantity_label": "Quantity"
+    "quantity_label": "Quantity",
+    "blast_damage": "Explosion damage"
   },
   "equipment": {
     "title": "EQUIPMENT",
@@ -177,7 +185,8 @@
     "timeout": "Enemies seize the initiative!",
     "dist_unit_1": "meter",
     "dist_unit_2_4": "meters",
-    "dist_unit_5_plus": "meters"
+    "dist_unit_5_plus": "meters",
+    "out_of_range": "OUT OF RANGE"
   },
   "logs": {
     "system_load": "Location loaded: \"{location}\"",
@@ -230,7 +239,8 @@
     "reload_not_required": "Reload not required.",
     "no_ammo_spare": "No ammo.",
     "item_thrown": "You threw {name}.",
-    "throw_hit": "{enemy} hit by {item}! -{damage} HP"
+    "throw_hit": "{enemy} hit by {item}! -{damage} HP",
+    "explosion_hit_player": "Explosion hit you! -{damage} HP"
   },
   "initial_items": {
     "knife": {

@@ -6,6 +6,7 @@
   "soundtrack": "AMBIENT",
   "globalLight": 0.3,
   "ceilingType": "INDOOR",
+  "ceilingTextureId": "CEILING",
   "weather": "none",
   "grid": [
     "############",
@@ -45,77 +46,23 @@
   "enemies": [
     {
       "symbol": "O",
-      "name": "Охранник/Security Guard",
-      "hp": 10,
-      "maxHp": 10,
-      "damageDice": "1d6",
-      "accuracy": 5,
-      "attackRange": 5,
-      "muzzleFlash": true,
-      "assets": {
-        "map": "SOLDIER",
-        "portrait": "SOLDIER_PORTRAIT",
-        "attack": "SOLDIER_ATTACK_PORTRAIT",
-        "distanceAttack": "SOLDIER_ATTACK_SPRITE",
-        "dead": "SOLDIER_DEAD"
-      },
-      "sounds": {
-        "attack": "PISTOL_SHOT",
-        "damage": "SOLDIER_DAMAGE",
-        "death": "SOLDIER_DIES"
-      },
-      "description": "Вооружённый охранник комплекса./Armed complex security guard.",
-      "baseXP": 25
+      "id": "soldier_guard"
     }
   ],
   "items": [
     {
       "symbol": "M",
-      "name": "Армейская аптечка/Field Medkit",
-      "type": "CONSUMABLE",
-      "assetId": "CONSUMABLE",
-      "description": "Набор для оказания первой помощи./First aid supplies.",
-      "scale": 0.2,
-      "healDice": "2d4"
+      "id": "medkit"
     },
     {
       "symbol": "W",
-      "name": "Дробовик/Shotgun",
-      "type": "WEAPON",
-      "assetId": "SHOTGUN",
-      "dollAssetId": "SHOTGUN_DOLL",
-      "description": "Стандартный помповый дробовик используемый полицией./Standard pump-action shotgun used by police.",
-      "scale": 0.2,
-      "damageDice": "3d4",
-      "accuracy": 17,
-      "range": 3,
-      "zIndex": 2,
-      "magazineMax": 4,
-      "currentAmmo": 4,
-      "ammoType": "12g",
-      "handAsset": "HAND_SHOTGUN",
-      "handScale": 1.0,
-      "handOffset": { "x": 20, "y": 40 },
-      "attackAnimation": [
-        { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
-        { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
-        { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
-      ],
-      "sounds": {
-      "attack": "SHOTGUN_SHOT",
-      "reload": "SHOTGUN_RELOAD"
-    },
-      "shootType": "shotgun"
+      "id": "shotgun"
     }
   ],
   "decorations": [
     {
       "symbol": "R",
-      "name": "Трубы/Pipes",
-      "description": "Протекающие трубы./Leaking pipes.",
-      "assetId": "PIPES",
-      "scale": 0.4,
-      "blocking": true
+      "id": "pipes"
     }
   ],
   "construction": [

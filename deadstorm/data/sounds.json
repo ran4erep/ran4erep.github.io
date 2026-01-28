@@ -24,6 +24,14 @@
     "streaming": true,
     "randomizePitch": false
   },
+  "GAME_OVER": {
+    "assetId": "GAME_OVER",
+    "volume": 1.0,
+    "looped": true,
+    "allowOverlap": false,
+    "streaming": true,
+    "randomizePitch": false
+  },
   "PISTOL_SHOT": {
     "assetId": "PISTOL_SHOT",
     "volume": 1.0,
@@ -250,6 +258,62 @@
   },
   "THUNDER": {
     "assetId": "THUNDER",
+    "volume": 1.0,
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "BANDAGE_USE": {
+    "assetId": "BANDAGE_USE",
+    "volume": 1.0,
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "EQUIPING": {
+    "assetId": "EQUIPING",
+    "volume": 1.0,
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "FLIES": {
+    "assetId": "FLIES",
+    "volume": 0.5,
+    "looped": true,
+    "allowOverlap": false,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "GRENADE_USE": {
+    "assetId": "GRENADE_USE",
+    "volume": 1.0,
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "LOCKED": {
+    "assetId": "LOCKED",
+    "volume": 1.0,
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "MAP_USE": {
+    "assetId": "MAP_USE",
+    "volume": 1.0,
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "MEDKIT_USE": {
+    "assetId": "MEDKIT_USE",
     "volume": 1.0,
     "looped": false,
     "allowOverlap": true,

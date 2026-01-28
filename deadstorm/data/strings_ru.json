@@ -47,11 +47,17 @@
       "volume_master": "ОБЩАЯ ГРОМКОСТЬ",
       "volume_music": "МУЗЫКА",
       "volume_sound": "ЗВУКИ",
+      "volume_voice": "ГОЛОС",
       "debug": "ОТЛАДКА",
       "debug_textures": "ТЕКСТУРЫ",
+      "debug_textures_desc": "ПЕРЕКЛЮЧИТЬ ТЕКСТУРЫ ОКРУЖЕНИЯ",
       "debug_godmode": "БЕССМЕРТИЕ",
+      "debug_godmode_desc": "ПРЕДОТВРАЩАЕТ ЛЮБОЙ УРОН",
       "debug_timer": "ТАЙМЕР ХОДА",
+      "debug_timer_desc": "ОТКЛЮЧИТЬ ЛИМИТЫ ВРЕМЕНИ",
       "debug_fps": "СЧЁТЧИК FPS",
+      "debug_fps_desc": "ПОКАЗЫВАТЬ ПРОИЗВОДИТЕЛЬНОСТЬ",
+      "debug_levelup": "ПОВЫСИТЬ УРОВЕНЬ",
       "on": "ВКЛ",
       "off": "ВЫКЛ",
       "btn_close": "ЗАКРЫТЬ"
@@ -84,7 +90,8 @@
       "btn_cancel": "ОТМЕНА",
       "btn_prev": "<",
       "btn_next": ">",
-      "btn_hide_map": "СПРЯТАТЬ КАРТУ"
+      "btn_hide_map": "СПРЯТАТЬ КАРТУ",
+      "btn_talk": "ГОВОРИТЬ"
     },
     "victory": {
       "title": "ЭВАКУАЦИЯ УСПЕШНА",
@@ -103,7 +110,7 @@
     "empty": "Карманы пусты.",
     "equipped": "В РУКАХ",
     "damage_short": "Урон",
-    "throw_damage_short": "Бросок",
+    "throw_damage_short": "Урон от броска",
     "heal_short": "Лечение",
     "accuracy": "Точность",
     "protection_short": "Броня",
@@ -118,7 +125,8 @@
     "details_title": "ХАРАКТЕРИСТИКИ",
     "type_label": "Тип",
     "capacity": "Занято",
-    "quantity_label": "Количество"
+    "quantity_label": "Количество",
+    "blast_damage": "Урон от взрыва"
   },
   "equipment": {
     "title": "СНАРЯЖЕНИЕ",
@@ -175,7 +183,8 @@
     "timeout": "Враги перехватывают инициативу!",
     "dist_unit_1": "метр",
     "dist_unit_2_4": "метра",
-    "dist_unit_5_plus": "метров"
+    "dist_unit_5_plus": "метров",
+    "out_of_range": "ВНЕ ДОСЯГАЕМОСТИ"
   },
   "logs": {
     "system_load": "Локация загружена: \"{location}\"",
@@ -228,7 +237,8 @@
     "reload_not_required": "Перезарядка не требуется.",
     "no_ammo_spare": "Нет патронов.",
     "item_thrown": "Вы бросили {name}.",
-    "throw_hit": "{enemy} получает урон от {item}: -{damage} HP"
+    "throw_hit": "{enemy} получает урон от {item}: -{damage} HP",
+    "explosion_hit_player": "Взрыв задел вас! -{damage} HP"
   },
   "initial_items": {
     "knife": {

@@ -1,0 +1,22 @@
+
+{
+  "lana": {
+    "name": "Лана/Lana",
+    "description": "Журналистка из другой игровой вселенной./Journalist from another game universe.",
+    "assets": {
+      "map": "LANA",
+      "dead": "LANA_DEAD",
+      "portrait": "ANIM_LANA_TALKING"
+    },
+    "hp": 1,
+    "dialogueId": "lana_intro",
+    "voice": {
+      "pitch": 2.0,
+      "rate": 1.0,
+      "waveform": "sawtooth",
+      "volume": 1.2,
+      "resonance": 1.4
+    },
+    "corpseScale": 0.5
+  }
+}

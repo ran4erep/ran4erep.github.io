@@ -1,0 +1,24 @@
+
+{
+  "barrel": {
+    "name": "Бочка с маслом/Oil Barrel",
+    "description": "Ржавая бочка с остатками топлива./Rusty barrel with fuel residue.",
+    "assetId": "BARREL",
+    "scale": 0.7,
+    "blocking": true
+  },
+  "debris": {
+    "name": "Строительный мусор/Debris",
+    "description": "Куча обломков бетона и арматуры./Pile of concrete and rebar.",
+    "assetId": "DEBRIS",
+    "scale": 0.5,
+    "blocking": true
+  },
+  "pipes": {
+    "name": "Трубы/Pipes",
+    "description": "Протекающие трубы./Leaking pipes.",
+    "assetId": "PIPES",
+    "scale": 0.4,
+    "blocking": true
+  }
+}

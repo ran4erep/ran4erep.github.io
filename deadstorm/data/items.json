@@ -27,6 +27,23 @@
     "shootType": "default",
     "muzzleFlash": false
   },
+  "grenade": {
+      "name": "Граната/Grenade",
+      "description": "Осколочная граната./Frag grenade.",
+      "type": "GRENADE",
+      "assetId": "GRENADE",
+      "throwId": "GRENADE_ARMED",
+      "explosionId": "ANIM_EXPLOSION",
+      "explosionSoundId": "EXPLOSION",
+      "scale": 0.15,
+      "damageDice": "4d4",
+      "throwDamage": "1d1",
+      "timer": 0,
+      "explosionRange": 1,
+      "sounds": {
+        "prime": "GRENADE_USE"
+      }
+    },
   "pistol": {
     "type": "WEAPON",
     "damageDice": "1d8",
@@ -57,6 +74,36 @@
     "shootType": "default",
     "muzzleFlash": true
   },
+  "shotgun": {
+      "name": "Дробовик/Shotgun",
+      "type": "WEAPON",
+      "assetId": "SHOTGUN",
+      "dollAssetId": "SHOTGUN_DOLL",
+      "description": "Стандартный помповый дробовик используемый полицией./Standard pump-action shotgun used by police.",
+      "scale": 0.2,
+      "damageDice": "3d4",
+      "throwDamage": "1d1",
+      "accuracy": 17,
+      "range": 3,
+      "zIndex": 2,
+      "magazineMax": 4,
+      "currentAmmo": 4,
+      "ammoType": "12g",
+      "handAsset": "HAND_SHOTGUN",
+      "handScale": 1.0,
+      "handOffset": { "x": 20, "y": 40 },
+      "attackAnimation": [
+        { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
+        { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
+        { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
+      ],
+      "sounds": {
+        "attack": "SHOTGUN_SHOT",
+        "reload": "SHOTGUN_RELOAD"
+      },
+      "shootType": "shotgun",
+      "muzzleFlash": true
+  },
   "medkit": {
     "type": "CONSUMABLE",
     "healDice": "2d6",
@@ -64,18 +111,64 @@
     "accuracy": 10,
     "range": 0,
     "assetId": "CONSUMABLE",
+    "scale": 0.2,
     "name": "Армейская аптечка/Field Medkit",
-    "description": "Набор для оказания первой помощи./First aid supplies."
+    "description": "Набор для оказания первой помощи./First aid supplies.",
+    "sounds": {
+      "use": "MEDKIT_USE"
+    }
+  },
+  "bandage": {
+      "name": "Бинт/Bandage",
+      "type": "CONSUMABLE",
+      "assetId": "BANDAGE",
+      "description": "Немного грязный, но всё ещё стерильный бинт./Slightly dirty but still sterile bandage.",
+      "scale": 0.15,
+      "healDice": "1d4",
+      "sounds": {
+        "use": "BANDAGE_USE"
+      }
+  },
+  "map": {
+      "name": "Карта/Map",
+      "type": "MAP",
+      "assetId": "MAP",
+      "handAsset": "HAND_MAP",
+      "maskAsset": "HAND_MAP_MASK",
+      "description": "Карта локации: {sector}./Map of {sector}.",
+      "handScale": 2.2,
+      "handOffset": { "x": 0, "y": 80 },
+      "drawScale": 0.5,
+      "scale": 0.15,
+      "sounds": {
+        "use": "MAP_USE"
+      }
+  },
+  "keycard": {
+      "name": "Ключ-карта/Keycard",
+      "type": "KEY",
+      "assetId": "KEY",
+      "description": "Карта доступа./Access card.",
+      "scale": 0.1
   },
   "ammo_9mm": {
     "type": "AMMO",
     "assetId": "PISTOL_AMMO",
     "scale": 0.12,
     "ammoType": "9mm",
-    "count": 11,
+    "count": 30,
     "throwDamage": "0",
     "name": "Патроны 9мм/9mm Ammo",
     "description": "Патроны калибра 9мм./9mm ammunition."
+  },
+  "ammo_12g": {
+      "name": "Патроны 12 калибра/12-Gauge Shells",
+      "type": "AMMO",
+      "assetId": "SHOTGUN_AMMO",
+      "scale": 0.12,
+      "ammoType": "12g",
+      "count": 12,
+      "description": "Коробка с патронами для дробовика./Box of shotgun shells."
   },
   "helmet": {
     "type": "ARMOR",

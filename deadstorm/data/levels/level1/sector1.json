@@ -58,174 +58,59 @@
   "NPCs": [
     {
       "symbol": "L",
-      "name": "Лана",
-      "hp": 1,
-      "assets": {
-        "map": "LANA",
-        "dead": "LANA_DEAD"
-      },
-      "description": "Журналистка из другой игровой вселенной./Journalistt from another game universe."
+      "id": "lana"
     }
   ],
   "enemies": [
     {
       "symbol": "Z",
-      "name": "Заражённый техник/Infected Technician",
-      "hp": 12,
-      "maxHp": 12,
-      "damageDice": "1d4",
-      "accuracy": 1,
-      "attackRange": 1,
-      "assets": {
-        "map": "ZOMBIE2",
-        "portrait": "ZOMBIE2_PORTRAIT",
-        "attack": "ZOMBIE2_ATTACK_PORTRAIT",
-        "dead": "ZOMBIE_DEAD"
-      },
-      "sounds": {
-        "attack": "ZOMBIE_ATTACK",
-        "damage": "ZOMBIE_DAMAGE",
-        "death": "ZOMBIE_DIES"
-      },
-      "description": "Бывший сотрудник склада, теперь лишь оболочка./Former warehouse employee, now just a shell.",
-      "baseXP": 15
+      "id": "zombie_tech"
     },
     {
       "symbol": "O",
-      "name": "Охранник/Security Guard",
-      "hp": 18,
-      "maxHp": 18,
-      "damageDice": "1d6",
-      "accuracy": 5,
-      "attackRange": 5,
-      "muzzleFlash": true,
-      "assets": {
-        "map": "SOLDIER",
-        "portrait": "SOLDIER_PORTRAIT",
-        "attack": "SOLDIER_ATTACK_PORTRAIT",
-        "distanceAttack": "SOLDIER_ATTACK_SPRITE",
-        "dead": "SOLDIER_DEAD"
-      },
-      "sounds": {
-        "attack": "PISTOL_SHOT",
-        "damage": "SOLDIER_DAMAGE",
-        "death": "SOLDIER_DIES"
-      },
-      "description": "Вооружённый охранник комплекса./Armed complex security guard.",
-      "baseXP": 30
+      "id": "soldier_guard"
     }
   ],
   "items": [
     {
       "symbol": "N",
-      "name": "Граната/Grenade",
-      "description": "Осколочная граната./Frag grenade.",
-      "type": "THROWABLE_WEAPON",
-      "assetId": "GRENADE",
-      "throwId": "GRENADE_ARMED",
-      "scale": 0.16,
-      "damageDice": "4d4",
-      "throwDamage": "1d1"
+      "id": "grenade"
     },
     {
       "symbol": "M",
-      "name": "Карта/Map",
-      "type": "MAP",
-      "assetId": "MAP",
-      "handAsset": "HAND_MAP",
-      "maskAsset": "HAND_MAP_MASK",
-      "description": "Карта локации: {sector}./Map of {sector}.",
-      "handScale": 2.2,
-      "handOffset": { "x": 0, "y": 80 },
-      "drawScale": 0.5,
-      "scale": 0.15
+      "id": "map"
     },
     {
       "symbol": "B",
-      "name": "Бинт/Bandage",
-      "type": "CONSUMABLE",
-      "assetId": "BANDAGE",
-      "description": "Немного грязный, но всё ещё стерильный бинт./Slightly dirty but still sterile bandage.",
-      "scale": 0.15,
-      "healDice": "1d4"
+      "id": "bandage"
     },
     {
       "symbol": "K",
-      "name": "Ключ-карта/Keycard",
-      "type": "KEY",
-      "assetId": "KEY",
+      "id": "keycard",
       "description": "Синяя карта доступа./Blue access card.",
-      "scale": 0.1,
       "keyId": "BLUE_CARD"
     },
     {
       "symbol": "W",
-      "name": "Дробовик/Shotgun",
-      "type": "WEAPON",
-      "assetId": "SHOTGUN",
-      "dollAssetId": "SHOTGUN_DOLL",
-      "description": "Стандартный помповый дробовик используемый полицией./Standard pump-action shotgun used by police.",
-      "scale": 0.2,
-      "damageDice": "3d4",
-      "throwDamage": "1d1",
-      "accuracy": 17,
-      "range": 3,
-      "zIndex": 2,
-      "magazineMax": 4,
-      "currentAmmo": 4,
-      "ammoType": "12g",
-      "handAsset": "HAND_SHOTGUN",
-      "handScale": 1.0,
-      "handOffset": { "x": 20, "y": 40 },
-      "attackAnimation": [
-        { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
-        { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
-        { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
-      ],
-      "sounds": {
-      "attack": "SHOTGUN_SHOT",
-      "reload": "SHOTGUN_RELOAD"
-    },
-      "shootType": "shotgun",
-      "muzzleFlash": true
+      "id": "shotgun"
     },
     {
       "symbol": "9",
-      "name": "Патроны 9мм/9mm Ammo",
-      "type": "AMMO",
-      "assetId": "PISTOL_AMMO",
-      "scale": 0.12,
-      "ammoType": "9mm",
-      "count": 30,
-      "description": "Коробка с патронами калибра 9мм./Box of 9mm ammunition."
+      "id": "ammo_9mm"
     },
     {
       "symbol": "G",
-      "name": "Патроны 12 калибра/12-Gauge Shells",
-      "type": "AMMO",
-      "assetId": "SHOTGUN_AMMO",
-      "scale": 0.12,
-      "ammoType": "12g",
-      "count": 12,
-      "description": "Коробка с патронами для дробовика./Box of shotgun shells."
+      "id": "ammo_12g"
     }
   ],
   "decorations": [
     {
       "symbol": "0",
-      "name": "Бочка с маслом/Oil Barrel",
-      "description": "Ржавая бочка с остатками топлива./Rusty barrel with fuel residue.",
-      "assetId": "BARREL",
-      "scale": 0.7,
-      "blocking": true
+      "id": "barrel"
     },
     {
       "symbol": "R",
-      "name": "Строительный мусор/Debris",
-      "description": "Куча обломков бетона и арматуры./Pile of concrete and rebar.",
-      "assetId": "DEBRIS",
-      "scale": 0.5,
-      "blocking": true
+      "id": "debris"
     }
   ],
   "construction": [
