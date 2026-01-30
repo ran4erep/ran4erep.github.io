@@ -52,6 +52,7 @@ export const projects: { [key: string]: Project[] } = {
         { titleKey: 'game_sokoban_title', descriptionKey: 'game_sokoban_desc', link: '/projects/games/sokoban/', linkTypeKey: 'btn_play', tech: 'javascript' },
     ],
     tools: [
+		{ titleKey: 'chromaclean_title', descriptionKey: 'chromaclean_desc', link: '/projects/tools/chromaclean/', linkTypeKey: 'btn_open', tech: 'react' },
         { titleKey: 'passgen_title', descriptionKey: 'passgen_desc', link: '/projects/tools/passgen/', linkTypeKey: 'btn_open', tech: 'react' },
         { titleKey: 'tool_webide_title', descriptionKey: 'tool_webide_desc', link: '/projects/tools/ide/', linkTypeKey: 'btn_open', tech: 'html' },
         { titleKey: 'tool_birthday_title', descriptionKey: 'tool_birthday_desc', link: '/projects/tools/bdgen/', linkTypeKey: 'btn_open', tech: 'javascript' },
@@ -196,6 +197,8 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "game_sokoban_desc": { "ru": "Классический Сокобан. В этой логической игре вы выступите в роли грузчика, которому нужно расставить ящики на складе в определённые места. Уровни для игры устроены в виде двумерных массивов, что делает их создание очень простым.", "en": "Classic Sokoban. In this logic game, you will act as a loader who needs to arrange boxes in a warehouse in certain places. The levels for the game are arranged in the form of two-dimensional arrays, which makes their creation very simple." },
     
     // Tools
+    "chromaclean_title": { "ru": "Chromaclean", "en": "Chromaclean" },
+    "chromaclean_desc": { "ru": "Полностью вырезает зелёный канал из изображения. Полезно для удаления хромакея.", "en": "Completely deletes green channel from the image. Usefull for chromakey removing." },
     "passgen_title": { "ru": "Генератор цифровых паролей", "en": "Digital Password Generator" },
     "passgen_desc": { "ru": "Утилита для генерации .txt файлов содержащих цифровые пароли.", "en": "Utility for generating .txt files containing numeric passwords." },
     "tool_webide_title": { "ru": "Web IDE", "en": "Web IDE" },
