@@ -1,0 +1,238 @@
+
+{
+  "knife": {
+    "type": "WEAPON",
+    "damageDice": "1d6",
+    "throwDamage": "1d3",
+    "accuracy": 15,
+    "range": 1,
+    "assetId": "KNIFE",
+    "scale": 0.1,
+    "dollAssetId": "KNIFE_DOLL",
+    "handAsset": "HAND_KNIFE",
+    "handScale": 1.0,
+    "handOffset": { "x": 20, "y": 20 },
+    "zIndex": 5,
+    "slot": "weapon",
+    "name": "Боевой нож/Combat Knife",
+    "description": "Тяжелый армейский нож. Надёжный инструмент выживания./Heavy military knife. Reliable survival tool.",
+    "attackAnimation": [
+      { "duration": 80, "x": 30, "y": 30, "scale": 1.0 },
+      { "duration": 60, "x": -80, "y": -80, "scale": 1.1 },
+      { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
+    ],
+    "sounds": {
+      "attack": "KNIFE_HIT"
+    },
+    "shootType": "default",
+    "muzzleFlash": false,
+    "vibrationPattern": 50
+  },
+  "grenade": {
+      "name": "Граната/Grenade",
+      "description": "Осколочная граната./Frag grenade.",
+      "type": "GRENADE",
+      "assetId": "GRENADE",
+      "throwId": "GRENADE_ARMED",
+      "explosionId": "ANIM_EXPLOSION",
+      "explosionSoundId": "EXPLOSION",
+      "scale": 0.15,
+      "damageDice": "4d4",
+      "throwDamage": "1d1",
+      "timer": 0,
+      "explosionRange": 1,
+      "sounds": {
+        "prime": "GRENADE_USE"
+      },
+      "vibrationPattern": 1000,
+      "maxStack": 5
+    },
+  "pistol": {
+    "type": "WEAPON",
+    "damageDice": "1d8",
+    "throwDamage": "1d1",
+    "accuracy": 25,
+    "range": 5,
+    "assetId": "PISTOL",
+    "scale": 0.2,
+    "dollAssetId": "PISTOL_DOLL",
+    "handAsset": "HAND_PISTOL",
+    "handScale": 1.1,
+    "handOffset": { "x": 20, "y": 20 },
+    "zIndex": 5,
+    "slot": "weapon",
+    "magazineMax": 9,
+    "currentAmmo": 9,
+    "ammoType": "9mm",
+    "name": "Пистолет Beretta M9/Beretta M9 Pistol",
+    "description": "Пистолет калибра 9мм./9mm sidearm.",
+    "attackAnimation": [
+      { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
+      { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
+      { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
+    ],
+    "sounds": {
+      "attack": "PISTOL_SHOT",
+      "reload": "PISTOL_RELOAD"
+    },
+    "shootType": "default",
+    "muzzleFlash": true,
+    "vibrationPattern": 40
+  },
+  "shotgun": {
+      "name": "Дробовик/Shotgun",
+      "type": "WEAPON",
+      "assetId": "SHOTGUN",
+      "dollAssetId": "SHOTGUN_DOLL",
+      "description": "Стандартный помповый дробовик используемый полицией./Standard pump-action shotgun used by police.",
+      "scale": 0.18,
+      "damageDice": "3d4",
+      "throwDamage": "1d1",
+      "accuracy": 17,
+      "range": 3,
+      "zIndex": 2,
+      "magazineMax": 4,
+      "currentAmmo": 4,
+      "ammoType": "12g",
+      "handAsset": "HAND_SHOTGUN",
+      "handScale": 1.0,
+      "handOffset": { "x": 20, "y": 40 },
+      "attackAnimation": [
+        { "duration": 80, "x": 10, "y": -40, "scale": 1.1 },
+        { "duration": 60, "x": 5, "y": -30, "scale": 1.1 },
+        { "duration": 200, "x": 0, "y": 0, "scale": 1.0 }
+      ],
+      "sounds": {
+        "attack": "SHOTGUN_SHOT",
+        "reload": "SHOTGUN_RELOAD"
+      },
+      "shootType": "shotgun",
+      "muzzleFlash": true,
+      "vibrationPattern": [80, 20, 60],
+      "knockbackChance": 60
+  },
+  "medkit": {
+    "type": "CONSUMABLE",
+    "healDice": "2d6",
+    "throwDamage": "0",
+    "accuracy": 10,
+    "range": 0,
+    "assetId": "CONSUMABLE",
+    "scale": 0.2,
+    "name": "Армейская аптечка/Field Medkit",
+    "description": "Набор для оказания первой помощи./First aid supplies.",
+    "sounds": {
+      "use": "MEDKIT_USE"
+    },
+    "maxStack": 3
+  },
+  "bandage": {
+      "name": "Бинт/Bandage",
+      "type": "CONSUMABLE",
+      "assetId": "BANDAGE",
+      "description": "Немного грязный, но всё ещё стерильный бинт./Slightly dirty but still sterile bandage.",
+      "scale": 0.15,
+      "healDice": "1d4",
+      "sounds": {
+        "use": "BANDAGE_USE"
+      },
+      "maxStack": 5,
+      "onUseEffect": {
+          "id": "antiseptic",
+          "chance": 100
+      }
+  },
+  "map": {
+      "name": "Карта/Map",
+      "type": "MAP",
+      "assetId": "MAP",
+      "handAsset": "HAND_MAP",
+      "maskAsset": "HAND_MAP_MASK",
+      "description": "Карта локации: {sector}./Map of {sector}.",
+      "handScale": 2.2,
+      "handOffset": { "x": 0, "y": 80 },
+      "drawScale": 0.5,
+      "scale": 0.15,
+      "sounds": {
+        "use": "MAP_USE"
+      }
+  },
+  "keycard": {
+      "name": "Ключ-карта/Keycard",
+      "type": "KEY",
+      "assetId": "KEY",
+      "description": "Карта доступа./Access card.",
+      "scale": 0.1
+  },
+  "ammo_9mm": {
+    "type": "AMMO",
+    "assetId": "PISTOL_AMMO",
+    "scale": 0.12,
+    "ammoType": "9mm",
+    "count": 30,
+    "maxStack": 50,
+    "throwDamage": "0",
+    "name": "Патроны 9мм/9mm Ammo",
+    "description": "Патроны калибра 9мм./9mm ammunition."
+  },
+  "ammo_12g": {
+      "name": "Патроны 12 калибра/12-Gauge Shells",
+      "type": "AMMO",
+      "assetId": "SHOTGUN_AMMO",
+      "scale": 0.12,
+      "ammoType": "12g",
+      "count": 12,
+      "maxStack": 20,
+      "description": "Коробка с патронами для дробовика./Box of shotgun shells."
+  },
+  "helmet": {
+    "type": "ARMOR",
+    "protection": 1,
+    "throwDamage": "1d1",
+    "zIndex": 4,
+    "slot": "helmet",
+    "assetId": "HELMET_ICON",
+    "scale": 0.2,
+    "dollAssetId": "HELMET",
+    "name": "Военный шлем/Military Helmet",
+    "description": "Смягчает удары в голову./Softens blows to the head."
+  },
+  "vest": {
+    "type": "ARMOR",
+    "protection": 2,
+    "throwDamage": "1d1",
+    "inventorySlots": 4,
+    "zIndex": 3,
+    "slot": "vest",
+    "assetId": "VEST_ICON",
+    "scale": 0.4,
+    "dollAssetId": "VEST",
+    "name": "Бронежилет/Body Armor",
+    "description": "Армейский бронежилет. Надёжная защита торса./Military body armor. Reliable torso protection."
+  },
+  "pants": {
+    "type": "ARMOR",
+    "protection": 0,
+    "throwDamage": "1d1",
+    "inventorySlots": 2,
+    "zIndex": 2,
+    "slot": "pants",
+    "assetId": "PANTS_ICON",
+    "scale": 0.4,
+    "dollAssetId": "PANTS",
+    "name": "Тактические штаны/Tactical Pants",
+    "description": "Прочные и функциональные./Durable and functional.",
+    "femaleOffsetX": -1
+  },
+  "boots": {
+    "type": "ARMOR",
+    "protection": 0,
+    "throwDamage": "1d1",
+    "zIndex": 1,
+    "slot": "boots",
+    "assetId": "BOOTS_ICON",
+    "dollAssetId": "BOOTS",
+    "name": "Армейские берцы/Combat Boots",
+    "description": "Защищают голеностоп./Protects the ankle."
+  }
+}

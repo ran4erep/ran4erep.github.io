@@ -1,0 +1,79 @@
+
+{
+  "locationName": "Технический Коридор/Tech Corridor",
+  "locationDescription": "Узкие коридоры, заполненные паром и мигающими лампами аварийного освещения./Narrow corridors filled with steam and flashing emergency lights.",
+  "objective": "Пробиться через охрану к панели управления./Break through security to the control panel.",
+  "soundtrack": "AMBIENT",
+  "globalLight": 0.3,
+  "ceilingType": "INDOOR",
+  "ceilingTextureId": "CEILING",
+  "weather": "none",
+  "grid": [
+    "############",
+    "#S...R.....#",
+    "###.####.#.#",
+    "#...O....#.#",
+    "#.####.###.#",
+    "#.#...O..#.#",
+    "#.#.#O.###.#",
+    "#M..#W...X.#",
+    "############"
+  ],
+  "gridLight": [
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............"
+  ],
+  "exits": [
+    {
+      "symbol": "X",
+      "destination": "./data/levels/level1/sector1.json",
+      "assetId": "EXIT"
+    }
+  ],
+  "legend": [
+    { "char": "#", "description": "Стена/Wall" },
+    { "char": ".", "description": "Пол/Floor" },
+    { "char": "S", "description": "Старт/Start" },
+    { "char": "X", "description": "Переход/Transition" }
+  ],
+  "enemies": [
+    {
+      "symbol": "O",
+      "id": "soldier_guard"
+    }
+  ],
+  "items": [
+    {
+      "symbol": "M",
+      "id": "medkit"
+    },
+    {
+      "symbol": "W",
+      "id": "shotgun"
+    }
+  ],
+  "decorations": [
+    {
+      "symbol": "R",
+      "id": "pipes"
+    }
+  ],
+  "construction": [
+    {
+      "symbol": ".",
+      "assetId": "FLOOR",
+      "footstepSound": "CONCRETE"
+    },
+    {
+      "symbol": "#",
+      "assetId": "WALL"
+    }
+  ]
+}
