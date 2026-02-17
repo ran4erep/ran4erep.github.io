@@ -319,5 +319,37 @@
     "allowOverlap": true,
     "streaming": false,
     "randomizePitch": true
+  },
+  "BEEP": {
+    "assetId": "BEEP",
+    "volume": 1.0,
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": false
+  },
+  "DOG_ATTACKS": {
+    "assetId": "DOG_ATTACKS",
+    "volume": 1.0,
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "DOG_DAMAGE": {
+    "assetId": "DOG_DAMAGE",
+    "volume": 1.0,
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
+  },
+  "DOG_DIES": {
+    "assetId": "DOG_DIES",
+    "volume": 1.0,
+    "looped": false,
+    "allowOverlap": true,
+    "streaming": false,
+    "randomizePitch": true
   }
 }

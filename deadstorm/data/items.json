@@ -167,7 +167,7 @@
   "ammo_9mm": {
     "type": "AMMO",
     "assetId": "PISTOL_AMMO",
-    "scale": 0.12,
+    "scale": 0.14,
     "ammoType": "9mm",
     "count": 30,
     "maxStack": 50,
@@ -179,7 +179,7 @@
       "name": "Патроны 12 калибра/12-Gauge Shells",
       "type": "AMMO",
       "assetId": "SHOTGUN_AMMO",
-      "scale": 0.12,
+      "scale": 0.14,
       "ammoType": "12g",
       "count": 12,
       "maxStack": 20,

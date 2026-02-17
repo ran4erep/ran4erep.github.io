@@ -101,7 +101,9 @@
       "btn_next": ">",
       "btn_hide_map": "HIDE MAP",
       "btn_talk": "TALK",
-      "btn_skip": "SKIP TURN"
+      "btn_skip": "SKIP TURN",
+      "btn_zoom_in": "ENLARGE",
+      "btn_zoom_out": "SHRINK"
     },
     "victory": {
       "title": "EVAC SUCCESSFUL",

@@ -6,7 +6,8 @@
     "assets": {
       "map": "LANA",
       "dead": "LANA_DEAD",
-      "portrait": "ANIM_LANA_TALKING"
+      "portrait": "LANA_PORTRAIT",
+      "dialogue_portrait": "ANIM_LANA_TALKING"
     },
     "hp": 1,
     "dialogueId": "lana_intro",
@@ -17,6 +18,18 @@
       "volume": 1.2,
       "resonance": 1.4
     },
+    "corpseScale": 0.5
+  },
+  "merchant": {
+    "name": "Торговец/Merchant",
+    "description": "Хитрый торговец./Catchy merchant.",
+    "assets": {
+      "map": "MERCHANT",
+      "dead": "MERCHANT_DEAD",
+      "portrait": "MERCHANT_PORTRAIT",
+      "dialogue_portrait": "ANIM_MERCHANT_TALKING"
+    },
+    "hp": 1,
     "corpseScale": 0.5
   }
 }
