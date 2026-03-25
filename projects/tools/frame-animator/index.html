@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аниматор Кадров</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .canvas-container {
+            background-image: 
+                linear-gradient(45deg, #1e293b 25%, transparent 25%), 
+                linear-gradient(-45deg, #1e293b 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #1e293b 75%), 
+                linear-gradient(-45deg, transparent 75%, #1e293b 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+        #animationCanvas {
+            image-rendering: pixelated;
+            max-width: none;
+        }
+        input[type="range"] {
+            cursor: pointer;
+        }
+        
+        /* Стили для ленты кадров */
+        .strip-wrapper {
+            position: relative;
+            /* Убираем overflow отсюда, чтобы подсказки не резались */
+        }
+        
+        #thumbnailStrip {
+            display: flex;
+            gap: 0.75rem;
+            overflow-x: auto;
+            padding: 40px 10px 15px 10px; /* Верхний паддинг для места под подсказки */
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #1e293b;
+        }
+
+        .thumb-item {
+            cursor: grab;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative; /* Подсказка будет привязана к этому элементу */
+            flex-shrink: 0;
+            height: 64px;
+            width: 64px;
+            background: black;
+            border-radius: 4px;
+        }
+
+        .thumb-item:active {
+            cursor: grabbing;
+        }
+
+        .thumb-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.9);
+            border-color: #60a5fa;
+        }
+        
+        /* Всплывающая подсказка - теперь она НЕ будет обрезаться */
+        .thumb-item .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 10px); /* Над иконкой */
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 9999; /* Максимальный приоритет */
+            border: 1px solid #60a5fa;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .thumb-item:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Треугольник подсказки */
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #60a5fa transparent transparent transparent;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-5xl mx-auto">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-blue-400 mb-2">Аниматор Кадров</h1>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Панель управления -->
+            <div class="lg:col-span-1 space-y-6 bg-slate-800 p-6 rounded-xl shadow-xl border border-slate-700 h-fit">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-300">1. Загрузка кадров</label>
+                    <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
+                    <button onclick="document.getElementById('fileInput').click()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Выбрать файлы
+                    </button>
+                    <p id="fileCount" class="text-xs text-slate-500 mt-2 text-center italic">Файлы не выбраны</p>
+                </div>
+
+                <hr class="border-slate-700">
+
+                <div>
+                    <label class="block text-sm font-medium mb-1">2. Скорость (FPS): <span id="fpsValue" class="text-blue-400 font-bold">12</span></label>
+                    <input type="range" id="fpsRange" min="1" max="60" value="12" class="w-full h-2 bg-slate-700 rounded-lg appearance-none">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1">3. Масштаб: <span id="scaleValue" class="text-blue-400 font-bold">100</span>%</label>
+                    <input type="range" id="scaleRange" min="10" max="1000" value="100" class="w-full h-2 bg-slate-700 rounded-lg appearance-none">
+                </div>
+
+                <hr class="border-slate-700">
+
+                <div class="flex flex-col gap-2">
+                    <button id="playPauseBtn" class="w-full bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-md font-bold" disabled>
+                        <span>Запуск</span>
+                    </button>
+                    <button id="resetBtn" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg transition-colors text-sm">
+                        Сбросить всё
+                    </button>
+                </div>
+            </div>
+
+            <!-- Область просмотра -->
+            <div class="lg:col-span-3 space-y-4">
+                <div class="canvas-container shadow-inner bg-slate-900/50">
+                    <canvas id="animationCanvas"></canvas>
+                    <div id="placeholderText" class="text-slate-500 text-center p-8">
+                        <p class="text-xl font-semibold">Экран предпросмотра</p>
+                        <p class="text-sm">Загрузите файлы для начала просмотра...</p>
+                    </div>
+                </div>
+                
+                <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 shadow-md">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Лента кадров:</h3>
+                        <span id="currentFrameIndicator" class="text-xs text-blue-400 font-mono font-bold"></span>
+                    </div>
+                    <div class="strip-wrapper">
+                        <div id="thumbnailStrip">
+                            <!-- Кадры появятся здесь -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const canvas = document.getElementById('animationCanvas');
+        const ctx = canvas.getContext('2d');
+        const fpsRange = document.getElementById('fpsRange');
+        const fpsValue = document.getElementById('fpsValue');
+        const scaleRange = document.getElementById('scaleRange');
+        const scaleValue = document.getElementById('scaleValue');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const fileCountDisplay = document.getElementById('fileCount');
+        const placeholderText = document.getElementById('placeholderText');
+        const thumbnailStrip = document.getElementById('thumbnailStrip');
+        const frameIndicator = document.getElementById('currentFrameIndicator');
+
+        let frames = []; 
+        let currentFrameIndex = 0;
+        let isPlaying = false;
+        let lastFrameTime = 0;
+        let animationId = null;
+        let draggedElement = null;
+
+        fileInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            files.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true, sensitivity: 'base'}));
+
+            for (const file of files) {
+                const img = await loadImage(URL.createObjectURL(file));
+                frames.push({ img, name: file.name });
+            }
+
+            renderThumbnails();
+            fileCountDisplay.innerText = `Загружено: ${frames.length}`;
+            playPauseBtn.disabled = false;
+            placeholderText.classList.add('hidden');
+            canvas.classList.remove('hidden');
+            
+            if (!isPlaying) {
+                currentFrameIndex = 0;
+                updateCanvas();
+            }
+        });
+
+        function loadImage(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = url;
+            });
+        }
+
+        function renderThumbnails() {
+            thumbnailStrip.innerHTML = '';
+            frames.forEach((frame, index) => {
+                const container = document.createElement('div');
+                container.className = `thumb-item border-2 ${index === currentFrameIndex ? 'border-blue-500 ring-2 ring-blue-400/30' : 'border-slate-700'} border-2`;
+                container.draggable = true;
+                container.dataset.index = index;
+
+                const img = document.createElement('img');
+                img.src = frame.img.src;
+                img.className = "w-full h-full object-contain pointer-events-none rounded";
+                
+                const tooltip = document.createElement('div');
+                tooltip.className = "tooltip";
+                tooltip.innerText = frame.name;
+
+                container.appendChild(img);
+                container.appendChild(tooltip);
+
+                container.addEventListener('dragstart', handleDragStart);
+                container.addEventListener('dragover', handleDragOver);
+                container.addEventListener('drop', handleDrop);
+                container.addEventListener('dragend', handleDragEnd);
+                
+                container.addEventListener('click', () => {
+                    currentFrameIndex = index;
+                    updateCanvas(true);
+                });
+
+                thumbnailStrip.appendChild(container);
+            });
+            updateFrameIndicator();
+        }
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            if (draggedElement !== this) {
+                const fromIndex = parseInt(draggedElement.dataset.index);
+                const toIndex = parseInt(this.dataset.index);
+                
+                const movedItem = frames.splice(fromIndex, 1)[0];
+                frames.splice(toIndex, 0, movedItem);
+                
+                if (currentFrameIndex === fromIndex) {
+                    currentFrameIndex = toIndex;
+                } else if (fromIndex < currentFrameIndex && toIndex >= currentFrameIndex) {
+                    currentFrameIndex--;
+                } else if (fromIndex > currentFrameIndex && toIndex <= currentFrameIndex) {
+                    currentFrameIndex++;
+                }
+
+                renderThumbnails();
+                updateCanvas(true);
+            }
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        function updateCanvas(manual = false) {
+            if (frames.length === 0) return;
+
+            const frameObj = frames[currentFrameIndex];
+            const scale = parseInt(scaleRange.value) / 100;
+
+            const targetWidth = frameObj.img.width * scale;
+            const targetHeight = frameObj.img.height * scale;
+
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+
+            ctx.imageSmoothingEnabled = false;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(frameObj.img, 0, 0, targetWidth, targetHeight);
+
+            if (manual) {
+                highlightThumbnail();
+                updateFrameIndicator();
+            }
+        }
+
+        function highlightThumbnail() {
+            const items = thumbnailStrip.querySelectorAll('.thumb-item');
+            items.forEach((item, idx) => {
+                if (idx === currentFrameIndex) {
+                    item.className = `thumb-item border-2 border-blue-500 ring-2 ring-blue-400/30 rounded bg-black shadow-lg scale-105 transition-transform`;
+                    item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                } else {
+                    item.className = `thumb-item border-2 border-slate-700 rounded bg-black`;
+                }
+            });
+        }
+
+        function updateFrameIndicator() {
+            if (frames.length > 0) {
+                frameIndicator.innerText = `[${currentFrameIndex + 1} / ${frames.length}]`;
+            }
+        }
+
+        fpsRange.addEventListener('input', () => fpsValue.innerText = fpsRange.value);
+        scaleRange.addEventListener('input', () => {
+            scaleValue.innerText = scaleRange.value;
+            updateCanvas(true);
+        });
+
+        playPauseBtn.addEventListener('click', () => isPlaying ? stopAnimation() : startAnimation());
+
+        function startAnimation() {
+            if (frames.length === 0) return;
+            isPlaying = true;
+            playPauseBtn.innerHTML = '<span>ПАУЗА</span>';
+            playPauseBtn.classList.replace('bg-green-600', 'bg-yellow-600');
+            lastFrameTime = performance.now();
+            requestAnimationFrame(animate);
+        }
+
+        function stopAnimation() {
+            isPlaying = false;
+            playPauseBtn.innerHTML = '<span>ЗАПУСК</span>';
+            playPauseBtn.classList.replace('bg-yellow-600', 'bg-green-600');
+            if (animationId) cancelAnimationFrame(animationId);
+            highlightThumbnail();
+        }
+
+        function animate(now) {
+            if (!isPlaying) return;
+            const interval = 1000 / parseInt(fpsRange.value);
+            const delta = now - lastFrameTime;
+
+            if (delta >= interval) {
+                currentFrameIndex = (currentFrameIndex + 1) % frames.length;
+                updateCanvas(true);
+                lastFrameTime = now - (delta % interval);
+            }
+            animationId = requestAnimationFrame(animate);
+        }
+
+        resetBtn.addEventListener('click', () => {
+            stopAnimation();
+            frames = [];
+            currentFrameIndex = 0;
+            fileInput.value = '';
+            fileCountDisplay.innerText = 'Файлы не выбраны';
+            playPauseBtn.disabled = true;
+            thumbnailStrip.innerHTML = '';
+            placeholderText.classList.remove('hidden');
+            canvas.classList.add('hidden');
+            fpsRange.value = 12;
+            fpsValue.innerText = 12;
+            scaleRange.value = 100;
+            scaleValue.innerText = 100;
+            frameIndicator.innerText = '';
+        });
+    </script>
+</body>
+</html>

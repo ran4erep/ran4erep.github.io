@@ -52,6 +52,7 @@ export const projects: { [key: string]: Project[] } = {
         { titleKey: 'game_sokoban_title', descriptionKey: 'game_sokoban_desc', link: '/projects/games/sokoban/', linkTypeKey: 'btn_play', tech: 'javascript' },
     ],
     tools: [
+		{ titleKey: 'frame_animator_title', descriptionKey: 'frame_animator_desc', link: '/projects/tools/frame-animator/', linkTypeKey: 'btn_open', tech: 'html' },
 		{ titleKey: 'frame_extractor_title', descriptionKey: 'frame_extractor_desc', link: '/projects/tools/frame-extractor/', linkTypeKey: 'btn_open', tech: 'html' },
 		{ titleKey: 'chromaclean_title', descriptionKey: 'chromaclean_desc', link: '/projects/tools/chromaclean/', linkTypeKey: 'btn_open', tech: 'react' },
         { titleKey: 'passgen_title', descriptionKey: 'passgen_desc', link: '/projects/tools/passgen/', linkTypeKey: 'btn_open', tech: 'react' },
@@ -198,6 +199,8 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "game_sokoban_desc": { "ru": "Классический Сокобан. В этой логической игре вы выступите в роли грузчика, которому нужно расставить ящики на складе в определённые места. Уровни для игры устроены в виде двумерных массивов, что делает их создание очень простым.", "en": "Classic Sokoban. In this logic game, you will act as a loader who needs to arrange boxes in a warehouse in certain places. The levels for the game are arranged in the form of two-dimensional arrays, which makes their creation very simple." },
     
     // Tools
+	"frame_animator_title": { "ru": "Аниматор кадров", "en": "Frame animator" },
+    "frame_animator_desc": { "ru": "Инструмент для воспроизведения последовательности кадров как анимации. Для анимации имеется настройка частоты кадров и масштаба.", "en": "A tool for playing a sequence of frames as an animation. The animation settings include frame rate and scale." },
 	"frame_extractor_title": { "ru": "Экстрактор кадров", "en": "Frame extractor" },
     "frame_extractor_desc": { "ru": "Инструмент для извлечения кадров из видеофайлов. Можно извлечь как один кадр, так и несколько кадров в диапазоне.", "en": "A tool for extracting frames from video files. You can extract either a single frame or multiple frames within a specified range." },
     "chromaclean_title": { "ru": "Chromaclean", "en": "Chromaclean" },
