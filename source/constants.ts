@@ -39,6 +39,7 @@ export const projects: { [key: string]: Project[] } = {
         { titleKey: 'cod_book_title', descriptionKey: 'cod_book_desc', link: '/projects/misc/cod_book/', linkTypeKey: 'btn_read' },
     ],
     games: [
+		{ titleKey: 'nethack3d_title', descriptionKey: 'nethack3d_desc', link: '/nethack3d', linkTypeKey: 'btn_play', tech: 'html' },
 		{ titleKey: 'scraper_title', descriptionKey: 'scraper_desc', link: '/projects/games/scraper/', linkTypeKey: 'btn_go', tech: 'react' },
         { titleKey: 'dos_title', descriptionKey: 'dos_desc', link: 'https://r4dos.pages.dev', linkTypeKey: 'btn_go', tech: 'msdos' },
         { titleKey: 'faggots_hunter_title', descriptionKey: 'faggots_hunter_desc', link: '/projects/games/hunter', linkTypeKey: 'btn_play', tech: 'html' },
@@ -175,6 +176,8 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "cod_book_desc": { "ru": "Современная версия моей книги, которая полностью переписана с учётом событий фильма. С иллюстрациями, среди которых есть неиспользованные в фильме материалы.", "en": "A modern version of my book, which has been completely rewritten to take into account the events of the film. With illustrations, among which there are materials not used in the film." },
     
     // Games
+	"nethack3d_title": { "ru": "NetHack 3D", "en": "NetHack 3D" },
+    "nethack3d_desc": { "ru": "Полноценная игра NetHack, но в 3D. Не я автор данного лаунчера игры, но не мог не добавить такую красоту на сайт. У лаунчера не было русского языка, его уже переводил я.", "en": "A full-fledged version of NetHack, but in 3D. I’m not the author of this game launcher, but I just had to add such a gem to the site. The launcher didn’t have a Russian language option, so I’ve already translated it." },
     "scraper_title": { "ru": "Скрапер для игровых ромов", "en": "Game ROMs scraper" },
     "scraper_desc": { "ru": "Ищет обложки для ромов через API сервиса Libretro Thumbnails. Для работы использует регулярные выражения.", "en": "Searches covers for ROMs through Libretro Thumbnails service's API. Uses regular expressions." },
     "dos_title": { "ru": "DOS Games Library", "en": "DOS Games Library" },
