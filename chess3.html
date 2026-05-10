@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Текстовые P2P Шахматы</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .chess-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            border: 8px solid #1e293b;
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            max-width: 550px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        @media (max-width: 640px) { .square { font-size: 2.2rem; } }
+        
+        /* Цвета доски */
+        .square.light { background-color: #e2e8f0; } 
+        .square.dark { background-color: #334155; }  
+        
+        /* Выделение */
+        .square.selected { background-color: #f59e0b !important; }
+        .square.last-move { background-color: rgba(16, 185, 129, 0.4) !important; }
+
+        /* Стилизация фигур для максимального контраста */
+        .piece { 
+            display: block;
+            line-height: 1;
+            transition: transform 0.15s ease;
+            z-index: 10;
+        }
+        .piece.white-piece {
+            color: #ffffff;
+            filter: drop-shadow(0 0 2px rgba(0,0,0,0.8)) drop-shadow(0 0 1px #000);
+        }
+        .piece.black-piece {
+            color: #000000;
+            filter: drop-shadow(0 0 2px rgba(255,255,255,0.8)) drop-shadow(0 0 1px #fff);
+        }
+        .piece:hover { transform: scale(1.1); }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+
+    <div class="w-full max-w-4xl flex flex-col md:flex-row gap-6">
+        <div class="flex-1 flex flex-col items-center">
+            <h1 class="text-3xl font-bold mb-4 text-white">Шахматы <span class="text-blue-400">P2P</span></h1>
+            
+            <div id="game-info" class="mb-4 text-center w-full bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-700">
+                <div class="flex justify-between items-center mb-3">
+                    <span id="player-turn" class="font-semibold text-lg">Инициализация...</span>
+                    <span id="connection-status" class="text-sm flex items-center gap-2">
+                        <span class="status-dot bg-yellow-500"></span> Ожидание PeerJS...
+                    </span>
+                </div>
+
+                <div id="setup-controls" class="space-y-2">
+                    <div class="flex gap-2">
+                        <input id="peer-id-display" readonly class="bg-slate-900 border border-slate-700 px-3 py-2 rounded flex-1 text-sm outline-none font-mono" placeholder="Генерация ID...">
+                        <button onclick="copyMyId()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium transition text-sm">Копировать ID</button>
+                    </div>
+                    <div class="flex gap-2">
+                        <input id="remote-id-input" class="bg-slate-900 border border-slate-700 px-3 py-2 rounded flex-1 text-sm outline-none" placeholder="Вставьте ID соперника...">
+                        <button onclick="connectToPeer()" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded font-medium transition text-sm">Играть</button>
+                    </div>
+                    <div class="pt-2 border-t border-slate-700">
+                        <button onclick="startOfflineMode()" class="w-full bg-slate-700 hover:bg-slate-600 py-2 rounded text-xs font-semibold">ИГРАТЬ ЛОКАЛЬНО (БЕЗ СЕТИ)</button>
+                    </div>
+                </div>
+
+                <div id="game-controls" class="hidden flex justify-between items-center mt-2">
+                    <span id="role-display" class="text-blue-400 font-bold"></span>
+                    <button onclick="location.reload()" class="text-xs text-slate-400 underline">В меню</button>
+                </div>
+            </div>
+
+            <div id="board" class="chess-board rounded-lg shadow-2xl overflow-hidden mb-4 bg-slate-900">
+                <!-- Squares injected by JS -->
+            </div>
+        </div>
+
+        <div class="w-full md:w-72 flex flex-col gap-4">
+            <div class="bg-slate-800 p-4 rounded-xl shadow-lg h-64 flex flex-col border border-slate-700">
+                <h3 class="font-bold mb-2 border-b border-slate-700 pb-1 text-sm uppercase tracking-wider">История ходов</h3>
+                <div id="move-history" class="text-sm overflow-y-auto flex-1 font-mono text-slate-300"></div>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-700">
+                <h3 class="font-bold mb-2 border-b border-slate-700 pb-1 text-sm uppercase tracking-wider">Чат</h3>
+                <div id="chat-messages" class="h-32 overflow-y-auto text-xs mb-2 space-y-1 bg-slate-900/50 p-2 rounded"></div>
+                <div class="flex gap-1">
+                    <input id="chat-input" class="bg-slate-900 border border-slate-700 px-2 py-1 rounded flex-1 text-xs outline-none" placeholder="Текст...">
+                    <button onclick="sendChatMessage()" class="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded text-xs">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Modal -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-slate-800 p-6 rounded-2xl max-w-sm w-full text-center border border-slate-700 shadow-2xl">
+            <h2 id="modal-title" class="text-xl font-bold mb-2"></h2>
+            <p id="modal-text" class="mb-6 text-slate-400 text-sm leading-relaxed"></p>
+            <button onclick="closeModal()" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-xl font-bold transition">ОК</button>
+        </div>
+    </div>
+
+    <script>
+    const PIECES = {
+        white: { k: '♔', q: '♕', r: '♖', b: '♗', n: '♘', p: '♙' },
+        black: { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' }
+    };
+
+    let board = [];
+    let selectedSquare = null;
+    let turn = 'white';
+    let myColor = null; 
+    let peer = null;
+    let conn = null;
+    let lastMove = null;
+
+    function initBoard() {
+        board = Array(8).fill(null).map(() => Array(8).fill(null));
+        const setup = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'];
+        
+        for (let i = 0; i < 8; i++) {
+            board[0][i] = { type: setup[i], color: 'black' };
+            board[1][i] = { type: 'p', color: 'black' };
+            board[6][i] = { type: 'p', color: 'white' };
+            board[7][i] = { type: setup[i], color: 'white' };
+        }
+        render();
+    }
+
+    function render() {
+        const boardEl = document.getElementById('board');
+        boardEl.innerHTML = '';
+        
+        // Разворачиваем доску для черного игрока
+        const isFlipped = (myColor === 'black');
+
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                const row = isFlipped ? 7 - r : r;
+                const col = isFlipped ? 7 - c : c;
+                
+                const square = document.createElement('div');
+                square.className = `square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
+                
+                if (selectedSquare && selectedSquare.r === row && selectedSquare.c === col) {
+                    square.classList.add('selected');
+                }
+                
+                if (lastMove && ((lastMove.from.r === row && lastMove.from.c === col) || (lastMove.to.r === row && lastMove.to.c === col))) {
+                    square.classList.add('last-move');
+                }
+
+                const piece = board[row][col];
+                if (piece) {
+                    const span = document.createElement('span');
+                    span.className = `piece ${piece.color === 'white' ? 'white-piece' : 'black-piece'}`;
+                    span.innerText = PIECES[piece.color][piece.type];
+                    square.appendChild(span);
+                }
+
+                square.onclick = () => handleSquareClick(row, col);
+                boardEl.appendChild(square);
+            }
+        }
+
+        const turnEl = document.getElementById('player-turn');
+        turnEl.innerText = turn === 'white' ? "Ход Белых" : "Ход Черных";
+        turnEl.className = turn === 'white' ? "text-white font-bold text-lg" : "text-slate-400 font-bold text-lg";
+    }
+
+    function handleSquareClick(r, c) {
+        if (myColor !== null && turn !== myColor) return; 
+
+        const piece = board[r][c];
+
+        if (selectedSquare) {
+            if (selectedSquare.r === r && selectedSquare.c === c) {
+                selectedSquare = null;
+            } else if (isValidMove(selectedSquare.r, selectedSquare.c, r, c)) {
+                executeMove(selectedSquare.r, selectedSquare.c, r, c);
+                selectedSquare = null;
+            } else if (piece && piece.color === turn) {
+                selectedSquare = { r, c };
+            } else {
+                selectedSquare = null;
+            }
+        } else if (piece && piece.color === turn) {
+            selectedSquare = { r, c };
+        }
+        render();
+    }
+
+    function isValidMove(fr, fc, tr, tc) {
+        const piece = board[fr][fc];
+        const target = board[tr][tc];
+        if (target && target.color === piece.color) return false;
+
+        const dr = tr - fr;
+        const dc = tc - fc;
+        const absDr = Math.abs(dr);
+        const absDc = Math.abs(dc);
+
+        switch (piece.type) {
+            case 'p':
+                const dir = piece.color === 'white' ? -1 : 1;
+                if (dc === 0 && !target) {
+                    if (dr === dir) return true;
+                    if (dr === 2 * dir && ((piece.color === 'white' && fr === 6) || (piece.color === 'black' && fr === 1)) && !board[fr + dir][fc]) return true;
+                }
+                if (absDc === 1 && dr === dir && target) return true;
+                return false;
+            case 'r':
+                if (dr !== 0 && dc !== 0) return false;
+                return isPathClear(fr, fc, tr, tc);
+            case 'n':
+                return (absDr === 2 && absDc === 1) || (absDr === 1 && absDc === 2);
+            case 'b':
+                if (absDr !== absDc) return false;
+                return isPathClear(fr, fc, tr, tc);
+            case 'q':
+                if (absDr !== absDc && dr !== 0 && dc !== 0) return false;
+                return isPathClear(fr, fc, tr, tc);
+            case 'k':
+                return absDr <= 1 && absDc <= 1;
+        }
+        return false;
+    }
+
+    function isPathClear(fr, fc, tr, tc) {
+        const dr = Math.sign(tr - fr);
+        const dc = Math.sign(tc - fc);
+        let r = fr + dr;
+        let c = fc + dc;
+        while (r !== tr || c !== tc) {
+            if (board[r][c]) return false;
+            r += dr;
+            c += dc;
+        }
+        return true;
+    }
+
+    function initPeer() {
+        try {
+            peer = new Peer({
+                debug: 2,
+                config: {
+                    'iceServers': [
+                        { url: 'stun:stun.l.google.com:19302' },
+                        { url: 'stun:stun1.l.google.com:19302' }
+                    ]
+                }
+            });
+            
+            peer.on('open', (id) => {
+                document.getElementById('peer-id-display').value = id;
+                updateConnectionStatus(false, "Готов к подключению");
+            });
+
+            peer.on('connection', (connection) => {
+                if (conn) { connection.close(); return; }
+                conn = connection;
+                myColor = 'white'; 
+                setupConnectionListeners();
+                startGame();
+            });
+
+            peer.on('error', (err) => {
+                console.error("PeerJS error:", err);
+                updateConnectionStatus(false, "Ошибка сети");
+            });
+        } catch (e) {
+            updateConnectionStatus(false, "Недоступно");
+        }
+    }
+
+    function connectToPeer() {
+        const remoteId = document.getElementById('remote-id-input').value.trim();
+        if (!remoteId) return;
+        updateConnectionStatus(false, "Подключение...");
+        conn = peer.connect(remoteId, { reliable: true });
+        myColor = 'black'; 
+        setupConnectionListeners();
+    }
+
+    function setupConnectionListeners() {
+        conn.on('open', () => {
+            updateConnectionStatus(true);
+            startGame();
+            addChatMessage("Система", "Соперник подключен!");
+        });
+
+        conn.on('data', (data) => {
+            if (data.type === 'move') {
+                applyMoveToLogic(data.move);
+                render();
+            } else if (data.type === 'chat') {
+                addChatMessage("Соперник", data.text);
+            }
+        });
+
+        conn.on('close', () => {
+            updateConnectionStatus(false, "Отключено");
+            showModal("Связь потеряна", "Соперник отключился.");
+        });
+    }
+
+    function startGame() {
+        document.getElementById('setup-controls').classList.add('hidden');
+        document.getElementById('game-controls').classList.remove('hidden');
+        document.getElementById('role-display').innerText = myColor === null ? "Режим: Локально" : `Вы: ${myColor === 'white' ? 'БЕЛЫЕ' : 'ЧЕРНЫЕ'}`;
+        initBoard();
+    }
+
+    function startOfflineMode() {
+        myColor = null;
+        startGame();
+        addChatMessage("Система", "Локальная игра начата.");
+    }
+
+    function executeMove(fr, fc, tr, tc) {
+        const moveData = { fr, fc, tr, tc };
+        applyMoveToLogic(moveData);
+        if (conn && conn.open) {
+            conn.send({ type: 'move', move: moveData });
+        }
+    }
+
+    function applyMoveToLogic(m) {
+        const piece = board[m.fr][m.fc];
+        const cols = ['a','b','c','d','e','f','g','h'];
+        const moveStr = `${piece.type.toUpperCase()}${cols[m.fc]}${8-m.fr} ➔ ${cols[m.tc]}${8-m.tr}`;
+        addToHistory(moveStr, turn);
+
+        board[m.tr][m.tc] = piece;
+        board[m.fr][m.fc] = null;
+        lastMove = { from: {r: m.fr, c: m.fc}, to: {r: m.tr, c: m.tc} };
+        
+        if (piece.type === 'p' && (m.tr === 0 || m.tr === 7)) {
+            board[m.tr][m.tc].type = 'q';
+        }
+        
+        turn = turn === 'white' ? 'black' : 'white';
+    }
+
+    function updateConnectionStatus(connected, text) {
+        const statusEl = document.getElementById('connection-status');
+        if (connected) {
+            statusEl.innerHTML = '<span class="status-dot bg-green-500 animate-pulse"></span> В сети';
+        } else {
+            statusEl.innerHTML = `<span class="status-dot bg-red-500"></span> ${text || 'Оффлайн'}`;
+        }
+    }
+
+    function addToHistory(move, color) {
+        const historyEl = document.getElementById('move-history');
+        const div = document.createElement('div');
+        div.className = color === 'white' ? 'text-white border-b border-slate-700/50 py-1' : 'text-slate-400 border-b border-slate-700/50 py-1';
+        div.innerText = move;
+        historyEl.prepend(div);
+    }
+
+    function addChatMessage(sender, text) {
+        const chatEl = document.getElementById('chat-messages');
+        const msg = document.createElement('div');
+        msg.innerHTML = `<span class="font-bold ${sender === 'Вы' ? 'text-emerald-400' : 'text-blue-400'}">${sender}:</span> ${text}`;
+        chatEl.appendChild(msg);
+        chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    function sendChatMessage() {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if (!text) return;
+        if (conn && conn.open) {
+            conn.send({ type: 'chat', text: text });
+            addChatMessage("Вы", text);
+        } else if (myColor === null) {
+            addChatMessage("Вы", text);
+        }
+        input.value = '';
+    }
+
+    function copyMyId() {
+        const id = document.getElementById('peer-id-display').value;
+        if (!id) return;
+        const tempInput = document.createElement('input');
+        tempInput.value = id;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        
+        const btn = document.querySelector('button[onclick="copyMyId()"]');
+        btn.innerText = "Скопировано!";
+        setTimeout(() => btn.innerText = "Копировать ID", 2000);
+    }
+
+    function showModal(title, text) {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-text').innerText = text;
+        document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('modal-overlay').classList.add('hidden');
+    }
+
+    window.onload = () => {
+        initBoard();
+        initPeer();
+    };
+
+    document.getElementById('chat-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendChatMessage();
+    });
+    </script>
+</body>
+</html>
