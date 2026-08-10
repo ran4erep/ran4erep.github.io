@@ -1,20 +1,35 @@
 [
   {
-    "id": "server_The Legend of Zelda - Link's Awakening (USA).gb",
-    "title": "ZELDA",
-    "filename": "The Legend of Zelda - Link's Awakening (USA).gb",
-    "url": "./roms/The Legend of Zelda - Link's Awakening (USA).gb",
-    "isGBC": false,
-    "romSize": 524288,
+    "id": "server_Resident Evil Gaiden (USA).gbc",
+    "title": "RES EVIL GDARHE",
+    "filename": "Resident Evil Gaiden (USA).gbc",
+    "url": "./roms/Resident Evil Gaiden (USA).gbc",
+    "isGBC": true,
+    "isZip": false,
+    "coverUrl": "./roms/images/Resident Evil Gaiden (USA).jpg",
+    "romSize": 2097152,
     "isBuiltIn": true
   },
   {
-    "id": "server_Warlocked (USA).gbc",
-    "title": "WARLOCKED",
-    "filename": "Warlocked (USA).gbc",
-    "url": "./roms/Warlocked (USA).gbc",
-    "isGBC": true,
-    "romSize": 2097152,
+    "id": "server_Super Mario Land (World).gb",
+    "title": "SUPER MARIOLAND",
+    "filename": "Super Mario Land (World).gb",
+    "url": "./roms/Super Mario Land (World).gb",
+    "isGBC": false,
+    "isZip": false,
+    "coverUrl": "./roms/images/Super Mario Land (World).jpg",
+    "romSize": 65536,
+    "isBuiltIn": true
+  },
+  {
+    "id": "server_Warlocked (USA).zip",
+    "title": "Warlocked (USA)",
+    "filename": "Warlocked (USA).zip",
+    "url": "./roms/Warlocked (USA).zip",
+    "isGBC": false,
+    "isZip": true,
+    "coverUrl": "./roms/images/Warlocked (USA).jpg",
+    "romSize": 413046,
     "isBuiltIn": true
   }
 ]
