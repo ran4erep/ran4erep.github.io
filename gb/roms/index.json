@@ -1,0 +1,20 @@
+[
+  {
+    "id": "server_The Legend of Zelda - Link's Awakening (USA).gb",
+    "title": "ZELDA",
+    "filename": "The Legend of Zelda - Link's Awakening (USA).gb",
+    "url": "./roms/The Legend of Zelda - Link's Awakening (USA).gb",
+    "isGBC": false,
+    "romSize": 524288,
+    "isBuiltIn": true
+  },
+  {
+    "id": "server_Warlocked (USA).gbc",
+    "title": "WARLOCKED",
+    "filename": "Warlocked (USA).gbc",
+    "url": "./roms/Warlocked (USA).gbc",
+    "isGBC": true,
+    "romSize": 2097152,
+    "isBuiltIn": true
+  }
+]
