@@ -1001,7 +1001,7 @@
           }
         }
 
-        const title = existing?.title || cleanRomTitle(headerTitle || baseName);
+        const title = existing?.title || cleanRomTitle(baseName);
 
         newGamesList.push({
           id: existing?.id || `server_${filename}`,
