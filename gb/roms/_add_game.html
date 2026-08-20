@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>r4Boy — Генератор и редактор index.json</title>
+  <style>
+    :root {
+      --bg-dark: #09090b;
+      --panel-bg: #121215;
+      --panel-border: #27272a;
+      --accent-green: #10b981;
+      --accent-green-hover: #059669;
+      --accent-cyan: #06b6d4;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --gbc-badge: #8b5cf6;
+      --gb-badge: #3b82f6;
+      --zip-badge: #ec4899;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    header {
+      max-width: 1200px;
+      margin: 0 auto 24px auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--panel-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #000;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Top Controls / File Picker Area */
+    .hero-picker {
+      background: var(--panel-bg);
+      border: 2px dashed var(--panel-border);
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      transition: border-color 0.2s, background-color 0.2s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .hero-picker:hover, .hero-picker.dragover {
+      border-color: var(--accent-green);
+      background-color: rgba(16, 185, 129, 0.05);
+    }
+
+    .hero-picker h2 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .hero-picker p {
+      color: var(--text-muted);
+      font-size: 14px;
+      max-width: 600px;
+      margin: 0 auto 16px auto;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: #27272a;
+      color: var(--text-main);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: #3f3f46;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--accent-green);
+      color: #000;
+      border: none;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-green-hover);
+      color: #fff;
+    }
+
+    .btn-cyan {
+      background: var(--accent-cyan);
+      color: #000;
+      border: none;
+    }
+
+    .btn-cyan:hover {
+      background: #0891b2;
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Toolbar & Search Bar */
+    .controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: var(--panel-bg);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 240px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: #09090b;
+      border: 1px solid var(--panel-border);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-green);
+    }
+
+    .stats-badge {
+      background: #18181b;
+      border: 1px solid var(--panel-border);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 12px;
+    }
+
+    .stats-badge span {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Games Grid */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .game-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .game-card:hover {
+      border-color: #3f3f46;
+    }
+
+    .game-card-header {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .cover-preview {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      background: #000;
+      border: 1px solid var(--panel-border);
+      object-fit: cover;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--text-muted);
+      overflow: hidden;
+    }
+
+    .cover-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .game-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .game-title-input {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      border-radius: 4px;
+      padding: 2px 4px;
+      margin-bottom: 4px;
+    }
+
+    .game-title-input:hover, .game-title-input:focus {
+      background: #09090b;
+      border-color: var(--panel-border);
+    }
+
+    .game-filename {
+      font-size: 11px;
+      color: var(--text-muted);
+      word-break: break-all;
+      font-family: monospace;
+    }
+
+    .badges-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge-gbc { background: rgba(139, 92, 246, 0.2); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); }
+    .badge-gb { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .badge-zip { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.4); }
+
+    .game-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-label input {
+      accent-color: var(--accent-green);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.2s;
+    }
+
+    .icon-btn:hover {
+      color: var(--danger);
+    }
+
+    /* Modal / Code View */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    textarea.code-area {
+      width: 100%;
+      height: 350px;
+      background: #09090b;
+      border: 1px solid var(--panel-border);
+      color: #34d399;
+      font-family: monospace;
+      font-size: 13px;
+      padding: 12px;
+      border-radius: 8px;
+      resize: vertical;
+      outline: none;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--accent-green);
+      color: #000;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 2000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      grid-column: 1 / -1;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">r4</div>
+      <div>
+        <div class="brand-title">r4Boy ROM Indexer</div>
+        <div class="brand-subtitle">Генератор и редактор библиотеки public/roms/index.json</div>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary" id="btnSaveDirect" disabled onclick="saveIndexJsonDirect()">
+        💾 Сохранить в папку
+      </button>
+      <button class="btn btn-cyan" onclick="openJsonModal()">
+        👁️ Просмотр JSON
+      </button>
+      <button class="btn" onclick="downloadJsonFile()">
+        ⬇️ Скачать index.json
+      </button>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <!-- Hero Drop / Selection Area -->
+    <div class="hero-picker" id="dropArea" onclick="triggerFolderSelect()">
+      <h2>📁 Выберите или перетащите папку с играми</h2>
+      <p>Выберите папку <b>roms</b> (или любую папку с файлами .gb, .gbc, .zip). Инструмент сосканирует заголовки ромов, найдет обложки в подпапке <b>images</b> и сформирует <b>index.json</b> без сервера.</p>
+      <div class="btn-group" onclick="event.stopPropagation()">
+        <button class="btn btn-primary" onclick="selectFolderWithAPI()">
+          📂 Выбрать папку (File System API)
+        </button>
+        <button class="btn" onclick="triggerFolderSelect()">
+          📁 Стандартный выбор папки
+        </button>
+      </div>
+      <input type="file" id="folderInput" webkitdirectory directory multiple onchange="handleFolderSelect(event)" />
+    </div>
+
+    <!-- Controls & Search -->
+    <div class="controls-bar" id="controlsBar" style="display: none;">
+      <div class="search-box">
+        <input type="text" class="search-input" id="searchInput" placeholder="🔍 Поиск по названию или файлу..." oninput="renderGamesList()" />
+      </div>
+
+      <div class="stats-badge" id="statsBadge">
+        Всего игр: <span id="statTotal">0</span>
+        | GBC: <span id="statGbc">0</span>
+        | GB: <span id="statGb">0</span>
+        | ZIP: <span id="statZip">0</span>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn" onclick="addNewManualGame()">+ Добавить игру</button>
+        <button class="btn btn-danger" onclick="clearAllGames()">Очистить всё</button>
+      </div>
+    </div>
+
+    <!-- Games Grid -->
+    <div class="games-grid" id="gamesGrid">
+      <div class="empty-state">
+        Выберите папку с играми выше, чтобы сформировать список.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JSON View Modal -->
+  <div class="modal-overlay" id="jsonModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="font-size: 16px;">Содержимое index.json</h3>
+        <button class="icon-btn" onclick="closeJsonModal()" style="font-size: 18px;">✕</button>
+      </div>
+      <div class="modal-body">
+        <textarea class="code-area" id="jsonTextArea" spellcheck="false" oninput="parseEditedJson(this.value)"></textarea>
+      </div>
+      <div class="modal-header" style="border-top: 1px solid var(--panel-border); border-bottom: none;">
+        <span style="font-size: 12px; color: var(--text-muted);" id="jsonValidStatus">JSON валиден</span>
+        <div class="btn-group">
+          <button class="btn btn-cyan" onclick="copyJsonToClipboard()">📋 Скопировать</button>
+          <button class="btn btn-primary" onclick="closeJsonModal()">Применить и закрыть</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">Успешно сохранено!</div>
+
+  <script>
+    // State
+    let gamesList = [];
+    let dirHandle = null;
+    let fileMap = new Map(); // filename -> File object
+
+    // ROM title cleaning rules matching emulator/romLibrary.ts
+    const EXT_REGEX = /\.(gb|gbc|zip)$/i;
+    const TAGS_REGEX = /\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|<[^>]*>/g;
+    const UNDERSCORE_REGEX = /_/g;
+    const MULTI_SPACE_REGEX = /\s+/g;
+    const EDGE_PUNCT_REGEX = /^[\s\-_:=.,]+|[\s\-_:=.,]+$/g;
+
+    function cleanRomTitle(rawName) {
+      if (!rawName) return '';
+      let name = rawName;
+      try { name = decodeURIComponent(name); } catch(e) {}
+
+      let cleaned = name.replace(EXT_REGEX, '');
+      cleaned = cleaned.replace(TAGS_REGEX, '');
+      if (cleaned.includes('_')) cleaned = cleaned.replace(UNDERSCORE_REGEX, ' ');
+      cleaned = cleaned.replace(MULTI_SPACE_REGEX, ' ').replace(EDGE_PUNCT_REGEX, '').trim();
+
+      if (!cleaned) cleaned = name.replace(EXT_REGEX, '').trim();
+      return cleaned || rawName;
+    }
+
+    function detectGBCFromName(name) {
+      if (!name) return false;
+      const lower = name.toLowerCase();
+      if (lower.endsWith('.gbc') || lower.includes('.gbc.')) return true;
+      if (/\b(gbc|color|cgb)\b/i.test(lower) || /\((gbc|color|cgb|c)\)/i.test(name) || /\[(gbc|color|cgb|c)\]/i.test(name)) return true;
+      if (/\bdx\b/i.test(lower) || /\bcolorized\b/i.test(lower)) return true;
+      return false;
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Trigger standard input select
+    function triggerFolderSelect() {
+      document.getElementById('folderInput').click();
+    }
+
+    // Modern File System Access API Select
+    async function selectFolderWithAPI() {
+      if (!('showDirectoryPicker' in window)) {
+        alert('Ваш браузер не поддерживает File System Access API. Используйте стандартную кнопку выбора папки.');
+        triggerFolderSelect();
+        return;
+      }
+
+      try {
+        dirHandle = await window.showDirectoryPicker();
+        fileMap.clear();
+        gamesList = [];
+
+        showToast('Чтение папки...');
+        await scanDirectoryHandle(dirHandle, '');
+        
+        // Try reading existing index.json if present
+        let existingIndex = null;
+        try {
+          const indexFileHandle = await dirHandle.getFileHandle('index.json');
+          const file = await indexFileHandle.getFile();
+          const text = await file.text();
+          existingIndex = JSON.parse(text);
+        } catch(e) {
+          // No index.json found, will create new
+        }
+
+        await processScannedFiles(existingIndex);
+        document.getElementById('btnSaveDirect').disabled = false;
+        showToast('Папка успешно сосканирована!');
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error(err);
+          alert('Ошибка чтения папки: ' + err.message);
+        }
+      }
+    }
+
+    async function scanDirectoryHandle(handle, pathPrefix) {
+      for await (const entry of handle.values()) {
+        const currentPath = pathPrefix ? `${pathPrefix}/${entry.name}` : entry.name;
+        if (entry.kind === 'file') {
+          const file = await entry.getFile();
+          fileMap.set(currentPath.toLowerCase(), file);
+          fileMap.set(entry.name.toLowerCase(), file); // fallback short name
+        } else if (entry.kind === 'directory') {
+          await scanDirectoryHandle(entry, currentPath);
+        }
+      }
+    }
+
+    // Standard input webkitdirectory fallback
+    async function handleFolderSelect(event) {
+      const files = Array.from(event.target.files);
+      if (!files.length) return;
+
+      fileMap.clear();
+      gamesList = [];
+
+      let existingIndexFile = null;
+
+      for (const file of files) {
+        const relPath = file.webkitRelativePath || file.name;
+        fileMap.set(relPath.toLowerCase(), file);
+        fileMap.set(file.name.toLowerCase(), file);
+
+        if (file.name.toLowerCase() === 'index.json') {
+          existingIndexFile = file;
+        }
+      }
+
+      let existingIndex = null;
+      if (existingIndexFile) {
+        try {
+          const text = await existingIndexFile.text();
+          existingIndex = JSON.parse(text);
+        } catch(e) {}
+      }
+
+      await processScannedFiles(existingIndex);
+      showToast('Игры сосканированы!');
+    }
+
+    // High performance ROM scanner
+    async function processScannedFiles(existingIndex) {
+      const existingMap = new Map();
+      if (Array.isArray(existingIndex)) {
+        for (const item of existingIndex) {
+          if (item.filename) existingMap.set(item.filename.toLowerCase(), item);
+        }
+      }
+
+      const newGamesList = [];
+      const romEntries = Array.from(fileMap.values()).filter(file => {
+        const lower = file.name.toLowerCase();
+        return (lower.endsWith('.gb') || lower.endsWith('.gbc') || lower.endsWith('.zip')) && !lower.startsWith('.');
+      });
+
+      // Filter duplicate file references (since we saved both path and filename in map)
+      const uniqueRoms = Array.from(new Set(romEntries));
+
+      for (const file of uniqueRoms) {
+        const filename = file.name;
+        const lowerName = filename.toLowerCase();
+        const baseName = filename.replace(EXT_REGEX, '');
+        const isZip = lowerName.endsWith('.zip');
+
+        // Check if existing index entry exists to preserve manual user edits
+        const existing = existingMap.get(lowerName);
+
+        let isGBC = lowerName.endsWith('.gbc') || detectGBCFromName(filename);
+        let headerTitle = '';
+
+        // Read first 512 bytes for fast header inspection without loading whole file
+        try {
+          const slice = file.slice(0, 512);
+          const buf = await slice.arrayBuffer();
+          const bytes = new Uint8Array(buf);
+
+          // Header title at 0x0134 - 0x0143
+          if (bytes.length >= 0x0143) {
+            let t = '';
+            for (let i = 0x0134; i < 0x0143; i++) {
+              if (bytes[i] === 0 || bytes[i] > 127) break;
+              t += String.fromCharCode(bytes[i]);
+            }
+            if (t.trim().length >= 2) headerTitle = t.trim();
+
+            if ((bytes[0x0143] & 0x80) !== 0 || (bytes[0x0143] & 0xc0) !== 0) {
+              isGBC = true;
+            }
+          }
+        } catch (e) {
+          // ignore slice error
+        }
+
+        // Cover detection
+        let coverUrl = existing?.coverUrl;
+        if (!coverUrl) {
+          // Check for images/<baseName>.png etc.
+          const coverExtensions = ['.png', '.jpg', '.jpeg', '.webp'];
+          for (const ext of coverExtensions) {
+            const imgPath = `images/${baseName}${ext}`.toLowerCase();
+            const rootImgPath = `${baseName}${ext}`.toLowerCase();
+            if (fileMap.has(imgPath)) {
+              coverUrl = `./roms/images/${baseName}${ext}`;
+              break;
+            } else if (fileMap.has(rootImgPath)) {
+              coverUrl = `./roms/${baseName}${ext}`;
+              break;
+            }
+          }
+        }
+
+        const title = existing?.title || cleanRomTitle(headerTitle || baseName);
+
+        newGamesList.push({
+          id: existing?.id || `server_${filename}`,
+          title: title,
+          filename: filename,
+          url: `./roms/${filename}`,
+          isGBC: existing?.isGBC !== undefined ? existing.isGBC : isGBC,
+          isZip: isZip,
+          coverUrl: coverUrl || `./roms/images/${baseName}.png`,
+          romSize: file.size,
+          isBuiltIn: true
+        });
+      }
+
+      gamesList = newGamesList;
+      document.getElementById('controlsBar').style.display = 'flex';
+      renderGamesList();
+    }
+
+    // Render cards
+    function renderGamesList() {
+      const grid = document.getElementById('gamesGrid');
+      const search = document.getElementById('searchInput').value.toLowerCase();
+
+      const filtered = gamesList.filter(g => 
+        g.title.toLowerCase().includes(search) || 
+        g.filename.toLowerCase().includes(search)
+      );
+
+      // Stats
+      document.getElementById('statTotal').innerText = gamesList.length;
+      document.getElementById('statGbc').innerText = gamesList.filter(g => g.isGBC).length;
+      document.getElementById('statGb').innerText = gamesList.filter(g => !g.isGBC && !g.isZip).length;
+      document.getElementById('statZip').innerText = gamesList.filter(g => g.isZip).length;
+
+      if (!filtered.length) {
+        grid.innerHTML = `<div class="empty-state">Ничего не найдено.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map((game, index) => {
+        const realIndex = gamesList.indexOf(game);
+        const sizeKb = (game.romSize / 1024).toFixed(0);
+
+        return `
+          <div class="game-card">
+            <div class="game-card-header">
+              <div class="cover-preview">
+                <img src="${game.coverUrl}" onerror="this.parentElement.innerHTML='NO COVER'" />
+              </div>
+              <div class="game-details">
+                <input type="text" class="game-title-input" value="${escapeHtml(game.title)}" onchange="updateGameTitle(${realIndex}, this.value)" />
+                <div class="game-filename">${escapeHtml(game.filename)}</div>
+                <div class="badges-row">
+                  ${game.isGBC ? '<span class="badge badge-gbc">GBC</span>' : '<span class="badge badge-gb">GB</span>'}
+                  ${game.isZip ? '<span class="badge badge-zip">ZIP</span>' : ''}
+                  <span class="badge" style="background:#27272a; color:#a1a1aa">${sizeKb} KB</span>
+                </div>
+              </div>
+            </div>
+            <div class="game-card-footer">
+              <label class="checkbox-label">
+                <input type="checkbox" ${game.isGBC ? 'checked' : ''} onchange="toggleGbcFlag(${realIndex}, this.checked)" />
+                Режим Game Boy Color
+              </label>
+              <div class="card-actions">
+                <button class="icon-btn" title="Удалить из списка" onclick="removeGame(${realIndex})">🗑️</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function updateGameTitle(index, newTitle) {
+      gamesList[index].title = newTitle.trim();
+    }
+
+    function toggleGbcFlag(index, isGBC) {
+      gamesList[index].isGBC = isGBC;
+      renderGamesList();
+    }
+
+    function removeGame(index) {
+      gamesList.splice(index, 1);
+      renderGamesList();
+    }
+
+    function clearAllGames() {
+      if (confirm('Очистить весь список игр?')) {
+        gamesList = [];
+        renderGamesList();
+      }
+    }
+
+    function addNewManualGame() {
+      const filename = prompt('Введите имя файла игры (например: Mario.gbc):');
+      if (!filename) return;
+
+      const baseName = filename.replace(EXT_REGEX, '');
+      const isGBC = filename.toLowerCase().endsWith('.gbc');
+      const isZip = filename.toLowerCase().endsWith('.zip');
+
+      gamesList.unshift({
+        id: `server_${filename}`,
+        title: cleanRomTitle(baseName),
+        filename: filename,
+        url: `./roms/${filename}`,
+        isGBC: isGBC,
+        isZip: isZip,
+        coverUrl: `./roms/images/${baseName}.png`,
+        romSize: 0,
+        isBuiltIn: true
+      });
+
+      renderGamesList();
+    }
+
+    // Direct Save using File System Access API
+    async function saveIndexJsonDirect() {
+      if (!dirHandle) return;
+
+      try {
+        const fileHandle = await dirHandle.getFileHandle('index.json', { create: true });
+        const writable = await fileHandle.createWritable();
+        const jsonStr = JSON.stringify(gamesList, null, 2);
+        await writable.write(jsonStr);
+        await writable.close();
+
+        showToast('Файл index.json успешно сохранен в папку!');
+      } catch (err) {
+        console.error(err);
+        alert('Ошибка при сохранении: ' + err.message);
+      }
+    }
+
+    // Download JSON file
+    function downloadJsonFile() {
+      const jsonStr = JSON.stringify(gamesList, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Modal Json Code Editor
+    function openJsonModal() {
+      const modal = document.getElementById('jsonModal');
+      const area = document.getElementById('jsonTextArea');
+      area.value = JSON.stringify(gamesList, null, 2);
+      document.getElementById('jsonValidStatus').innerText = 'JSON валиден';
+      document.getElementById('jsonValidStatus').style.color = 'var(--accent-green)';
+      modal.classList.add('active');
+    }
+
+    function closeJsonModal() {
+      document.getElementById('jsonModal').classList.remove('active');
+      renderGamesList();
+    }
+
+    function parseEditedJson(text) {
+      const status = document.getElementById('jsonValidStatus');
+      try {
+        const parsed = JSON.parse(text);
+        if (Array.isArray(parsed)) {
+          gamesList = parsed;
+          status.innerText = 'JSON валиден';
+          status.style.color = 'var(--accent-green)';
+        } else {
+          status.innerText = 'Ошибка: Ожидается массив [...]';
+          status.style.color = 'var(--danger)';
+        }
+      } catch (err) {
+        status.innerText = 'Ошибка синтаксиса JSON';
+        status.style.color = 'var(--danger)';
+      }
+    }
+
+    function copyJsonToClipboard() {
+      const text = JSON.stringify(gamesList, null, 2);
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('JSON скопирован в буфер обмена!');
+      });
+    }
+
+    // Drag and Drop support on hero box
+    const dropArea = document.getElementById('dropArea');
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropArea.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropArea.classList.remove('dragover');
+      }, false);
+    });
+
+    dropArea.addEventListener('drop', async (e) => {
+      const items = e.dataTransfer.items;
+      if (!items) return;
+
+      fileMap.clear();
+      gamesList = [];
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i].webkitGetAsEntry();
+        if (item) {
+          await traverseFileTree(item, '');
+        }
+      }
+
+      let existingIndex = null;
+      if (fileMap.has('index.json')) {
+        try {
+          const indexFile = fileMap.get('index.json');
+          const text = await indexFile.text();
+          existingIndex = JSON.parse(text);
+        } catch(e) {}
+      }
+
+      await processScannedFiles(existingIndex);
+      showToast('Папка сосканирована!');
+    });
+
+    async function traverseFileTree(item, path) {
+      if (item.isFile) {
+        item.file(file => {
+          const fullPath = path + file.name;
+          fileMap.set(fullPath.toLowerCase(), file);
+          fileMap.set(file.name.toLowerCase(), file);
+        });
+      } else if (item.isDirectory) {
+        const dirReader = item.createReader();
+        const readEntries = () => {
+          dirReader.readEntries(async entries => {
+            if (entries.length > 0) {
+              for (let i = 0; i < entries.length; i++) {
+                await traverseFileTree(entries[i], path + item.name + '/');
+              }
+              readEntries();
+            }
+          });
+        };
+        readEntries();
+      }
+    }
+  </script>
+</body>
+</html>
