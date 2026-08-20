@@ -1,7 +1,7 @@
 [
   {
     "id": "server_Deadeus (Homebrew v1.3.8).zip",
-    "title": "DEADEUS GB",
+    "title": "Deadeus",
     "filename": "Deadeus (Homebrew v1.3.8).zip",
     "url": "./roms/Deadeus (Homebrew v1.3.8).zip",
     "isGBC": false,
@@ -12,7 +12,7 @@
   },
   {
     "id": "server_Ninja Gaiden Shadow (DX v1.0).zip",
-    "title": "NINJAGAIDENDX",
+    "title": "Ninja Gaiden Shadow",
     "filename": "Ninja Gaiden Shadow (DX v1.0).zip",
     "url": "./roms/Ninja Gaiden Shadow (DX v1.0).zip",
     "isGBC": true,
@@ -23,7 +23,7 @@
   },
   {
     "id": "server_Phoenix Wright - Ace Attorney (GB Port).zip",
-    "title": "PHOBNIXWRIGHT",
+    "title": "Phoenix Wright - Ace Attorney",
     "filename": "Phoenix Wright - Ace Attorney (GB Port).zip",
     "url": "./roms/Phoenix Wright - Ace Attorney (GB Port).zip",
     "isGBC": false,
@@ -34,7 +34,7 @@
   },
   {
     "id": "server_porklike.gb",
-    "title": "PORKLIKE",
+    "title": "Porklike GB",
     "filename": "porklike.gb",
     "url": "./roms/porklike.gb",
     "isGBC": false,
@@ -45,7 +45,7 @@
   },
   {
     "id": "server_Resident Evil GBC Cart 1 (Bugfix v1.0).zip",
-    "title": "RES EVIL",
+    "title": "Resident Evil Bugfix",
     "filename": "Resident Evil GBC Cart 1 (Bugfix v1.0).zip",
     "url": "./roms/Resident Evil GBC Cart 1 (Bugfix v1.0).zip",
     "isGBC": true,
@@ -56,7 +56,7 @@
   },
   {
     "id": "server_porklike.gbc",
-    "title": "PORKLIKE",
+    "title": "Porklike GBC",
     "filename": "porklike.gbc",
     "url": "./roms/porklike.gbc",
     "isGBC": true,
@@ -67,7 +67,7 @@
   },
   {
     "id": "server_The Legend of Zelda - Moonrise Regalia v1.0.6.zip",
-    "title": "ZELDA NAYRUAZ8E",
+    "title": "ZThe Legend of Zelda - Moonrise Regalia",
     "filename": "The Legend of Zelda - Moonrise Regalia v1.0.6.zip",
     "url": "./roms/The Legend of Zelda - Moonrise Regalia v1.0.6.zip",
     "isGBC": true,
@@ -78,7 +78,7 @@
   },
   {
     "id": "server_Castlevania - Order of Shadows v1.0.2.zip",
-    "title": "CASTLEVANIAORDE",
+    "title": "Castlevania - Order of Shadows",
     "filename": "Castlevania - Order of Shadows v1.0.2.zip",
     "url": "./roms/Castlevania - Order of Shadows v1.0.2.zip",
     "isGBC": true,
@@ -89,7 +89,7 @@
   },
   {
     "id": "server_Tobu Tobu Girl (Deluxe) (Homebrew).zip",
-    "title": "TOBUDX",
+    "title": "Tobu Tobu Girl Deluxe",
     "filename": "Tobu Tobu Girl (Deluxe) (Homebrew).zip",
     "url": "./roms/Tobu Tobu Girl (Deluxe) (Homebrew).zip",
     "isGBC": true,
