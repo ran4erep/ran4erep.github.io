@@ -1,5 +1,104 @@
 [
   {
+    "id": "server_Deadeus (Homebrew v1.3.8).zip",
+    "title": "DEADEUS GB",
+    "filename": "Deadeus (Homebrew v1.3.8).zip",
+    "url": "./roms/Deadeus (Homebrew v1.3.8).zip",
+    "isGBC": false,
+    "isZip": true,
+    "coverUrl": "./roms/images/Deadeus (Homebrew v1.3.8).jpg",
+    "romSize": 157140,
+    "isBuiltIn": true
+  },
+  {
+    "id": "server_Ninja Gaiden Shadow (DX v1.0).zip",
+    "title": "NINJAGAIDENDX",
+    "filename": "Ninja Gaiden Shadow (DX v1.0).zip",
+    "url": "./roms/Ninja Gaiden Shadow (DX v1.0).zip",
+    "isGBC": true,
+    "isZip": true,
+    "coverUrl": "./roms/images/Ninja Gaiden Shadow (DX v1.0).jpg",
+    "romSize": 140304,
+    "isBuiltIn": true
+  },
+  {
+    "id": "server_Phoenix Wright - Ace Attorney (GB Port).zip",
+    "title": "PHOBNIXWRIGHT",
+    "filename": "Phoenix Wright - Ace Attorney (GB Port).zip",
+    "url": "./roms/Phoenix Wright - Ace Attorney (GB Port).zip",
+    "isGBC": false,
+    "isZip": true,
+    "coverUrl": "./roms/images/Phoenix Wright - Ace Attorney (GB Port).jpg",
+    "romSize": 377725,
+    "isBuiltIn": true
+  },
+  {
+    "id": "server_porklike.gb",
+    "title": "PORKLIKE",
+    "filename": "porklike.gb",
+    "url": "./roms/porklike.gb",
+    "isGBC": false,
+    "isZip": false,
+    "coverUrl": "./roms/images/porklike.png",
+    "romSize": 65536,
+    "isBuiltIn": true
+  },
+  {
+    "id": "server_Resident Evil GBC Cart 1 (Bugfix v1.0).zip",
+    "title": "RES EVIL",
+    "filename": "Resident Evil GBC Cart 1 (Bugfix v1.0).zip",
+    "url": "./roms/Resident Evil GBC Cart 1 (Bugfix v1.0).zip",
+    "isGBC": true,
+    "isZip": true,
+    "coverUrl": "./roms/images/Resident Evil GBC Cart 1 (Bugfix v1.0).jpg",
+    "romSize": 1778824,
+    "isBuiltIn": true
+  },
+  {
+    "id": "server_porklike.gbc",
+    "title": "PORKLIKE",
+    "filename": "porklike.gbc",
+    "url": "./roms/porklike.gbc",
+    "isGBC": true,
+    "isZip": false,
+    "coverUrl": "./roms/images/porklike.png",
+    "romSize": 65536,
+    "isBuiltIn": true
+  },
+  {
+    "id": "server_The Legend of Zelda - Moonrise Regalia v1.0.6.zip",
+    "title": "ZELDA NAYRUAZ8E",
+    "filename": "The Legend of Zelda - Moonrise Regalia v1.0.6.zip",
+    "url": "./roms/The Legend of Zelda - Moonrise Regalia v1.0.6.zip",
+    "isGBC": true,
+    "isZip": true,
+    "coverUrl": "./roms/images/The Legend of Zelda - Moonrise Regalia v1.0.6.webp",
+    "romSize": 711086,
+    "isBuiltIn": true
+  },
+  {
+    "id": "server_Castlevania - Order of Shadows v1.0.2.zip",
+    "title": "CASTLEVANIAORDE",
+    "filename": "Castlevania - Order of Shadows v1.0.2.zip",
+    "url": "./roms/Castlevania - Order of Shadows v1.0.2.zip",
+    "isGBC": true,
+    "isZip": true,
+    "coverUrl": "./roms/images/Castlevania - Order of Shadows v1.0.2.webp",
+    "romSize": 421305,
+    "isBuiltIn": true
+  },
+  {
+    "id": "server_Tobu Tobu Girl (Deluxe) (Homebrew).zip",
+    "title": "TOBUDX",
+    "filename": "Tobu Tobu Girl (Deluxe) (Homebrew).zip",
+    "url": "./roms/Tobu Tobu Girl (Deluxe) (Homebrew).zip",
+    "isGBC": true,
+    "isZip": true,
+    "coverUrl": "./roms/images/Tobu Tobu Girl (Deluxe) (Homebrew).png",
+    "romSize": 94455,
+    "isBuiltIn": true
+  },
+  {
     "id": "server_007 - The World Is Not Enough[GBC].zip",
     "title": "007 - The World Is Not Enough[GBC]",
     "filename": "007 - The World Is Not Enough[GBC].zip",

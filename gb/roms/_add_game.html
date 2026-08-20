@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>r4Boy — Indexer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     :root {
       --bg-dark: #09090b;
@@ -892,43 +893,110 @@
         let isGBC = lowerName.endsWith('.gbc') || detectGBCFromName(filename);
         let headerTitle = '';
 
-        // Read first 512 bytes for fast header inspection without loading whole file
-        try {
-          const slice = file.slice(0, 512);
-          const buf = await slice.arrayBuffer();
-          const bytes = new Uint8Array(buf);
-
-          // Header title at 0x0134 - 0x0143
-          if (bytes.length >= 0x0143) {
-            let tStr = '';
-            for (let i = 0x0134; i < 0x0143; i++) {
-              if (bytes[i] === 0 || bytes[i] > 127) break;
-              tStr += String.fromCharCode(bytes[i]);
+        if (isZip && typeof JSZip !== 'undefined') {
+          try {
+            const zip = await JSZip.loadAsync(file);
+            let romFileInZip = null;
+            for (const relativePath in zip.files) {
+              const zipEntry = zip.files[relativePath];
+              if (!zipEntry.dir) {
+                const entryLower = zipEntry.name.toLowerCase();
+                if (entryLower.endsWith('.gb') || entryLower.endsWith('.gbc')) {
+                  romFileInZip = zipEntry;
+                  break;
+                }
+              }
             }
-            if (tStr.trim().length >= 2) headerTitle = tStr.trim();
 
-            if ((bytes[0x0143] & 0x80) !== 0 || (bytes[0x0143] & 0xc0) !== 0) {
-              isGBC = true;
+            if (romFileInZip) {
+              const entryLower = romFileInZip.name.toLowerCase();
+              if (entryLower.endsWith('.gbc') || detectGBCFromName(romFileInZip.name)) {
+                isGBC = true;
+              }
+
+              // Read first 512 bytes for header inspection
+              const romBuffer = await romFileInZip.async("arraybuffer");
+              const bytes = new Uint8Array(romBuffer);
+              if (bytes.length >= 0x0143) {
+                let tStr = '';
+                for (let i = 0x0134; i < 0x0143; i++) {
+                  if (bytes[i] === 0 || bytes[i] > 127) break;
+                  tStr += String.fromCharCode(bytes[i]);
+                }
+                if (tStr.trim().length >= 2) headerTitle = tStr.trim();
+
+                if ((bytes[0x0143] & 0x80) !== 0 || (bytes[0x0143] & 0xc0) !== 0) {
+                  isGBC = true;
+                }
+              }
             }
+          } catch (e) {
+            console.error("Error reading zip file:", filename, e);
           }
-        } catch (e) {
-          // ignore slice error
+        } else {
+          // Read first 512 bytes for fast header inspection without loading whole file
+          try {
+            const slice = file.slice(0, 512);
+            const buf = await slice.arrayBuffer();
+            const bytes = new Uint8Array(buf);
+
+            // Header title at 0x0134 - 0x0143
+            if (bytes.length >= 0x0143) {
+              let tStr = '';
+              for (let i = 0x0134; i < 0x0143; i++) {
+                if (bytes[i] === 0 || bytes[i] > 127) break;
+                tStr += String.fromCharCode(bytes[i]);
+              }
+              if (tStr.trim().length >= 2) headerTitle = tStr.trim();
+
+              if ((bytes[0x0143] & 0x80) !== 0 || (bytes[0x0143] & 0xc0) !== 0) {
+                isGBC = true;
+              }
+            }
+          } catch (e) {
+            // ignore slice error
+          }
         }
 
         // Cover detection
         let coverUrl = existing?.coverUrl;
         if (!coverUrl) {
-          // Check for images/<baseName>.png etc.
           const coverExtensions = ['.png', '.jpg', '.jpeg', '.webp'];
+          let foundCoverKey = null;
+
+          // Search in fileMap for image with baseName containing "/images/"
           for (const ext of coverExtensions) {
-            const imgPath = `images/${baseName}${ext}`.toLowerCase();
-            const rootImgPath = `${baseName}${ext}`.toLowerCase();
-            if (fileMap.has(imgPath)) {
-              coverUrl = `./roms/images/${baseName}${ext}`;
-              break;
-            } else if (fileMap.has(rootImgPath)) {
-              coverUrl = `./roms/${baseName}${ext}`;
-              break;
+            const targetSuffix = `/images/${baseName}${ext}`.toLowerCase();
+            const targetRoot = `images/${baseName}${ext}`.toLowerCase();
+            for (const key of fileMap.keys()) {
+              if (key === targetRoot || key.endsWith(targetSuffix)) {
+                foundCoverKey = key;
+                break;
+              }
+            }
+            if (foundCoverKey) break;
+          }
+
+          // Fallback to searching anywhere in the folder
+          if (!foundCoverKey) {
+            for (const ext of coverExtensions) {
+              const exactName = `${baseName}${ext}`.toLowerCase();
+              for (const key of fileMap.keys()) {
+                if (key === exactName || key.endsWith('/' + exactName)) {
+                  foundCoverKey = key;
+                  break;
+                }
+              }
+              if (foundCoverKey) break;
+            }
+          }
+
+          if (foundCoverKey) {
+            const matchedExt = coverExtensions.find(e => foundCoverKey.endsWith(e)) || '.png';
+            if (foundCoverKey.includes('images/')) {
+              coverUrl = `./roms/images/${baseName}${matchedExt}`;
+            } else {
+              coverUrl = `./roms/${baseName}${matchedExt}`;
             }
           }
         }
