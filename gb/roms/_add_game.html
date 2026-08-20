@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>r4Boy — Генератор и редактор index.json</title>
+  <title>r4Boy — Indexer</title>
   <style>
     :root {
       --bg-dark: #09090b;
@@ -125,6 +125,33 @@
       gap: 12px;
       justify-content: center;
       flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .lang-switcher {
+      display: flex;
+      background: #18181b;
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-btn.active {
+      background: var(--accent-green);
+      color: #000;
     }
 
     .btn {
@@ -481,17 +508,21 @@
       <div class="brand-logo">r4</div>
       <div>
         <div class="brand-title">r4Boy ROM Indexer</div>
-        <div class="brand-subtitle">Генератор и редактор библиотеки public/roms/index.json</div>
+        <div class="brand-subtitle" data-i18n="subtitle">Генератор и редактор библиотеки public/roms/index.json</div>
       </div>
     </div>
     <div class="btn-group">
-      <button class="btn btn-primary" id="btnSaveDirect" disabled onclick="saveIndexJsonDirect()">
+      <div class="lang-switcher">
+        <button class="lang-btn" id="langRuBtn" onclick="switchLanguage('ru')">RU</button>
+        <button class="lang-btn" id="langEnBtn" onclick="switchLanguage('en')">EN</button>
+      </div>
+      <button class="btn btn-primary" id="btnSaveDirect" disabled onclick="saveIndexJsonDirect()" data-i18n="saveFolder">
         💾 Сохранить в папку
       </button>
-      <button class="btn btn-cyan" onclick="openJsonModal()">
+      <button class="btn btn-cyan" onclick="openJsonModal()" data-i18n="viewJson">
         👁️ Просмотр JSON
       </button>
-      <button class="btn" onclick="downloadJsonFile()">
+      <button class="btn" onclick="downloadJsonFile()" data-i18n="downloadJson">
         ⬇️ Скачать index.json
       </button>
     </div>
@@ -501,13 +532,13 @@
     
     <!-- Hero Drop / Selection Area -->
     <div class="hero-picker" id="dropArea" onclick="triggerFolderSelect()">
-      <h2>📁 Выберите или перетащите папку с играми</h2>
-      <p>Выберите папку <b>roms</b> (или любую папку с файлами .gb, .gbc, .zip). Инструмент сосканирует заголовки ромов, найдет обложки в подпапке <b>images</b> и сформирует <b>index.json</b> без сервера.</p>
+      <h2 data-i18n="dropTitle">📁 Выберите или перетащите папку с играми</h2>
+      <p data-i18n="dropSub">Выберите папку <b>roms</b> (или любую папку с файлами .gb, .gbc, .zip). Инструмент сосканирует заголовки ромов, найдет обложки в подпапке <b>images</b> и сформирует <b>index.json</b> без сервера.</p>
       <div class="btn-group" onclick="event.stopPropagation()">
-        <button class="btn btn-primary" onclick="selectFolderWithAPI()">
+        <button class="btn btn-primary" onclick="selectFolderWithAPI()" data-i18n="selectApi">
           📂 Выбрать папку (File System API)
         </button>
-        <button class="btn" onclick="triggerFolderSelect()">
+        <button class="btn" onclick="triggerFolderSelect()" data-i18n="selectStd">
           📁 Стандартный выбор папки
         </button>
       </div>
@@ -517,25 +548,25 @@
     <!-- Controls & Search -->
     <div class="controls-bar" id="controlsBar" style="display: none;">
       <div class="search-box">
-        <input type="text" class="search-input" id="searchInput" placeholder="🔍 Поиск по названию или файлу..." oninput="renderGamesList()" />
+        <input type="text" class="search-input" id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="🔍 Поиск по названию или файлу..." oninput="renderGamesList()" />
       </div>
 
       <div class="stats-badge" id="statsBadge">
-        Всего игр: <span id="statTotal">0</span>
-        | GBC: <span id="statGbc">0</span>
-        | GB: <span id="statGb">0</span>
-        | ZIP: <span id="statZip">0</span>
+        <span data-i18n="lblTotal">Всего игр:</span> <span id="statTotal">0</span>
+        | <span>GBC:</span> <span id="statGbc">0</span>
+        | <span>GB:</span> <span id="statGb">0</span>
+        | <span>ZIP:</span> <span id="statZip">0</span>
       </div>
 
       <div class="btn-group">
-        <button class="btn" onclick="addNewManualGame()">+ Добавить игру</button>
-        <button class="btn btn-danger" onclick="clearAllGames()">Очистить всё</button>
+        <button class="btn" onclick="addNewManualGame()" data-i18n="addGame">+ Добавить игру</button>
+        <button class="btn btn-danger" onclick="clearAllGames()" data-i18n="clearAll">Очистить всё</button>
       </div>
     </div>
 
     <!-- Games Grid -->
     <div class="games-grid" id="gamesGrid">
-      <div class="empty-state">
+      <div class="empty-state" data-i18n="emptyState">
         Выберите папку с играми выше, чтобы сформировать список.
       </div>
     </div>
@@ -546,17 +577,17 @@
   <div class="modal-overlay" id="jsonModal">
     <div class="modal-box">
       <div class="modal-header">
-        <h3 style="font-size: 16px;">Содержимое index.json</h3>
+        <h3 style="font-size: 16px;" data-i18n="modalTitle">Содержимое index.json</h3>
         <button class="icon-btn" onclick="closeJsonModal()" style="font-size: 18px;">✕</button>
       </div>
       <div class="modal-body">
         <textarea class="code-area" id="jsonTextArea" spellcheck="false" oninput="parseEditedJson(this.value)"></textarea>
       </div>
       <div class="modal-header" style="border-top: 1px solid var(--panel-border); border-bottom: none;">
-        <span style="font-size: 12px; color: var(--text-muted);" id="jsonValidStatus">JSON валиден</span>
+        <span style="font-size: 12px; color: var(--text-muted);" id="jsonValidStatus" data-i18n="jsonValid">JSON валиден</span>
         <div class="btn-group">
-          <button class="btn btn-cyan" onclick="copyJsonToClipboard()">📋 Скопировать</button>
-          <button class="btn btn-primary" onclick="closeJsonModal()">Применить и закрыть</button>
+          <button class="btn btn-cyan" onclick="copyJsonToClipboard()" data-i18n="copyClipboard">📋 Скопировать</button>
+          <button class="btn btn-primary" onclick="closeJsonModal()" data-i18n="applyClose">Применить и закрыть</button>
         </div>
       </div>
     </div>
@@ -566,6 +597,141 @@
   <div class="toast" id="toast">Успешно сохранено!</div>
 
   <script>
+    // i18n Dictionary
+    const i18nDict = {
+      ru: {
+        subtitle: "Генератор и редактор библиотеки public/roms/index.json",
+        saveFolder: "💾 Сохранить в папку",
+        viewJson: "👁️ Просмотр JSON",
+        downloadJson: "⬇️ Скачать index.json",
+        dropTitle: "📁 Выберите или перетащите папку с играми",
+        dropSub: "Выберите папку <b>roms</b> (или любую папку с файлами .gb, .gbc, .zip). Инструмент сосканирует заголовки ромов, найдет обложки в подпапке <b>images</b> и сформирует <b>index.json</b> без сервера.",
+        selectApi: "📂 Выбрать папку (File System API)",
+        selectStd: "📁 Стандартный выбор папки",
+        searchPlaceholder: "🔍 Поиск по названию или файлу...",
+        lblTotal: "Всего игр:",
+        addGame: "+ Добавить игру",
+        clearAll: "Очистить всё",
+        emptyState: "Выберите папку с играми выше, чтобы сформировать список.",
+        nothingFound: "Ничего не найдено.",
+        modalTitle: "Содержимое index.json",
+        jsonValid: "JSON валиден",
+        jsonExpectedArray: "Ошибка: Ожидается массив [...]",
+        jsonSyntaxError: "Ошибка синтаксиса JSON",
+        copyClipboard: "📋 Скопировать",
+        applyClose: "Применить и закрыть",
+        gbcMode: "Режим Game Boy Color",
+        deleteTooltip: "Удалить из списка",
+        noCover: "БЕЗ ОБЛОЖКИ",
+        // Alerts & Toasts
+        readingFolder: "Чтение папки...",
+        folderScanned: "Папка успешно сосканирована!",
+        browserNoApi: "Ваш браузер не поддерживает File System Access API. Используйте стандартную кнопку выбора папки.",
+        folderReadError: "Ошибка чтения папки: ",
+        gamesScanned: "Игры сосканированы!",
+        confirmClear: "Очистить весь список игр?",
+        promptFilename: "Введите имя файла игры (например: Mario.gbc):",
+        jsonSaved: "Файл index.json успешно сохранен в папку!",
+        jsonCopied: "JSON скопирован в буфер обмена!",
+        savedSuccess: "Успешно сохранено!"
+      },
+      en: {
+        subtitle: "Generator and editor for public/roms/index.json library",
+        saveFolder: "💾 Save to Folder",
+        viewJson: "👁️ View JSON",
+        downloadJson: "⬇️ Download index.json",
+        dropTitle: "📁 Select or drag & drop games folder",
+        dropSub: "Select the <b>roms</b> folder (or any folder containing .gb, .gbc, .zip files). The tool scans ROM headers, finds covers in <b>images</b>, and builds <b>index.json</b> completely serverless.",
+        selectApi: "📂 Select Folder (File System API)",
+        selectStd: "📁 Standard Folder Picker",
+        searchPlaceholder: "🔍 Search by title or filename...",
+        lblTotal: "Total Games:",
+        addGame: "+ Add Game",
+        clearAll: "Clear All",
+        emptyState: "Select a games folder above to generate the library.",
+        nothingFound: "Nothing found.",
+        modalTitle: "index.json Contents",
+        jsonValid: "JSON is valid",
+        jsonExpectedArray: "Error: Expected array [...]",
+        jsonSyntaxError: "JSON syntax error",
+        copyClipboard: "📋 Copy to Clipboard",
+        applyClose: "Apply & Close",
+        gbcMode: "Game Boy Color Mode",
+        deleteTooltip: "Remove from list",
+        noCover: "NO COVER",
+        // Alerts & Toasts
+        readingFolder: "Scanning folder...",
+        folderScanned: "Folder scanned successfully!",
+        browserNoApi: "Your browser does not support the File System Access API. Please use the standard folder picker.",
+        folderReadError: "Error reading folder: ",
+        gamesScanned: "Games scanned!",
+        confirmClear: "Clear all games from the list?",
+        promptFilename: "Enter game filename (e.g. Mario.gbc):",
+        jsonSaved: "index.json file successfully saved to folder!",
+        jsonCopied: "JSON copied to clipboard!",
+        savedSuccess: "Saved successfully!"
+      }
+    };
+
+    function getInitialLanguage() {
+      try {
+        const savedLang = localStorage.getItem('r4boy_lang');
+        if (savedLang === 'ru' || savedLang === 'en') return savedLang;
+
+        const emulatorSettings = localStorage.getItem('gb_emulator_settings_v1');
+        if (emulatorSettings) {
+          const parsed = JSON.parse(emulatorSettings);
+          if (parsed.language === 'ru' || parsed.language === 'en') return parsed.language;
+        }
+      } catch(e) {}
+
+      const sysLang = (navigator.language || (navigator.languages && navigator.languages[0]) || '').toLowerCase();
+      return sysLang.startsWith('ru') ? 'ru' : 'en';
+    }
+
+    let currentLang = getInitialLanguage();
+
+    function t(key) {
+      return i18nDict[currentLang]?.[key] || i18nDict.ru?.[key] || key;
+    }
+
+    function switchLanguage(lang) {
+      if (lang !== 'ru' && lang !== 'en') return;
+      currentLang = lang;
+      try {
+        localStorage.setItem('r4boy_lang', lang);
+        const emulatorSettings = localStorage.getItem('gb_emulator_settings_v1');
+        if (emulatorSettings) {
+          const parsed = JSON.parse(emulatorSettings);
+          parsed.language = lang;
+          localStorage.setItem('gb_emulator_settings_v1', JSON.stringify(parsed));
+        }
+      } catch(e) {}
+      applyLanguage();
+    }
+
+    function applyLanguage() {
+      document.documentElement.lang = currentLang;
+      document.getElementById('langRuBtn').classList.toggle('active', currentLang === 'ru');
+      document.getElementById('langEnBtn').classList.toggle('active', currentLang === 'en');
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (i18nDict[currentLang][key]) {
+          el.innerHTML = i18nDict[currentLang][key];
+        }
+      });
+
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (i18nDict[currentLang][key]) {
+          el.placeholder = i18nDict[currentLang][key];
+        }
+      });
+
+      renderGamesList();
+    }
+
     // State
     let gamesList = [];
     let dirHandle = null;
@@ -616,7 +782,7 @@
     // Modern File System Access API Select
     async function selectFolderWithAPI() {
       if (!('showDirectoryPicker' in window)) {
-        alert('Ваш браузер не поддерживает File System Access API. Используйте стандартную кнопку выбора папки.');
+        alert(t('browserNoApi'));
         triggerFolderSelect();
         return;
       }
@@ -626,7 +792,7 @@
         fileMap.clear();
         gamesList = [];
 
-        showToast('Чтение папки...');
+        showToast(t('readingFolder'));
         await scanDirectoryHandle(dirHandle, '');
         
         // Try reading existing index.json if present
@@ -642,11 +808,11 @@
 
         await processScannedFiles(existingIndex);
         document.getElementById('btnSaveDirect').disabled = false;
-        showToast('Папка успешно сосканирована!');
+        showToast(t('folderScanned'));
       } catch (err) {
         if (err.name !== 'AbortError') {
           console.error(err);
-          alert('Ошибка чтения папки: ' + err.message);
+          alert(t('folderReadError') + err.message);
         }
       }
     }
@@ -693,7 +859,7 @@
       }
 
       await processScannedFiles(existingIndex);
-      showToast('Игры сосканированы!');
+      showToast(t('gamesScanned'));
     }
 
     // High performance ROM scanner
@@ -734,12 +900,12 @@
 
           // Header title at 0x0134 - 0x0143
           if (bytes.length >= 0x0143) {
-            let t = '';
+            let tStr = '';
             for (let i = 0x0134; i < 0x0143; i++) {
               if (bytes[i] === 0 || bytes[i] > 127) break;
-              t += String.fromCharCode(bytes[i]);
+              tStr += String.fromCharCode(bytes[i]);
             }
-            if (t.trim().length >= 2) headerTitle = t.trim();
+            if (tStr.trim().length >= 2) headerTitle = tStr.trim();
 
             if ((bytes[0x0143] & 0x80) !== 0 || (bytes[0x0143] & 0xc0) !== 0) {
               isGBC = true;
@@ -804,7 +970,7 @@
       document.getElementById('statZip').innerText = gamesList.filter(g => g.isZip).length;
 
       if (!filtered.length) {
-        grid.innerHTML = `<div class="empty-state">Ничего не найдено.</div>`;
+        grid.innerHTML = `<div class="empty-state">${t('nothingFound')}</div>`;
         return;
       }
 
@@ -816,7 +982,7 @@
           <div class="game-card">
             <div class="game-card-header">
               <div class="cover-preview">
-                <img src="${game.coverUrl}" onerror="this.parentElement.innerHTML='NO COVER'" />
+                <img src="${game.coverUrl}" onerror="this.parentElement.innerHTML='${t('noCover')}'" />
               </div>
               <div class="game-details">
                 <input type="text" class="game-title-input" value="${escapeHtml(game.title)}" onchange="updateGameTitle(${realIndex}, this.value)" />
@@ -831,10 +997,10 @@
             <div class="game-card-footer">
               <label class="checkbox-label">
                 <input type="checkbox" ${game.isGBC ? 'checked' : ''} onchange="toggleGbcFlag(${realIndex}, this.checked)" />
-                Режим Game Boy Color
+                ${t('gbcMode')}
               </label>
               <div class="card-actions">
-                <button class="icon-btn" title="Удалить из списка" onclick="removeGame(${realIndex})">🗑️</button>
+                <button class="icon-btn" title="${t('deleteTooltip')}" onclick="removeGame(${realIndex})">🗑️</button>
               </div>
             </div>
           </div>
@@ -861,14 +1027,14 @@
     }
 
     function clearAllGames() {
-      if (confirm('Очистить весь список игр?')) {
+      if (confirm(t('confirmClear'))) {
         gamesList = [];
         renderGamesList();
       }
     }
 
     function addNewManualGame() {
-      const filename = prompt('Введите имя файла игры (например: Mario.gbc):');
+      const filename = prompt(t('promptFilename'));
       if (!filename) return;
 
       const baseName = filename.replace(EXT_REGEX, '');
@@ -901,10 +1067,10 @@
         await writable.write(jsonStr);
         await writable.close();
 
-        showToast('Файл index.json успешно сохранен в папку!');
+        showToast(t('jsonSaved'));
       } catch (err) {
         console.error(err);
-        alert('Ошибка при сохранении: ' + err.message);
+        alert('Error saving: ' + err.message);
       }
     }
 
@@ -926,7 +1092,7 @@
       const modal = document.getElementById('jsonModal');
       const area = document.getElementById('jsonTextArea');
       area.value = JSON.stringify(gamesList, null, 2);
-      document.getElementById('jsonValidStatus').innerText = 'JSON валиден';
+      document.getElementById('jsonValidStatus').innerText = t('jsonValid');
       document.getElementById('jsonValidStatus').style.color = 'var(--accent-green)';
       modal.classList.add('active');
     }
@@ -942,14 +1108,14 @@
         const parsed = JSON.parse(text);
         if (Array.isArray(parsed)) {
           gamesList = parsed;
-          status.innerText = 'JSON валиден';
+          status.innerText = t('jsonValid');
           status.style.color = 'var(--accent-green)';
         } else {
-          status.innerText = 'Ошибка: Ожидается массив [...]';
+          status.innerText = t('jsonExpectedArray');
           status.style.color = 'var(--danger)';
         }
       } catch (err) {
-        status.innerText = 'Ошибка синтаксиса JSON';
+        status.innerText = t('jsonSyntaxError');
         status.style.color = 'var(--danger)';
       }
     }
@@ -957,7 +1123,7 @@
     function copyJsonToClipboard() {
       const text = JSON.stringify(gamesList, null, 2);
       navigator.clipboard.writeText(text).then(() => {
-        showToast('JSON скопирован в буфер обмена!');
+        showToast(t('jsonCopied'));
       });
     }
 
@@ -1002,7 +1168,7 @@
       }
 
       await processScannedFiles(existingIndex);
-      showToast('Папка сосканирована!');
+      showToast(t('folderScanned'));
     });
 
     async function traverseFileTree(item, path) {
@@ -1027,6 +1193,9 @@
         readEntries();
       }
     }
+
+    // Initialize UI language on boot
+    applyLanguage();
   </script>
 </body>
 </html>
