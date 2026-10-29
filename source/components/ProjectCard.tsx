@@ -13,8 +13,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     const iconClass = project.tech ? languageIcons[project.tech.toLowerCase()] || 'devicon-devicon-plain' : '';
 
     return (
-        <div className="relative group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 flex flex-col transition-all duration-300 hover:border-violet-500 hover:-translate-y-1 overflow-hidden h-full">
-            <div className="flex flex-col flex-grow">
+        <div className="relative isolate group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 flex flex-col transition-all duration-300 hover:border-violet-500 hover:-translate-y-1 overflow-hidden h-full">
+            <div className="relative z-0 flex flex-col flex-grow">
                 {project.image && <img src={project.image} alt={t(project.titleKey)} className="rounded-md mb-4 w-full h-40 object-cover" />}
                 <h3 className="text-xl font-bold text-gray-100 mb-2">{t(project.titleKey)}</h3>
                 <p className="text-gray-400 text-sm flex-grow mb-4">{t(project.descriptionKey)}</p>
@@ -30,7 +30,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 </div>
             </div>
             {project.tech && (
-                <i className={`${iconClass} absolute -bottom-8 -right-8 text-[160px] text-white/5 group-hover:text-white/10 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-6 -z-10`}></i>
+                <i className={`${iconClass} absolute -bottom-6 -right-6 text-[160px] text-violet-500/10 group-hover:text-violet-400/25 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-6 -z-10`}></i>
             )}
         </div>
     );

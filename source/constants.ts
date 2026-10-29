@@ -39,10 +39,10 @@ export const projects: { [key: string]: Project[] } = {
         { titleKey: 'cod_book_title', descriptionKey: 'cod_book_desc', link: '/projects/misc/cod_book/', linkTypeKey: 'btn_read' },
     ],
     games: [
+        { titleKey: 'r4boy_title', descriptionKey: 'r4boy_desc', link: '/gb', linkTypeKey: 'btn_play', tech: 'javascript' },
 		{ titleKey: 'nethack3d_title', descriptionKey: 'nethack3d_desc', link: '/nethack3d', linkTypeKey: 'btn_play', tech: 'html' },
 		{ titleKey: 'scraper_title', descriptionKey: 'scraper_desc', link: '/projects/games/scraper/', linkTypeKey: 'btn_go', tech: 'react' },
         { titleKey: 'dos_title', descriptionKey: 'dos_desc', link: 'https://r4dos.pages.dev', linkTypeKey: 'btn_go', tech: 'msdos' },
-        { titleKey: 'r4boy_title', descriptionKey: 'r4boy_desc', link: '/gb', linkTypeKey: 'btn_play', tech: 'javascript' },
         { titleKey: 'faggots_hunter_title', descriptionKey: 'faggots_hunter_desc', link: '/projects/games/hunter', linkTypeKey: 'btn_play', tech: 'html' },
         { titleKey: 'arlade_title', descriptionKey: 'arlade_desc', link: '/arlade', linkTypeKey: 'btn_play', tech: 'javascript' },
         { titleKey: 'game_or_title', descriptionKey: 'game_or_desc', link: '/projects/games/opposite_reaction/game.apk', linkTypeKey: 'btn_download_apk', tech: 'android', secondaryLink: '/projects/games/opposite_reaction', secondaryLinkTypeKey: 'btn_play' },
