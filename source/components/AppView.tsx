@@ -22,7 +22,7 @@ export const AppView: React.FC<AppViewProps> = ({ path, title }) => {
                 const color = window.getComputedStyle(body).color;
                 if (color === 'rgb(0, 0, 0)' || color === '#000000' || color === 'black') {
                     const style = doc.createElement('style');
-                    style.textContent = 'html { color-scheme: dark; } body { color: #f3f4f6; }';
+                    style.textContent = 'body { color: #f3f4f6; }';
                     doc.head.appendChild(style);
                 }
             } catch {}
