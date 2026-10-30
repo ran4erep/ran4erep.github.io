@@ -23,6 +23,7 @@ export const languageIcons: { [key: string]: string } = {
     'windows': 'devicon-windows8-original', 'gimp': 'devicon-gimp-plain', 'chrome': 'devicon-chrome-plain',
     'msdos': 'devicon-msdos-plain', 'html': 'devicon-html5-plain', 'android': 'devicon-android-plain',
     'devicon': 'devicon-devicon-plain', 'cpp': 'devicon-cplusplus-plain',
+    'typescript': 'devicon-typescript-plain', 'c': 'devicon-c-plain',
 };
 
 export const projects: { [key: string]: Project[] } = {
@@ -33,13 +34,15 @@ export const projects: { [key: string]: Project[] } = {
         { titleKey: 'snake_ai_title', descriptionKey: 'snake_ai_desc', link: '/projects/ai/snake/', linkTypeKey: 'btn_go', tech: 'javascript' },
     ],
     misc: [
+        { titleKey: 'r4ezka_title', descriptionKey: 'r4ezka_desc', link: 'https://github.com/ran4erep/R4ezka', linkTypeKey: 'btn_github', tech: 'android' },
         { titleKey: 'tilecuti_title', descriptionKey: 'tilecut_desc', link: '/projects/misc/tilecut/', linkTypeKey: 'btn_go', tech: 'react' },
         { titleKey: 'wiki_title', descriptionKey: 'wiki_desc', link: '/projects/misc/wiki/', linkTypeKey: 'btn_go', tech: 'windows' },
         { titleKey: 'switch_theme_title', descriptionKey: 'switch_theme_desc', link: 'https://themezer.net/packs/Skulls-8be', linkTypeKey: 'btn_go', tech: 'gimp' },
         { titleKey: 'cod_book_title', descriptionKey: 'cod_book_desc', link: '/projects/misc/cod_book/', linkTypeKey: 'btn_read' },
     ],
     games: [
-        { titleKey: 'r4boy_title', descriptionKey: 'r4boy_desc', link: '/gb', linkTypeKey: 'btn_play', tech: 'javascript' },
+        { titleKey: 'nethack3ds_title', descriptionKey: 'nethack3ds_desc', link: 'https://github.com/ran4erep/Nethack-for-Nintendo-3DS', linkTypeKey: 'btn_github', tech: 'c' },
+        { titleKey: 'r4boy_title', descriptionKey: 'r4boy_desc', link: '/gb', linkTypeKey: 'btn_play', tech: 'typescript' },
 		{ titleKey: 'nethack3d_title', descriptionKey: 'nethack3d_desc', link: '/nethack3d', linkTypeKey: 'btn_play', tech: 'html' },
 		{ titleKey: 'scraper_title', descriptionKey: 'scraper_desc', link: '/projects/games/scraper/', linkTypeKey: 'btn_go', tech: 'react' },
         { titleKey: 'dos_title', descriptionKey: 'dos_desc', link: 'https://r4dos.pages.dev', linkTypeKey: 'btn_go', tech: 'msdos' },
@@ -155,6 +158,7 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "btn_play": { "ru": "Играть в браузере", "en": "Play in browser" },
     "btn_download_apk": { "ru": "Скачать APK", "en": "Download APK" },
     "btn_open": { "ru": "Открыть", "en": "Open" },
+    "btn_back": { "ru": "Назад", "en": "Back" },
 
     // AI Projects
     "universe_title": { "ru": "Universe A-Life", "en": "Universe A-Life" },
@@ -183,8 +187,12 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "scraper_desc": { "ru": "Ищет обложки для ромов через API сервиса Libretro Thumbnails. Для работы использует регулярные выражения.", "en": "Searches covers for ROMs through Libretro Thumbnails service's API. Uses regular expressions." },
     "dos_title": { "ru": "DOS Games Library", "en": "DOS Games Library" },
     "dos_desc": { "ru": "Каталог DOS игр с возможностью играть в них прямо в браузере. Используется эмулятор JS-DOS, который поддерживает мультиплеер через IPX. Крутится это всё на другом хостинге, так как там дают 20 гигов.", "en": "A catalog of DOS games with the ability to play them directly in the browser. It uses the JS-DOS emulator, which supports multiplayer via IPX. This is all running on another hosting, as they provide 20 gigs of space." },
-    "r4boy_title": { "ru": "Эмулятор r4Boy (Game Boy / GBC)", "en": "r4Boy emulator (Game Boy / GBC)" },
-    "r4boy_desc": { "ru": "Мой эмулятор Game Boy / Game Boy Color, который работает прямо в браузере. Загружай ромы и играй как с компьютера, так и с телефона — всё в одном месте.", "en": "My Game Boy / Game Boy Color emulator that runs right in the browser. Load ROMs and play from either desktop or phone — all in one place." },
+    "r4boy_title": { "ru": "r4Boy - эмулятор GB&GBC", "en": "r4Boy - GB&GBC emulator" },
+    "r4boy_desc": { "ru": "Написал эмулятор Game Boy, можно загружать как свои ромы, так и просто играть в огромную уже загруженную библиотеку игр.", "en": "I wrote a Game Boy emulator where you can load your own ROMs or simply play from a huge library of games that is already included." },
+    "nethack3ds_title": { "ru": "Порт Nethack 5.0 для Nintendo 3DS", "en": "Nethack 5.0 port for Nintendo 3DS" },
+    "nethack3ds_desc": { "ru": "Портировал легендарный рогалик Nethack, последнюю версию 5.0 под Nintendo 3DS. Удивлён что никто не сделал этого до меня...", "en": "I ported the legendary roguelike Nethack, version 5.0, to Nintendo 3DS. Surprised that nobody did this before me..." },
+    "r4ezka_title": { "ru": "r4ezka - клиент Rezka", "en": "r4ezka - Rezka client" },
+    "r4ezka_desc": { "ru": "Клиент онлайн-кинотеатра Rezka с возможностью бесплатного скачивания фильмов, с поддержкой телевизоров, блекджеком и шлюхами 🙃", "en": "A client for the online cinema Rezka with the ability to download movies for free, with TV support, blackjack and hookers 🙃" },
     "faggots_hunter_title": { "ru": "Охота на пидоров", "en": "Faggot Hunt" },
     "faggots_hunter_desc": { "ru": "Старая добрая (🙃) Flash игра про отважного охотника, который отправился на сафари на пидоров. На кону стоит ваша жопа, будьте максимально бдительны, они могут поджидать вас в каждом кусту... Собственно запустил игру на сайте через библиотеку Ruffle, сверху добавил простое сенсорное управление, чтобы сидя в туалете можно было ПРОЧУВСТВОВАТЬ всю боль поражения в этой игре. 😄", "en": "The good old (🙃) Flash game about a brave hunter who went on a faggot safari. Your ass is on the line, be as vigilant as possible, they can be waiting for you in every bush... Actually, I launched the game on the site through the Ruffle library, and added simple touch controls on top, so that while sitting on the toilet you could FEEL all the pain of defeat in this game. 😄" },
     "arlade_title": { "ru": "Roguelike игра Arlade", "en": "Roguelike game Arlade" },

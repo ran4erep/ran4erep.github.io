@@ -42,6 +42,9 @@ jobs:
       - name: Sync build output to site root
         run: rsync -a --exclude='.git' source/dist/ ./
 
+      - name: Generate pages manifest
+        run: node scripts/generate-pages.mjs
+
       - name: Commit & push rebuilt site
         run: |
           git add -A

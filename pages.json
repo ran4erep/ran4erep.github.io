@@ -1,0 +1,158 @@
+[
+  {
+    "path": "/arlade/",
+    "title": "Arlade"
+  },
+  {
+    "path": "/bill/",
+    "title": "3D WebRTC Billiards"
+  },
+  {
+    "path": "/dead-storm/",
+    "title": "DEAD STORM"
+  },
+  {
+    "path": "/deadstorm/",
+    "title": "Dead Storm"
+  },
+  {
+    "path": "/dos/",
+    "title": "Переадресация"
+  },
+  {
+    "path": "/gb/",
+    "title": "r4Boy — Game Boy & GBC Mobile Emulator"
+  },
+  {
+    "path": "/nethack3d/",
+    "title": "NetHack 3D"
+  },
+  {
+    "path": "/projects/ai/snake/",
+    "title": "Snake AI"
+  },
+  {
+    "path": "/projects/ai/universe/",
+    "title": "Bacteria Simulator"
+  },
+  {
+    "path": "/projects/games/cardgame/",
+    "title": ""
+  },
+  {
+    "path": "/projects/games/cod_js/",
+    "title": ""
+  },
+  {
+    "path": "/projects/games/guess/",
+    "title": "Угадай число"
+  },
+  {
+    "path": "/projects/games/hunter/",
+    "title": "Охота на пидоров"
+  },
+  {
+    "path": "/projects/games/opposite_reaction/",
+    "title": ""
+  },
+  {
+    "path": "/projects/games/scraper/",
+    "title": "r4Scraper"
+  },
+  {
+    "path": "/projects/games/snake/",
+    "title": ""
+  },
+  {
+    "path": "/projects/games/sokoban/",
+    "title": ""
+  },
+  {
+    "path": "/projects/games/tetris/",
+    "title": "Tetris"
+  },
+  {
+    "path": "/projects/misc/cod_book/",
+    "title": "Виртуальная книга"
+  },
+  {
+    "path": "/projects/misc/tilecut/",
+    "title": "Image Tiler Pro"
+  },
+  {
+    "path": "/projects/misc/wiki/",
+    "title": "Windows Tablet Wiki"
+  },
+  {
+    "path": "/projects/tools/bdgen/",
+    "title": "Генератор словаря дней рождений"
+  },
+  {
+    "path": "/projects/tools/calculator/",
+    "title": ""
+  },
+  {
+    "path": "/projects/tools/calendar/",
+    "title": "Календарь"
+  },
+  {
+    "path": "/projects/tools/chromaclean/",
+    "title": "Chromaclean"
+  },
+  {
+    "path": "/projects/tools/frame-animator/",
+    "title": "Аниматор Кадров"
+  },
+  {
+    "path": "/projects/tools/frame-extractor/",
+    "title": "Экстрактор кадров"
+  },
+  {
+    "path": "/projects/tools/ide/",
+    "title": "Web IDE (HTML, CSS, JS)"
+  },
+  {
+    "path": "/projects/tools/image_optimizer/",
+    "title": "Оптимизатор изображений"
+  },
+  {
+    "path": "/projects/tools/particles/",
+    "title": "New project"
+  },
+  {
+    "path": "/projects/tools/passgen/",
+    "title": "Генератор паролей"
+  },
+  {
+    "path": "/projects/tools/password/",
+    "title": ""
+  },
+  {
+    "path": "/projects/tools/piano/",
+    "title": "Piano"
+  },
+  {
+    "path": "/projects/tools/pixel/",
+    "title": ""
+  },
+  {
+    "path": "/projects/tools/qwerty/",
+    "title": ""
+  },
+  {
+    "path": "/projects/tools/scan/",
+    "title": ""
+  },
+  {
+    "path": "/projects/tools/sheet_slice/",
+    "title": "Sprite Sheet Slicer"
+  },
+  {
+    "path": "/projects/tools/sound_test/",
+    "title": "Тест наушников"
+  },
+  {
+    "path": "/webrtc/",
+    "title": "WebRTC Simple Chat"
+  }
+]

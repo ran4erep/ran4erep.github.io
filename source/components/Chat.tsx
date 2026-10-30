@@ -240,9 +240,11 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
                     transition: opacity 0.2s, visibility 0.2s;
                     pointer-events: none;
                 }
-                .group:hover .tooltip {
-                    opacity: 1;
-                    visibility: visible;
+                @media (hover: hover) {
+                    .group:hover .tooltip {
+                        opacity: 1;
+                        visibility: visible;
+                    }
                 }
             `}</style>
         </>

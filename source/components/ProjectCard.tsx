@@ -1,16 +1,24 @@
 
 import React, { useContext } from 'react';
-import type { Project, LanguageContextType } from '../types';
+import type { Project, LanguageContextType, SitePage } from '../types';
 import { LanguageContext } from '../App';
 import { languageIcons } from '../constants';
 
 interface ProjectCardProps {
     project: Project;
+    pages?: SitePage[];
+    onOpenApp?: (path: string) => void;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
+export const ProjectCard: React.FC<ProjectCardProps> = ({ project, pages, onOpenApp }) => {
     const { t } = useContext(LanguageContext) as LanguageContextType;
     const iconClass = project.tech ? languageIcons[project.tech.toLowerCase()] || 'devicon-devicon-plain' : '';
+
+    const pageForLink = (link?: string) => {
+        if (!link || !pages || /^https?:/i.test(link)) return undefined;
+        const norm = link.endsWith('/') ? link : link + '/';
+        return pages.find(p => p.path === norm);
+    };
 
     return (
         <div className="relative isolate group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 flex flex-col transition-all duration-300 hover:border-violet-500 hover:-translate-y-1 overflow-hidden h-full">
@@ -19,13 +27,25 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 <h3 className="text-xl font-bold text-gray-100 mb-2">{t(project.titleKey)}</h3>
                 <p className="text-gray-400 text-sm flex-grow mb-4">{t(project.descriptionKey)}</p>
                 <div className="mt-auto flex flex-col gap-2">
-                    <a href={project.link} target="_blank" rel="noopener noreferrer" className="inline-block bg-violet-600 text-white text-center font-semibold px-4 py-2 rounded-md transition-all duration-200 hover:bg-violet-500 active:bg-violet-700 active:scale-[0.98]">
-                        {t(project.linkTypeKey)}
-                    </a>
+                    {pageForLink(project.link) ? (
+                        <button onClick={() => onOpenApp?.(pageForLink(project.link)!.path)} className="inline-block bg-violet-600 text-white text-center font-semibold px-4 py-2 rounded-md transition-all duration-200 hover:bg-violet-500 active:bg-violet-700 active:scale-[0.98]">
+                            {t(project.linkTypeKey)}
+                        </button>
+                    ) : (
+                        <a href={project.link} target="_blank" rel="noopener noreferrer" className="inline-block bg-violet-600 text-white text-center font-semibold px-4 py-2 rounded-md transition-all duration-200 hover:bg-violet-500 active:bg-violet-700 active:scale-[0.98]">
+                            {t(project.linkTypeKey)}
+                        </a>
+                    )}
                     {project.secondaryLink && project.secondaryLinkTypeKey && (
-                         <a href={project.secondaryLink} target="_blank" rel="noopener noreferrer" className="inline-block bg-gray-600 text-white text-center font-semibold px-4 py-2 rounded-md transition-all duration-200 hover:bg-gray-500 active:bg-gray-700 active:scale-[0.98]">
-                            {t(project.secondaryLinkTypeKey)}
-                         </a>
+                        pageForLink(project.secondaryLink) ? (
+                            <button onClick={() => onOpenApp?.(pageForLink(project.secondaryLink)!.path)} className="inline-block bg-gray-600 text-white text-center font-semibold px-4 py-2 rounded-md transition-all duration-200 hover:bg-gray-500 active:bg-gray-700 active:scale-[0.98]">
+                                {t(project.secondaryLinkTypeKey)}
+                            </button>
+                        ) : (
+                            <a href={project.secondaryLink} target="_blank" rel="noopener noreferrer" className="inline-block bg-gray-600 text-white text-center font-semibold px-4 py-2 rounded-md transition-all duration-200 hover:bg-gray-500 active:bg-gray-700 active:scale-[0.98]">
+                                {t(project.secondaryLinkTypeKey)}
+                            </a>
+                        )
                     )}
                 </div>
             </div>

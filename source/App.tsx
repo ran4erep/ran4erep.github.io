@@ -9,7 +9,8 @@ import { Gallery } from './components/Gallery';
 import { Chat } from './components/Chat';
 import { FloatingButtons } from './components/FloatingButtons';
 import { translations, projects, recommendations } from './constants';
-import type { Language, LanguageContextType } from './types';
+import { AppView } from './components/AppView';
+import type { Language, LanguageContextType, SitePage } from './types';
 
 export const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
@@ -18,6 +19,8 @@ const App: React.FC = () => {
         const savedLang = localStorage.getItem('language');
         return (savedLang === 'en' || savedLang === 'ru') ? savedLang : 'ru';
     });
+    const [pages, setPages] = useState<SitePage[]>([]);
+    const [openPath, setOpenPath] = useState<string | null>(null);
     const [isSidebarOpen, setSidebarOpen] = useState(() => {
         // Check user agent for mobile keywords. This is more reliable than just touch detection,
         // as it correctly identifies devices like Windows convertibles as desktops.
@@ -28,6 +31,16 @@ const App: React.FC = () => {
     useEffect(() => {
         localStorage.setItem('language', lang);
     }, [lang]);
+
+    useEffect(() => {
+        fetch('/pages.json')
+            .then(res => {
+                if (!res.ok) throw new Error('pages manifest not found');
+                return res.json();
+            })
+            .then((data: SitePage[]) => setPages(Array.isArray(data) ? data : []))
+            .catch(() => setPages([]));
+    }, []);
 
     useEffect(() => {
         const faviconFrames = [
@@ -49,6 +62,8 @@ const App: React.FC = () => {
             return () => clearInterval(intervalId);
         }
     }, []);
+
+    const openApp = useCallback((path: string) => setOpenPath(path), []);
 
     const t = useCallback((key: string) => {
         const entry = translations[key];
@@ -91,41 +106,47 @@ const App: React.FC = () => {
                 <div className="flex">
                     <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} />
                     <main className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-[22%]' : 'ml-0'} w-full md:w-auto`}>
-                        <div className="p-4 sm:p-8">
-                            <Header />
+                        {openPath ? (
+                            <div className="p-4 sm:p-8">
+                                <AppView path={openPath} title={pages.find(p => p.path === openPath)?.title || openPath} onClose={() => setOpenPath(null)} />
+                            </div>
+                        ) : (
+                            <div className="p-4 sm:p-8">
+                                <Header />
 
-                            {renderSection('gallery', 'nav_gallery', <Gallery />)}
-                            
-                            {renderSection('ai-projects', 'nav_ai_projects', (
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                    {projects.ai.map(p => <ProjectCard key={p.titleKey} project={p} />)}
-                                </div>
-                            ))}
+                                {renderSection('gallery', 'nav_gallery', <Gallery />)}
+                                
+                                {renderSection('ai-projects', 'nav_ai_projects', (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                        {projects.ai.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} />)}
+                                    </div>
+                                ))}
 
-                            {renderSection('info', 'nav_misc', (
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                    {projects.misc.map(p => <ProjectCard key={p.titleKey} project={p} />)}
-                                </div>
-                            ))}
+                                {renderSection('info', 'nav_misc', (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                        {projects.misc.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} />)}
+                                    </div>
+                                ))}
 
-                            {renderSection('games', 'nav_games', (
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                    {projects.games.map(p => <ProjectCard key={p.titleKey} project={p} />)}
-                                </div>
-                            ))}
+                                {renderSection('games', 'nav_games', (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                        {projects.games.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} />)}
+                                    </div>
+                                ))}
 
-                            {renderSection('tools', 'nav_tools', (
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                    {projects.tools.map(p => <ProjectCard key={p.titleKey} project={p} />)}
-                                </div>
-                            ))}
+                                {renderSection('tools', 'nav_tools', (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                        {projects.tools.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} />)}
+                                    </div>
+                                ))}
 
-                            {renderSection('recommendations', 'nav_recommendations', (
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                    {recommendations.map(r => <RecommendationCard key={r.titleKey} category={r} />)}
-                                </div>
-                            ))}
-                        </div>
+                                {renderSection('recommendations', 'nav_recommendations', (
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                        {recommendations.map(r => <RecommendationCard key={r.titleKey} category={r} />)}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </main>
                 </div>
                 <Chat isSidebarOpen={isSidebarOpen} />

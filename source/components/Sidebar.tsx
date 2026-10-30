@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                         {socialLinks.map(link => (
                             <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-transform duration-200 hover:scale-110 relative group">
                                 <img src={link.icon} alt={link.label} className={`w-6 h-6 rounded-sm ${link.label === 'GitHub' ? 'filter invert' : ''}`} />
-                                <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-gray-800 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">{t(link.tooltipKey)}</span>
+                                <span className="sidebar-tooltip">{t(link.tooltipKey)}</span>
                             </a>
                         ))}
                     </div>
@@ -71,6 +71,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                     </div>
                 </div>
             </div>
+            <style>{`
+                .sidebar-tooltip {
+                    position: absolute;
+                    bottom: 100%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    margin-bottom: 8px;
+                    white-space: nowrap;
+                    background-color: #1f2937;
+                    color: white;
+                    font-size: 12px;
+                    padding: 4px 8px;
+                    border-radius: 6px;
+                    opacity: 0;
+                    visibility: hidden;
+                    transition: opacity 0.2s, visibility 0.2s;
+                    pointer-events: none;
+                }
+                @media (hover: hover) {
+                    .group:hover .sidebar-tooltip {
+                        opacity: 1;
+                        visibility: visible;
+                    }
+                }
+            `}</style>
         </aside>
     );
 };

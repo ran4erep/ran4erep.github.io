@@ -52,9 +52,11 @@ export const FloatingButtons: React.FC = () => {
                     transition: opacity 0.2s, visibility 0.2s;
                     pointer-events: none;
                 }
-                .group:hover .tooltip-left {
-                    opacity: 1;
-                    visibility: visible;
+                @media (hover: hover) {
+                    .group:hover .tooltip-left {
+                        opacity: 1;
+                        visibility: visible;
+                    }
                 }
             `}</style>
         </div>
