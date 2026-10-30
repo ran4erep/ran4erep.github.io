@@ -8,27 +8,24 @@ import { MusicPlayer } from './MusicPlayer';
 interface SidebarProps {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
+    isAppOpen?: boolean;
+    onCloseApp?: () => void;
 }
 
-const NavLink: React.FC<{ href: string; label: string; onClick: () => void; }> = ({ href, label, onClick }) => {
-    const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>) => {
+const NavLink: React.FC<{ id: string; label: string; onClick: () => void; }> = ({ id, label, onClick }) => {
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
-        const targetId = href.substring(1);
-        const targetElement = document.getElementById(targetId);
-        if (targetElement) {
-            targetElement.scrollIntoView({ behavior: 'smooth' });
-        }
         onClick();
     };
 
     return (
-        <a href={href} onClick={scrollToSection} className="block text-gray-400 hover:text-white hover:bg-white/5 px-3 py-2 rounded-md transition-colors duration-200">
+        <a href={`#${id}`} onClick={handleClick} className="block text-gray-400 hover:text-white hover:bg-white/5 px-3 py-2 rounded-md transition-colors duration-200">
             {label}
         </a>
     );
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, onCloseApp }) => {
     const { t } = useContext(LanguageContext) as LanguageContextType;
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
@@ -36,10 +33,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         setCurrentYear(new Date().getFullYear());
     }, []);
 
-    const handleNavLinkClick = () => {
+    const handleNavLinkClick = (id: string) => {
         if (window.innerWidth <= 768) {
             setIsOpen(false);
         }
+        if (isAppOpen && onCloseApp) {
+            onCloseApp();
+        }
+        setTimeout(() => {
+            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+        }, 80);
     };
     
     return (
@@ -53,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
 
                 <nav className="my-4 flex-grow">
                     {navLinks.map(link => (
-                        <NavLink key={link.href} href={link.href} label={t(link.labelKey)} onClick={handleNavLinkClick} />
+                        <NavLink key={link.href} id={link.href.substring(1)} label={t(link.labelKey)} onClick={() => handleNavLinkClick(link.href.substring(1))} />
                     ))}
                 </nav>
                 

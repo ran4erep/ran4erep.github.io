@@ -158,7 +158,6 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "btn_play": { "ru": "Играть в браузере", "en": "Play in browser" },
     "btn_download_apk": { "ru": "Скачать APK", "en": "Download APK" },
     "btn_open": { "ru": "Открыть", "en": "Open" },
-    "btn_back": { "ru": "Назад", "en": "Back" },
 
     // AI Projects
     "universe_title": { "ru": "Universe A-Life", "en": "Universe A-Life" },
