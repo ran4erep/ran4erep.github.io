@@ -108,7 +108,7 @@ const App: React.FC = () => {
                     <main className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-[22%]' : 'ml-0'} w-full md:w-auto`}>
                         {openPath ? (
                             <div className="p-4 sm:p-8">
-                                <AppView path={openPath} title={pages.find(p => p.path === openPath)?.title || openPath} onClose={() => setOpenPath(null)} />
+                                <AppView path={openPath} title={pages.find(p => p.path === openPath)?.title || openPath} />
                             </div>
                         ) : (
                             <div className="p-4 sm:p-8">
@@ -152,6 +152,12 @@ const App: React.FC = () => {
                 <Chat isSidebarOpen={isSidebarOpen} />
                 <FloatingButtons />
             </div>
+            {openPath && (
+                <button onClick={() => setOpenPath(null)} className="fixed top-4 right-4 z-50 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-900/90 border border-slate-700 text-gray-300 hover:text-white text-sm transition-colors">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    {t('btn_back')}
+                </button>
+            )}
         </LanguageContext.Provider>
     );
 };
