@@ -143,6 +143,7 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "send_message_tooltip": { "ru": "Отправить", "en": "Send" },
     
     // Navigation
+    "nav_home": { "ru": "На главную", "en": "Home" },
     "nav_gallery": { "ru": "Галерея", "en": "Gallery" },
     "nav_ai_projects": { "ru": "AI Проекты", "en": "AI Projects" },
     "nav_misc": { "ru": "Разное", "en": "Misc" },

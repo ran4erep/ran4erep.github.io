@@ -55,6 +55,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                 <MusicPlayer />
 
                 <nav className="my-4 flex-grow">
+                    {isAppOpen && (
+                        <button onClick={onCloseApp} className="w-full text-left mb-2 flex items-center gap-2 px-3 py-2 rounded-md bg-violet-600 hover:bg-violet-500 text-white font-semibold transition-colors duration-200">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                            {t('nav_home')}
+                        </button>
+                    )}
                     {navLinks.map(link => (
                         <NavLink key={link.href} id={link.href.substring(1)} label={t(link.labelKey)} onClick={() => handleNavLinkClick(link.href.substring(1))} />
                     ))}
