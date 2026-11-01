@@ -10,6 +10,7 @@ interface SidebarProps {
     setIsOpen: (isOpen: boolean) => void;
     isAppOpen?: boolean;
     onCloseApp?: () => void;
+    openPath?: string | null;
 }
 
 const NavLink: React.FC<{ id: string; label: string; onClick: () => void; }> = ({ id, label, onClick }) => {
@@ -25,7 +26,7 @@ const NavLink: React.FC<{ id: string; label: string; onClick: () => void; }> = (
     );
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, onCloseApp }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, onCloseApp, openPath }) => {
     const { t } = useContext(LanguageContext) as LanguageContextType;
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
@@ -56,10 +57,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
 
                 <nav className="my-4 flex-grow">
                     {isAppOpen && (
-                        <button onClick={onCloseApp} className="w-full text-left mb-2 flex items-center gap-2 px-3 py-2 rounded-md bg-violet-600 hover:bg-violet-500 text-white font-semibold transition-colors duration-200">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                            {t('nav_home')}
-                        </button>
+                        <>
+                            <button onClick={onCloseApp} className="w-full text-left mb-2 flex items-center gap-2 px-3 py-2 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                {t('nav_home')}
+                            </button>
+                            {openPath && (
+                                <a href={openPath} className="w-full text-left mb-2 flex items-center gap-2 px-3 py-2 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                                    {t('nav_go_to_page')}
+                                </a>
+                            )}
+                        </>
                     )}
                     {navLinks.map(link => (
                         <NavLink key={link.href} id={link.href.substring(1)} label={t(link.labelKey)} onClick={() => handleNavLinkClick(link.href.substring(1))} />

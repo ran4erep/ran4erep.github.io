@@ -144,6 +144,7 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     
     // Navigation
     "nav_home": { "ru": "На главную", "en": "Home" },
+    "nav_go_to_page": { "ru": "Перейти на страницу", "en": "Go to page" },
     "nav_gallery": { "ru": "Галерея", "en": "Gallery" },
     "nav_ai_projects": { "ru": "AI Проекты", "en": "AI Projects" },
     "nav_misc": { "ru": "Разное", "en": "Misc" },
