@@ -79,9 +79,9 @@ const App: React.FC = () => {
         const clean = path.replace(/^\/+|\/+$/g, '');
         const url = new URL(window.location.href);
         if (clean) {
-            url.searchParams.set('app', clean);
+            url.search = '?app=' + encodeURIComponent(clean).replace(/%2F/g, '/');
         } else {
-            url.searchParams.delete('app');
+            url.search = '';
         }
         window.history.pushState({}, '', url.toString());
     }, []);
@@ -89,7 +89,7 @@ const App: React.FC = () => {
     const closeApp = useCallback(() => {
         setOpenPath(null);
         const url = new URL(window.location.href);
-        url.searchParams.delete('app');
+        url.search = '';
         window.history.pushState({}, '', url.toString());
     }, []);
 
@@ -189,8 +189,12 @@ const App: React.FC = () => {
                         )}
                     </main>
                 </div>
-                <Chat isSidebarOpen={isSidebarOpen} />
-                <FloatingButtons />
+                {!openPath && (
+                    <>
+                        <Chat isSidebarOpen={isSidebarOpen} />
+                        <FloatingButtons />
+                    </>
+                )}
             </div>
         </LanguageContext.Provider>
     );

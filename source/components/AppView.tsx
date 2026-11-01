@@ -6,6 +6,13 @@ interface AppViewProps {
     title: string;
 }
 
+// Фон тела страницы не задан (прозрачный/дефолтный) — страница не оформлена.
+// Если фон задан явно (любой цвет), страница уже имеет свой дизайн, и текст
+// перекрашивать нельзя.
+const isDefaultBackground = (bg: string): boolean => {
+    return !bg || bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)';
+};
+
 export const AppView: React.FC<AppViewProps> = ({ path, title }) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -19,8 +26,10 @@ export const AppView: React.FC<AppViewProps> = ({ path, title }) => {
                 const doc = iframe.contentDocument;
                 const body = doc.body;
                 if (!body) return;
-                const color = window.getComputedStyle(body).color;
-                if (color === 'rgb(0, 0, 0)' || color === '#000000' || color === 'black') {
+                const computed = window.getComputedStyle(body);
+                const color = computed.color;
+                const isUnsetTextColor = color === 'rgb(0, 0, 0)' || color === '#000000' || color === 'black';
+                if (isUnsetTextColor && isDefaultBackground(computed.backgroundColor)) {
                     const style = doc.createElement('style');
                     style.textContent = 'body { color: #f3f4f6; }';
                     doc.head.appendChild(style);
@@ -36,7 +45,7 @@ export const AppView: React.FC<AppViewProps> = ({ path, title }) => {
     }, [path]);
 
     return (
-        <div className="h-screen">
+        <div className="h-screen overflow-hidden" style={{ height: '100dvh' }}>
             <iframe ref={iframeRef} src={path} title={title} className="w-full h-full border-0 block" />
         </div>
     );
