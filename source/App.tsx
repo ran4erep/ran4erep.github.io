@@ -20,7 +20,12 @@ const App: React.FC = () => {
         return (savedLang === 'en' || savedLang === 'ru') ? savedLang : 'ru';
     });
     const [pages, setPages] = useState<SitePage[]>([]);
-    const [openPath, setOpenPath] = useState<string | null>(null);
+    const [openPath, setOpenPath] = useState<string | null>(() => {
+        const params = new URLSearchParams(window.location.search);
+        const app = params.get('app');
+        if (!app) return null;
+        return '/' + app.replace(/^\/+|\/+$/g, '') + '/';
+    });
     const [isSidebarOpen, setSidebarOpen] = useState(() => {
         // Check user agent for mobile keywords. This is more reliable than just touch detection,
         // as it correctly identifies devices like Windows convertibles as desktops.
@@ -69,7 +74,38 @@ const App: React.FC = () => {
         }
     }, []);
 
-    const openApp = useCallback((path: string) => setOpenPath(path), []);
+    const openApp = useCallback((path: string) => {
+        setOpenPath(path);
+        const clean = path.replace(/^\/+|\/+$/g, '');
+        const url = new URL(window.location.href);
+        if (clean) {
+            url.searchParams.set('app', clean);
+        } else {
+            url.searchParams.delete('app');
+        }
+        window.history.pushState({}, '', url.toString());
+    }, []);
+
+    const closeApp = useCallback(() => {
+        setOpenPath(null);
+        const url = new URL(window.location.href);
+        url.searchParams.delete('app');
+        window.history.pushState({}, '', url.toString());
+    }, []);
+
+    useEffect(() => {
+        const onPopState = () => {
+            const params = new URLSearchParams(window.location.search);
+            const app = params.get('app');
+            if (app) {
+                setOpenPath('/' + app.replace(/^\/+|\/+$/g, '') + '/');
+            } else {
+                setOpenPath(null);
+            }
+        };
+        window.addEventListener('popstate', onPopState);
+        return () => window.removeEventListener('popstate', onPopState);
+    }, []);
 
     const t = useCallback((key: string) => {
         const entry = translations[key];
@@ -110,7 +146,7 @@ const App: React.FC = () => {
                     </svg>
                 </button>
                 <div className="flex">
-                    <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} isAppOpen={!!openPath} onCloseApp={() => setOpenPath(null)} openPath={openPath} />
+                    <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} isAppOpen={!!openPath} onCloseApp={closeApp} openPath={openPath} />
                     <main className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-[22%]' : 'ml-0'} w-full md:w-auto`}>
                         {openPath ? (
                             <AppView path={openPath} title={pages.find(p => p.path === openPath)?.title || openPath} />
