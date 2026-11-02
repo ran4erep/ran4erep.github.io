@@ -189,12 +189,8 @@ const App: React.FC = () => {
                         )}
                     </main>
                 </div>
-                {!openPath && (
-                    <>
-                        <Chat isSidebarOpen={isSidebarOpen} />
-                        <FloatingButtons />
-                    </>
-                )}
+                <Chat isSidebarOpen={isSidebarOpen} />
+                <FloatingButtons />
             </div>
         </LanguageContext.Provider>
     );
