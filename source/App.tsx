@@ -52,7 +52,12 @@ const App: React.FC = () => {
 
     useEffect(() => {
         if (openPath) {
-            window.scrollTo(0, 0);
+            const rootEl = document.getElementById('root');
+            if (rootEl) {
+                rootEl.scrollTo({ top: 0 });
+            } else {
+                window.scrollTo(0, 0);
+            }
         }
     }, [openPath]);
 

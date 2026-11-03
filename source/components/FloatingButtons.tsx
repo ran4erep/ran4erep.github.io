@@ -7,8 +7,12 @@ export const FloatingButtons: React.FC = () => {
     const { t } = useContext(LanguageContext) as LanguageContextType;
     const [isVisible, setIsVisible] = useState(false);
     
+    const getRoot = (): HTMLElement | null => document.getElementById('root');
+
     const toggleVisibility = () => {
-        if (window.pageYOffset > 300) {
+        const root = getRoot();
+        const y = root ? root.scrollTop : window.pageYOffset;
+        if (y > 300) {
             setIsVisible(true);
         } else {
             setIsVisible(false);
@@ -16,15 +20,19 @@ export const FloatingButtons: React.FC = () => {
     };
     
     const scrollToTop = () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
+        const root = getRoot();
+        if (root) {
+            root.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
     
     useEffect(() => {
-        window.addEventListener('scroll', toggleVisibility);
-        return () => window.removeEventListener('scroll', toggleVisibility);
+        const root = getRoot();
+        const target = root || window;
+        target.addEventListener('scroll', toggleVisibility);
+        return () => target.removeEventListener('scroll', toggleVisibility);
     }, []);
 
     return (

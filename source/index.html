@@ -72,6 +72,19 @@
       a, button, [role="button"], input[type="submit"], input[type="button"], [onclick], .cursor-pointer {
         cursor: inherit !important;
       }
+      /* Скролл страницы идёт внутри #root, а не в документе — так
+         мобильные браузеры не прячут адресную строку/панель навигации
+         при прокрутке вниз. */
+      html, body {
+        height: 100%;
+        overflow: hidden;
+      }
+      #root {
+        height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: none;
+      }
     </style>
   <script type="importmap">
 {
