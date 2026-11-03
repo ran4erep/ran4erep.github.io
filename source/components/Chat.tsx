@@ -1,23 +1,9 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+import { push, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
 import { LanguageContext } from '../App';
 import { useAuth } from '../auth';
+import { messagesRef } from '../firebaseChat';
 import type { ChatMessage, LanguageContextType } from '../types';
-
-const firebaseConfig = {
-    apiKey: "AIzaSyAg9N0m22cVx_C4xz8JNLWEEEritOqML_Q",
-    authDomain: "ran4erep-chat.firebaseapp.com",
-    projectId: "ran4erep-chat",
-    databaseURL: "https://ran4erep-chat-default-rtdb.europe-west1.firebasedatabase.app",
-    storageBucket: "ran4erep-chat.appspot.com",
-    messagingSenderId: "480010047491",
-    appId: "1:480010047491:web:4bdfae90bccf9cd806fe36"
-};
-
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-const messagesRef = ref(database, 'messages');
 
 const MAX_MESSAGE_LENGTH = 300;
 

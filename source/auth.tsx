@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { AuthUser, AuthContextType } from './types';
+import { ensureFirebaseAuthUser, logoutFirebase } from './firebaseChat';
 
 const DATABASE_URL = 'https://r4ezka-default-rtdb.europe-west1.firebasedatabase.app';
 const SESSION_KEY = 'r4ezka_session';
@@ -186,6 +187,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } catch {
                 // ignore
             }
+            try {
+                await ensureFirebaseAuthUser(realUsername, password);
+            } catch (e) {
+                console.warn('FirebaseAuth sync failed:', e);
+            }
             setUser(session);
             setLoginOpen(false);
             return;
@@ -234,6 +240,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             localStorage.setItem(SESSION_KEY, JSON.stringify(session));
         } catch {
             // ignore
+        }
+        try {
+            await ensureFirebaseAuthUser(realUsername, password);
+        } catch (e) {
+            console.warn('FirebaseAuth sync failed:', e);
         }
         setUser(session);
         setLoginOpen(false);
@@ -297,11 +308,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch {
             // ignore
         }
+        try {
+            await ensureFirebaseAuthUser(cleanName, password);
+        } catch (e) {
+            console.warn('FirebaseAuth sync failed:', e);
+        }
         setUser(session);
         setLoginOpen(false);
     }, []);
 
     const logout = useCallback(() => {
+        void logoutFirebase();
         setUser(null);
         try {
             localStorage.removeItem(SESSION_KEY);
