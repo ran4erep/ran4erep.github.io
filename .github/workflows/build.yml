@@ -21,41 +21,22 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          # Не тянем тяжёлые статические файлы (ROM-ы, mp3, wasm, картинки,
-          # архивы) — они не нужны для сборки и никогда не меняются CI.
-          # Полное дерево остаётся в репозитории и на GitHub Pages.
+          # Не тянем тяжёлые статические разделы (ROM-ы, mp3, wasm,
+          # картинки, архивы) — они не нужны для сборки.
+          # Список страниц (pages.json) генерируется из git-дерева,
+          # поэтому отсутствие этих папок на диске не мешает.
           sparse-checkout: |
             /*
-            !/gb/roms
-            !/gb/r4boy.png
-            !/nethack3d/assets
-            !/nethack3d/*.wasm
-            !/nethack3d/fmod
-            !/nethack3d/NetHack3D-splash.png
-            !/nethack3d/NetHack3D.icns
-            !/nethack3d/soundpacks/Default.soundpack.zip
-            !/music
-            !/fonts
-            !/gallery
-            !/storm/sounds
-            !/storm/engine_vertical.mp4
-            !/storm/engine.mp4
-            !/storm/logo.png
-            !/dead-storm/images/map.png
-            !/dead-storm/images/npc.png
-            !/bill/assets/index-C_dI83iC.js
-            !/projects/games/hunter/libs/ruffle
-            !/projects/games/opposite_reaction/game.apk
-            !/projects/games/opposite_reaction/theme.ogg
-            !/projects/games/cod_js/test.png
-            !/projects/misc/wiki/dxwrapper.zip
-            !/projects/misc/wiki/OblyTile.exe
-            !/projects/misc/wiki/TileIconifier.exe
-            !/projects/misc/wiki/start1.png
-            !/projects/misc/wiki/start2.png
-            !/projects/misc/wiki/dualboot.jpg
-            !/projects/misc/wiki/re4.png
-            !/projects/misc/wiki/tmpkeyboard.png
+            !/gb
+            !/nethack3d
+            !/projects
+            !/storm
+            !/dead-storm
+            !/bill
+            !/arlade
+            !/webrtc
+            !/dos
+            !/deadstorm
           sparse-checkout-cone-mode: false
 
       - name: Setup Node.js
