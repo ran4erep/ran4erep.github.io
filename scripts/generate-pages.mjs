@@ -7,8 +7,6 @@ const root = process.argv[2] || '.';
 /**
  * Получает список всех путей дерева репозитория прямо из git
  * (git ls-tree), не читая содержимое файлов с диска.
- * Это позволяет генерировать pages.json, даже если часть папок
- * не материализована в рабочей копии (sparse-checkout).
  */
 function getPathsFromGit() {
     try {
@@ -23,6 +21,10 @@ function getPathsFromGit() {
     }
 }
 
+/**
+ * Предохранитель при поиске НОВЫХ путей: служебные папки
+ * (исходники, сборка, ресурсы) не являются страницами сайта.
+ */
 const EXCLUDE_DIRS = new Set([
     '.git',
     'source',
@@ -42,8 +44,7 @@ const EXCLUDE_DIRS = new Set([
 const EXCLUDE_SUBSTR = ['codemirror'];
 
 function isExcludedPath(path) {
-    const parts = path.split('/');
-    const name = parts[0];
+    const name = path.split('/')[0];
     if (name.startsWith('.')) return true;
     if (EXCLUDE_DIRS.has(name)) return true;
     return EXCLUDE_SUBSTR.some((s) => path.includes(s));
@@ -86,22 +87,24 @@ function readTitle(path) {
     }
 }
 
-/** Читает старый pages.json, чтобы сохранить title, если файл не скачан. */
-function loadOldTitles() {
+/**
+ * Читает существующий pages.json — это «уже проверенный» список.
+ * Его записи сохраняются как есть (не перезаписываются).
+ */
+function loadExistingPages() {
     try {
         const raw = readFileSync(join(root, 'pages.json'), 'utf8');
         const data = JSON.parse(raw);
         if (Array.isArray(data)) {
-            const map = new Map();
-            for (const p of data) {
-                if (p && typeof p.path === 'string' && typeof p.title === 'string') {
-                    map.set(p.path, p.title);
-                }
-            }
-            return map;
+            return data
+                .filter((p) => p && typeof p.path === 'string')
+                .map((p) => ({
+                    path: p.path,
+                    title: typeof p.title === 'string' ? p.title : '',
+                }));
         }
     } catch {}
-    return new Map();
+    return [];
 }
 
 function prettyNameFromPath(path) {
@@ -112,28 +115,35 @@ function prettyNameFromPath(path) {
         .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-// 1. Собираем список всех index.html
+// 1. Собираем список всех index.html из дерева
 let htmlPaths = [];
 const gitPaths = getPathsFromGit();
 if (gitPaths) {
-    htmlPaths = gitPaths.filter((p) => p.endsWith('/index.html') && !isExcludedPath(p));
+    htmlPaths = gitPaths.filter((p) => p.endsWith('/index.html'));
 } else {
     htmlPaths = walk(root)
         .map((f) => relative(root, f).split(sep).join('/'))
-        .filter((p) => !isExcludedPath(p));
+        .filter((p) => p.endsWith('/index.html'));
 }
 
-// 2. Title: локальный файл → старый pages.json → имя папки
-const oldTitles = loadOldTitles();
+const pathOf = (r) => '/' + r.slice(0, -'index.html'.length);
 
-const pages = htmlPaths
+// 2. База: то, что уже есть в pages.json, — не трогаем.
+const existingPages = loadExistingPages();
+const existingPaths = new Set(existingPages.map((p) => p.path));
+
+// 3. Добавляем ТОЛЬКО новые пути, которых ещё нет в pages.json.
+const newPages = htmlPaths
+    .filter((r) => !isExcludedPath(r) && !existingPaths.has(pathOf(r)))
     .map((r) => {
-        const path = '/' + r.slice(0, -'index.html'.length);
-        const title = readTitle(join(root, r)) ?? oldTitles.get(path) ?? prettyNameFromPath(r);
+        const path = pathOf(r);
+        const title = readTitle(join(root, r)) ?? prettyNameFromPath(r);
         return { path, title };
-    })
+    });
+
+const pages = [...existingPages, ...newPages]
     .filter((p) => p.path !== '/')
     .sort((a, b) => a.path.localeCompare(b.path));
 
 writeFileSync(join(root, 'pages.json'), JSON.stringify(pages, null, 2) + '\n');
-console.log(`Generated pages.json with ${pages.length} pages`);
+console.log(`Generated pages.json with ${pages.length} pages (+${newPages.length} new)`);
