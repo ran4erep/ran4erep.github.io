@@ -78,4 +78,7 @@ export interface AuthContextType {
     login: (username: string, password: string) => Promise<void>;
     register: (username: string, password: string) => Promise<void>;
     logout: () => void;
+    accountOpen: boolean;
+    openAccount: () => void;
+    closeAccount: () => void;
 }

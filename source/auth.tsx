@@ -129,9 +129,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<AuthUser | null>(loadSession);
     const [loginOpen, setLoginOpen] = useState(false);
+    const [accountOpen, setAccountOpen] = useState(false);
 
     const openLogin = useCallback(() => setLoginOpen(true), []);
     const closeLogin = useCallback(() => setLoginOpen(false), []);
+
+    const openAccount = useCallback(() => setAccountOpen(true), []);
+    const closeAccount = useCallback(() => setAccountOpen(false), []);
 
     const login = useCallback(async (username: string, password: string): Promise<void> => {
         const cleanName = username.trim();
@@ -307,8 +311,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const value = useMemo(
-        () => ({ user, loginOpen, openLogin, closeLogin, login, register, logout }),
-        [user, loginOpen, openLogin, closeLogin, login, register, logout]
+        () => ({ user, loginOpen, openLogin, closeLogin, login, register, logout, accountOpen, openAccount, closeAccount }),
+        [user, loginOpen, openLogin, closeLogin, login, register, logout, accountOpen, openAccount, closeAccount]
     );
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

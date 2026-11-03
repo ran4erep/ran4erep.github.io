@@ -1,6 +1,7 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { LanguageContext } from '../App';
+import { useAuth } from '../auth';
 import { navLinks, socialLinks } from '../constants';
 import type { LanguageContextType } from '../types';
 import { MusicPlayer } from './MusicPlayer';
@@ -28,6 +29,7 @@ const NavLink: React.FC<{ id: string; label: string; onClick: () => void; }> = (
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, onCloseApp, openPath }) => {
     const { t } = useContext(LanguageContext) as LanguageContextType;
+    const { user, openLogin, openAccount } = useAuth();
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
     useEffect(() => {
@@ -83,7 +85,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                         <NavLink key={link.href} id={link.href.substring(1)} label={t(link.labelKey)} onClick={() => handleNavLinkClick(link.href.substring(1))} />
                     ))}
                 </nav>
-                
+
+                {user ? (
+                    <button
+                        onClick={openAccount}
+                        className="w-full mb-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                        aria-label={t('auth_account')}
+                    >
+                        {user.avatar ? (
+                            <img src={user.avatar} alt="" className="w-8 h-8 rounded-full object-cover border border-violet-500/40 shrink-0" />
+                        ) : (
+                            <span className="w-8 h-8 rounded-full bg-violet-500/40 flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-200">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </span>
+                        )}
+                        <span className="text-sm font-medium text-gray-100 truncate">{user.username}</span>
+                    </button>
+                ) : (
+                    <button
+                        onClick={openLogin}
+                        className="w-full mb-4 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-violet-600/90 hover:bg-violet-500 text-white text-sm font-medium border border-violet-400/30 transition-colors"
+                    >
+                        {t('auth_login_submit')}
+                    </button>
+                )}
+
                 <div className="mt-auto">
                     <div className="flex justify-center gap-4 my-4">
                         {socialLinks.map(link => (

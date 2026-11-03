@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { LanguageContext } from '../App';
 import { useAuth } from '../auth';
-import { AccountModal } from './AccountModal';
 import type { LanguageContextType } from '../types';
 
 const useClock = () => {
@@ -39,8 +38,7 @@ const useClock = () => {
 
 export const Header: React.FC = () => {
     const { lang, setLang, t } = useContext(LanguageContext) as LanguageContextType;
-    const { user, openLogin } = useAuth();
-    const [accountOpen, setAccountOpen] = useState(false);
+    const { user, openLogin, openAccount } = useAuth();
     const time = useClock();
 
     return (
@@ -49,7 +47,7 @@ export const Header: React.FC = () => {
             <div className="flex items-center justify-end gap-2 z-10 pb-4">
                 {user ? (
                     <button
-                        onClick={() => setAccountOpen(true)}
+                        onClick={openAccount}
                         className="flex items-center gap-2 pl-1.5 pr-3 py-1 bg-black/20 border border-white/10 rounded-full transition-all hover:bg-white/10 active:scale-95"
                         aria-label={t('auth_account')}
                     >
@@ -91,8 +89,6 @@ export const Header: React.FC = () => {
                     ran4erep's HUB
                 </h1>
             </div>
-
-            <AccountModal open={accountOpen} onClose={() => setAccountOpen(false)} />
 
             <style>{`
                 @keyframes gradient-pulse {

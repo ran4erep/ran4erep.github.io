@@ -56,6 +56,7 @@ export const LoginModal: React.FC = () => {
     };
 
     return (
+        <>
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !submitting && closeLogin()} />
             <form
@@ -93,14 +94,14 @@ export const LoginModal: React.FC = () => {
                             placeholder={t('auth_password_placeholder')}
                             autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                             disabled={submitting}
-                            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3.5 py-2.5 pr-10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:opacity-60"
+                            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3.5 py-2.5 pr-11 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:opacity-60"
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(v => !v)}
                             disabled={submitting}
                             aria-label={t(showPassword ? 'auth_hide_password' : 'auth_show_password')}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-white hover:text-violet-300 transition-colors disabled:opacity-60"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 p-1 z-10 text-white hover:text-violet-300 transition-colors disabled:opacity-60"
                         >
                             {showPassword ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -150,5 +151,18 @@ export const LoginModal: React.FC = () => {
                 )}
             </form>
         </div>
+        <style>{`
+            /* Прячем нативный переключатель пароля браузера (Safari/Edge),
+               чтобы не дублировал наш белый глаз. */
+            input[type="password"]::-ms-reveal,
+            input[type="password"]::-ms-clear {
+                display: none;
+            }
+            input[type="password"]::-webkit-credentials-auto-fill-button {
+                visibility: hidden;
+                pointer-events: none;
+            }
+        `}</style>
+        </>
     );
 };

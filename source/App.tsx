@@ -11,10 +11,21 @@ import { FloatingButtons } from './components/FloatingButtons';
 import { translations, projects, recommendations } from './constants';
 import { AppView } from './components/AppView';
 import { LoginModal } from './components/LoginModal';
-import { AuthProvider } from './auth';
+import { AccountModal } from './components/AccountModal';
+import { AuthProvider, useAuth } from './auth';
 import type { Language, LanguageContextType, SitePage } from './types';
 
 export const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+const AuthModals: React.FC = () => {
+    const { accountOpen, closeAccount } = useAuth();
+    return (
+        <>
+            <LoginModal />
+            <AccountModal open={accountOpen} onClose={closeAccount} />
+        </>
+    );
+};
 
 const App: React.FC = () => {
     const [lang, setLang] = useState<Language>(() => {
@@ -194,7 +205,7 @@ const App: React.FC = () => {
                 </div>
                 <Chat isSidebarOpen={isSidebarOpen} />
                 <FloatingButtons />
-                <LoginModal />
+                <AuthModals />
             </div>
             </AuthProvider>
         </LanguageContext.Provider>
