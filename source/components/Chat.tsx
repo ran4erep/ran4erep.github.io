@@ -122,9 +122,9 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
         try {
             await push(messagesRef, { nickname: user.username, message: trimmedMessage, timestamp: Date.now() });
             setMessage('');
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert(t('chat_error_send'));
+            alert(`${t('chat_error_send')} (${error?.code || error?.message || ''})`);
         }
     };
     
@@ -137,9 +137,9 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
         try {
             await push(messagesRef, { nickname: user.username, message: '', image: imageData, timestamp: Date.now() });
             if (fileInputRef.current) fileInputRef.current.value = "";
-        } catch (error) {
+        } catch (error: any) {
              console.error(error);
-             alert(t('chat_error_send'));
+             alert(`${t('chat_error_send')} (${error?.code || error?.message || ''})`);
         }
     };
     

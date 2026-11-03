@@ -17,6 +17,20 @@ export const AUTH_ERR = {
 } as const;
 
 /**
+ * Синхронизирует пользователя с Firebase Auth (чат).
+ * При сбое показывает причину на экране — иначе с телефона не видно,
+ * почему запись не проходит.
+ */
+async function syncFirebaseAuth(username: string, password: string): Promise<void> {
+    try {
+        await ensureFirebaseAuthUser(username, password);
+    } catch (e: any) {
+        console.warn('FirebaseAuth sync failed:', e);
+        alert(`FirebaseAuth: ${e?.code || e?.message || ''}`);
+    }
+}
+
+/**
  * SHA-256 (lowercase hex) via WebCrypto.
  * Requires a secure context (https or localhost) — true on GitHub Pages and vite dev.
  */
@@ -187,11 +201,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } catch {
                 // ignore
             }
-            try {
-                await ensureFirebaseAuthUser(realUsername, password);
-            } catch (e) {
-                console.warn('FirebaseAuth sync failed:', e);
-            }
+            await syncFirebaseAuth(realUsername, password);
             setUser(session);
             setLoginOpen(false);
             return;
@@ -241,11 +251,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch {
             // ignore
         }
-        try {
-            await ensureFirebaseAuthUser(realUsername, password);
-        } catch (e) {
-            console.warn('FirebaseAuth sync failed:', e);
-        }
+        await syncFirebaseAuth(realUsername, password);
         setUser(session);
         setLoginOpen(false);
     }, []);
@@ -308,11 +314,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch {
             // ignore
         }
-        try {
-            await ensureFirebaseAuthUser(cleanName, password);
-        } catch (e) {
-            console.warn('FirebaseAuth sync failed:', e);
-        }
+        await syncFirebaseAuth(cleanName, password);
         setUser(session);
         setLoginOpen(false);
     }, []);
