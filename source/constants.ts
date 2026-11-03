@@ -283,6 +283,7 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "chat_error_too_long": { "ru": "Сообщение слишком длинное!", "en": "Message is too long!" },
     "chat_error_forbidden_links": { "ru": "Ссылки запрещены! Разрешены только ссылки на YouTube и ran4erep.github.io", "en": "Links are forbidden! Only links to YouTube and ran4erep.github.io are allowed" },
     "chat_error_send": { "ru": "Не удалось отправить сообщение.", "en": "Failed to send message." },
+    "chat_login_to_write": { "ru": "Войдите чтобы написать", "en": "Sign in to write" },
 
     // Auth
     "auth_account": { "ru": "Аккаунт", "en": "Account" },

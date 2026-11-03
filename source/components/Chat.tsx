@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
 import { getDatabase, ref, push, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
 import { LanguageContext } from '../App';
+import { useAuth } from '../auth';
 import type { ChatMessage, LanguageContextType } from '../types';
 
 const firebaseConfig = {
@@ -68,21 +69,12 @@ interface ChatProps {
 
 export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
     const { t } = useContext(LanguageContext) as LanguageContextType;
+    const { user, openLogin } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const [nickname, setNickname] = useState('');
     const [message, setMessage] = useState('');
-    const [isNicknameSet, setIsNicknameSet] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        const savedNickname = localStorage.getItem('chatNickname');
-        if (savedNickname) {
-            setNickname(savedNickname);
-            setIsNicknameSet(true);
-        }
-    }, []);
 
     useEffect(() => {
         const recentMessagesQuery = query(messagesRef, limitToLast(50));
@@ -130,9 +122,8 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
     }
 
     const sendMessage = async () => {
+        if (!user) return;
         const trimmedMessage = message.trim();
-        const trimmedNickname = nickname.trim();
-        if (!trimmedNickname) { alert(t('chat_error_nickname')); return; }
         if (!trimmedMessage) { alert(t('chat_error_message')); return; }
         if (trimmedMessage.length > MAX_MESSAGE_LENGTH) { alert(t('chat_error_too_long')); return; }
 
@@ -142,13 +133,8 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
              return;
         }
 
-        if (!isNicknameSet) {
-            localStorage.setItem('chatNickname', trimmedNickname);
-            setIsNicknameSet(true);
-        }
-
         try {
-            await push(messagesRef, { nickname: trimmedNickname, message: trimmedMessage, timestamp: Date.now() });
+            await push(messagesRef, { nickname: user.username, message: trimmedMessage, timestamp: Date.now() });
             setMessage('');
         } catch (error) {
             console.error(error);
@@ -157,21 +143,13 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
     };
     
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!user) return;
         const file = e.target.files?.[0];
-        const trimmedNickname = nickname.trim();
-        if (!file || !trimmedNickname) {
-            if(!trimmedNickname) alert(t('chat_error_nickname'));
-            return;
-        }
-
-        if (!isNicknameSet) {
-            localStorage.setItem('chatNickname', trimmedNickname);
-            setIsNicknameSet(true);
-        }
+        if (!file) return;
         
         const imageData = await resizeImage(file);
         try {
-            await push(messagesRef, { nickname: trimmedNickname, message: '', image: imageData, timestamp: Date.now() });
+            await push(messagesRef, { nickname: user.username, message: '', image: imageData, timestamp: Date.now() });
             if (fileInputRef.current) fileInputRef.current.value = "";
         } catch (error) {
              console.error(error);
@@ -203,20 +181,28 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
                         <div ref={messagesEndRef} />
                     </div>
                     <div className="chat-input p-4 border-t border-slate-700 grid grid-cols-[1fr_auto_auto] gap-2 items-center relative">
-                        <input type="text" id="nickname" placeholder={t('chat_nickname_placeholder')} value={nickname} onChange={e => setNickname(e.target.value)} disabled={isNicknameSet} maxLength={20} className="col-span-3 mb-2 bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-violet-500" />
                         <div className="relative col-span-1">
-                          <input type="text" id="message" placeholder={t('chat_message_placeholder')} value={message} onChange={e => setMessage(e.target.value)} onKeyPress={e => e.key === 'Enter' && sendMessage()} className="w-full bg-slate-800 border border-slate-600 rounded-md pl-3 pr-12 py-2 text-white focus:outline-none focus:ring-2 focus:ring-violet-500" />
+                          <input type="text" id="message" placeholder={t('chat_message_placeholder')} value={message} disabled={!user} onChange={e => setMessage(e.target.value)} onKeyPress={e => e.key === 'Enter' && user && sendMessage()} className="w-full bg-slate-800 border border-slate-600 rounded-md pl-3 pr-12 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:opacity-40 disabled:cursor-not-allowed" />
                           <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">{message.length}/{MAX_MESSAGE_LENGTH}</span>
                         </div>
                         <input type="file" id="image-upload" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleImageUpload} />
-                        <button onClick={() => fileInputRef.current?.click()} className="image-upload-btn w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-md flex items-center justify-center group relative transition-transform active:scale-90">
+                        <button onClick={() => fileInputRef.current?.click()} disabled={!user} className="image-upload-btn w-10 h-10 bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed rounded-md flex items-center justify-center group relative transition-transform active:scale-90">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                             <span className="tooltip">{t('upload_image_tooltip')}</span>
                         </button>
-                        <button onClick={sendMessage} className="w-10 h-10 bg-violet-600 hover:bg-violet-500 rounded-md flex items-center justify-center group relative transition-transform active:scale-90">
+                        <button onClick={sendMessage} disabled={!user} className="w-10 h-10 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-md flex items-center justify-center group relative transition-transform active:scale-90">
                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                              <span className="tooltip">{t('send_message_tooltip')}</span>
                         </button>
+                        {!user && (
+                            <button
+                                type="button"
+                                onClick={openLogin}
+                                className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm rounded-b-xl text-violet-300 hover:text-violet-200 font-medium text-sm transition-colors"
+                            >
+                                {t('chat_login_to_write')}
+                            </button>
+                        )}
                     </div>
                 </div>
             )}
