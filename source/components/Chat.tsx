@@ -180,14 +180,9 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
     };
     
     const modalClasses = `
-        chat-modal fixed top-1/2 -translate-y-1/2 h-[80vh] 
+        chat-modal fixed bottom-24 right-5 left-5 md:left-auto md:w-[20vw] h-[80vh] max-h-[calc(100vh-7rem)]
         bg-slate-900/70 backdrop-blur-lg border border-slate-700 
         rounded-xl shadow-2xl z-[150] flex flex-col transition-all duration-300
-        w-[95vw] md:w-[20vw]
-        ${isSidebarOpen 
-            ? 'left-1/2 md:left-[calc(22%_+(100%_-_22%)/2)] -translate-x-1/2' 
-            : 'left-1/2 -translate-x-1/2'
-        }
     `;
 
     return (
