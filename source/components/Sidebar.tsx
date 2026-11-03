@@ -101,9 +101,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                                     {t('nav_go_to_page')}
                                 </a>
                             )}
-                            <div className="border-t border-white/10 my-2"></div>
                         </>
                     )}
+                    <div className="border-t border-white/10 my-2"></div>
                     {navLinks.map(link => (
                         <NavLink key={link.href} id={link.href.substring(1)} label={t(link.labelKey)} onClick={() => handleNavLinkClick(link.href.substring(1))} />
                     ))}
