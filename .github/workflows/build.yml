@@ -40,7 +40,11 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Sync build output to site root
-        run: rsync -a --exclude='.git' source/dist/ ./
+        run: |
+          # Remove previous JS bundles from the site root so only the fresh
+          # build remains (Vite emits assets/index-<hash>.js).
+          rm -f assets/index-*.js
+          rsync -a --exclude='.git' source/dist/ ./
 
       - name: Generate pages manifest
         run: node scripts/generate-pages.mjs
