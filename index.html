@@ -72,6 +72,19 @@
       a, button, [role="button"], input[type="submit"], input[type="button"], [onclick], .cursor-pointer {
         cursor: inherit !important;
       }
+      /* Скролл страницы идёт внутри #root, а не в документе — так
+         мобильные браузеры не прячут адресную строку/панель навигации
+         при прокрутке вниз. */
+      html, body {
+        height: 100%;
+        overflow: hidden;
+      }
+      #root {
+        height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: none;
+      }
     </style>
 
 <link rel="stylesheet" href="/index.css">
@@ -84,7 +97,7 @@
   }
 }
 </script>
-  <script type="module" crossorigin src="/assets/index-CVtKlmkd.js"></script>
+  <script type="module" crossorigin src="/assets/index-BuZEf_2f.js"></script>
 </head>
   <body>
     <div id="root"></div>
