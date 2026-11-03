@@ -282,5 +282,18 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "chat_error_message": { "ru": "Нельзя отправить пустое сообщение!", "en": "Cannot send an empty message!" },
     "chat_error_too_long": { "ru": "Сообщение слишком длинное!", "en": "Message is too long!" },
     "chat_error_forbidden_links": { "ru": "Ссылки запрещены! Разрешены только ссылки на YouTube и ran4erep.github.io", "en": "Links are forbidden! Only links to YouTube and ran4erep.github.io are allowed" },
-    "chat_error_send": { "ru": "Не удалось отправить сообщение.", "en": "Failed to send message." }
+    "chat_error_send": { "ru": "Не удалось отправить сообщение.", "en": "Failed to send message." },
+
+    // Auth
+    "auth_account": { "ru": "Аккаунт", "en": "Account" },
+    "auth_login_title": { "ru": "Вход", "en": "Sign in" },
+    "auth_username_placeholder": { "ru": "Логин", "en": "Login" },
+    "auth_password_placeholder": { "ru": "Пароль", "en": "Password" },
+    "auth_login_submit": { "ru": "Войти", "en": "Sign in" },
+    "auth_logout": { "ru": "Выйти", "en": "Log out" },
+    "auth_err_fill": { "ru": "Заполните логин и пароль", "en": "Enter login and password" },
+    "auth_err_not_found": { "ru": "Пользователь с таким логином не найден", "en": "User with this login was not found" },
+    "auth_err_wrong_password": { "ru": "Неверный пароль", "en": "Wrong password" },
+    "auth_err_network": { "ru": "Ошибка сети или базы данных", "en": "Network or database error" },
+    "auth_err_corrupted": { "ru": "Некорректные данные профиля", "en": "Corrupted profile data" }
 };

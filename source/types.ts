@@ -61,3 +61,20 @@ export interface ChatMessage {
     timestamp: number;
     image?: string;
 }
+
+export interface AuthUser {
+    username: string;
+    key: string;
+    legacyKey?: string;
+    avatar?: string | null;
+    registeredAt?: number;
+}
+
+export interface AuthContextType {
+    user: AuthUser | null;
+    loginOpen: boolean;
+    openLogin: () => void;
+    closeLogin: () => void;
+    login: (username: string, password: string) => Promise<void>;
+    logout: () => void;
+}

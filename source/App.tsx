@@ -10,6 +10,8 @@ import { Chat } from './components/Chat';
 import { FloatingButtons } from './components/FloatingButtons';
 import { translations, projects, recommendations } from './constants';
 import { AppView } from './components/AppView';
+import { LoginModal } from './components/LoginModal';
+import { AuthProvider } from './auth';
 import type { Language, LanguageContextType, SitePage } from './types';
 
 export const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -128,6 +130,7 @@ const App: React.FC = () => {
 
     return (
         <LanguageContext.Provider value={languageContextValue}>
+            <AuthProvider>
             {/* Layer 1: Background Image */}
             <div 
                 className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
@@ -191,7 +194,9 @@ const App: React.FC = () => {
                 </div>
                 <Chat isSidebarOpen={isSidebarOpen} />
                 <FloatingButtons />
+                <LoginModal />
             </div>
+            </AuthProvider>
         </LanguageContext.Provider>
     );
 };
