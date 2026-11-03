@@ -295,5 +295,11 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "auth_err_not_found": { "ru": "Пользователь с таким логином не найден", "en": "User with this login was not found" },
     "auth_err_wrong_password": { "ru": "Неверный пароль", "en": "Wrong password" },
     "auth_err_network": { "ru": "Ошибка сети или базы данных", "en": "Network or database error" },
-    "auth_err_corrupted": { "ru": "Некорректные данные профиля", "en": "Corrupted profile data" }
+    "auth_err_corrupted": { "ru": "Некорректные данные профиля", "en": "Corrupted profile data" },
+    "auth_err_exists": { "ru": "Пользователь с таким логином уже существует", "en": "User with this login already exists" },
+    "auth_register_title": { "ru": "Регистрация", "en": "Sign up" },
+    "auth_register_submit": { "ru": "Зарегистрироваться", "en": "Sign up" },
+    "auth_no_account_register": { "ru": "Нет аккаунта? Зарегистрироваться", "en": "No account? Sign up" },
+    "auth_have_account_login": { "ru": "Уже есть аккаунт? Войти", "en": "Have an account? Sign in" },
+    "auth_registered_at": { "ru": "Дата регистрации", "en": "Registered" }
 };

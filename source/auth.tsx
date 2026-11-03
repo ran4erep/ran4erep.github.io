@@ -12,6 +12,7 @@ export const AUTH_ERR = {
     WRONG_PASSWORD: 'wrongPassword',
     NETWORK: 'network',
     CORRUPTED: 'corrupted',
+    EXISTS: 'exists',
 } as const;
 
 /**
@@ -234,6 +235,68 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setLoginOpen(false);
     }, []);
 
+    const register = useCallback(async (username: string, password: string): Promise<void> => {
+        const cleanName = username.trim();
+        if (!cleanName || !password) {
+            throw new Error(AUTH_ERR.FILL);
+        }
+
+        const secretKey = await generateSecretKey(cleanName, password);
+        const legacyKey = await generateUserKey(cleanName);
+
+        // Регистрация повторяет механизм приложения R4ezka:
+        // профиль хранится по секретному ключу SHA-256(логин:пароль),
+        // пароль — как SHA-256(соль:пароль).
+        let existing: any = null;
+        try {
+            existing = await getJson(`${DATABASE_URL}/users/${secretKey}/private/profile.json`);
+        } catch (e) {
+            throw e;
+        }
+        if (existing && typeof existing === 'object') {
+            throw new Error(AUTH_ERR.EXISTS);
+        }
+
+        const saltBytes = new Uint8Array(16);
+        crypto.getRandomValues(saltBytes);
+        const salt = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+        const passwordHash = await hashPassword(password, salt);
+
+        const profile = {
+            username: cleanName,
+            passwordHash,
+            salt,
+            registeredAt: Date.now(),
+        };
+
+        try {
+            const res = await fetch(`${DATABASE_URL}/users/${secretKey}/private/profile.json`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(profile),
+                cache: 'no-store',
+            });
+            if (!res.ok) throw new Error();
+        } catch {
+            throw new Error(AUTH_ERR.NETWORK);
+        }
+
+        const session: ParsedSession = {
+            username: cleanName,
+            key: secretKey,
+            legacyKey,
+            avatar: null,
+            registeredAt: profile.registeredAt,
+        };
+        try {
+            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        } catch {
+            // ignore
+        }
+        setUser(session);
+        setLoginOpen(false);
+    }, []);
+
     const logout = useCallback(() => {
         setUser(null);
         try {
@@ -244,8 +307,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const value = useMemo(
-        () => ({ user, loginOpen, openLogin, closeLogin, login, logout }),
-        [user, loginOpen, openLogin, closeLogin, login, logout]
+        () => ({ user, loginOpen, openLogin, closeLogin, login, register, logout }),
+        [user, loginOpen, openLogin, closeLogin, login, register, logout]
     );
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -76,5 +76,6 @@ export interface AuthContextType {
     openLogin: () => void;
     closeLogin: () => void;
     login: (username: string, password: string) => Promise<void>;
+    register: (username: string, password: string) => Promise<void>;
     logout: () => void;
 }

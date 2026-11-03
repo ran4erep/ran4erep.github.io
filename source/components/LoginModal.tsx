@@ -10,11 +10,15 @@ const ERROR_KEYS: Record<string, string> = {
     [AUTH_ERR.WRONG_PASSWORD]: 'auth_err_wrong_password',
     [AUTH_ERR.NETWORK]: 'auth_err_network',
     [AUTH_ERR.CORRUPTED]: 'auth_err_corrupted',
+    [AUTH_ERR.EXISTS]: 'auth_err_exists',
 };
 
+type Mode = 'login' | 'register';
+
 export const LoginModal: React.FC = () => {
-    const { loginOpen, closeLogin, login } = useAuth();
+    const { loginOpen, closeLogin, login, register } = useAuth();
     const { t } = useContext(LanguageContext) as LanguageContextType;
+    const [mode, setMode] = useState<Mode>('login');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorKey, setErrorKey] = useState<string | null>(null);
@@ -22,13 +26,23 @@ export const LoginModal: React.FC = () => {
 
     if (!loginOpen) return null;
 
+    const switchMode = (m: Mode) => {
+        setMode(m);
+        setErrorKey(null);
+        setPassword('');
+    };
+
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
         if (submitting) return;
         setSubmitting(true);
         setErrorKey(null);
         try {
-            await login(username, password);
+            if (mode === 'register') {
+                await register(username, password);
+            } else {
+                await login(username, password);
+            }
             setUsername('');
             setPassword('');
         } catch (err) {
@@ -44,10 +58,10 @@ export const LoginModal: React.FC = () => {
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !submitting && closeLogin()} />
             <form
                 onSubmit={handleSubmit}
-                className="relative w-full max-w-sm bg-slate-900/90 backdrop-blur-lg border border-slate-700 rounded-2xl shadow-2xl p-6"
+                className="relative w-full max-w-sm bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-6"
             >
                 <div className="flex items-center justify-between mb-5">
-                    <h3 className="text-lg font-semibold text-white">{t('auth_login_title')}</h3>
+                    <h3 className="text-lg font-semibold text-white">{t(mode === 'login' ? 'auth_login_title' : 'auth_register_title')}</h3>
                     <button
                         type="button"
                         onClick={() => !submitting && closeLogin()}
@@ -74,7 +88,7 @@ export const LoginModal: React.FC = () => {
                         value={password}
                         onChange={e => { setPassword(e.target.value); setErrorKey(null); }}
                         placeholder={t('auth_password_placeholder')}
-                        autoComplete="current-password"
+                        autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                         disabled={submitting}
                         className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3.5 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:opacity-60"
                     />
@@ -89,8 +103,28 @@ export const LoginModal: React.FC = () => {
                     disabled={submitting}
                     className="mt-5 w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-medium rounded-lg py-2.5 transition-all active:scale-[0.98]"
                 >
-                    {submitting ? '…' : t('auth_login_submit')}
+                    {submitting ? '…' : t(mode === 'login' ? 'auth_login_submit' : 'auth_register_submit')}
                 </button>
+
+                {mode === 'login' ? (
+                    <button
+                        type="button"
+                        onClick={() => switchMode('register')}
+                        disabled={submitting}
+                        className="mt-4 w-full text-sm text-violet-400 hover:text-violet-300 transition-colors"
+                    >
+                        {t('auth_no_account_register')}
+                    </button>
+                ) : (
+                    <button
+                        type="button"
+                        onClick={() => switchMode('login')}
+                        disabled={submitting}
+                        className="mt-4 w-full text-sm text-violet-400 hover:text-violet-300 transition-colors"
+                    >
+                        {t('auth_have_account_login')}
+                    </button>
+                )}
             </form>
         </div>
     );
