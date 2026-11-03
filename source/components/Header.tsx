@@ -38,7 +38,7 @@ const useClock = () => {
 
 
 export const Header: React.FC = () => {
-    const { lang, setLang } = useContext(LanguageContext) as LanguageContextType;
+    const { lang, setLang, t } = useContext(LanguageContext) as LanguageContextType;
     const { user, openLogin, logout } = useAuth();
     const [menuOpen, setMenuOpen] = useState(false);
     const time = useClock();
