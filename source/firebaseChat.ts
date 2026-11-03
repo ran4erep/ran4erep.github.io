@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
 import { getDatabase, ref } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
 
 const firebaseConfig = {
@@ -33,16 +33,28 @@ export async function ensureFirebaseAuthUser(username: string, password: string)
     const email = chatEmailFor(username);
     try {
         await signInWithEmailAndPassword(chatAuth, email, password);
-    } catch (error: any) {
-        if (error && error.code === 'auth/user-not-found') {
-            // Пользователь ещё не в Firebase Auth (например, регистрировался
-            // в приложении) — добавляем его сейчас.
-            await createUserWithEmailAndPassword(chatAuth, email, password);
-            return;
-        }
-        // wrong-password или сетевая ошибка — не можем гарантировать доступ.
-        throw error;
+        return;
+    } catch {
+        // Скорее всего, аккаунта в Firebase Auth ещё нет
+        // (миграция с r4ezka). Разбираемся ниже.
     }
+
+    // Проверяем, существует ли аккаунт с таким email.
+    let methods: string[] = [];
+    try {
+        methods = await fetchSignInMethodsForEmail(chatAuth, email);
+    } catch {
+        methods = [];
+    }
+
+    if (methods.includes('password')) {
+        // Аккаунт есть, но войти не удалось. Пароль уже подтверждён
+        // в r4ezka, поэтому это аномалия — не создаём дубликат.
+        throw new Error('auth/wrong-password');
+    }
+
+    // Аккаунта нет — создаём (createUser сам выполняет вход).
+    await createUserWithEmailAndPassword(chatAuth, email, password);
 }
 
 export async function logoutFirebase(): Promise<void> {
