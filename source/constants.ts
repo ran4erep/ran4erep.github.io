@@ -301,5 +301,10 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "auth_register_submit": { "ru": "Зарегистрироваться", "en": "Sign up" },
     "auth_no_account_register": { "ru": "Нет аккаунта? Зарегистрироваться", "en": "No account? Sign up" },
     "auth_have_account_login": { "ru": "Уже есть аккаунт? Войти", "en": "Have an account? Sign in" },
-    "auth_registered_at": { "ru": "Дата регистрации", "en": "Registered" }
+    "auth_registered_at": { "ru": "Дата регистрации", "en": "Registered" },
+    "auth_show_password": { "ru": "Показать пароль", "en": "Show password" },
+    "auth_hide_password": { "ru": "Скрыть пароль", "en": "Hide password" },
+    "auth_stat_favorites": { "ru": "В избранном", "en": "Favorites" },
+    "auth_stat_watched": { "ru": "Просмотрено", "en": "Watched" },
+    "auth_stat_subscriptions": { "ru": "Подписки", "en": "Subscriptions" }
 };

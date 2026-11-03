@@ -61,7 +61,7 @@ function constantTimeEqual(a: string, b: string): boolean {
     return diff === 0;
 }
 
-async function getJson(url: string): Promise<any> {
+export async function getJson(url: string): Promise<any> {
     let res: Response;
     try {
         res = await fetch(url, { cache: 'no-store' });
