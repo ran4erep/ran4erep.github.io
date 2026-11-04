@@ -1,12 +1,35 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { push, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
 import { LanguageContext } from '../App';
-import { useAuth } from '../auth';
+import { useAuth, generateUserKey, safeAvatar } from '../auth';
 import { messagesRef } from '../firebaseChat';
 import { UserAvatar } from './UserAvatar';
 import type { ChatMessage, LanguageContextType } from '../types';
 
 const MAX_MESSAGE_LENGTH = 300;
+
+const DATABASE_URL = 'https://r4ezka-default-rtdb.europe-west1.firebasedatabase.app';
+
+// Кэш аватаров для старых сообщений (по нику), чтобы не дёргать базу повторно.
+const legacyAvatarCache = new Map<string, string | null>();
+
+async function getLegacyAvatar(nickname: string): Promise<string | null> {
+    const key = nickname.trim().toLowerCase();
+    if (legacyAvatarCache.has(key)) return legacyAvatarCache.get(key)!;
+    try {
+        const legacyKey = await generateUserKey(key);
+        const res = await fetch(`${DATABASE_URL}/users/${legacyKey}/avatar.json`, { cache: 'no-store' });
+        if (!res.ok) throw new Error();
+        const text = (await res.text()).trim();
+        const value = text === '' || text === 'null' ? null : JSON.parse(text);
+        const safe = safeAvatar(value);
+        legacyAvatarCache.set(key, safe);
+        return safe;
+    } catch {
+        legacyAvatarCache.set(key, null);
+        return null;
+    }
+}
 
 const escapeHtml = (unsafe: string) => {
     return unsafe
@@ -19,6 +42,20 @@ const escapeHtml = (unsafe: string) => {
 
 
 const MessageItem: React.FC<{ msg: ChatMessage }> = ({ msg }) => {
+    const [avatar, setAvatar] = useState<string | null>(msg.avatar ?? null);
+
+    useEffect(() => {
+        let cancelled = false;
+        if (!msg.avatar) {
+            // Старое сообщение (до регистрации) — подтягиваем аватар автора
+            // из базы аккаунтов по legacy-ключу ника.
+            getLegacyAvatar(msg.nickname).then(a => {
+                if (!cancelled) setAvatar(a);
+            });
+        }
+        return () => { cancelled = true; };
+    }, [msg.nickname, msg.avatar]);
+
     const formatTimestamp = (timestamp: number) => {
         const date = new Date(timestamp);
         const kievDate = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Kiev' }));
@@ -39,7 +76,7 @@ const MessageItem: React.FC<{ msg: ChatMessage }> = ({ msg }) => {
     return (
         <div className="message bg-white/5 p-2 rounded-md text-sm">
             <div className="flex items-center gap-2 flex-wrap">
-                <UserAvatar avatar={msg.avatar} className="w-7 h-7" ring="border border-violet-500/30" />
+                <UserAvatar avatar={avatar} className="w-7 h-7" ring="border border-violet-500/30" />
                 {msg.nickname.toLowerCase() === 'ran4erep' && (
                     <img src="/icons/crown.svg" alt="crown" className="w-4 h-4 shrink-0" />
                 )}
