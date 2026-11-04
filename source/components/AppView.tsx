@@ -43,7 +43,7 @@ export const AppView: React.FC<AppViewProps> = ({ path, title }) => {
                 if (parentCursor && parentCursor !== 'auto') {
                     const cursorStyle = doc.createElement('style');
                     cursorStyle.textContent =
-                        `html, body { cursor: ${parentCursor}; }` +
+                        `html, body { cursor: ${parentCursor}; overflow-anchor: none; }` +
                         `a, a:any-link, button, input, select, textarea, label, summary, ` +
                         `[role="button"], [role="link"], [onclick], [href], [draggable="true"] { ` +
                         `cursor: inherit !important; }`;
@@ -60,8 +60,8 @@ export const AppView: React.FC<AppViewProps> = ({ path, title }) => {
     }, [path]);
 
     return (
-        <div className="h-screen overflow-hidden" style={{ height: '100dvh' }}>
-            <iframe ref={iframeRef} src={path} title={title} className="w-full h-full border-0 block" />
+        <div className="h-screen overflow-hidden" style={{ height: '100dvh', overflowAnchor: 'none' }}>
+            <iframe ref={iframeRef} src={path} title={title} className="w-full h-full border-0 block" style={{ verticalAlign: 'top' }} />
         </div>
     );
 };
