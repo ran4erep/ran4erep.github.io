@@ -68,10 +68,10 @@ export const Header: React.FC = () => {
                 </div>
                 <div className="flex gap-1 bg-black/20 border border-white/10 rounded-full p-1">
                     <button onClick={() => setLang('ru')} title="Русский" className={`px-2 py-1 rounded-full flex items-center transition-all ${lang === 'ru' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
-                        <img src="flags/ru.svg" alt="RU" className="w-[18px] h-[12px] rounded-[2px] shadow-sm" />
+                        <img src="/flags/ru.svg" alt="RU" className="w-[18px] h-[12px] rounded-[2px] shadow-sm" />
                     </button>
                     <button onClick={() => setLang('en')} title="English" className={`px-2 py-1 rounded-full flex items-center transition-all ${lang === 'en' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
-                        <img src="flags/us.svg" alt="US" className="w-[18px] h-[12px] rounded-[2px] shadow-sm" />
+                        <img src="/flags/us.svg" alt="US" className="w-[18px] h-[12px] rounded-[2px] shadow-sm" />
                     </button>
                 </div>
             </div>
