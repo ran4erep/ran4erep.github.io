@@ -58,7 +58,7 @@ export const LoginModal: React.FC = () => {
     return (
         <>
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/10" onClick={() => !submitting && closeLogin()} />
+            <div className="absolute inset-0 bg-black/15" onClick={() => !submitting && closeLogin()} />
             <form
                 onSubmit={handleSubmit}
                 className="relative w-full max-w-sm bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-6"
@@ -125,7 +125,7 @@ export const LoginModal: React.FC = () => {
                 <button
                     type="submit"
                     disabled={submitting}
-                    className="mt-5 w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-medium rounded-lg py-2.5 transition-all active:scale-[0.98] inline-flex items-center justify-center"
+                    className="mt-5 w-full min-h-[44px] bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-medium rounded-lg py-2.5 transition-all active:scale-[0.98] inline-flex items-center justify-center"
                 >
                     {submitting ? (
                         <span className="inline-flex items-center gap-1.5">

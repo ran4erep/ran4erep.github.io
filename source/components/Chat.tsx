@@ -163,7 +163,7 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
             </button>
             {isOpen && (
                 <>
-                <div className="fixed inset-0 bg-black/10 z-[140] pointer-events-none" />
+                <div className="fixed inset-0 bg-black/15 z-[140] pointer-events-none" />
                 <div className={modalClasses}>
                     <div className="chat-header p-4 border-b border-slate-700 flex justify-between items-center">
                         <h3 className="text-white font-semibold">{t('chat_title')}</h3>
