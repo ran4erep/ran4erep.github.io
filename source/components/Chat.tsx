@@ -138,7 +138,7 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
     
     const modalClasses = `
         chat-modal fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] h-[80vh]
-        md:top-auto md:left-auto md:translate-x-0 md:translate-y-0 md:bottom-24 md:right-5 md:w-[30vw] md:h-[50vh]
+        md:top-auto md:left-auto md:translate-x-0 md:translate-y-0 md:bottom-24 md:right-5 md:w-[30vw] md:h-[min(40vw,70vh)]
         bg-slate-900/70 backdrop-blur-lg border border-slate-700 
         rounded-xl shadow-2xl z-[150] flex flex-col transition-all duration-300
     `;
