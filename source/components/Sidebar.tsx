@@ -119,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                                             className="w-full text-left flex items-start gap-2 px-3 py-2 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors duration-200 text-sm"
                                         >
                                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0"><path d="M4 19.5A2.5 2.5 0 0 1 1.5 17V7a2.5 2.5 0 0 1 2.5-2.5h15a2.5 2.5 0 0 1 2.5 2.5v10a2.5 2.5 0 0 1-2.5 2.5z"/><path d="M1.5 8.5h21"/></svg>
-                                            <span className="truncate">{item.label}</span>
+                                            <span className="flex-1 min-w-0 break-words">{item.label}</span>
                                         </button>
                                     ))}
                                 </div>
