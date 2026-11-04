@@ -158,7 +158,7 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
                         <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white text-2xl transition-transform active:scale-90">&times;</button>
                     </div>
                     <div className="chat-messages flex-grow overflow-y-auto p-4 flex flex-col-reverse gap-4 custom-scrollbar overscroll-contain">
-                        {messages.map((msg, index) => <MessageItem key={index} msg={msg} />)}
+                        {[...messages].reverse().map((msg, index) => <MessageItem key={index} msg={msg} />)}
                     </div>
                     <div className="chat-input p-4 border-t border-slate-700 grid grid-cols-[1fr_auto_auto] gap-2 items-center relative">
                         <div className="relative col-span-1">
