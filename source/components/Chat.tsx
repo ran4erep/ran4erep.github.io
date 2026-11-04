@@ -41,8 +41,9 @@ const MessageItem: React.FC<{ msg: ChatMessage }> = ({ msg }) => {
             <div className="flex items-center gap-2 flex-wrap">
                 <UserAvatar avatar={msg.avatar} className="w-7 h-7" ring="border border-violet-500/30" />
                 {msg.nickname.toLowerCase() === 'ran4erep' && (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-yellow-400 shrink-0">
-                        <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" className="text-yellow-400 shrink-0">
+                        <path d="M3 19l1.4-8.2 4.2 3.8 3.4-5.6 3.4 5.6 4.2-3.8L21 19H3z"/>
+                        <rect x="3" y="18" width="18" height="2" rx="1"/>
                     </svg>
                 )}
                 <span className="nickname text-violet-400 font-bold">{escapeHtml(msg.nickname)}</span>
