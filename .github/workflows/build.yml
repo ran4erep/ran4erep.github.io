@@ -33,6 +33,8 @@ jobs:
             /pages.json
             /index.html
             /assets
+            /flags
+            /icons
             /gallery/gallery.json
             /music/playlist.json
           sparse-checkout-cone-mode: false
@@ -74,7 +76,7 @@ jobs:
 
       - name: Commit & push rebuilt site
         run: |
-          git add -A
+          git add -A --sparse
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
