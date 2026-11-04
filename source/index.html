@@ -103,7 +103,11 @@
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: none;
-        will-change: scroll-position;
+        /* Поднимаем контейнер прокрутки на собственный композиторный слой:
+           скролл идёт через GPU, а не перерисовывается на CPU каждый кадр.
+           (Все position:fixed элементы вынесены в портал на body, поэтому
+           transform здесь ничего не ломает.) */
+        transform: translateZ(0);
       }
       /* Во время активной прокрутки отключаем дорогой backdrop-filter,
          чтобы не нагружать CPU; после остановки блюр возвращается. */
