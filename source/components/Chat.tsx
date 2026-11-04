@@ -37,8 +37,11 @@ const MessageItem: React.FC<{ msg: ChatMessage }> = ({ msg }) => {
 
     return (
         <div className="message bg-white/5 p-2 rounded-md text-sm">
-            <div>
-                <span className="nickname text-violet-400 font-bold mr-2">{msg.nickname.toLowerCase() === 'ran4erep' ? '👑' : '👤'} {escapeHtml(msg.nickname)}</span>
+            <div className="flex items-center gap-2 flex-wrap">
+                {msg.avatar && (
+                    <img src={msg.avatar} alt="" className="w-7 h-7 rounded-full object-cover border border-violet-500/30 shrink-0" />
+                )}
+                <span className="nickname text-violet-400 font-bold">{msg.nickname.toLowerCase() === 'ran4erep' ? '👑' : '👤'} {escapeHtml(msg.nickname)}</span>
                 <span className="time text-gray-400 text-xs">
                     <span className="time-box bg-black/20 border border-white/10 px-1.5 py-0.5 rounded">{time}</span> <span className="date-box bg-violet-500/10 border border-violet-500/20 px-1.5 py-0.5 rounded">{dateStr}</span>
                 </span>
@@ -120,7 +123,7 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
         }
 
         try {
-            await push(messagesRef, { nickname: user.username, message: trimmedMessage, timestamp: Date.now() });
+            await push(messagesRef, { nickname: user.username, message: trimmedMessage, timestamp: Date.now(), avatar: user.avatar || null });
             setMessage('');
         } catch (error: any) {
             console.error(error);
@@ -135,7 +138,7 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
         
         const imageData = await resizeImage(file);
         try {
-            await push(messagesRef, { nickname: user.username, message: '', image: imageData, timestamp: Date.now() });
+            await push(messagesRef, { nickname: user.username, message: '', image: imageData, timestamp: Date.now(), avatar: user.avatar || null });
             if (fileInputRef.current) fileInputRef.current.value = "";
         } catch (error: any) {
              console.error(error);

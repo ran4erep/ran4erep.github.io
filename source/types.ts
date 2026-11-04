@@ -60,6 +60,7 @@ export interface ChatMessage {
     message: string;
     timestamp: number;
     image?: string;
+    avatar?: string | null;
 }
 
 export interface AuthUser {
