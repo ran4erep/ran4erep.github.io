@@ -49,28 +49,28 @@ export const Header: React.FC = () => {
                 {user ? (
                     <button
                         onClick={openAccount}
-                        className="flex items-center gap-2 pl-1.5 pr-3 py-1 bg-black/20 border border-white/10 rounded-full transition-all hover:bg-white/10 active:scale-95"
+                        className="flex items-center gap-2 pl-1.5 pr-3 h-[30px] bg-black/20 border border-white/10 rounded-full transition-all hover:bg-white/10 active:scale-95"
                         aria-label={t('auth_account')}
                     >
-                        <UserAvatar avatar={user.avatar} className="w-7 h-7" ring="border border-violet-500/40" />
+                        <UserAvatar avatar={user.avatar} className="w-6 h-6" ring="border border-violet-500/40" />
                         <span className="text-sm font-medium text-gray-100 break-words max-w-[55vw]">{user.username}</span>
                     </button>
                 ) : (
                     <button
                         onClick={openLogin}
-                        className="px-3 py-1.5 bg-violet-600/90 hover:bg-violet-500 text-white text-sm font-medium rounded-full border border-violet-400/30 transition-all active:scale-95"
+                        className="px-3 h-[30px] inline-flex items-center bg-violet-600/90 hover:bg-violet-500 text-white text-sm font-medium rounded-full border border-violet-400/30 transition-all active:scale-95"
                     >
                         {t('auth_login_submit')}
                     </button>
                 )}
-                <div className="hidden sm:block px-3 py-1 bg-black/20 border border-white/10 rounded-full text-sm">
+                <div className="hidden sm:flex items-center px-3 h-[30px] bg-black/20 border border-white/10 rounded-full text-sm">
                     {time}
                 </div>
-                <div className="flex gap-1 bg-black/20 border border-white/10 rounded-full p-1">
-                    <button onClick={() => setLang('ru')} title="Русский" className={`px-2 py-1 rounded-full flex items-center transition-all ${lang === 'ru' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
+                <div className="flex gap-1 h-[30px] items-center bg-black/20 border border-white/10 rounded-full p-1">
+                    <button onClick={() => setLang('ru')} title="Русский" className={`px-2 h-6 rounded-full flex items-center transition-all ${lang === 'ru' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
                         <img src="/flags/ru.svg" alt="RU" className="w-[18px] h-[12px] rounded-[2px] shadow-sm" />
                     </button>
-                    <button onClick={() => setLang('en')} title="English" className={`px-2 py-1 rounded-full flex items-center transition-all ${lang === 'en' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
+                    <button onClick={() => setLang('en')} title="English" className={`px-2 h-6 rounded-full flex items-center transition-all ${lang === 'en' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
                         <img src="/flags/us.svg" alt="US" className="w-[18px] h-[12px] rounded-[2px] shadow-sm" />
                     </button>
                 </div>

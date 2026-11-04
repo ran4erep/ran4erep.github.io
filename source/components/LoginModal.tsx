@@ -58,7 +58,7 @@ export const LoginModal: React.FC = () => {
     return (
         <>
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <div className="absolute inset-0" onClick={() => !submitting && closeLogin()} />
+            <div className="absolute inset-0 bg-black/10" onClick={() => !submitting && closeLogin()} />
             <form
                 onSubmit={handleSubmit}
                 className="relative w-full max-w-sm bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-6"
@@ -125,9 +125,19 @@ export const LoginModal: React.FC = () => {
                 <button
                     type="submit"
                     disabled={submitting}
-                    className="mt-5 w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-medium rounded-lg py-2.5 transition-all active:scale-[0.98]"
+                    className="mt-5 w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-medium rounded-lg py-2.5 transition-all active:scale-[0.98] inline-flex items-center justify-center"
                 >
-                    {submitting ? '…' : t(mode === 'login' ? 'auth_login_submit' : 'auth_register_submit')}
+                    {submitting ? (
+                        <span className="inline-flex items-center gap-1.5">
+                            {[0, 1, 2].map(i => (
+                                <span
+                                    key={i}
+                                    className="w-1.5 h-1.5 rounded-full bg-white animate-bounce"
+                                    style={{ animationDelay: `${i * 0.15}s` }}
+                                />
+                            ))}
+                        </span>
+                    ) : t(mode === 'login' ? 'auth_login_submit' : 'auth_register_submit')}
                 </button>
 
                 {mode === 'login' ? (
