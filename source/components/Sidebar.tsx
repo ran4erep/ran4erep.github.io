@@ -52,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
     };
     
     return (
-        <aside className={`fixed top-0 left-0 h-full bg-[#101218e6] backdrop-blur-lg border-r border-white/10 z-40 transition-transform duration-300 ease-in-out w-[85%] sm:w-[60%] md:w-[22%] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <aside className={`fixed top-0 left-0 h-full bg-[#101218f2] border-r border-white/10 z-40 transform-gpu transition-transform duration-300 ease-in-out w-[85%] sm:w-[60%] md:w-[22%] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             <div className="flex flex-col h-full p-4 overflow-y-auto">
                 <div className="text-center mb-4 shrink-0">
                     <div className="w-20 h-20 mx-auto mb-2 rounded-full p-[3px] bg-gradient-to-r from-violet-500 via-pink-500 to-violet-500 animate-gradient-pulse bg-[size:200%_auto]">
