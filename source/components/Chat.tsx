@@ -3,6 +3,7 @@ import { push, onChildAdded, query, limitToLast } from "https://www.gstatic.com/
 import { LanguageContext } from '../App';
 import { useAuth } from '../auth';
 import { messagesRef } from '../firebaseChat';
+import { UserAvatar } from './UserAvatar';
 import type { ChatMessage, LanguageContextType } from '../types';
 
 const MAX_MESSAGE_LENGTH = 300;
@@ -38,10 +39,8 @@ const MessageItem: React.FC<{ msg: ChatMessage }> = ({ msg }) => {
     return (
         <div className="message bg-white/5 p-2 rounded-md text-sm">
             <div className="flex items-center gap-2 flex-wrap">
-                {msg.avatar && (
-                    <img src={msg.avatar} alt="" className="w-7 h-7 rounded-full object-cover border border-violet-500/30 shrink-0" />
-                )}
-                <span className="nickname text-violet-400 font-bold">{msg.nickname.toLowerCase() === 'ran4erep' ? '👑' : '👤'} {escapeHtml(msg.nickname)}</span>
+                <UserAvatar avatar={msg.avatar} className="w-7 h-7" ring="border border-violet-500/30" />
+                <span className="nickname text-violet-400 font-bold">{msg.nickname.toLowerCase() === 'ran4erep' ? '👑' : ''} {escapeHtml(msg.nickname)}</span>
                 <span className="time text-gray-400 text-xs">
                     <span className="time-box bg-black/20 border border-white/10 px-1.5 py-0.5 rounded">{time}</span> <span className="date-box bg-violet-500/10 border border-violet-500/20 px-1.5 py-0.5 rounded">{dateStr}</span>
                 </span>

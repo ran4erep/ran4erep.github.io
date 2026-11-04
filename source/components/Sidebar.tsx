@@ -5,6 +5,7 @@ import { useAuth } from '../auth';
 import { navLinks, socialLinks } from '../constants';
 import type { LanguageContextType } from '../types';
 import { MusicPlayer } from './MusicPlayer';
+import { UserAvatar } from './UserAvatar';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -52,7 +53,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
         <aside className={`fixed top-0 left-0 h-full bg-[#101218e6] backdrop-blur-lg border-r border-white/10 z-40 transition-transform duration-300 ease-in-out w-[85%] sm:w-[60%] md:w-[22%] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             <div className="flex flex-col h-full p-4 overflow-y-auto">
                 <div className="text-center mb-4">
-                     <img src="https://ran4erep.github.io/logo.png" alt="Avatar" className="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-violet-500"/>
+                    <div className="w-20 h-20 mx-auto mb-2 rounded-full p-[3px] bg-gradient-to-r from-violet-500 via-pink-500 to-violet-500 animate-gradient-pulse bg-[size:200%_auto]">
+                        <img src="https://ran4erep.github.io/logo.png" alt="Avatar" className="w-full h-full rounded-full object-cover bg-[#101218]" />
+                    </div>
                 </div>
 
                 <MusicPlayer />
@@ -61,15 +64,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                     {user ? (
                         <button
                             onClick={openAccount}
-                            className="w-full text-left mb-2 flex items-center gap-2 px-3 py-2 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors duration-200"
+                            className="w-full text-center mb-2 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors duration-200"
                             aria-label={t('auth_account')}
                         >
-                            {user.avatar ? (
-                                <img src={user.avatar} alt="" className="w-5 h-5 rounded-full object-cover border border-violet-500/40 shrink-0" />
-                            ) : (
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            )}
-                            {user.username}
+                            <UserAvatar avatar={user.avatar} className="w-5 h-5" />
+                            <span className="truncate max-w-[70%]">{user.username}</span>
                         </button>
                     ) : (
                         <button
@@ -124,6 +123,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                 </div>
             </div>
             <style>{`
+                @keyframes gradient-pulse {
+                    0% { background-position: 0% 50%; }
+                    5% { background-position: 100% 50%; }
+                    10% { background-position: 0% 50%; }
+                    100% { background-position: 0% 50%; }
+                }
+                .animate-gradient-pulse {
+                    animation: gradient-pulse 10s linear infinite;
+                }
                 .sidebar-tooltip {
                     position: absolute;
                     bottom: 100%;

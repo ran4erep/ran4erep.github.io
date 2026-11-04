@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useAuth, getJson } from '../auth';
 import { LanguageContext } from '../App';
+import { UserAvatar } from './UserAvatar';
 import type { LanguageContextType } from '../types';
 
 const DATABASE_URL = 'https://r4ezka-default-rtdb.europe-west1.firebasedatabase.app';
@@ -110,16 +111,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
 
                 {/* Карточка профиля — как в приложении */}
                 <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4">
-                    {user.avatar ? (
-                        <img src={user.avatar} alt="" className="w-14 h-14 rounded-full object-cover border border-violet-500/40 shrink-0" />
-                    ) : (
-                        <span className="w-14 h-14 rounded-full bg-violet-500/40 flex items-center justify-center shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-200">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg>
-                        </span>
-                    )}
+                    <UserAvatar avatar={user.avatar} className="w-14 h-14" ring="border border-violet-500/40" />
                     <div className="min-w-0">
                         <div className="text-lg font-bold text-white break-words leading-snug">{user.username}</div>
                         {registeredAt && (
