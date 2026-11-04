@@ -296,100 +296,115 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log(`Установлено количество слов на странице: ${wordsPerPage}`);
     }
     
-    // Функция разбивки текста на страницы по количеству слов
+    // Функция разбивки текста на страницы: наполняем каждую страницу
+    // до границы (измеряем фактическую высоту текста), пустое место
+    // остаётся только перед новой главой — она всегда начинается
+    // с новой страницы.
     function preparePages() {
         pages = [];
-        let position = 0;
-        
-        // Add cover page
-        pages.push('');
-        
-        while (position < bookContent.length) {
-            // Получаем следующий фрагмент текста для анализа
-            const remainingText = bookContent.substring(position);
-            
-            // Проверяем, есть ли изображение в начале оставшегося текста
-            const imgMatch = remainingText.match(/^<img\/([^>]+)>/);
-            if (imgMatch) {
-                // Если нашли изображение, добавляем его на отдельную страницу как обложку
-                pages.push(`<div class="book-cover illustration-page"><img src="${imgMatch[1]}" alt="Иллюстрация"></div>`);
-                position += imgMatch[0].length;
-                
-                // Пропускаем пробелы и переводы строк после изображения
-                while (position < bookContent.length && /[\s\n\r]/.test(bookContent[position])) {
-                    position++;
-                }
-                continue;
-            }
-            
-            // Разбиваем текст на строки
-            const lines = remainingText.split('\n');
-            let pageLines = [];
-            let currentLength = 0;
-            let hasImage = false;
-            let processedLength = 0;
-            
-            for (let line of lines) {
-                // Проверяем наличие маркера изображения
-                if (line.includes('<img/')) {
-                    hasImage = true;
-                    break;
-                }
-                
-                // Считаем количество слов в строке
-                const words = line.trim() ? line.split(' ').length : 1;
-                
-                // Проверяем, поместится ли вся строка
-                if (currentLength + words <= charsPerPage) {
-                    pageLines.push(line);
-                    currentLength += words;
-                    processedLength += line.length + 1; // +1 для учета символа новой строки
+        pages.push(''); // обложка
+
+        const bookHeight = bookElement.offsetHeight || window.innerHeight * 0.94;
+        const pageWidth = Math.max(1, (bookElement.offsetWidth || window.innerWidth) / 2);
+
+        // Вертикальные отступы: .stf__item (25px сверху / 35px снизу) +
+        // .page-content (20px сверху / 20px снизу) + запас под номер страницы.
+        const AVAILABLE_HEIGHT = Math.max(120, bookHeight - 25 - 35 - 20 - 20 - 40);
+
+        // Настраиваем измерительный элемент под реальную ширину текстовой области:
+        // ширина страницы минус боковые отступы .stf__item и .page-content (по 20px с каждой стороны).
+        testElement.style.width = Math.max(1, pageWidth - 80) + 'px';
+        testElement.style.height = 'auto';
+        testElement.style.padding = '0';
+
+        const fits = (rawHtml) => {
+            testElement.innerHTML = rawHtml;
+            return testElement.scrollHeight <= AVAILABLE_HEIGHT;
+        };
+
+        // Разбивает одну длинную строку на куски, каждый из которых помещается на странице.
+        const splitLineToFit = (line) => {
+            const words = line.split(' ');
+            const pieces = [];
+            let current = '';
+            for (const word of words) {
+                const candidate = current ? current + ' ' + word : word;
+                if (fits(formatContent(candidate))) {
+                    current = candidate;
                 } else {
-                    break;
+                    if (current) pieces.push(current);
+                    current = word;
                 }
             }
-            
-            let pageText = pageLines.join('\n');
-            
-            // Если нашли изображение в тексте
-            if (hasImage) {
-                const imgIndex = pageText.indexOf('<img/');
-                if (imgIndex !== -1) {
-                    pageText = pageText.substring(0, imgIndex).trim();
-                    processedLength = imgIndex;
-                }
-            }
-            
-            // Проверяем, не разрезаем ли мы заголовок
-            const titleMatch = pageText.match(/---.*?---/);
-            if (titleMatch) {
-                const titleStart = pageText.indexOf('---');
-                if (titleStart > 0) {
-                    pageText = pageText.substring(0, titleStart).trim();
-                    processedLength = titleStart;
-                }
-            }
-            
-            // Добавляем страницу только если в ней есть текст
-            if (pageText.trim()) {
-                pages.push(pageText);
-                position += processedLength;
+            if (current) pieces.push(current);
+            return pieces;
+        };
+
+        // Разбираем текст книги на блоки: текст, главы, иллюстрации.
+        const blocks = [];
+        for (const line of bookContent.split('\n')) {
+            const trimmed = line.trim();
+            const imgMatch = trimmed.match(/^<img\/([^>]+)>$/);
+            if (imgMatch) {
+                blocks.push({ type: 'image', src: imgMatch[1], raw: trimmed });
+            } else if (/^---\s+.+?\s+---$/.test(trimmed)) {
+                blocks.push({ type: 'heading', raw: trimmed });
             } else {
-                // Если текст пустой, продвигаемся вперёд
-                position++;
-            }
-            
-            // Пропускаем пробелы и переводы строк
-            while (position < bookContent.length && /[\s\n\r]/.test(bookContent[position])) {
-                position++;
+                blocks.push({ type: 'text', raw: line });
             }
         }
-        
-        // Ensure even number of pages for proper book layout
+
+        let pageRaw = '';
+        const commitPage = () => {
+            if (pageRaw.trim()) {
+                pages.push(pageRaw.replace(/\n{3,}/g, '\n\n').trim());
+            }
+            pageRaw = '';
+        };
+
+        for (const block of blocks) {
+            if (block.type === 'image') {
+                commitPage();
+                pages.push(`<div class="book-cover illustration-page"><img src="${block.src}" alt="Иллюстрация"></div>`);
+                continue;
+            }
+
+            // Глава всегда начинается с новой страницы.
+            if (block.type === 'heading') {
+                commitPage();
+                pageRaw = block.raw;
+                continue;
+            }
+
+            const candidateRaw = pageRaw ? pageRaw + '\n' + block.raw : block.raw;
+
+            if (fits(formatContent(candidateRaw))) {
+                pageRaw = candidateRaw;
+                continue;
+            }
+
+            // Обычный текст: дозаполняем текущую страницу кусками строки,
+            // а то, что не влезло, переносим на следующие страницы.
+            const pieces = splitLineToFit(block.raw);
+            for (const piece of pieces) {
+                const nextRaw = pageRaw ? pageRaw + '\n' + piece : piece;
+                if (fits(formatContent(nextRaw))) {
+                    pageRaw = nextRaw;
+                } else {
+                    commitPage();
+                    pageRaw = piece;
+                }
+            }
+        }
+
+        commitPage();
+
+        // Чётное число страниц для корректной раскладки разворота.
         if (pages.length % 2 !== 0) {
             pages.push('');
         }
-        
+
+        testElement.innerHTML = '';
         console.log(`Книга разбита на ${pages.length} страниц`);
     }
     

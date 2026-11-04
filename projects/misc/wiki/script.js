@@ -2,6 +2,7 @@
 // Это те же вкладки, что были в боковом меню (кроме «Вернуться на главную»
 // и «Начальная страница» — они на главной не нужны).
 const TABLET_WIKI_NAV = [
+    { label: 'Начальная страница', path: '/projects/misc/wiki/' },
     { label: 'Сенсорное управление в играх при помощи программы GestureWorks Gameplay', path: '/projects/misc/wiki/gwg.html' },
     { label: 'Сенсорное управление в играх при помощи программы Comfort Keys Pro', path: '/projects/misc/wiki/comfort_keys.html' },
     { label: 'Улучшаем старые игры при помощи DgVoodoo 2', path: '/projects/misc/wiki/dgvoodoo.html' },
