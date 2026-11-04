@@ -58,7 +58,7 @@ export const LoginModal: React.FC = () => {
     return (
         <>
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !submitting && closeLogin()} />
+            <div className="absolute inset-0" onClick={() => !submitting && closeLogin()} />
             <form
                 onSubmit={handleSubmit}
                 className="relative w-full max-w-sm bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-6"
