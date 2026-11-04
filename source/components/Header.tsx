@@ -52,7 +52,7 @@ export const Header: React.FC = () => {
                         className="flex items-center gap-2 pl-1.5 pr-3 py-1 bg-black/20 border border-white/10 rounded-full transition-all hover:bg-white/10 active:scale-95"
                         aria-label={t('auth_account')}
                     >
-                        <UserAvatar avatar={user.avatar} className="w-8 h-8" ring="border border-violet-500/40" />
+                        <UserAvatar avatar={user.avatar} className="w-7 h-7" ring="border border-violet-500/40" />
                         <span className="text-sm font-medium text-gray-100 break-words max-w-[55vw]">{user.username}</span>
                     </button>
                 ) : (
@@ -67,11 +67,11 @@ export const Header: React.FC = () => {
                     {time}
                 </div>
                 <div className="flex gap-1 bg-black/20 border border-white/10 rounded-full p-1">
-                    <button onClick={() => setLang('ru')} className={`px-2 py-0.5 rounded-full text-sm transition-all ${lang === 'ru' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
-                        🇷🇺
+                    <button onClick={() => setLang('ru')} title="Русский" className={`px-2 py-0.5 rounded-full flex items-center transition-all ${lang === 'ru' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
+                        <span className="fi fi-ru text-base leading-none"></span>
                     </button>
-                    <button onClick={() => setLang('en')} className={`px-2 py-0.5 rounded-full text-sm transition-all ${lang === 'en' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
-                        🇺🇸
+                    <button onClick={() => setLang('en')} title="English" className={`px-2 py-0.5 rounded-full flex items-center transition-all ${lang === 'en' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
+                        <span className="fi fi-us text-base leading-none"></span>
                     </button>
                 </div>
             </div>
