@@ -45,6 +45,27 @@ const App: React.FC = () => {
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         return !isMobile;
     });
+    // Пункты навигации, которые приложения (например, вики) присылают через мост.
+    const [appNavItems, setAppNavItems] = useState<{ label: string; path: string }[]>([]);
+
+    useEffect(() => {
+        const onMessage = (e: MessageEvent) => {
+            if (e.origin !== window.location.origin) return;
+            const data = e.data;
+            if (data && data.type === 'app-nav' && Array.isArray(data.items)) {
+                setAppNavItems(
+                    data.items.filter((it: any) => it && typeof it.label === 'string' && typeof it.path === 'string')
+                );
+            }
+        };
+        window.addEventListener('message', onMessage);
+        return () => window.removeEventListener('message', onMessage);
+    }, []);
+
+    // При смене/закрытии приложения старые пункты моста сбрасываем.
+    useEffect(() => {
+        setAppNavItems([]);
+    }, [openPath]);
 
     useEffect(() => {
         localStorage.setItem('language', lang);
@@ -172,7 +193,7 @@ const App: React.FC = () => {
                     </svg>
                 </button>
                 <div className="flex">
-                    <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} isAppOpen={!!openPath} onCloseApp={closeApp} openPath={openPath} />
+                    <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} isAppOpen={!!openPath} onCloseApp={closeApp} openPath={openPath} appNavItems={appNavItems} onOpenApp={openApp} />
                     <main className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-[22%]' : 'ml-0'} w-full md:w-auto`}>
                         {openPath ? (
                             <AppView path={openPath} title={pages.find(p => p.path === openPath)?.title || openPath} />

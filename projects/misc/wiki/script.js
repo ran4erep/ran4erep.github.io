@@ -1,56 +1,27 @@
-// Load sidebar
-async function loadSidebar() {
-    const response = await fetch('sidebar.html');
-    const sidebarHtml = await response.text();
-    document.getElementById('wrapper').insertAdjacentHTML('afterbegin', sidebarHtml);
-    
-    // Set active menu item based on current page
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    const menuItems = document.querySelectorAll('.article-list a');
-    menuItems.forEach(item => {
-        if (item.getAttribute('data-href') === currentPage) {
-            item.classList.add('active');
-        }
-    });
-}
+// Навигация вики для моста с главной страницей.
+// Это те же вкладки, что были в боковом меню (кроме «Вернуться на главную»
+// и «Начальная страница» — они на главной не нужны).
+const TABLET_WIKI_NAV = [
+    { label: 'Сенсорное управление в играх при помощи программы GestureWorks Gameplay', path: '/projects/misc/wiki/gwg.html' },
+    { label: 'Сенсорное управление в играх при помощи программы Comfort Keys Pro', path: '/projects/misc/wiki/comfort_keys.html' },
+    { label: 'Улучшаем старые игры при помощи DgVoodoo 2', path: '/projects/misc/wiki/dgvoodoo.html' },
+    { label: 'Вся площадь экрана в качестве тачпада при помощи программы Touch Mouse Pointer', path: '/projects/misc/wiki/touchmousepointer.html' },
+    { label: 'Делаем меню Пуск красивее', path: '/projects/misc/wiki/start_menu.html' },
+    { label: 'Увеличиваем количество свободной оперативной памяти при помощи программы MemReduct', path: '/projects/misc/wiki/mem_reduct.html' },
+];
 
-// Sidebar Toggle
-function toggleSidebar() {
-    const sidebar = document.querySelector('.sidebar');
-    sidebar.classList.toggle('hidden');
-}
-
-// Language Switching
-function switchLanguage(lang) {
-    const buttons = document.querySelectorAll('.lang-btn');
-    buttons.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.textContent.toLowerCase() === lang.toLowerCase()) {
-            btn.classList.add('active');
-        }
-    });
-
-    // Here you would typically load the content for the selected language
-    // For now, we'll just log the language change
-    console.log(`Switching to ${lang}`);
-}
-
-// Initialize sidebar state based on screen size
-function initializeSidebar() {
-    const sidebar = document.querySelector('.sidebar');
-    if (window.innerWidth <= 768) {
-        sidebar.classList.add('hidden');
-    } else {
-        sidebar.classList.remove('hidden');
+// Отправляем навигацию родительской странице (главной),
+// чтобы она показывала эти вкладки в своём боковом меню.
+function notifyParentNav() {
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'app-nav', items: TABLET_WIKI_NAV }, '*');
     }
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadSidebar();
-    initializeSidebar();
-    
-    // Setup loading overlay for links and images
+document.addEventListener('DOMContentLoaded', () => {
+    notifyParentNav();
+
+    // Setup loading overlay for external links and images
     const loadingOverlay = document.getElementById('loadingOverlay');
     const loadLinks = document.querySelectorAll('.load-link');
 
@@ -76,8 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Hide loading overlay when window gets focus
 window.onfocus = function () {
     const loadingOverlay = document.getElementById('loadingOverlay');
-    loadingOverlay.style.display = "none";
-}
-
-// Call initializeSidebar when the window is resized
-window.addEventListener('resize', initializeSidebar); 
+    if (loadingOverlay) {
+        loadingOverlay.style.display = "none";
+    }
+};

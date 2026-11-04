@@ -13,6 +13,8 @@ interface SidebarProps {
     isAppOpen?: boolean;
     onCloseApp?: () => void;
     openPath?: string | null;
+    appNavItems?: { label: string; path: string }[];
+    onOpenApp?: (path: string) => void;
 }
 
 const NavLink: React.FC<{ id: string; label: string; onClick: () => void; }> = ({ id, label, onClick }) => {
@@ -28,7 +30,7 @@ const NavLink: React.FC<{ id: string; label: string; onClick: () => void; }> = (
     );
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, onCloseApp, openPath }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, onCloseApp, openPath, appNavItems, onOpenApp }) => {
     const { t } = useContext(LanguageContext) as LanguageContextType;
     const { user, openLogin, openAccount } = useAuth();
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
