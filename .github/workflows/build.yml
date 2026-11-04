@@ -6,7 +6,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: build-deploy
@@ -15,29 +17,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.actor != 'github-actions[bot]'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          # Качаем ТОЛЬКО то, что нужно для сборки. Никаких ручных списков
-          # разделов сайта: статические разделы (gb, projects, nethack3d и т.д.)
-          # просто отсутствуют здесь, поэтому никогда не скачиваются.
-          # Список страниц (pages.json) генерируется из git-дерева и
-          # не требует наличия разделов в рабочей копии.
-          sparse-checkout: |
-            /source
-            /scripts
-            /.github
-            /pages.json
-            /index.html
-            /assets
-            /flags
-            /icons
-            /gallery/gallery.json
-            /music/playlist.json
-          sparse-checkout-cone-mode: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -64,24 +48,32 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
-      - name: Sync build output to site root
-        run: |
-          # Remove previous JS bundles from the site root so only the fresh
-          # build remains (Vite emits assets/index-<hash>.js).
-          rm -f assets/index-*.js
-          rsync -a --exclude='.git' source/dist/ ./
-
       - name: Generate pages manifest
         run: node scripts/generate-pages.mjs
 
-      - name: Commit & push rebuilt site
+      - name: Stage site for Pages
         run: |
-          git add -A --sparse
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "ci: rebuild site from source"
-          git push origin master
+          # Собираем полный снимок сайта: репозиторий (статические
+          # разделы) + свежая сборка Vite поверх.
+          rm -rf _site && mkdir _site
+          rsync -a --exclude='.git' --exclude='source' --exclude='scripts' \
+                --exclude='.github' --exclude='node_modules' --exclude='_site' \
+                ./ _site/
+          rm -f _site/assets/index-*.js
+          rsync -a source/dist/ _site/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
