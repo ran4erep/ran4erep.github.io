@@ -26,26 +26,35 @@ document.addEventListener('DOMContentLoaded', async function() {
     tooltipContainer.className = 'tooltip-container';
     document.body.appendChild(tooltipContainer);
 
+    // Один переиспользуемый тултип (без создания/удаления узлов на каждый
+    // ховер — это вызывало перекомпозитинг 3D-слоёв книги и тряску).
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    tooltip.style.display = 'none';
+    tooltipContainer.appendChild(tooltip);
+
+    const showTooltip = (footnote) => {
+        tooltip.textContent = footnote.getAttribute('data-tooltip');
+        const rect = footnote.getBoundingClientRect();
+        tooltip.style.left = rect.left + (rect.width / 2) + 'px';
+        tooltip.style.top = rect.top - 10 + 'px';
+        tooltip.style.display = 'block';
+    };
+
     // Добавляем обработчики для тултипов
     document.addEventListener('mouseover', function(e) {
-        if (!isMobile) {  // Отключаем тултипы на мобильных
-            const footnote = e.target.closest('.footnote');
-            if (footnote) {
-                const tooltip = document.createElement('div');
-                tooltip.className = 'tooltip';
-                tooltip.textContent = footnote.getAttribute('data-tooltip');
-                
-                const rect = footnote.getBoundingClientRect();
-                tooltip.style.position = 'fixed';
-                tooltip.style.left = rect.left + (rect.width / 2) + 'px';
-                tooltip.style.top = rect.top - 10 + 'px';
-                
-                tooltipContainer.appendChild(tooltip);
-                
-                footnote.addEventListener('mouseleave', function() {
-                    tooltip.remove();
-                }, { once: true });
-            }
+        if (isMobile) return; // Отключаем тултипы на мобильных
+        const footnote = e.target.closest('.footnote');
+        if (footnote) {
+            showTooltip(footnote);
+        }
+    });
+
+    document.addEventListener('mouseout', function(e) {
+        if (isMobile) return;
+        const footnote = e.target.closest('.footnote');
+        if (footnote && !footnote.contains(e.relatedTarget)) {
+            tooltip.style.display = 'none';
         }
     });
     
@@ -307,9 +316,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         const bookHeight = bookElement.offsetHeight || window.innerHeight * 0.94;
         const pageWidth = Math.max(1, (bookElement.offsetWidth || window.innerWidth) / 2);
 
-        // Вертикальные отступы: .stf__item (25px сверху / 35px снизу) +
-        // .page-content (20px сверху / 20px снизу) + запас под номер страницы.
-        const AVAILABLE_HEIGHT = Math.max(120, bookHeight - 25 - 35 - 20 - 20 - 40);
+        // Высота текстовой области: высота страницы минус вертикальные отступы
+        // .stf__item (25/35) и .page-content (20/20). Небольшой запас (16px)
+        // оставляем только чтобы номер страницы не накладывался на текст.
+        const AVAILABLE_HEIGHT = Math.max(120, bookHeight - 25 - 35 - 20 - 20 - 16);
 
         // Настраиваем измерительный элемент под реальную ширину текстовой области:
         // ширина страницы минус боковые отступы .stf__item и .page-content (по 20px с каждой стороны).
