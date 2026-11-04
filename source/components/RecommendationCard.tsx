@@ -13,7 +13,7 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({ category
     const iconClass = languageIcons[category.tech.toLowerCase()] || 'devicon-devicon-plain';
 
     return (
-        <div className="relative isolate group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 flex flex-col transition-all duration-300 hover:border-violet-500 hover:-translate-y-1 overflow-hidden">
+        <div className="relative isolate group bg-slate-800/70 border border-slate-700 rounded-lg p-6 flex flex-col transition-all duration-300 hover:border-violet-500 hover:-translate-y-1 overflow-hidden">
             <h3 className="text-xl font-bold text-violet-400 mb-4">{t(category.titleKey)}</h3>
             <div className="relative z-0 flex-grow overflow-y-auto pr-2 -mr-2 space-y-2 max-h-[250px] custom-scrollbar">
                 {category.links.map(link => (
