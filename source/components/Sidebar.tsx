@@ -52,8 +52,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
     };
     
     return (
-        <aside className={`fixed top-0 left-0 h-full bg-[#101218f2] border-r border-white/10 z-40 transform-gpu transition-transform duration-300 ease-in-out w-[85%] sm:w-[60%] md:w-[22%] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-            <div className="flex flex-col h-full p-4 overflow-y-auto">
+        <aside className={`fixed top-0 left-0 h-full border-r border-white/10 z-40 transform-gpu transition-transform duration-300 ease-in-out w-[85%] sm:w-[60%] md:w-[22%] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            {/* Фоновый слой с блюром отделён от интерактивного контента:
+                ховер по пунктам меню не инвалидирует backdrop-filter и не
+                дёргает лежащий под панелью iframe. */}
+            <div className="absolute inset-0 bg-[#101218e6] backdrop-blur-lg" aria-hidden="true" />
+            <div className="relative flex flex-col h-full p-4 overflow-y-auto">
                 <div className="text-center mb-4 shrink-0">
                     <div className="w-20 h-20 mx-auto mb-2 rounded-full p-[3px] bg-gradient-to-r from-violet-500 via-pink-500 to-violet-500 animate-gradient-pulse bg-[size:200%_auto]">
                         <img src="https://ran4erep.github.io/logo.png" alt="Avatar" className="w-full h-full rounded-full object-cover bg-[#101218]" />
