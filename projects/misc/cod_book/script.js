@@ -411,9 +411,16 @@ document.addEventListener('DOMContentLoaded', async function() {
         };
 
         for (const block of blocks) {
+            // Иллюстрации идут в потоке текста (inline), а не отдельной
+            // страницей — так текст заполняет страницы полностью.
             if (block.type === 'image') {
-                commitPage();
-                pages.push(`<div class="book-cover illustration-page"><img src="${block.src}" alt="Иллюстрация"></div>`);
+                const imageCandidateRaw = pageRaw ? pageRaw + '\n' + block.raw : block.raw;
+                if (fits(formatContent(imageCandidateRaw))) {
+                    pageRaw = imageCandidateRaw;
+                } else {
+                    commitPage();
+                    pageRaw = block.raw;
+                }
                 continue;
             }
 
@@ -467,6 +474,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // Обрабатываем заголовки в строгом формате "--- Текст ---"
         content = content.replace(/---\s+(.+?)\s+---/g, '<h2>$1</h2>');
+
+        // Иллюстрации встраиваем в поток текста (как на мобильных).
+        content = content.replace(/<img\/([^>]+)>/g, '<div class="book-illustration"><img src="$1" alt="Иллюстрация"></div>');
         
         // Обрабатываем текст в квадратных скобках - подчеркивание
         content = content.replace(/\[([^\]]+)\]/g, '<u>$1</u>');
