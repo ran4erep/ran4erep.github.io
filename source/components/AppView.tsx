@@ -37,11 +37,16 @@ export const AppView: React.FC<AppViewProps> = ({ path, title }) => {
 
                 // Переносим кастомный курсор с родительской страницы в iframe,
                 // чтобы он работал и внутри открытых приложений.
+                // Тот же приём, что на основном сайте: кастомный на корне,
+                // а интерактивные элементы наследуют его (cursor: inherit).
                 const parentCursor = window.getComputedStyle(document.body).cursor;
                 if (parentCursor && parentCursor !== 'auto') {
                     const cursorStyle = doc.createElement('style');
                     cursorStyle.textContent =
-                        `html, body, * { cursor: ${parentCursor} !important; }`;
+                        `html, body { cursor: ${parentCursor}; }` +
+                        `a, a:any-link, button, input, select, textarea, label, summary, ` +
+                        `[role="button"], [role="link"], [onclick], [href], [draggable="true"] { ` +
+                        `cursor: inherit !important; }`;
                     doc.head.appendChild(cursorStyle);
                 }
             } catch {}
