@@ -77,11 +77,11 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
 
     useEffect(() => {
         if (isOpen) {
-            // The timeout ensures that the scroll happens after the modal's render and animation,
-            // reliably scrolling to the latest message.
+            // Ожидаем рендер модалки, затем мгновенно перескакиваем в конец
+            // (без анимации прокрутки с первого сообщения).
             const timerId = setTimeout(() => {
-                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-            }, 100);
+                messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+            }, 50);
             return () => clearTimeout(timerId);
         }
     }, [messages, isOpen]);
