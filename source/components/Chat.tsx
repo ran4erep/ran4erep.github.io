@@ -145,8 +145,11 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
 
     return (
         <>
-            <button onClick={() => setIsOpen(!isOpen)} id="new-chat-button" className="group fixed bottom-5 right-5 w-14 h-14 bg-violet-600 hover:bg-violet-500 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95 z-[100]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <button onClick={() => setIsOpen(!isOpen)} id="new-chat-button" className="group fixed bottom-5 right-5 w-14 h-14 bg-slate-900/70 backdrop-blur-lg border border-slate-700 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/70 hover:scale-110 active:scale-95 z-[100]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <g stroke="#000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></g>
+                    <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></g>
+                </svg>
                 <span className="tooltip">{t('chat_tooltip')}</span>
             </button>
             {isOpen && (
