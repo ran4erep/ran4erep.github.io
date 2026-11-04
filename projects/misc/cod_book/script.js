@@ -313,38 +313,26 @@ document.addEventListener('DOMContentLoaded', async function() {
         pages = [];
         pages.push(''); // обложка
 
-        // Динамически узнаём реальные размеры и отступы из действующих стилей,
-        // чтобы разбивка работала на ЛЮБОМ разрешении без хардкода.
-        const bookWidth = bookElement.offsetWidth || window.innerWidth;
+        // Динамически узнаём реальные размеры страницы из действующих стилей:
+        // создаём скрытую копию настоящей страницы (.stf__item > .page-content)
+        // в реальных размерах — измерение тогда совпадает с рендером 1:1,
+        // без хардкода и без «не сходится» на стыках страниц.
+        const pageOuterWidth = Math.max(1, (bookElement.offsetWidth || window.innerWidth) / 2);
         const bookHeight = bookElement.offsetHeight || window.innerHeight * 0.94;
 
-        // Прозондируем реальный элемент страницы (.stf__item), чтобы снять
-        // его фактические внутренние отступы (не зашитые в код).
-        const probeItem = document.createElement('div');
-        probeItem.className = 'stf__item';
-        probeItem.style.position = 'absolute';
-        probeItem.style.visibility = 'hidden';
-        document.body.appendChild(probeItem);
-        const itemStyle = window.getComputedStyle(probeItem);
-        const itemPadTop = parseFloat(itemStyle.paddingTop) || 0;
-        const itemPadBottom = parseFloat(itemStyle.paddingBottom) || 0;
-        const itemPadLeft = parseFloat(itemStyle.paddingLeft) || 0;
-        const itemPadRight = parseFloat(itemStyle.paddingRight) || 0;
-        probeItem.remove();
+        const probePage = document.createElement('div');
+        probePage.className = 'stf__item';
+        probePage.style.position = 'absolute';
+        probePage.style.visibility = 'hidden';
+        probePage.style.width = pageOuterWidth + 'px';
+        probePage.style.height = bookHeight + 'px';
 
-        // Отступы самого .page-content (снимаем с измерительного элемента).
-        const contentStyle = window.getComputedStyle(testElement);
-        const contentPadTop = parseFloat(contentStyle.paddingTop) || 0;
-        const contentPadBottom = parseFloat(contentStyle.paddingBottom) || 0;
-        const contentPadLeft = parseFloat(contentStyle.paddingLeft) || 0;
-        const contentPadRight = parseFloat(contentStyle.paddingRight) || 0;
-
-        const pageOuterWidth = Math.max(1, bookWidth / 2);
-        const pageOuterHeight = bookHeight;
-
-        // Реальная ширина/высота текстовой области страницы.
-        const textWidth = Math.max(1, pageOuterWidth - itemPadLeft - itemPadRight - contentPadLeft - contentPadRight);
-        const textHeight = Math.max(1, pageOuterHeight - itemPadTop - itemPadBottom - contentPadTop - contentPadBottom);
+        const probeContent = document.createElement('div');
+        probeContent.className = 'page-content';
+        probeContent.style.padding = '0';
+        probeContent.style.height = '100%';
+        probePage.appendChild(probeContent);
+        document.body.appendChild(probePage);
 
         // Реальная высота подписи-номера страницы (она абсолютная, но текст
         // не должен под неё залезать).
@@ -357,17 +345,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         const pageNumberHeight = probePageNumber.offsetHeight || 24;
         probePageNumber.remove();
 
-        const AVAILABLE_HEIGHT = Math.max(120, textHeight - pageNumberHeight - 8);
-
-        // Измерительный элемент: ширина = ширина текстовой области,
-        // собственные отступы обнуляем (чтобы scrollHeight был чистой высотой текста).
-        testElement.style.width = textWidth + 'px';
-        testElement.style.height = 'auto';
-        testElement.style.padding = '0';
+        const AVAILABLE_HEIGHT = Math.max(120, probeContent.clientHeight - pageNumberHeight - 12);
 
         const fits = (rawHtml) => {
-            testElement.innerHTML = rawHtml;
-            return testElement.scrollHeight <= AVAILABLE_HEIGHT;
+            probeContent.innerHTML = rawHtml;
+            return probeContent.scrollHeight <= AVAILABLE_HEIGHT;
         };
 
         // Разбивает одну длинную строку на куски, каждый из которых помещается на странице.
@@ -411,16 +393,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         };
 
         for (const block of blocks) {
-            // Иллюстрации идут в потоке текста (inline), а не отдельной
-            // страницей — так текст заполняет страницы полностью.
+            // Иллюстрации — по одной на отдельную страницу (во весь лист).
             if (block.type === 'image') {
-                const imageCandidateRaw = pageRaw ? pageRaw + '\n' + block.raw : block.raw;
-                if (fits(formatContent(imageCandidateRaw))) {
-                    pageRaw = imageCandidateRaw;
-                } else {
-                    commitPage();
-                    pageRaw = block.raw;
-                }
+                commitPage();
+                pages.push(`<div class="book-cover illustration-page"><img src="${block.src}" alt="Иллюстрация"></div>`);
                 continue;
             }
 
@@ -474,9 +450,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // Обрабатываем заголовки в строгом формате "--- Текст ---"
         content = content.replace(/---\s+(.+?)\s+---/g, '<h2>$1</h2>');
-
-        // Иллюстрации встраиваем в поток текста (как на мобильных).
-        content = content.replace(/<img\/([^>]+)>/g, '<div class="book-illustration"><img src="$1" alt="Иллюстрация"></div>');
         
         // Обрабатываем текст в квадратных скобках - подчеркивание
         content = content.replace(/\[([^\]]+)\]/g, '<u>$1</u>');
@@ -641,9 +614,9 @@ document.addEventListener('DOMContentLoaded', async function() {
             margin: 0;
         }
         .book-cover.illustration-page img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
             display: block;
         }
         .bookmark-button {

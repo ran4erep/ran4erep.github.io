@@ -59,7 +59,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
             <div className="absolute inset-0 bg-[#101218e6] backdrop-blur-lg" aria-hidden="true" />
             <div className="relative flex flex-col h-full p-4 overflow-y-auto custom-scrollbar">
                 <div className="text-center mb-4 shrink-0">
-                    <div className="w-20 h-20 mx-auto mb-2 rounded-full p-[3px] bg-gradient-to-r from-violet-500 via-pink-500 to-violet-500 animate-gradient-pulse bg-[size:200%_auto]">
+                    <div className="w-20 h-20 mx-auto mb-2 rounded-full p-[3px] bg-gradient-to-r from-violet-500 via-pink-500 to-violet-500 bg-[size:200%_auto]">
                         <img src="https://ran4erep.github.io/logo.png" alt="Avatar" className="w-full h-full rounded-full object-cover bg-[#101218]" />
                     </div>
                 </div>

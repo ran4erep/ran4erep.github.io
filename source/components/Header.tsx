@@ -77,7 +77,7 @@ export const Header: React.FC = () => {
             </div>
 
             <div className="text-center">
-                <h1 className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-500 via-pink-500 to-violet-500 animate-gradient-pulse bg-[size:200%_auto]">
+                <h1 className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-500 via-pink-500 to-violet-500 bg-[size:200%_auto]">
                     ran4erep's HUB
                 </h1>
             </div>
