@@ -1,7 +1,6 @@
 
 
 import React, { useState, useEffect, createContext, useCallback, useMemo } from 'react';
-import { createPortal } from 'react-dom';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { ProjectCard } from './components/ProjectCard';
@@ -67,24 +66,6 @@ const App: React.FC = () => {
     useEffect(() => {
         setAppNavItems([]);
     }, [openPath]);
-
-    // Отключаем дорогой backdrop-filter на время активной прокрутки,
-    // чтобы скролл не нагружал CPU (см. body.is-scrolling в index.html).
-    useEffect(() => {
-        const rootEl = document.getElementById('root');
-        if (!rootEl) return;
-        let timer: number | undefined;
-        const onScroll = () => {
-            document.body.classList.add('is-scrolling');
-            window.clearTimeout(timer);
-            timer = window.setTimeout(() => document.body.classList.remove('is-scrolling'), 150);
-        };
-        rootEl.addEventListener('scroll', onScroll, { passive: true });
-        return () => {
-            rootEl.removeEventListener('scroll', onScroll);
-            window.clearTimeout(timer);
-        };
-    }, []);
 
     useEffect(() => {
         localStorage.setItem('language', lang);
@@ -187,15 +168,32 @@ const App: React.FC = () => {
     return (
         <LanguageContext.Provider value={languageContextValue}>
             <AuthProvider>
-            {createPortal(
-                <>
-                    <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat -z-10" style={{ backgroundImage: "url('bg.webp')" }} />
-                    <div className="fixed inset-0 w-full h-full bg-[#0f1116] opacity-90 -z-10" />
-                </>,
-                document.body
-            )}
+            {/* Layer 1: Background Image */}
+            <div 
+                className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: "url('bg.webp')" }}
+            ></div>
+            {/* Layer 2: Dark Overlay */}
+            <div className="fixed inset-0 w-full h-full bg-[#0f1116] opacity-90"></div>
+            
+            {/* Layer 3: Content */}
             <div className="relative min-h-screen text-gray-200">
+                 <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="fixed top-4 left-4 p-2 rounded-xl bg-slate-900/70 backdrop-blur-lg border border-slate-700 shadow-2xl hover:bg-slate-800/70 transition-all z-50 active:scale-95" aria-label="Toggle sidebar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <g stroke="#000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </g>
+                        <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </g>
+                    </svg>
+                </button>
                 <div className="flex">
+                    <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} isAppOpen={!!openPath} onCloseApp={closeApp} openPath={openPath} appNavItems={appNavItems} onOpenApp={openApp} />
                     <main className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-[22%]' : 'ml-0'} w-full md:w-auto`}>
                         {openPath ? (
                             <AppView path={openPath} title={pages.find(p => p.path === openPath)?.title || openPath} />
@@ -238,30 +236,10 @@ const App: React.FC = () => {
                         )}
                     </main>
                 </div>
+                <Chat isSidebarOpen={isSidebarOpen} />
+                <FloatingButtons />
+                <AuthModals />
             </div>
-            {createPortal(
-                <>
-                    <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="fixed top-4 left-4 p-2 rounded-xl bg-slate-900/70 backdrop-blur-lg border border-slate-700 shadow-2xl hover:bg-slate-800/70 transition-all z-50 active:scale-95" aria-label="Toggle sidebar">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <g stroke="#000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="3" y1="12" x2="21" y2="12"></line>
-                                <line x1="3" y1="6" x2="21" y2="6"></line>
-                                <line x1="3" y1="18" x2="21" y2="18"></line>
-                            </g>
-                            <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="3" y1="12" x2="21" y2="12"></line>
-                                <line x1="3" y1="6" x2="21" y2="6"></line>
-                                <line x1="3" y1="18" x2="21" y2="18"></line>
-                            </g>
-                        </svg>
-                    </button>
-                    <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} isAppOpen={!!openPath} onCloseApp={closeApp} openPath={openPath} appNavItems={appNavItems} onOpenApp={openApp} />
-                    <Chat isSidebarOpen={isSidebarOpen} />
-                    <FloatingButtons />
-                    <AuthModals />
-                </>,
-                document.body
-            )}
             </AuthProvider>
         </LanguageContext.Provider>
     );
