@@ -20,7 +20,7 @@ export const AppView: React.FC<AppViewProps> = ({ path, title }) => {
         const iframe = iframeRef.current;
         if (!iframe) return;
 
-        const applyDefaultTextColor = () => {
+        const applyFixes = () => {
             if (!iframe.contentDocument) return;
             try {
                 const doc = iframe.contentDocument;
@@ -34,14 +34,24 @@ export const AppView: React.FC<AppViewProps> = ({ path, title }) => {
                     style.textContent = 'body { color: #f3f4f6; }';
                     doc.head.appendChild(style);
                 }
+
+                // Переносим кастомный курсор с родительской страницы в iframe,
+                // чтобы он работал и внутри открытых приложений.
+                const parentCursor = window.getComputedStyle(document.body).cursor;
+                if (parentCursor && parentCursor !== 'auto') {
+                    const cursorStyle = doc.createElement('style');
+                    cursorStyle.textContent =
+                        `html, body, * { cursor: ${parentCursor} !important; }`;
+                    doc.head.appendChild(cursorStyle);
+                }
             } catch {}
         };
 
-        iframe.addEventListener('load', applyDefaultTextColor);
+        iframe.addEventListener('load', applyFixes);
         if (iframe.contentDocument?.readyState === 'complete') {
-            applyDefaultTextColor();
+            applyFixes();
         }
-        return () => iframe.removeEventListener('load', applyDefaultTextColor);
+        return () => iframe.removeEventListener('load', applyFixes);
     }, [path]);
 
     return (
