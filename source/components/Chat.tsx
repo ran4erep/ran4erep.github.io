@@ -74,17 +74,6 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
         return () => unsubscribe();
     }, []);
 
-    useEffect(() => {
-        if (isOpen) {
-            // Ожидаем рендер модалки, затем мгновенно перескакиваем в конец
-            // (без анимации прокрутки с первого сообщения).
-            const timerId = setTimeout(() => {
-                messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-            }, 50);
-            return () => clearTimeout(timerId);
-        }
-    }, [messages, isOpen]);
-
     const resizeImage = (file: File): Promise<string> => {
         return new Promise((resolve) => {
             const reader = new FileReader();
