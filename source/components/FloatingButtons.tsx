@@ -38,7 +38,7 @@ export const FloatingButtons: React.FC = () => {
     return (
         <div className="fixed bottom-24 right-5 z-50 flex flex-col gap-3">
             {isVisible && (
-                <button onClick={scrollToTop} id="new-scroll-top" className="group w-14 h-14 bg-slate-900/70 backdrop-blur-lg border border-slate-700 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/70 hover:scale-110 active:scale-95">
+                <button onClick={scrollToTop} id="new-scroll-top" className="group w-14 h-14 bg-slate-900/35 backdrop-blur-xl border border-slate-700/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/45 hover:scale-110 active:scale-95">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                         <g stroke="#000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></g>
                         <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></g>

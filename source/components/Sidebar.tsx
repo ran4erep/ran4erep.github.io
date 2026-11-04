@@ -30,7 +30,7 @@ const NavLink: React.FC<{ id: string; label: string; onClick: () => void; }> = (
     );
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, onCloseApp, openPath, appNavItems, onOpenApp }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, onCloseApp, openPath, appNavItems = [], onOpenApp }) => {
     const { t } = useContext(LanguageContext) as LanguageContextType;
     const { user, openLogin, openAccount } = useAuth();
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -103,6 +103,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
                                     {t('nav_go_to_page')}
                                 </a>
+                            )}
+                            {appNavItems.length > 0 && (
+                                <div className="border-t border-white/10 my-2 pt-2 space-y-1">
+                                    {appNavItems.map(item => (
+                                        <button
+                                            key={item.path}
+                                            onClick={() => {
+                                                if (window.innerWidth <= 768) {
+                                                    setIsOpen(false);
+                                                }
+                                                onOpenApp?.(item.path);
+                                            }}
+                                            title={item.label}
+                                            className="w-full text-left flex items-start gap-2 px-3 py-2 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors duration-200 text-sm"
+                                        >
+                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0"><path d="M4 19.5A2.5 2.5 0 0 1 1.5 17V7a2.5 2.5 0 0 1 2.5-2.5h15a2.5 2.5 0 0 1 2.5 2.5v10a2.5 2.5 0 0 1-2.5 2.5z"/><path d="M1.5 8.5h21"/></svg>
+                                            <span className="truncate">{item.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
                             )}
                         </>
                     )}
