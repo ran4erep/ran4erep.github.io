@@ -63,6 +63,8 @@
         };
     }
 
+    /* ---------------- Поиск по проектам ---------------- */
+
     function clearFlashes() {
         qsa('.hub-flash').forEach(function (el) { el.classList.remove('hub-flash'); });
     }
@@ -106,25 +108,46 @@
         return input;
     }
 
-    function reconcileHeader() {
-        var main = document.querySelector('#root main');
-        if (!main) return;
-        var header = main.querySelector('header');
-        if (!header) return;
-        var row = header.firstElementChild;
-        if (!row || !row.classList.contains('flex')) return;
+    /* ---------------- Шапка ---------------- */
 
-        // 1) Блок ближе к верхней границе экрана.
+    function isClockDiv(el) {
+        if (el.tagName !== 'DIV') return false;
+        var text = (el.textContent || '').trim();
+        if (!/^\d{1,2}:\d{2}$/.test(text)) return false;
+        // часы — это блок с классом hidden + sm:flex (скрывается на мобильных)
+        var cls = (el.className || '').split(/\s+/);
+        if (cls.indexOf('hidden') !== -1) return true;
+        // запасной вариант: пустой див только с текстом времени
+        return el.children.length === 0;
+    }
+
+    function findHeaderContext() {
+        var main = document.querySelector('#root main');
+        if (!main) return null;
+        var header = main.querySelector('header');
+        if (!header) return null;
+        var row = header.firstElementChild;
+        if (!row || !row.classList.contains('flex')) return null;
+        return { header: header, row: row };
+    }
+
+    function reconcileHeader() {
+        var ctx = findHeaderContext();
+        if (!ctx) return;
+        var header = ctx.header;
+        var row = ctx.row;
+
+        // Блок ближе к верхней границе экрана.
         var wrap = header.parentElement;
+        var main = document.querySelector('#root main');
         if (wrap && wrap !== main) wrap.style.paddingTop = '6px';
 
-        // 2) Убираем часы (блок с временем HH:MM).
-        Array.prototype.slice.call(row.children).filter(function (child) {
-            return child.tagName === 'DIV' && child.children.length === 0 &&
-                /^\d{1,2}:\d{2}$/.test((child.textContent || '').trim());
-        }).forEach(function (el) { el.remove(); });
+        // Убираем часы.
+        Array.prototype.slice.call(row.children).forEach(function (child) {
+            if (isClockDiv(child)) child.remove();
+        });
 
-        // 3) Находим блок выбора языка (две кнопки с флагами RU/US).
+        // Блок выбора языка (две кнопки с флагами RU/US).
         var langBlock = null;
         Array.prototype.slice.call(row.children).forEach(function (child) {
             if (!langBlock && child.tagName === 'DIV' &&
@@ -133,27 +156,27 @@
             }
         });
 
-        // 4) Кнопка входа (или аккаунта).
+        // Кнопка входа (или аккаунта).
         var btn = qsa('button', row).filter(function (b) {
             return b.getAttribute('aria-label') === 'auth_login_submit' ||
                 /Войти|Sign in|Увійти/i.test(b.textContent || '');
         })[0] || null;
 
-        // 5) Строка поиска слева.
+        // Строка поиска слева.
         var search = row.querySelector('.hub-search');
         if (!search) {
             search = makeSearchInput();
             row.insertBefore(search, row.firstChild);
         }
 
-        // 6) Порядок: [поиск, язык] слева, кнопка справа.
+        // Порядок: [поиск, язык] слева, кнопка справа.
         if (langBlock) {
             row.insertBefore(langBlock, btn || null);
         }
         row.style.justifyContent = 'space-between';
         row.style.gap = '10px';
 
-        // 7) Иконка на кнопке входа (как в боковом меню).
+        // Иконка на кнопке входа (как в боковом меню).
         if (btn && !btn.querySelector('svg')) {
             var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '0 0 24 24');
@@ -171,6 +194,8 @@
         }
     }
 
+    /* ---------------- Наблюдение за DOM ---------------- */
+
     function startObserver() {
         var root = document.getElementById('root');
         if (!root) return;
@@ -186,7 +211,19 @@
         mo.observe(root, { childList: true, subtree: true });
     }
 
+    // Резервная проверка: применяем, даже если MutationObserver пропустил
+    // первичную отрисовку (например, очень быстрый рендер).
+    function startPolling() {
+        var tries = 0;
+        var timer = setInterval(function () {
+            tries++;
+            try { reconcileHeader(); } catch (e) { /* ignore */ }
+            if (tries >= 60) clearInterval(timer); // ~30 секунд
+        }, 500);
+    }
+
     injectCss();
     startObserver();
+    startPolling();
     try { reconcileHeader(); } catch (e) { /* ignore */ }
 })();

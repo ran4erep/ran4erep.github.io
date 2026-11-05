@@ -21,7 +21,6 @@ const els = {
     loader: document.getElementById('loader'),
     loadMsg: document.getElementById('loadMsg'),
     pbarFill: document.getElementById('pbarFill'),
-    hint: document.getElementById('hint'),
 };
 
 const state = {
@@ -39,7 +38,6 @@ const state = {
 };
 
 const cache = new Map();     // индекс страницы -> canvas
-const inflight = new Set();  // рендеры в фоне (апгрейд чёткости)
 
 /* ================= Разметка книги ================= */
 
@@ -91,10 +89,14 @@ function makeBlank() {
     return d;
 }
 
-async function renderPage(idx, targetPx) {
+// Полный качественный рендер сразу (ретина до 2x). Размытых промежуточных
+// версий нет: страница появляется только готовой.
+async function getCanvas(idx) {
+    if (cache.has(idx)) return cache.get(idx);
     const page = await state.doc.getPage(idx + 1);
     const vpBase = page.getViewport({ scale: 1 });
-    const scale = Math.min(3, Math.max(0.5, targetPx / vpBase.width));
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const scale = Math.min(3, Math.max(0.5, (state.pw * dpr) / vpBase.width));
     const vp = page.getViewport({ scale });
     const canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.round(vp.width));
@@ -103,47 +105,12 @@ async function renderPage(idx, targetPx) {
     canvas.dataset.page = String(idx);
     const ctx = canvas.getContext('2d');
     await page.render({ canvasContext: ctx, viewport: vp }).promise;
-    return canvas;
-}
-
-// Быстрый рендер (1:1 к размеру на экране) — страница видна сразу.
-async function getCanvas(idx) {
-    if (cache.has(idx)) return cache.get(idx);
-    const canvas = await renderPage(idx, state.pw);
     cache.set(idx, canvas);
     while (cache.size > CACHE_MAX) {
         const k = cache.keys().next().value;
         cache.delete(k);
     }
     return canvas;
-}
-
-// Апгрейд до чёткого (ретина) рендера в фоне, когда есть время.
-async function upgradePage(idx) {
-    if (idx == null || idx < 0 || idx >= state.numPages) return;
-    if (inflight.has(idx) || !cache.has(idx)) return;
-    inflight.add(idx);
-    try {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const hi = await renderPage(idx, state.pw * dpr);
-        cache.set(idx, hi);
-        const holder = els.book.querySelector(`canvas[data-page="${idx}"]`);
-        if (holder && holder !== hi) holder.replaceWith(hi);
-    } catch (err) {
-        console.error(err);
-    } finally {
-        inflight.delete(idx);
-    }
-}
-
-function upgradeSoon(idxs) {
-    const valid = idxs.filter(i => i != null && i >= 0 && i < state.numPages);
-    let p = Promise.resolve();
-    valid.forEach((idx, k) => {
-        p = p.then(
-            () => new Promise(r => setTimeout(r, 150 + k * 120))
-        ).then(() => upgradePage(idx));
-    });
 }
 
 function faceCanvasSync(face, idx) {
@@ -239,7 +206,7 @@ async function goToSpread(target, dir) {
         paintSlot(els.slots.left, cur.l);
         paintSlot(els.slots.right, tgt.r);
         layer = buildFlip({ hinge: 'left', frontIdx: cur.r, backIdx: tgt.l });
-        layer.style.left = (state.pw + 6) + 'px';
+        layer.style.left = state.pw + 'px';
     } else {
         paintSlot(els.slots.left, tgt.l);
         paintSlot(els.slots.right, cur.r);
@@ -283,7 +250,6 @@ function afterNav() {
     saveMark();
     updateUI();
     prefetchNear();
-    upgradeSoon(currentIdxs());
     const d = state.pending;
     state.pending = null;
     if (d) setTimeout(() => nav(d), 20);
@@ -324,7 +290,6 @@ function goSpreadInstant(target) {
     saveMark();
     updateUI();
     prefetchNear();
-    upgradeSoon(currentIdxs());
 }
 
 function goPageInstant(target) {
@@ -335,7 +300,6 @@ function goPageInstant(target) {
     saveMark();
     updateUI();
     prefetchNear();
-    upgradeSoon(currentIdxs());
 }
 
 /* ================= UI ================= */
@@ -344,25 +308,19 @@ function updateUI() {
     // Верхняя панель управления убрана — обновлять нечего.
 }
 
-function currentIdxs() {
-    if (state.mode === 'double') {
-        const s = state.spreads[state.spread];
-        return [s.l, s.r];
-    }
-    return [state.page];
-}
-
 function prefetchNear() {
     if (state.mode === 'double') {
         const s = state.spreads[state.spread];
         const idxs = [s.l, s.r];
         const nxt = state.spreads[state.spread + 1];
+        const nxt2 = state.spreads[state.spread + 2];
         const prv = state.spreads[state.spread - 1];
         if (nxt) idxs.push(nxt.l, nxt.r);
+        if (nxt2) idxs.push(nxt2.l, nxt2.r);
         if (prv) idxs.push(prv.l, prv.r);
         preload(idxs);
     } else {
-        preload([state.page - 1, state.page, state.page + 1]);
+        preload([state.page - 2, state.page - 1, state.page, state.page + 1, state.page + 2]);
     }
 }
 
@@ -427,7 +385,6 @@ function onResize() {
         paintSlot(els.slots.single, state.page);
     }
     updateUI();
-    upgradeSoon(currentIdxs());
 }
 
 function debounce(fn, ms) {
@@ -520,10 +477,6 @@ async function init() {
         updateUI();
         showLoader(false);
         prefetchNear();
-        upgradeSoon(currentIdxs());
-
-        setTimeout(() => els.hint.classList.add('show'), 500);
-        setTimeout(() => els.hint.classList.remove('show'), 7000);
     } catch (err) {
         console.error(err);
         loaderMessage('Не удалось открыть книгу: ' + err.message);
