@@ -30,7 +30,7 @@ function makeJwt() {
     const header = { alg: 'RS256', typ: 'JWT' };
     const payload = {
         iss: sa.client_email,
-        scope: 'https://www.googleapis.com/auth/firebase.database',
+        scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/firebase.database',
         aud: 'https://oauth2.googleapis.com/token',
         iat: now,
         exp: now + 3600,
