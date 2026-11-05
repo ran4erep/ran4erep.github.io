@@ -276,11 +276,13 @@ html, body {
     position: absolute;
     inset: 0;
     overflow-y: auto;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     background: transparent;
     display: none;
     padding: 12px 0;
+    touch-action: pan-y;
     transition: opacity 0.4s ease;
 }
 
@@ -289,7 +291,7 @@ html, body {
 }
 
 .m-page {
-    width: 100%;
+    width: calc(100% * var(--z, 1));
     aspect-ratio: var(--ar);
     position: relative;
     background: var(--paper);

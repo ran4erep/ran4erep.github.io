@@ -125,6 +125,23 @@ const App: React.FC = () => {
         window.history.pushState({}, '', url.toString());
     }, []);
 
+    // Обработчик кликов по пунктам моста. Пункты вида "cod_book:page=N"
+    // не открывают приложение, а передают команду внутрь книги (iframe).
+    const handleOpenApp = useCallback((path: string) => {
+        const m = path.match(/^cod_book:page=(\d+)$/);
+        if (m) {
+            const frame = document.querySelector('#root main iframe') as HTMLIFrameElement | null;
+            if (frame && frame.contentWindow) {
+                frame.contentWindow.postMessage(
+                    { type: 'book-goto', page: parseInt(m[1], 10) },
+                    window.location.origin
+                );
+            }
+            return;
+        }
+        openApp(path);
+    }, [openApp]);
+
     const closeApp = useCallback(() => {
         setOpenPath(null);
         const url = new URL(window.location.href);
@@ -193,7 +210,7 @@ const App: React.FC = () => {
                     </svg>
                 </button>
                 <div className="flex">
-                    <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} isAppOpen={!!openPath} onCloseApp={closeApp} openPath={openPath} appNavItems={appNavItems} onOpenApp={openApp} />
+                    <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} isAppOpen={!!openPath} onCloseApp={closeApp} openPath={openPath} appNavItems={appNavItems} onOpenApp={handleOpenApp} />
                     <main className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-[45%] lg:ml-[22%]' : 'ml-0'} w-full md:w-auto`}>
                         {openPath ? (
                             <AppView path={openPath} title={pages.find(p => p.path === openPath)?.title || openPath} />

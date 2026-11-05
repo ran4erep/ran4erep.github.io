@@ -42,6 +42,7 @@ const state = {
 const cache = new Map();     // индекс страницы -> canvas
 const mobReady = new Set();  // какие мобильные страницы уже отрисованы
 let mobIO = null;
+let currentZoom = 1;         // текущий масштаб мобильного читателя
 
 /* ================= PDF: загрузка с кэшем ================= */
 
@@ -317,6 +318,10 @@ function buildMobile() {
         }
     }, { root: r, rootMargin: '600px 0px', threshold: 0 });
     Array.from(r.children).forEach(slot => mobIO.observe(slot));
+
+    // Применяем сохранённый масштаб.
+    currentZoom = loadZoom();
+    r.style.setProperty('--z', currentZoom);
 }
 
 async function loadMobPage(i) {
@@ -368,6 +373,83 @@ function restoreMobile() {
     } else if (state.page > 0) {
         setTimeout(() => scrollToPage(state.page), 30);
     }
+}
+
+/* ================= Масштабирование (пинч-зум) ================= */
+
+const ZOOM_KEY = 'cod_book_zoom';
+const ZOOM_MIN = 0.8;
+const ZOOM_MAX = 4;
+
+function loadZoom() {
+    try {
+        const v = parseFloat(localStorage.getItem(ZOOM_KEY));
+        return v > 0 && Number.isFinite(v) ? Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, v)) : 1;
+    } catch (e) {
+        return 1;
+    }
+}
+
+function saveZoom() {
+    try { localStorage.setItem(ZOOM_KEY, String(currentZoom)); } catch (e) { /* ignore */ }
+}
+
+function applyZoom(z) {
+    currentZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z));
+    els.mobileReader.style.setProperty('--z', currentZoom);
+    saveZoom();
+}
+
+function installPinchZoom() {
+    const r = els.mobileReader;
+    let pinch = null;
+
+    function pinchState(e) {
+        const ts = Array.from(e.touches);
+        if (ts.length < 2) return null;
+        const rect = r.getBoundingClientRect();
+        const a = ts[0], b = ts[1];
+        const dx = b.clientX - a.clientX;
+        const dy = b.clientY - a.clientY;
+        return {
+            dist: Math.hypot(dx, dy),
+            cx: (a.clientX + b.clientX) / 2 - rect.left,
+            cy: (a.clientY + b.clientY) / 2 - rect.top,
+        };
+    }
+
+    r.addEventListener('touchstart', () => {
+        pinch = null;
+    }, { passive: true });
+
+    r.addEventListener('touchmove', (e) => {
+        if (e.touches.length < 2) return;
+        const now = pinchState(e);
+        if (!now) return;
+        e.preventDefault();
+
+        if (!pinch) {
+            // Начало пинча: фиксируем базу.
+            pinch = { dist: now.dist, zoom: currentZoom, cx: now.cx, cy: now.cy };
+            return;
+        }
+
+        const k = now.dist / pinch.dist;
+        const newZ = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, pinch.zoom * k));
+        if (newZ === currentZoom) return;
+
+        const coeff = newZ / currentZoom;
+        // Сохраняем контентную точку под центром жеста.
+        r.scrollLeft = (r.scrollLeft + pinch.cx) * coeff - now.cx;
+        r.scrollTop = (r.scrollTop + pinch.cy) * coeff - now.cy;
+
+        applyZoom(newZ);
+        pinch = { dist: now.dist, zoom: newZ, cx: now.cx, cy: now.cy };
+    }, { passive: false });
+
+    r.addEventListener('touchend', () => {
+        pinch = null;
+    }, { passive: true });
 }
 
 /* ================= Закладка ================= */
@@ -565,11 +647,70 @@ function loaderMessage(text) {
     els.loadMsg.textContent = text;
 }
 
+/* ================= Мост: ссылки на главы ================= */
+
+const CHAPTERS = [
+    { label: 'Пролог', page: 2 },
+    { label: 'Глава 1. Новая жизнь', page: 10 },
+    { label: 'Глава 2. Дорога в никуда', page: 16 },
+    { label: 'Глава 3. Демон под личиной человека', page: 35 },
+    { label: 'Глава 4. Город мёртвых', page: 50 },
+    { label: 'Глава 5. В капкане', page: 58 },
+    { label: 'Глава 6. Последний бастион', page: 67 },
+    { label: 'Глава 7. За всё придётся платить', page: 79 },
+    { label: 'Эпилог', page: 89 },
+];
+
+let pendingGoto = null; // страница, запрошенная до готовности книги
+
+// Отправляем в боковое меню сайта список глав (через мост app-nav).
+function sendChapterNav() {
+    try {
+        const items = CHAPTERS.map(c => ({ label: c.label, path: 'cod_book:page=' + c.page }));
+        window.parent.postMessage({ type: 'app-nav', items }, window.location.origin);
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+// Переход к странице книги (idx — индекс 0-based).
+function goToBookPage(idx) {
+    if (state.mode === 'single') {
+        state.page = idx;
+        scrollToPage(idx);
+        saveMark();
+        prefetchNear();
+        return;
+    }
+    const s = spreadContaining(idx);
+    if (s < 0) return;
+    goSpreadInstant(s);
+}
+
+// Слушаем команды от сайта (клик по главе в боковом меню).
+function installBookMessageBridge() {
+    window.addEventListener('message', (e) => {
+        if (e.source !== window.parent) return;
+        const d = e.data;
+        if (!d || d.type !== 'book-goto') return;
+        const pageNum = parseInt(d.page, 10);
+        if (!Number.isFinite(pageNum)) return;
+        const idx = Math.max(0, Math.min(state.numPages - 1, pageNum - 1));
+        if (!state.doc || state.numPages === 0) {
+            pendingGoto = idx;
+            return;
+        }
+        goToBookPage(idx);
+    });
+}
+
 /* ================= Инициализация ================= */
 
 async function init() {
     buildSlots();
     bindEvents();
+    installPinchZoom();
+    installBookMessageBridge();
     showLoader(true);
     // Скрываем книгу, пока она не готова, — чтобы не светился шов-сгиб.
     els.book.style.opacity = '0';
@@ -617,6 +758,16 @@ async function init() {
         if (state.mode === 'single') els.mobileReader.style.opacity = '1';
         else els.book.style.opacity = '1';
         prefetchNear();
+
+        // Сообщаем сайту список глав.
+        sendChapterNav();
+
+        // Если глава была запрошена до готовности — переходим сейчас.
+        if (pendingGoto != null) {
+            const next = pendingGoto;
+            pendingGoto = null;
+            goToBookPage(next);
+        }
     } catch (err) {
         console.error(err);
         loaderMessage('Не удалось открыть книгу: ' + err.message);
