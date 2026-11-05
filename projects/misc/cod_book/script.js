@@ -86,6 +86,18 @@ async function loadPdfData(onProgress) {
 
 /* ================= Размеры ================= */
 
+function buildSlots() {
+    els.book.innerHTML =
+        '<div class="slot left"></div>' +
+        '<div class="slot right"></div>' +
+        '<div class="slot single"></div>';
+    els.slots = {
+        left: els.book.querySelector('.slot.left'),
+        right: els.book.querySelector('.slot.right'),
+        single: els.book.querySelector('.slot.single'),
+    };
+}
+
 function screenMode() {
     return window.innerWidth < DOUBLE_BP ? 'single' : 'double';
 }
@@ -556,8 +568,12 @@ function loaderMessage(text) {
 /* ================= Инициализация ================= */
 
 async function init() {
+    buildSlots();
     bindEvents();
     showLoader(true);
+    // Скрываем книгу, пока она не готова, — чтобы не светился шов-сгиб.
+    els.book.style.opacity = '0';
+    els.mobileReader.style.opacity = '0';
 
     try {
         fit();
@@ -598,6 +614,8 @@ async function init() {
         }
 
         showLoader(false);
+        if (state.mode === 'single') els.mobileReader.style.opacity = '1';
+        else els.book.style.opacity = '1';
         prefetchNear();
     } catch (err) {
         console.error(err);
