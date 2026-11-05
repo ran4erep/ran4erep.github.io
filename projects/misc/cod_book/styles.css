@@ -3,8 +3,6 @@
    ============================================================ */
 
 :root {
-    --bg: #0d0f15;
-    --bg2: #131724;
     --line: #232a3a;
     --ink: #e8e6e0;
     --mut: #8b91a0;
@@ -57,7 +55,7 @@ html, body {
 .book {
     position: relative;
     transform-style: preserve-3d;
-    filter: drop-shadow(0 34px 60px rgba(0, 0, 0, 0.6));
+    filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.3));
 }
 
 .book.double {

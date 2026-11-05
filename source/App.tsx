@@ -198,7 +198,7 @@ const App: React.FC = () => {
                         {openPath ? (
                             <AppView path={openPath} title={pages.find(p => p.path === openPath)?.title || openPath} />
                         ) : (
-                            <div className="p-4 sm:p-8">
+                            <div className="px-4 sm:px-8 pt-3 sm:pt-5 pb-4 sm:pb-8">
                                 <Header />
 
                                 {renderSection('gallery', 'nav_gallery', <Gallery />)}
