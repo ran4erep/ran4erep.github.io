@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { LanguageContext } from '../App';
 import { useAuth } from '../auth';
 import { UserAvatar } from './UserAvatar';
@@ -15,6 +15,12 @@ interface SearchResult {
     score: number;
 }
 
+interface FixedPos {
+    top: number;
+    left: number;
+    width: number;
+}
+
 export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
     const { lang, setLang, t } = useContext(LanguageContext) as LanguageContextType;
     const { user, openLogin, openAccount } = useAuth();
@@ -22,6 +28,8 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<SearchResult[]>([]);
     const [open, setOpen] = useState(false);
+    const [ddFixed, setDdFixed] = useState<FixedPos | null>(null);
+    const mobileSearchRef = useRef<HTMLDivElement>(null);
 
     // Сбор релевантных карточек по названию/описанию.
     const collectMatches = (q: string): SearchResult[] => {
@@ -113,7 +121,7 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
         }
     };
 
-    // Закрытие дропдауна при клике вне (любая обёртка .search-wrap).
+    // Закрытие дропдауна при клике вне.
     useEffect(() => {
         const onDocClick = (e: MouseEvent) => {
             if (!(e.target as Element).closest('.search-wrap')) {
@@ -124,47 +132,76 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
         return () => document.removeEventListener('mousedown', onDocClick);
     }, []);
 
-    // Общие блоки, переиспользуемые в desktop- и mobile-раскладках.
-    const searchBox = (
-        <div className="search-wrap relative w-full min-w-0">
-            <div className="flex items-center gap-1 bg-black/20 border border-white/10 rounded-full pl-4 pr-1 h-9 transition-colors hover:bg-white/5 focus-within:border-violet-500/70">
-                <input
-                    type="text"
-                    value={query}
-                    placeholder={lang === 'en' ? 'Search projects…' : 'Поиск проектов…'}
-                    aria-label={lang === 'en' ? 'Search projects' : 'Поиск проектов'}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    className="w-full min-w-0 bg-transparent outline-none text-sm text-gray-100 placeholder-gray-500"
-                />
-                <button
-                    onClick={runSearch}
-                    aria-label={lang === 'en' ? 'Search' : 'Найти'}
-                    className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 active:scale-95 transition"
-                >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="11" cy="11" r="8" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
-                </button>
-            </div>
+    // Для мобильного: растягиваем дропдаун на всю ширину шапки
+    // (поле + кнопка входа).
+    useEffect(() => {
+        if (!open || results.length === 0) {
+            setDdFixed(null);
+            return;
+        }
+        const el = mobileSearchRef.current;
+        if (!el) {
+            setDdFixed(null);
+            return;
+        }
+        const r = el.getBoundingClientRect();
+        setDdFixed({
+            top: r.bottom + 6,
+            left: r.left,
+            width: Math.max(220, window.innerWidth - r.left - 12),
+        });
+    }, [open, results]);
 
-            {open && results.length > 0 && (
-                <ul className="absolute top-full mt-2 left-0 right-0 bg-[#121722]/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-2xl z-40 max-h-[60vh] overflow-y-auto p-1">
-                    {results.map(r => (
-                        <li key={r.title}>
-                            <button
-                                onMouseDown={(e) => { e.preventDefault(); goToCard(r.card); }}
-                                className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-white/5 hover:text-white transition truncate"
-                            >
-                                {r.title}
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </div>
-    );
+    const renderSearchBox = (opts: { dropdownFixed?: FixedPos | null }) => {
+        const dropdownFixed = opts.dropdownFixed || null;
+        return (
+            <div className="search-wrap relative w-full min-w-0">
+                <div className="flex items-center gap-1 bg-black/20 border border-white/10 rounded-full pl-4 pr-1 h-9 transition-colors hover:bg-white/5 focus-within:border-violet-500/70">
+                    <input
+                        type="text"
+                        value={query}
+                        placeholder={lang === 'en' ? 'Search projects…' : 'Поиск проектов…'}
+                        aria-label={lang === 'en' ? 'Search projects' : 'Поиск проектов'}
+                        onChange={handleChange}
+                        onKeyDown={handleKeyDown}
+                        className="w-full min-w-0 bg-transparent outline-none text-sm text-gray-100 placeholder-gray-500"
+                    />
+                    <button
+                        onClick={runSearch}
+                        aria-label={lang === 'en' ? 'Search' : 'Найти'}
+                        className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 active:scale-95 transition"
+                    >
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                    </button>
+                </div>
+
+                {open && results.length > 0 && (
+                    <ul
+                        className={
+                            dropdownFixed
+                                ? "fixed z-40 max-h-[60vh] overflow-y-auto p-1 bg-[#121722]/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-2xl"
+                                : "absolute top-full mt-2 left-0 right-0 z-40 max-h-[60vh] overflow-y-auto p-1 bg-[#121722]/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-2xl"
+                        }
+                        style={dropdownFixed ? { top: dropdownFixed.top, left: dropdownFixed.left, width: dropdownFixed.width } : undefined}
+                    >
+                        {results.map(r => (
+                            <li key={r.title}>
+                                <button
+                                    onPointerDown={(e) => { e.preventDefault(); goToCard(r.card); }}
+                                    className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-white/5 hover:text-white transition truncate"
+                                >
+                                    {r.title}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        );
+    };
 
     const langBlock = (
         <div className="flex gap-1 h-[30px] items-center bg-black/20 border border-white/10 rounded-full p-1 shrink-0">
@@ -199,10 +236,10 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
 
     return (
         <header className="relative mb-6 md:mb-10">
-            {/* Desktop-раскладка (md+): как и было */}
+            {/* Desktop-раскладка (md+): счётчик в шапке */}
             <div className="hidden md:flex items-center justify-between gap-2 z-10 pb-3">
                 <div className={`w-full max-w-[240px] sm:max-w-[300px] min-w-0 ${sidebarOpen ? '' : 'ml-14'}`}>
-                    {searchBox}
+                    {renderSearchBox({})}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                     {langBlock}
@@ -213,15 +250,16 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
                 </div>
             </div>
 
-            {/* Mobile-раскладка (ниже md): два ряда */}
+            {/* Mobile-раскладка: счётчика в шапке НЕТ (он в сайдбаре) */}
             <div className="md:hidden z-10 pb-3 pt-1">
                 <div className="flex items-center gap-2 ml-11">
-                    {searchBox}
+                    <div ref={mobileSearchRef} className="relative flex-1 min-w-0">
+                        {renderSearchBox({ dropdownFixed: ddFixed })}
+                    </div>
                     {authButton}
                 </div>
-                <div className="flex items-center justify-between mt-2 pl-1 pr-1">
+                <div className="flex items-center mt-2 pl-1">
                     {langBlock}
-                    <UserCountBadge className="md:hidden" />
                 </div>
             </div>
 

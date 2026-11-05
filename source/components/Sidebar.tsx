@@ -89,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                             {t('auth_login_submit')}
                         </button>
                     )}
-                    <UserCountBadge className="md:hidden text-center mb-2" />
+                    <UserCountBadge className="md:hidden w-full justify-center mb-2" />
                     {isAppOpen && (
                         <>
                             <button
