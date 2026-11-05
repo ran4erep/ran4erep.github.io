@@ -2,18 +2,38 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Виртуальная книга</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0d0f15">
+    <title>Cradle of Death — Колыбель смерти</title>
+    <link rel="icon" type="image/jpeg" href="cover.jpg">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="book-container">
-        <div class="book" id="book"></div>
+    <div id="app">
+        <header class="topbar" id="topbar">
+            <div class="brand"><span class="dot"></span>Cradle of Death</div>
+            <div class="spacer"></div>
+            <button class="btn iconbtn" id="prevBtn" aria-label="Назад" title="Назад (←)">‹</button>
+            <span class="pageinfo" id="pageInfo">—</span>
+            <button class="btn iconbtn" id="nextBtn" aria-label="Вперёд" title="Вперёд (→)">›</button>
+            <select class="btn jump hide-m" id="jump" title="Перейти к странице"></select>
+            <button class="btn iconbtn hide-m" id="fsBtn" aria-label="Во весь экран" title="Во весь экран (F)">⛶</button>
+        </header>
+
+        <main class="stage" id="stage">
+            <div class="book" id="book"></div>
+            <div class="hint" id="hint">← → листают, пробел — вперёд, свайп по краям тоже работает</div>
+        </main>
     </div>
-    <script src="libs/page-flip.browser.min.js"></script>
-    <script src="script.js"></script>
+
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <div class="loadmsg" id="loadMsg">Загрузка книги…</div>
+        <div class="pbar"><i id="pbarFill"></i></div>
+    </div>
+
+    <noscript>Для чтения книги нужен включённый JavaScript.</noscript>
+
+    <script type="module" src="script.js"></script>
 </body>
-</html> 
+</html>
