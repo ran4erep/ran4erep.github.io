@@ -340,8 +340,19 @@ async function loadMobPage(i) {
 }
 
 function scrollToPage(i) {
-    const slot = els.mobileReader.querySelector(`[data-i="${i}"]`);
-    if (slot) slot.scrollIntoView({ behavior: 'auto' });
+    const r = els.mobileReader;
+    const slot = r.querySelector(`[data-i="${i}"]`);
+    if (!slot || !r) return;
+    // Точная прокрутка: считаем смещение слота относительно контейнера.
+    const place = () => {
+        const sRect = slot.getBoundingClientRect();
+        const cRect = r.getBoundingClientRect();
+        r.scrollTop += (sRect.top - cRect.top);
+    };
+    place();
+    // Повторяем после двух кадров: к этому моменту лениво подгруженные
+    // страницы финализировали layout, и позиция уже точная.
+    requestAnimationFrame(() => requestAnimationFrame(place));
 }
 
 function scrollToStep(dir) {

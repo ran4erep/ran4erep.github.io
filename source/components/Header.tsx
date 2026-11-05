@@ -50,38 +50,62 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
         return out.slice(0, 7);
     };
 
-    // Плавная прокрутка к карточке (по центру) + подсветка.
+    // Прокрутка к карточке (по центру) + подсветка. На телефонах тоже
+    // плавная, но с задержкой после тапа (чтобы жест завершился) и
+    // со страховкой, если плавная не сработала с первого раза.
     const goToCard = (card: Element) => {
-        try {
-            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } catch (e) {
-            card.scrollIntoView(true);
-        }
-        requestAnimationFrame(() => {
-            let node = card.parentElement;
-            let scroller: Element | null = null;
-            while (node && node !== document.documentElement) {
-                const cs = window.getComputedStyle(node);
-                if (/(auto|scroll|overlay)/i.test(cs.overflowY) && node.scrollHeight > node.clientHeight) {
-                    scroller = node;
-                    break;
-                }
-                node = node.parentElement;
+        const isMobile = window.innerWidth < 768;
+
+        const smooth = () => {
+            try {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } catch (e) {
+                card.scrollIntoView(true);
             }
-            if (!scroller) scroller = document.getElementById('root') || document.scrollingElement;
-            const cRect = card.getBoundingClientRect();
-            const sRect = scroller.getBoundingClientRect();
-            if (cRect.top < sRect.top + 8 || cRect.bottom > sRect.bottom - 8) {
-                const top = scroller.scrollTop + cRect.top - sRect.top
-                    - scroller.clientHeight / 2 + cRect.height / 2;
-                const clamped = Math.max(0, Math.min(top, scroller.scrollHeight - scroller.clientHeight));
-                try {
-                    scroller.scrollTo({ top: clamped, behavior: 'smooth' });
-                } catch (e) {
+        };
+
+        if (!isMobile) {
+            smooth();
+            requestAnimationFrame(() => {
+                let node = card.parentElement;
+                let scroller: Element | null = null;
+                while (node && node !== document.documentElement) {
+                    const cs = window.getComputedStyle(node);
+                    if (/(auto|scroll|overlay)/i.test(cs.overflowY) && node.scrollHeight > node.clientHeight) {
+                        scroller = node;
+                        break;
+                    }
+                    node = node.parentElement;
+                }
+                if (!scroller) scroller = document.getElementById('root') || document.scrollingElement;
+                const cRect = card.getBoundingClientRect();
+                const sRect = scroller.getBoundingClientRect();
+                if (cRect.top < sRect.top + 8 || cRect.bottom > sRect.bottom - 8) {
+                    const top = scroller.scrollTop + cRect.top - sRect.top
+                        - scroller.clientHeight / 2 + cRect.height / 2;
+                    const clamped = Math.max(0, Math.min(top, scroller.scrollHeight - scroller.clientHeight));
+                    try {
+                        scroller.scrollTo({ top: clamped, behavior: 'smooth' });
+                    } catch (e) {
+                        scroller.scrollTop = clamped;
+                    }
+                }
+            });
+        } else {
+            smooth();
+            setTimeout(() => {
+                const scroller = document.getElementById('root') || document.scrollingElement;
+                if (!scroller) return;
+                const cRect = card.getBoundingClientRect();
+                const sRect = scroller.getBoundingClientRect();
+                if (cRect.top < sRect.top + 8 || cRect.bottom > sRect.bottom - 8) {
+                    const top = scroller.scrollTop + cRect.top - sRect.top
+                        - scroller.clientHeight / 2 + cRect.height / 2;
+                    const clamped = Math.max(0, Math.min(top, scroller.scrollHeight - scroller.clientHeight));
                     scroller.scrollTop = clamped;
                 }
-            }
-        });
+            }, 260);
+        }
 
         document.querySelectorAll('.hub-flash').forEach(el => el.classList.remove('hub-flash'));
         card.classList.add('hub-flash');
@@ -190,7 +214,12 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
                         {results.map(r => (
                             <li key={r.title}>
                                 <button
-                                    onPointerDown={(e) => { e.preventDefault(); goToCard(r.card); }}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        // Небольшая задержка, чтобы тач-жест успел
+                                        // завершиться до программной прокрутки.
+                                        setTimeout(() => goToCard(r.card), 30);
+                                    }}
                                     className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-white/5 hover:text-white transition truncate"
                                 >
                                     {r.title}
@@ -258,7 +287,7 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
                     </div>
                     {authButton}
                 </div>
-                <div className="flex items-center mt-2 pl-1">
+                <div className="flex items-center justify-end mt-2 pr-1">
                     {langBlock}
                 </div>
             </div>
