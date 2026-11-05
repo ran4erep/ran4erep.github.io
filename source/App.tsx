@@ -202,8 +202,11 @@ const App: React.FC = () => {
             <div className="relative min-h-screen text-gray-200">
                 <style>{`
                     .project-grid {
+                        /* Фиксированный размер колонки: при скрытии бокового
+                           меню (больше места) добавляются новые колонки того же
+                           размера, а сами карточки не растягиваются. */
                         display: grid;
-                        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                        grid-template-columns: repeat(auto-fill, minmax(240px, 300px));
                         gap: 1.5rem;
                     }
                     .project-card {
