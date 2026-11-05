@@ -18,6 +18,7 @@ const els = {
     app: document.getElementById('app'),
     stage: document.getElementById('stage'),
     book: document.getElementById('book'),
+    topbar: document.getElementById('topbar'),
     prevBtn: document.getElementById('prevBtn'),
     nextBtn: document.getElementById('nextBtn'),
     pageInfo: document.getElementById('pageInfo'),
@@ -67,7 +68,8 @@ function screenMode() {
 
 function fit() {
     const w = window.innerWidth;
-    const h = window.innerHeight - els.topbar.offsetHeight;
+    const topH = els.topbar ? els.topbar.offsetHeight : 0;
+    const h = window.innerHeight - topH;
     const ar = state.aspect;
     const m = 40;
     let pw, ph;
@@ -491,17 +493,18 @@ function loaderMessage(text) {
 async function init() {
     buildSlots();
     bindEvents();
-    fit();
     showLoader(true);
 
-    const task = getDocument(BOOK_PATH);
-    task.onProgress = ev => {
-        const pct = ev.total ? Math.round((ev.loaded / ev.total) * 100) : 0;
-        setProgress(pct);
-        if (pct < 100) loaderMessage('Загрузка книги… ' + pct + '%');
-    };
-
     try {
+        fit();
+
+        const task = getDocument(BOOK_PATH);
+        task.onProgress = ev => {
+            const pct = ev.total ? Math.round((ev.loaded / ev.total) * 100) : 0;
+            setProgress(pct);
+            if (pct < 100) loaderMessage('Загрузка книги… ' + pct + '%');
+        };
+
         state.doc = await task.promise;
         state.numPages = state.doc.numPages;
         const p0 = await state.doc.getPage(1);
@@ -535,7 +538,8 @@ async function init() {
         console.error(err);
         loaderMessage('Не удалось открыть книгу: ' + err.message);
         setProgress(0);
-        els.loader.querySelector('.spinner').style.display = 'none';
+        const spin = els.loader.querySelector('.spinner');
+        if (spin) spin.style.display = 'none';
     }
 }
 
