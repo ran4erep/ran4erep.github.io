@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { LanguageContext } from '../App';
 import { useAuth } from '../auth';
 import { UserAvatar } from './UserAvatar';
+import { UserCountBadge } from './UserCountBadge';
 import type { LanguageContextType } from '../types';
 
 interface HeaderProps {
@@ -182,25 +183,28 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
                         </button>
                     </div>
 
-                    {user ? (
-                        <button
-                            onClick={openAccount}
-                            className="flex items-center gap-2 pl-1.5 pr-3 h-[30px] bg-black/20 border border-white/10 rounded-full transition-all hover:bg-white/10 active:scale-95"
-                            aria-label={t('auth_account')}
-                        >
-                            <UserAvatar avatar={user.avatar} className="w-6 h-6" ring="border border-violet-500/40" />
-                            <span className="text-sm font-medium text-gray-100 break-words max-w-[55vw]">{user.username}</span>
-                        </button>
-                    ) : (
-                        <button
-                            onClick={openLogin}
-                            className="px-3 h-[30px] inline-flex items-center gap-1.5 bg-violet-600/90 hover:bg-violet-500 text-white text-sm font-medium rounded-full border border-violet-400/30 transition-all active:scale-95"
-                            aria-label={t('auth_login_submit')}
-                        >
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                            {t('auth_login_submit')}
-                        </button>
-                    )}
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                        {user ? (
+                            <button
+                                onClick={openAccount}
+                                className="flex items-center gap-2 pl-1.5 pr-3 h-[30px] bg-black/20 border border-white/10 rounded-full transition-all hover:bg-white/10 active:scale-95"
+                                aria-label={t('auth_account')}
+                            >
+                                <UserAvatar avatar={user.avatar} className="w-6 h-6" ring="border border-violet-500/40" />
+                                <span className="text-sm font-medium text-gray-100 break-words max-w-[55vw]">{user.username}</span>
+                            </button>
+                        ) : (
+                            <button
+                                onClick={openLogin}
+                                className="px-3 h-[30px] inline-flex items-center gap-1.5 bg-violet-600/90 hover:bg-violet-500 text-white text-sm font-medium rounded-full border border-violet-400/30 transition-all active:scale-95"
+                                aria-label={t('auth_login_submit')}
+                            >
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                                {t('auth_login_submit')}
+                            </button>
+                        )}
+                        <UserCountBadge />
+                    </div>
                 </div>
             </div>
 

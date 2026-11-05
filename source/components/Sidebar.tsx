@@ -6,6 +6,7 @@ import { navLinks, socialLinks } from '../constants';
 import type { LanguageContextType } from '../types';
 import { MusicPlayer } from './MusicPlayer';
 import { UserAvatar } from './UserAvatar';
+import { UserCountBadge } from './UserCountBadge';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -31,23 +32,12 @@ const NavLink: React.FC<{ id: string; label: string; onClick: () => void; }> = (
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, onCloseApp, openPath, appNavItems = [], onOpenApp }) => {
-    const { t, lang } = useContext(LanguageContext) as LanguageContextType;
+    const { t } = useContext(LanguageContext) as LanguageContextType;
     const { user, openLogin, openAccount } = useAuth();
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-    const [userCount, setUserCount] = useState<number | null>(null);
 
     useEffect(() => {
         setCurrentYear(new Date().getFullYear());
-    }, []);
-
-    // Читаем количество зарегистрированных пользователей (users-count.json).
-    useEffect(() => {
-        fetch('/users-count.json')
-            .then(r => (r.ok ? r.json() : null))
-            .then(d => {
-                if (d && typeof d.count === 'number') setUserCount(d.count);
-            })
-            .catch(() => {});
     }, []);
 
     const handleNavLinkClick = (id: string) => {
@@ -92,13 +82,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                     ) : (
                         <button
                             onClick={openLogin}
-                            className="w-full text-left mb-2 flex items-center gap-2 px-3 py-2 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors duration-200"
+                            className="w-full text-left mb-1 flex items-center gap-2 px-3 py-2 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors duration-200"
                             aria-label={t('auth_login_submit')}
                         >
                             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
                             {t('auth_login_submit')}
                         </button>
                     )}
+                    <UserCountBadge className="text-center mb-2" />
                     {isAppOpen && (
                         <>
                             <button
@@ -156,9 +147,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                         ))}
                     </div>
                     <div className="text-center text-xs text-gray-500">
-                        {userCount !== null && (
-                            <div className="mb-1">👥 {userCount} {lang === 'en' ? 'users' : 'пользователей'}</div>
-                        )}
                         &#169; by ran4erep, 2023-{currentYear}
                     </div>
                 </div>
