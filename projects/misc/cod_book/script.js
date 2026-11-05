@@ -1,9 +1,9 @@
 // ============================================================
-// Cradle of Death — PDF-читалка с переворотом страниц
-//   • PDF.js рендерит страницы в canvas
-//   • Десктоп: разворот из двух страниц
-//   • Мобильные: одна страница
-//   • Переворот — на CSS 3D (без внешних библиотек)
+// Cradle of Death — PDF-читалка
+//   • Desktop: разворот из двух страниц с переворотом (CSS 3D)
+//   • Мобильные: вертикальная прокрутка, ширина = ширине экрана
+//   • PDF кэшируется через Cache API (второй заход без сети)
+//   • Загрузчик ждёт рендера первых страниц
 // ============================================================
 
 import { getDocument, GlobalWorkerOptions } from './libs/pdfjs/pdf.min.mjs';
@@ -11,13 +11,15 @@ GlobalWorkerOptions.workerSrc = new URL('./libs/pdfjs/pdf.worker.min.mjs', impor
 
 const BOOK_PATH = 'Cradle_of_Death.pdf';
 const BOOKMARK_KEY = 'cod_bookmark';
-const DOUBLE_BP = 880;      // ширина окна, ниже которой — одна страница
-const CACHE_MAX = 10;       // сколько отрисованных страниц держим в памяти
+const DOUBLE_BP = 880;      // ширина окна, ниже которой — мобильный режим
+const CACHE_MAX = 16;       // сколько отрисованных страниц держим в памяти (LRU)
+const CACHE_NAME = 'cod-book-v1';
 
 const els = {
     app: document.getElementById('app'),
     stage: document.getElementById('stage'),
     book: document.getElementById('book'),
+    mobileReader: document.getElementById('mobileReader'),
     loader: document.getElementById('loader'),
     loadMsg: document.getElementById('loadMsg'),
     pbarFill: document.getElementById('pbarFill'),
@@ -26,7 +28,7 @@ const els = {
 const state = {
     doc: null,
     numPages: 0,
-    aspect: 0.7071,          // w/h, уточняется после открытия PDF
+    aspect: 0.7071,
     mode: 'double',
     spreads: [],
     spread: 0,
@@ -38,19 +40,48 @@ const state = {
 };
 
 const cache = new Map();     // индекс страницы -> canvas
+const mobReady = new Set();  // какие мобильные страницы уже отрисованы
+let mobIO = null;
 
-/* ================= Разметка книги ================= */
+/* ================= PDF: загрузка с кэшем ================= */
 
-function buildSlots() {
-    els.book.innerHTML =
-        '<div class="slot left"></div>' +
-        '<div class="slot right"></div>' +
-        '<div class="slot single"></div>';
-    els.slots = {
-        left: els.book.querySelector('.slot.left'),
-        right: els.book.querySelector('.slot.right'),
-        single: els.book.querySelector('.slot.single'),
-    };
+async function loadPdfData(onProgress) {
+    // Сначала пробуем кэш — второй заход открывается без сети.
+    if ('caches' in window) {
+        try {
+            const c = await caches.open(CACHE_NAME);
+            const hit = await c.match(BOOK_PATH);
+            if (hit) return await hit.arrayBuffer();
+        } catch (e) {
+            console.warn('pdf cache read failed', e);
+        }
+    }
+    // Нет в кэше — качаем с прогрессом и сохраняем в кэш.
+    const resp = await fetch(BOOK_PATH);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const total = parseInt(resp.headers.get('content-length') || '0', 10) || 0;
+    const reader = resp.body.getReader();
+    const chunks = [];
+    let loaded = 0;
+    for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        loaded += value.length;
+        if (onProgress && total) onProgress(Math.round(loaded / total * 100));
+    }
+    const data = new Uint8Array(loaded);
+    let off = 0;
+    for (const ch of chunks) { data.set(ch, off); off += ch.length; }
+    if ('caches' in window) {
+        try {
+            const c = await caches.open(CACHE_NAME);
+            await c.put(BOOK_PATH, new Response(data, { headers: { 'Content-Type': 'application/pdf' } }));
+        } catch (e) {
+            console.warn('pdf cache write failed', e);
+        }
+    }
+    return data.buffer;
 }
 
 /* ================= Размеры ================= */
@@ -63,22 +94,23 @@ function fit() {
     const w = window.innerWidth;
     const h = window.innerHeight;
     const ar = state.aspect;
-    const m = 40;
-    let pw, ph;
     if (state.mode === 'double') {
-        pw = Math.min((w - m - 14) / 2, (h - m) * ar);
-        ph = pw / ar;
+        // Книга на всю высоту окна: вертикальные отступы убраны полностью,
+        // горизонтальные минимальные (чтобы разворот влезал по ширине).
+        state.pw = Math.min((w - 16) / 2, h * ar);
+        state.ph = state.pw / ar;
+        state.pw = Math.max(120, state.pw);
+        state.ph = Math.max(160, state.ph);
+        els.book.style.setProperty('--pw', state.pw + 'px');
+        els.book.style.setProperty('--ph', state.ph + 'px');
+        els.book.className = 'book double';
+        els.app.classList.remove('single');
     } else {
-        pw = Math.min(w - 28, (h - m) * ar);
-        ph = pw / ar;
+        // Мобильный режим: ширина страницы = ширина экрана.
+        state.pw = w;
+        state.ph = state.pw / ar;
+        els.app.classList.add('single');
     }
-    pw = Math.max(120, pw);
-    ph = Math.max(160, ph);
-    state.pw = pw;
-    state.ph = ph;
-    els.book.style.setProperty('--pw', pw + 'px');
-    els.book.style.setProperty('--ph', ph + 'px');
-    els.book.className = 'book ' + state.mode;
 }
 
 /* ================= Рендер страниц ================= */
@@ -89,8 +121,6 @@ function makeBlank() {
     return d;
 }
 
-// Полный качественный рендер сразу (ретина до 2x). Размытых промежуточных
-// версий нет: страница появляется только готовой.
 async function getCanvas(idx) {
     if (cache.has(idx)) return cache.get(idx);
     const page = await state.doc.getPage(idx + 1);
@@ -113,16 +143,9 @@ async function getCanvas(idx) {
     return canvas;
 }
 
-function faceCanvasSync(face, idx) {
-    if (idx == null) { face.appendChild(makeBlank()); return; }
-    const c = cache.get(idx);
-    if (c) { face.appendChild(c); return; }
-    const ph = document.createElement('div');
-    ph.className = 'paper-ph';
-    face.appendChild(ph);
-    getCanvas(idx).then(canvas => {
-        if (face.contains(ph)) { face.removeChild(ph); face.appendChild(canvas); }
-    }).catch(err => console.error(err));
+async function ensureCanvas(idx) {
+    if (idx == null) return;
+    await getCanvas(idx);
 }
 
 function paintSlot(slot, idx) {
@@ -144,7 +167,7 @@ function preload(idxs) {
     return Promise.all(valid.map(getCanvas)).catch(err => console.error(err));
 }
 
-/* ================= Разворо ты ================= */
+/* ================= Разворо ты (desktop) ================= */
 
 function buildSpreads(n) {
     const s = [];
@@ -157,8 +180,6 @@ function buildSpreads(n) {
 function spreadContaining(page) {
     return state.spreads.findIndex(s => s.l === page || s.r === page);
 }
-
-/* ================= Переворот ================= */
 
 function buildFlip({ hinge, frontIdx, backIdx }) {
     const layer = document.createElement('div');
@@ -173,6 +194,18 @@ function buildFlip({ hinge, frontIdx, backIdx }) {
     curl.className = 'curl';
     layer.append(curl, front, back);
     return layer;
+}
+
+function faceCanvasSync(face, idx) {
+    if (idx == null) { face.appendChild(makeBlank()); return; }
+    const c = cache.get(idx);
+    if (c) { face.appendChild(c); return; }
+    const ph = document.createElement('div');
+    ph.className = 'paper-ph';
+    face.appendChild(ph);
+    getCanvas(idx).then(canvas => {
+        if (face.contains(ph)) { face.removeChild(ph); face.appendChild(canvas); }
+    }).catch(err => console.error(err));
 }
 
 function animateFlip(layer, onDone) {
@@ -198,7 +231,9 @@ async function goToSpread(target, dir) {
 
     const cur = state.spreads[state.spread];
     const tgt = state.spreads[target];
+    const nextSpread = state.spreads[target + dir];
     const idxs = [cur.l, cur.r, tgt.l, tgt.r];
+    if (nextSpread) idxs.push(nextSpread.l, nextSpread.r);
     try { await preload(idxs); } catch (e) { console.error(e); }
 
     let layer;
@@ -224,60 +259,13 @@ async function goToSpread(target, dir) {
     });
 }
 
-async function goToPage(target, dir) {
-    if (state.busy || target === state.page) return;
-    if (target < 0 || target >= state.numPages) return;
-    state.busy = true;
-
-    const idxs = [state.page, target, dir === 'fwd' ? state.page + 1 : state.page - 1];
-    try { await preload(idxs); } catch (e) { console.error(e); }
-
-    const hinge = dir === 'fwd' ? 'left' : 'right';
-    paintSlot(els.slots.single, target);
-    const layer = buildFlip({ hinge, frontIdx: state.page, backIdx: target });
-    layer.style.left = '0px';
-    els.book.appendChild(layer);
-    animateFlip(layer, () => {
-        layer.remove();
-        paintSlot(els.slots.single, target);
-        state.page = target;
-        afterNav();
-    });
-}
-
 function afterNav() {
     state.busy = false;
     saveMark();
-    updateUI();
     prefetchNear();
     const d = state.pending;
     state.pending = null;
     if (d) setTimeout(() => nav(d), 20);
-}
-
-/* ================= Навигация ================= */
-
-function nav(dir) {
-    if (state.busy) { state.pending = dir; return; }
-    if (state.mode === 'double') {
-        const t = state.spread + dir;
-        if (t < 0 || t >= state.spreads.length) return;
-        goToSpread(t, dir < 0 ? 'bwd' : 'fwd');
-    } else {
-        const t = state.page + dir;
-        if (t < 0 || t >= state.numPages) return;
-        goToPage(t, dir < 0 ? 'bwd' : 'fwd');
-    }
-}
-
-function goStart() {
-    if (state.mode === 'double') goSpreadInstant(0);
-    else goPageInstant(0);
-}
-
-function goEnd() {
-    if (state.mode === 'double') goSpreadInstant(state.spreads.length - 1);
-    else goPageInstant(state.numPages - 1);
 }
 
 function goSpreadInstant(target) {
@@ -288,39 +276,85 @@ function goSpreadInstant(target) {
     paintSlot(els.slots.left, s.l);
     paintSlot(els.slots.right, s.r);
     saveMark();
-    updateUI();
     prefetchNear();
 }
 
-function goPageInstant(target) {
-    if (state.busy) return;
-    target = Math.max(0, Math.min(state.numPages - 1, target));
-    state.page = target;
-    paintSlot(els.slots.single, target);
+/* ================= Мобильный режим (скролл) ================= */
+
+function buildMobile() {
+    const r = els.mobileReader;
+    r.textContent = '';
+    r.style.setProperty('--ar', state.aspect);
+    for (let i = 0; i < state.numPages; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'm-page';
+        slot.dataset.i = String(i);
+        const ph = document.createElement('div');
+        ph.className = 'paper-ph';
+        slot.appendChild(ph);
+        r.appendChild(slot);
+    }
+    if (mobIO) mobIO.disconnect();
+    mobIO = new IntersectionObserver(entries => {
+        for (const en of entries) {
+            if (en.isIntersecting) {
+                const i = parseInt(en.target.dataset.i, 10);
+                loadMobPage(i);
+                mobIO.unobserve(en.target);
+            }
+        }
+    }, { root: r, rootMargin: '600px 0px', threshold: 0 });
+    Array.from(r.children).forEach(slot => mobIO.observe(slot));
+}
+
+async function loadMobPage(i) {
+    if (mobReady.has(i)) return;
+    mobReady.add(i);
+    const slot = els.mobileReader.querySelector(`[data-i="${i}"]`);
+    if (!slot) return;
+    try {
+        const cv = await getCanvas(i);
+        const ph = slot.querySelector('.paper-ph');
+        if (ph) slot.replaceChild(cv, ph);
+        else slot.appendChild(cv);
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+function scrollToPage(i) {
+    const slot = els.mobileReader.querySelector(`[data-i="${i}"]`);
+    if (slot) slot.scrollIntoView({ behavior: 'auto' });
+}
+
+function scrollToStep(dir) {
+    const top = els.mobileReader.scrollTop;
+    const slots = els.mobileReader.children;
+    let cur = 0;
+    for (let i = 0; i < slots.length; i++) {
+        if (slots[i].offsetTop + slots[i].offsetHeight > top) { cur = i; break; }
+    }
+    const np = Math.max(0, Math.min(state.numPages - 1, cur + dir));
+    state.page = np;
+    scrollToPage(np);
     saveMark();
-    updateUI();
-    prefetchNear();
 }
 
-/* ================= UI ================= */
-
-function updateUI() {
-    // Верхняя панель управления убрана — обновлять нечего.
+function visibleMobilePage() {
+    const top = els.mobileReader.scrollTop;
+    const slots = els.mobileReader.children;
+    for (let i = 0; i < slots.length; i++) {
+        if (slots[i].offsetTop + slots[i].offsetHeight > top) return i;
+    }
+    return 0;
 }
 
-function prefetchNear() {
-    if (state.mode === 'double') {
-        const s = state.spreads[state.spread];
-        const idxs = [s.l, s.r];
-        const nxt = state.spreads[state.spread + 1];
-        const nxt2 = state.spreads[state.spread + 2];
-        const prv = state.spreads[state.spread - 1];
-        if (nxt) idxs.push(nxt.l, nxt.r);
-        if (nxt2) idxs.push(nxt2.l, nxt2.r);
-        if (prv) idxs.push(prv.l, prv.r);
-        preload(idxs);
-    } else {
-        preload([state.page - 2, state.page - 1, state.page, state.page + 1, state.page + 2]);
+function restoreMobile() {
+    const saved = localStorage.getItem(BOOKMARK_KEY + '_s');
+    if (saved != null && !Number.isNaN(parseFloat(saved))) {
+        els.mobileReader.scrollTop = parseFloat(saved);
+    } else if (state.page > 0) {
+        setTimeout(() => scrollToPage(state.page), 30);
     }
 }
 
@@ -328,18 +362,71 @@ function prefetchNear() {
 
 function saveMark() {
     try {
-        localStorage.setItem(BOOKMARK_KEY + '_' + state.mode,
-            JSON.stringify({ s: state.spread, p: state.page }));
+        if (state.mode === 'double') {
+            localStorage.setItem(BOOKMARK_KEY + '_d', String(state.spread));
+        } else {
+            localStorage.setItem(BOOKMARK_KEY + '_s', String(els.mobileReader.scrollTop || 0));
+        }
     } catch (e) { /* ignore */ }
 }
 
-function loadMark() {
+function loadMark(kind) {
     try {
-        const raw = localStorage.getItem(BOOKMARK_KEY + '_' + state.mode);
-        return raw ? JSON.parse(raw) : null;
+        const v = localStorage.getItem(BOOKMARK_KEY + '_' + kind);
+        return v != null ? parseInt(v, 10) : null;
     } catch (e) {
         return null;
     }
+}
+
+/* ================= Навигация ================= */
+
+function nav(dir) {
+    if (state.mode === 'single') {
+        scrollToStep(dir);
+        return;
+    }
+    if (state.busy) { state.pending = dir; return; }
+    const t = state.spread + dir;
+    if (t < 0 || t >= state.spreads.length) return;
+    goToSpread(t, dir < 0 ? 'bwd' : 'fwd');
+}
+
+function goStart() {
+    if (state.mode === 'single') { state.page = 0; scrollToPage(0); saveMark(); return; }
+    goSpreadInstant(0);
+}
+
+function goEnd() {
+    if (state.mode === 'single') {
+        state.page = state.numPages - 1;
+        scrollToPage(state.page);
+        saveMark();
+        return;
+    }
+    goSpreadInstant(state.spreads.length - 1);
+}
+
+/* ================= Предзагрузка ================= */
+
+function prefetchNear() {
+    if (state.mode === 'single') {
+        // мобильным занимается IntersectionObserver (грузит сильно заранее)
+        const base = visibleMobilePage();
+        [base + 1, base + 2, base + 3].forEach(i => {
+            if (i < state.numPages) loadMobPage(i);
+        });
+        return;
+    }
+    const s = state.spreads[state.spread];
+    const idxs = [s.l, s.r];
+    const nxt = state.spreads[state.spread + 1];
+    const nxt2 = state.spreads[state.spread + 2];
+    const prv = state.spreads[state.spread - 1];
+    if (nxt) idxs.push(nxt.l, nxt.r);
+    if (nxt2) idxs.push(nxt2.l, nxt2.r);
+    if (prv) idxs.push(prv.l, prv.r);
+    preload(idxs);
 }
 
 /* ================= События ================= */
@@ -367,24 +454,42 @@ function onResize() {
     const nm = screenMode();
     if (nm !== state.mode) {
         if (nm === 'double') {
-            state.spread = Math.max(0, spreadContaining(state.page));
-        } else {
+            const cur = state.mode === 'single' ? visibleMobilePage() : (state.page || 0);
+            state.mode = 'double';
+            state.spreads = buildSpreads(state.numPages);
+            state.spread = Math.max(0, spreadContaining(cur));
+            cache.clear();
+            fit();
             const s = state.spreads[state.spread];
-            state.page = s && s.r != null ? s.r : (s ? s.l : 0);
-            if (state.page == null) state.page = 0;
+            paintSlot(els.slots.left, s.l);
+            paintSlot(els.slots.right, s.r);
+            prefetchNear();
+        } else {
+            const spread = state.spreads[state.spread];
+            const cur = spread ? spread.l : 0;
+            state.mode = 'single';
+            state.page = cur;
+            cache.clear();
+            fit();
+            buildMobile();
+            setTimeout(() => scrollToPage(cur), 40);
+            showLoader(false);
+            prefetchNear();
         }
-        state.mode = nm;
-    }
-    cache.clear();
-    fit();
-    if (state.mode === 'double') {
-        const s = state.spreads[state.spread];
-        paintSlot(els.slots.left, s.l);
-        paintSlot(els.slots.right, s.r);
     } else {
-        paintSlot(els.slots.single, state.page);
+        cache.clear();
+        fit();
+        if (state.mode === 'double') {
+            const s = state.spreads[state.spread];
+            paintSlot(els.slots.left, s.l);
+            paintSlot(els.slots.right, s.r);
+        } else {
+            // при изменении ширины перерисовываем видимые
+            const cur = visibleMobilePage();
+            buildMobile();
+            setTimeout(() => scrollToPage(cur), 40);
+        }
     }
-    updateUI();
 }
 
 function debounce(fn, ms) {
@@ -399,12 +504,14 @@ function bindEvents() {
     window.addEventListener('keydown', onKey);
     window.addEventListener('resize', debounce(onResize, 160));
 
+    // Тапы/свайпы — только в книжном (desktop) режиме.
     let down = null;
     els.stage.addEventListener('pointerdown', e => {
+        if (state.mode !== 'double') return;
         down = { x: e.clientX, y: e.clientY, t: Date.now() };
     });
     els.stage.addEventListener('pointerup', e => {
-        if (!down) return;
+        if (state.mode !== 'double' || !down) return;
         const dx = e.clientX - down.x;
         const dy = e.clientY - down.y;
         const dist = Math.hypot(dx, dy);
@@ -419,9 +526,20 @@ function bindEvents() {
         }
     });
     els.stage.addEventListener('pointercancel', () => { down = null; });
+
+    // Сохранение позиции при прокрутке на мобильном.
+    let scrollTimer;
+    els.mobileReader.addEventListener('scroll', () => {
+        if (state.mode !== 'single') return;
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+            saveMark();
+            prefetchNear();
+        }, 150);
+    });
 }
 
-/* ================= Загрузка ================= */
+/* ================= Загрузчик ================= */
 
 function showLoader(show) {
     els.loader.classList.toggle('hide', !show);
@@ -438,43 +556,47 @@ function loaderMessage(text) {
 /* ================= Инициализация ================= */
 
 async function init() {
-    buildSlots();
     bindEvents();
     showLoader(true);
 
     try {
         fit();
 
-        const task = getDocument(BOOK_PATH);
-        task.onProgress = ev => {
-            const pct = ev.total ? Math.round((ev.loaded / ev.total) * 100) : 0;
+        const data = await loadPdfData(pct => {
             setProgress(pct);
             if (pct < 100) loaderMessage('Загрузка книги… ' + pct + '%');
-        };
+        });
+        loaderMessage('Открытие книги…');
 
-        state.doc = await task.promise;
+        state.doc = await getDocument({ data }).promise;
         state.numPages = state.doc.numPages;
         const p0 = await state.doc.getPage(1);
         const vp0 = p0.getViewport({ scale: 1 });
         state.aspect = vp0.width / vp0.height;
-        state.mode = screenMode();
-        state.spreads = buildSpreads(state.numPages);
-        fit();
 
-        const mark = loadMark();
+        state.mode = screenMode();
+
         if (state.mode === 'double') {
-            const s = mark && mark.s != null ? mark.s : 0;
-            state.spread = Math.max(0, Math.min(state.spreads.length - 1, s));
+            state.spreads = buildSpreads(state.numPages);
+            fit();
+            const saved = loadMark('d');
+            state.spread = saved != null
+                ? Math.max(0, Math.min(state.spreads.length - 1, saved))
+                : 0;
             const sp = state.spreads[state.spread];
+            // Ждём рендер текущих страниц, чтобы не показывать пустоту.
+            await Promise.all([ensureCanvas(sp.l), ensureCanvas(sp.r)]);
             paintSlot(els.slots.left, sp.l);
             paintSlot(els.slots.right, sp.r);
         } else {
-            const p = mark && mark.p != null ? mark.p : 0;
-            state.page = Math.max(0, Math.min(state.numPages - 1, p));
-            paintSlot(els.slots.single, state.page);
+            fit();
+            buildMobile();
+            // Ждём первую страницу и сразу показываем.
+            await ensureCanvas(0);
+            loadMobPage(0);
+            restoreMobile();
         }
 
-        updateUI();
         showLoader(false);
         prefetchNear();
     } catch (err) {

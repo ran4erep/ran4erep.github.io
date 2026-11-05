@@ -267,4 +267,45 @@ html, body {
     transition: width 0.2s;
 }
 
+/* ---------------- Мобильный читатель (вертикальный скролл) ---------------- */
+
+#app.single .book { display: none; }
+
+.mobile-reader {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    background: transparent;
+    display: none;
+    padding: 12px 0;
+}
+
+#app.single .mobile-reader {
+    display: block;
+}
+
+.m-page {
+    width: 100%;
+    aspect-ratio: var(--ar);
+    position: relative;
+    background: var(--paper);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.04);
+}
+
+.m-page .paper-ph {
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+}
+
+.m-page canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
 /* ---------------- Адаптив ---------------- */
