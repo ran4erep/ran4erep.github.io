@@ -207,7 +207,10 @@ const App: React.FC = () => {
                         gap: 1.5rem;
                     }
                     .project-card {
+                        /* 3:4 — желаемая пропорция, но карточка растёт,
+                           если контент (картинка/текст/кнопки) выше. */
                         aspect-ratio: 3 / 4;
+                        height: auto;
                     }
                 `}</style>
                  <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="fixed top-4 left-4 p-2 rounded-xl bg-slate-900/70 backdrop-blur-lg border border-slate-700 shadow-2xl hover:bg-slate-800/70 transition-all z-50 active:scale-95" aria-label="Toggle sidebar">

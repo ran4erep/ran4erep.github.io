@@ -21,12 +21,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, pages, onOpen
     };
 
     return (
-        <div className="project-card relative isolate group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 flex flex-col transition-all duration-300 hover:border-violet-500 hover:-translate-y-1 overflow-hidden h-full">
+        <div className="project-card relative isolate group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 flex flex-col transition-all duration-300 hover:border-violet-500 hover:-translate-y-1 overflow-hidden">
             <div className="relative z-0 flex flex-col flex-grow">
                 {project.image && <img src={project.image} alt={t(project.titleKey)} className="rounded-md mb-4 w-full h-40 object-cover" />}
                 <h3 className="text-xl font-bold text-gray-100 mb-2">{t(project.titleKey)}</h3>
-                <p className="text-gray-400 text-sm flex-grow mb-4">{t(project.descriptionKey)}</p>
-                <div className="mt-auto flex flex-col gap-2">
+                <p className="text-gray-400 text-sm mb-4">{t(project.descriptionKey)}</p>
+                <div className="flex flex-col gap-2">
                     {pageForLink(project.link) ? (
                         <button onClick={() => onOpenApp?.(pageForLink(project.link)!.path)} className="inline-block bg-violet-600 text-white text-center font-semibold px-4 py-2 rounded-md transition-all duration-200 hover:bg-violet-500 active:bg-violet-700 active:scale-[0.98]">
                             {t(project.linkTypeKey)}
