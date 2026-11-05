@@ -18,12 +18,6 @@ const els = {
     app: document.getElementById('app'),
     stage: document.getElementById('stage'),
     book: document.getElementById('book'),
-    topbar: document.getElementById('topbar'),
-    prevBtn: document.getElementById('prevBtn'),
-    nextBtn: document.getElementById('nextBtn'),
-    pageInfo: document.getElementById('pageInfo'),
-    jump: document.getElementById('jump'),
-    fsBtn: document.getElementById('fsBtn'),
     loader: document.getElementById('loader'),
     loadMsg: document.getElementById('loadMsg'),
     pbarFill: document.getElementById('pbarFill'),
@@ -68,8 +62,7 @@ function screenMode() {
 
 function fit() {
     const w = window.innerWidth;
-    const topH = els.topbar ? els.topbar.offsetHeight : 0;
-    const h = window.innerHeight - topH;
+    const h = window.innerHeight;
     const ar = state.aspect;
     const m = 40;
     let pw, ph;
@@ -101,7 +94,8 @@ async function getCanvas(idx) {
     if (cache.has(idx)) return cache.get(idx);
     const page = await state.doc.getPage(idx + 1);
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const scale = Math.min(3, Math.max(0.5, (state.pw * dpr) / page.viewport.width));
+    const vpBase = page.getViewport({ scale: 1 });
+    const scale = Math.min(3, Math.max(0.5, (state.pw * dpr) / vpBase.width));
     const vp = page.getViewport({ scale });
     const canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.round(vp.width));
@@ -311,34 +305,8 @@ function goPageInstant(target) {
 
 /* ================= UI ================= */
 
-function populateJump() {
-    els.jump.textContent = '';
-    for (let i = 0; i < state.numPages; i++) {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = 'Стр. ' + (i + 1);
-        els.jump.appendChild(opt);
-    }
-}
-
 function updateUI() {
-    const n = state.numPages;
-    if (state.mode === 'double') {
-        const s = state.spreads[state.spread];
-        const parts = [];
-        if (s.l != null) parts.push(s.l + 1);
-        if (s.r != null) parts.push(s.r + 1);
-        els.pageInfo.textContent = parts.length ? 'стр. ' + parts.join('–') : '—';
-        els.prevBtn.disabled = state.spread <= 0;
-        els.nextBtn.disabled = state.spread >= state.spreads.length - 1;
-        if (s.l != null) els.jump.value = String(s.l);
-        else if (s.r != null) els.jump.value = String(s.r);
-    } else {
-        els.pageInfo.textContent = 'стр. ' + (state.page + 1) + ' / ' + n;
-        els.prevBtn.disabled = state.page <= 0;
-        els.nextBtn.disabled = state.page >= n - 1;
-        els.jump.value = String(state.page);
-    }
+    // Верхняя панель управления убрана — обновлять нечего.
 }
 
 function prefetchNear() {
@@ -388,23 +356,10 @@ function onKey(e) {
             break;
         case 'Home': goStart(); break;
         case 'End': goEnd(); break;
-        case 'f':
-        case 'F':
-            toggleFs();
-            break;
         default:
             handled = false;
     }
     if (handled) e.preventDefault();
-}
-
-function toggleFs() {
-    if (!document.fullscreenEnabled) return;
-    if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-    } else {
-        els.app.requestFullscreen().catch(() => {});
-    }
 }
 
 function onResize() {
@@ -440,15 +395,6 @@ function debounce(fn, ms) {
 }
 
 function bindEvents() {
-    els.prevBtn.addEventListener('click', () => nav(-1));
-    els.nextBtn.addEventListener('click', () => nav(1));
-    els.jump.addEventListener('change', () => {
-        const p = parseInt(els.jump.value, 10);
-        if (Number.isNaN(p)) return;
-        if (state.mode === 'double') goSpreadInstant(spreadContaining(p));
-        else goPageInstant(p);
-    });
-    els.fsBtn.addEventListener('click', toggleFs);
     window.addEventListener('keydown', onKey);
     window.addEventListener('resize', debounce(onResize, 160));
 
@@ -512,7 +458,6 @@ async function init() {
         state.aspect = vp0.width / vp0.height;
         state.mode = screenMode();
         state.spreads = buildSpreads(state.numPages);
-        populateJump();
         fit();
 
         const mark = loadMark();

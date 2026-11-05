@@ -38,81 +38,6 @@ html, body {
     flex-direction: column;
 }
 
-/* ---------------- Верхняя панель ---------------- */
-
-.topbar {
-    height: 52px;
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 14px;
-    background: rgba(13, 15, 21, 0.72);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid var(--line);
-    z-index: 30;
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 0.3px;
-    white-space: nowrap;
-}
-
-.brand .dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--acc), var(--acc2));
-    box-shadow: 0 0 12px rgba(139, 92, 246, 0.8);
-}
-
-.spacer { flex: 1; }
-
-.btn {
-    appearance: none;
-    -webkit-appearance: none;
-    background: #1b2130;
-    border: 1px solid var(--line);
-    color: var(--ink);
-    height: 32px;
-    min-width: 32px;
-    border-radius: 8px;
-    font-size: 15px;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 0 10px;
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, transform 0.05s;
-}
-
-.btn:hover { background: #242c3e; border-color: #2e3a54; }
-.btn:active { transform: scale(0.96); }
-.btn:disabled { opacity: 0.35; pointer-events: none; }
-
-.iconbtn { padding: 0; }
-
-.pageinfo {
-    font-size: 13px;
-    color: var(--mut);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-}
-
-.jump {
-    max-width: 150px;
-    height: 32px;
-    font-size: 13px;
-}
-
 /* ---------------- Сцена ---------------- */
 
 .stage {
@@ -380,8 +305,5 @@ html, body {
 /* ---------------- Адаптив ---------------- */
 
 @media (max-width: 880px) {
-    .topbar { height: 48px; padding: 0 10px; gap: 8px; }
-    .btn { height: 30px; min-width: 30px; }
-    .hide-m { display: none !important; }
     .hint { font-size: 11px; }
 }
