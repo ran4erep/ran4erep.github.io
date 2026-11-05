@@ -40,32 +40,24 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
         setTimeout(() => best?.classList.remove('hub-flash'), 2600);
     };
 
-    // Надёжная прокрутка к карточке: находим реальный скролл-контейнер
-    // (ближайший предок с overflow auto/scroll) и прокручиваем его так,
-    // чтобы карточка оказалась по центру видимой области.
+    // Прокрутка к карточке: основной способ — нативный scrollIntoView
+    // (работал изначально), плюс страховка, которая жёстко фиксирует
+    // позицию в скролл-контейнере, если плавная прокрутка не сработала.
     const scrollCardIntoView = (card: Element) => {
-        let node = card.parentElement;
-        let scroller: Element | null = null;
-        while (node && node !== document.documentElement) {
-            const cs = window.getComputedStyle(node);
-            if (/(auto|scroll|overlay)/i.test(cs.overflowY) && node.scrollHeight > node.clientHeight) {
-                scroller = node;
-                break;
-            }
-            node = node.parentElement;
-        }
-        if (!scroller) scroller = document.getElementById('root') || document.scrollingElement;
-
-        const sRect = scroller.getBoundingClientRect();
-        const cRect = card.getBoundingClientRect();
-        const target = scroller.scrollTop + cRect.top - sRect.top
-            - scroller.clientHeight / 2 + cRect.height / 2;
-        const clamped = Math.max(0, Math.min(target, scroller.scrollHeight - scroller.clientHeight));
         try {
-            scroller.scrollTo({ top: clamped, behavior: 'smooth' });
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } catch (e) {
-            scroller.scrollTop = clamped;
+            card.scrollIntoView(true);
         }
+        setTimeout(() => {
+            const scroller = document.getElementById('root') || document.scrollingElement;
+            if (!scroller) return;
+            const cRect = card.getBoundingClientRect();
+            const sRect = scroller.getBoundingClientRect();
+            const top = scroller.scrollTop + cRect.top - sRect.top
+                - scroller.clientHeight / 2 + cRect.height / 2;
+            scroller.scrollTop = Math.max(0, Math.min(top, scroller.scrollHeight - scroller.clientHeight));
+        }, 120);
     };
 
     return (
