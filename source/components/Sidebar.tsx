@@ -52,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
     };
     
     return (
-        <aside className={`fixed top-0 left-0 h-full border-r border-white/10 z-40 transform-gpu transition-transform duration-300 ease-in-out w-[85%] sm:w-[60%] md:w-[22%] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <aside className={`fixed top-0 left-0 h-full border-r border-white/10 z-40 transform-gpu transition-transform duration-300 ease-in-out w-[85%] sm:w-[60%] md:w-[45%] lg:w-[22%] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             {/* Фоновый слой с блюром отделён от интерактивного контента:
                 ховер по пунктам меню не инвалидирует backdrop-filter и не
                 дёргает лежащий под панелью iframe. */}

@@ -194,12 +194,12 @@ const App: React.FC = () => {
                 </button>
                 <div className="flex">
                     <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} isAppOpen={!!openPath} onCloseApp={closeApp} openPath={openPath} appNavItems={appNavItems} onOpenApp={openApp} />
-                    <main className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-[22%]' : 'ml-0'} w-full md:w-auto`}>
+                    <main className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-[45%] lg:ml-[22%]' : 'ml-0'} w-full md:w-auto`}>
                         {openPath ? (
                             <AppView path={openPath} title={pages.find(p => p.path === openPath)?.title || openPath} />
                         ) : (
                             <div className="px-4 sm:px-8 pt-3 sm:pt-5 pb-4 sm:pb-8">
-                                <Header />
+                                <Header sidebarOpen={isSidebarOpen} />
 
                                 {renderSection('gallery', 'nav_gallery', <Gallery />)}
                                 

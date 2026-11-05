@@ -4,7 +4,11 @@ import { useAuth } from '../auth';
 import { UserAvatar } from './UserAvatar';
 import type { LanguageContextType } from '../types';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+    sidebarOpen?: boolean;
+}
+
+export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
     const { lang, setLang, t } = useContext(LanguageContext) as LanguageContextType;
     const { user, openLogin, openAccount } = useAuth();
 
@@ -40,7 +44,7 @@ export const Header: React.FC = () => {
         <header className="relative mb-6 md:mb-10">
             {/* Верхняя строка: слева поиск, справа язык рядом с входом */}
             <div className="flex items-center justify-between gap-2 z-10 pb-3">
-                <div className="relative w-full max-w-[220px] sm:max-w-[280px] min-w-0 ml-11 md:ml-0">
+                <div className={`relative w-full max-w-[220px] sm:max-w-[280px] min-w-0 ${sidebarOpen ? '' : 'ml-14'}`}>
                     <svg
                         className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
