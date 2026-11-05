@@ -1,0 +1,75 @@
+
+import React, { useState, useEffect, useContext } from 'react';
+import { LanguageContext } from '../App';
+import type { LanguageContextType } from '../types';
+
+export const FloatingButtons: React.FC = () => {
+    const { t } = useContext(LanguageContext) as LanguageContextType;
+    const [isVisible, setIsVisible] = useState(false);
+    
+    const getRoot = (): HTMLElement | null => document.getElementById('root');
+
+    const toggleVisibility = () => {
+        const root = getRoot();
+        const y = root ? root.scrollTop : window.pageYOffset;
+        if (y > 300) {
+            setIsVisible(true);
+        } else {
+            setIsVisible(false);
+        }
+    };
+    
+    const scrollToTop = () => {
+        const root = getRoot();
+        if (root) {
+            root.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+    
+    useEffect(() => {
+        const root = getRoot();
+        const target = root || window;
+        target.addEventListener('scroll', toggleVisibility);
+        return () => target.removeEventListener('scroll', toggleVisibility);
+    }, []);
+
+    return (
+        <div className="fixed bottom-24 right-5 z-50 flex flex-col gap-3">
+            {isVisible && (
+                <button onClick={scrollToTop} id="new-scroll-top" className="group w-14 h-14 bg-slate-900/35 backdrop-blur-xl border border-slate-700/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/45 hover:scale-110 active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <g stroke="#000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></g>
+                        <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></g>
+                    </svg>
+                    <span className="tooltip-left">{t('ontop_tooltip')}</span>
+                </button>
+            )}
+             <style>{`
+                .tooltip-left {
+                    position: absolute;
+                    right: 110%;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background-color: #1f2937;
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    white-space: nowrap;
+                    opacity: 0;
+                    visibility: hidden;
+                    transition: opacity 0.2s, visibility 0.2s;
+                    pointer-events: none;
+                }
+                @media (hover: hover) {
+                    .group:hover .tooltip-left {
+                        opacity: 1;
+                        visibility: visible;
+                    }
+                }
+            `}</style>
+        </div>
+    );
+};

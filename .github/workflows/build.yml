@@ -1,0 +1,79 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: build-deploy
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: source/package-lock.json
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: source/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('source/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        working-directory: source
+        run: npm install
+
+      - name: Build
+        working-directory: source
+        run: npm run build
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      - name: Generate pages manifest
+        run: node scripts/generate-pages.mjs
+
+      - name: Stage site for Pages
+        run: |
+          # Собираем полный снимок сайта: репозиторий (статические
+          # разделы) + свежая сборка Vite поверх.
+          rm -rf _site && mkdir _site
+          rsync -a --exclude='.git' --exclude='source' --exclude='scripts' \
+                --exclude='.github' --exclude='node_modules' --exclude='_site' \
+                ./ _site/
+          rm -f _site/assets/index-*.js
+          rsync -a source/dist/ _site/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+		canvas {
+			border: 1px solid red;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="c" width="300" height="300"></canvas>
+	<script type="text/javascript">
+		    var ctx = c.getContext('2d');
+    onmousemove = function(e){
+        e = e || window.event;
+        ctx.clearRect(0,0,c.width,c.height);
+        brezLine(c.width/2,c.height/2,e.pageX,e.pageY);
+    }
+
+    
+function brezLine(x1,y1,x2,y2){
+    x1 |= 0; y1 |= 0; x2 |= 0; y2 |= 0; //no float values!
+    var dx = x2 - x1, dy = y2 - y1; //find delta x,y
+    var sx = (dx > 0) - (dx < 0), sy = (dy > 0) - (dy < 0); //sign of delta values +1 or 0 or -1
+    dx *= sx; dy *= sy; //convert dx,dy to abs values use the multiple with sign
+
+    ctx.fillRect(x1, y1, 1, 1); //start point draw always
+    if( !(dx || dy) )return;    //if no any delta dx or dy stop
+    var d = 0, x = x1, y = y1, v;
+    if(dy < dx) //if abs delta Y less then abs delta X - iterate by X += sign of delta X (+1 or -1)
+      for(v = 0 | (dy << 15) / dx * sy; x ^ x2; x += sx, d &= 32767) //v is Tan() = y/x scaled by * 32768 (sub grid step) 
+        ctx.fillRect(x*8, y += (d += v) >> 15, 8, 8); //d accumulate += grid step, so Y take +1px for each 32768 steps.
+    else //else if abs delta X less then abs delta Y - iterate by Y += sign of delta Y (+1 or -1)
+      for(v = 0 | (dx << 15) / dy * sx; y ^ y2; y += sy, d &= 32767) //v is Ctn() = x/y scaled by * 32768 (sub grid step)
+        ctx.fillRect(x*8 += (d += v) >> 15, y*8, 8, 8); // d &= 32767 is accumulator partial emptyer
+};
+	</script>
+</body>
+</html>

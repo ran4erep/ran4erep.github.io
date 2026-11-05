@@ -1,0 +1,47 @@
+html {
+	//touch-action: none;
+	font-family: Arial;
+}
+.black {
+	background-color: #000000;
+	width: 42px;
+	height: 90px;
+	margin-left: -21px;
+	margin-right: -21px;
+	z-index: 1;
+	border-radius: 0 0 3px 3px;
+	background: linear-gradient(45deg, #222 0%, #555 100%);
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	color: #ffffff;
+}
+.white {
+	background: linear-gradient(to bottom, #eee 0%, #fff 100%);
+	border: 1px solid black;
+	width: 80px;
+	height: 150px;
+	border-radius: 0 0 5px 5px;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+
+}
+.key {
+	cursor: pointer;
+}
+.pressedWhite {
+	background: linear-gradient(to bottom, #fff 0%, #c0c0c0 100%);
+	color: #aacaf3;
+}
+.pressedBlack {
+	background: linear-gradient(to right, #444 0%, #222 100%);
+	color: #aacaf3;
+}
+#piano {
+	display: flex;
+}
+input[type="radio"] {
+	width: 80px;
+	height: 80px;
+}

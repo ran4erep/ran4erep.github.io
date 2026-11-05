@@ -1,0 +1,31 @@
+
+{
+  "bleeding": {
+    "id": "bleeding",
+    "name": "Кровотечение/Bleeding",
+    "description": "Вы теряете кровь. -1 HP каждый ход./You are losing blood. -1 HP per turn.",
+    "type": "DEBUFF",
+    "icon": "M18,15A6,6,0,0,1,6,15c0-4,2-5,6-12C16,10,18,11,18,15Z",
+    "iconType": "SVG_PATH",
+    "color": "text-red-500",
+    "duration": 5,
+    "tickEffect": {
+      "stat": "hp",
+      "value": -1
+    }
+  },
+  "antiseptic": {
+    "id": "antiseptic",
+    "name": "Антисептик/Antiseptic",
+    "description": "Рана обработана. +1 HP каждый ход./Wound treated. +1 HP per turn.",
+    "type": "BUFF",
+    "icon": "PLUS",
+    "iconType": "LUCIDE",
+    "color": "text-green-400",
+    "duration": 5,
+    "tickEffect": {
+      "stat": "hp",
+      "value": 1
+    }
+  }
+}

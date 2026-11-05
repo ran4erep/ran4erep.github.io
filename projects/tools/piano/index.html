@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Piano</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body oncontextmenu="return=false;">
+	<div id="apiEnable"><span style="color: red;">Для работы пианино вы должны подтвердить активацию Audio API</span> <button id="audioOn">Включить аудио</button></div>
+	<div id="piano">
+		<div class="key white" data-key="C"></div>
+		<div class="key black" data-key="C#"></div>
+ 		<div class="key white" data-key="D"></div>
+ 		<div class="key black" data-key="Eb"></div>
+		<div class="key white" data-key="E"></div>
+		<div class="key white" data-key="F"></div>
+		<div class="key black" data-key="F#"></div>
+		<div class="key white" data-key="G"></div>
+		<div class="key black" data-key="G#"></div>
+		<div class="key white" data-key="A"></div>
+		<div class="key black" data-key="Bb"></div>
+		<div class="key white" data-key="B"></div>
+	</div>
+	<br>
+	<input type="radio" value="1" class="octaveRadio" name="octaveSelection">1
+	<input type="radio" value="2" class="octaveRadio" name="octaveSelection">2
+	<input type="radio" value="3" class="octaveRadio" name="octaveSelection">3
+	<input type="radio" checked value="4" class="octaveRadio" name="octaveSelection">4
+	<input type="radio" value="5" class="octaveRadio" name="octaveSelection">5
+	<input type="radio" value="6" class="octaveRadio" name="octaveSelection">6
+	<input type="radio" value="7" class="octaveRadio" name="octaveSelection">7
+
+	<script type="text/javascript" src="tone.js"></script>
+	<script type="text/javascript" src="script.js"></script>
+</body>
+</html>

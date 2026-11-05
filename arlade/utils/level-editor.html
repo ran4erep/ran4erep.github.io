@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level Editor</title>
+    <style>
+        :root {
+            --bg-main: #1E1E2E;
+            --bg-editor: #2A2A3A;
+            --bg-transparent: #353545;
+            --bg-controls: #2A2A3A;
+            --text-color: #f2f2f9;
+            --accent-color: #6a5fa0;
+            --border-color: #353545;
+            --grid-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            background-color: var(--bg-main);
+            color: var(--text-color);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+        }
+
+        .left-panel {
+            flex: 0 0 300px;
+        }
+
+        .right-panel {
+            flex: 1;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0 0 20px 0;
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .name-input {
+            margin-bottom: 30px;
+        }
+
+        .name-input input {
+            background: var(--bg-editor);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px;
+            font-family: monospace;
+            font-size: 14px;
+            border-radius: 6px;
+            width: 200px;
+        }
+
+        .editor-container {
+            background: var(--bg-editor);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            overflow: auto;
+            max-height: 70vh;
+        }
+
+        .editor {
+            display: grid;
+            gap: 1px;
+            background: var(--border-color);
+            padding: 1px;
+            border-radius: 4px;
+            position: relative;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .editor::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 25px 25px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .tile {
+            width: 24px;
+            height: 24px;
+            background: var(--bg-transparent);
+            cursor: pointer;
+            border-radius: 0;
+            transition: transform 0.1s;
+            position: relative;
+            z-index: 0;
+            image-rendering: pixelated;
+        }
+
+        .tile:hover {
+            transform: scale(1.1);
+            z-index: 1;
+        }
+
+        .palette-container {
+            background: var(--bg-editor);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg-transparent);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .glyph-button {
+            width: 64px;
+            height: 64px;
+            background: var(--bg-editor);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+
+        .glyph-button:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-color);
+        }
+
+        .glyph-button.selected {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .glyph-button canvas {
+            image-rendering: pixelated;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glyph-preview {
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .controls button {
+            padding: 8px 16px;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 4px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .controls button:hover {
+            background: color-mix(in srgb, var(--accent-color) 80%, white);
+        }
+
+        .controls button:last-child {
+            background: var(--bg-transparent);
+        }
+
+        .controls button:last-child:hover {
+            background: color-mix(in srgb, var(--bg-transparent) 80%, white);
+        }
+
+        .output {
+            background: var(--bg-editor);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .output pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-size: 14px;
+            color: #26dddd;
+            max-height: 300px;
+            overflow: auto;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .object-properties {
+            background: var(--bg-editor);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .property-group {
+            margin-bottom: 15px;
+        }
+
+        .property-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .property-group select {
+            width: 100%;
+            padding: 8px;
+            background: var(--bg-transparent);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 4px;
+        }
+
+        .property-group input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .size-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .size-controls input {
+            width: 60px;
+            padding: 8px;
+            background: var(--bg-transparent);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 4px;
+        }
+
+        .size-controls label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Стили для модального окна */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--bg-editor);
+            padding: 30px;
+            border-radius: 12px;
+            width: 400px;
+            position: relative;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal .section-title {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal .close-button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 5px;
+            font-size: 20px;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .modal .close-button:hover {
+            opacity: 1;
+        }
+
+        .modal .property-group {
+            margin-bottom: 20px;
+        }
+
+        .modal .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal .preview {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: var(--bg-transparent);
+            border-radius: 8px;
+        }
+
+        .modal .preview canvas {
+            width: 64px;
+            height: 64px;
+            image-rendering: pixelated;
+        }
+
+        .modal .preview-info {
+            flex: 1;
+        }
+
+        .modal .preview-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            font-weight: normal;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="left-panel">
+            <div class="header">
+                <h1>Level Editor</h1>
+                <div class="name-input">
+                    <input type="text" id="mapName" value="new_map" placeholder="Enter map name...">
+                </div>
+            </div>
+
+            <div class="size-controls">
+                <label>
+                    Width:
+                    <input type="number" id="mapWidth" value="40" min="10" max="100">
+                </label>
+                <label>
+                    Height:
+                    <input type="number" id="mapHeight" value="30" min="10" max="100">
+                </label>
+                <button onclick="resizeMap()">Resize</button>
+            </div>
+
+            <div class="palette-container">
+                <div class="section-title">Available Glyphs</div>
+                <div class="palette" id="palette"></div>
+            </div>
+
+            <div class="palette-container">
+                <div class="section-title">Configured Objects</div>
+                <div class="configured-objects" id="configuredObjects" style="
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+                    gap: 10px;
+                    padding: 10px;
+                    background: var(--bg-transparent);
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    min-height: 64px;
+                "></div>
+            </div>
+
+            <div class="controls">
+                <button onclick="fillMap()">Fill Map</button>
+                <button onclick="clearMap()">Clear Map</button>
+                <button onclick="copyToClipboard()">Copy JSON</button>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="editor-container">
+                <div class="editor" id="editor"></div>
+            </div>
+
+            <div class="output">
+                <div class="section-title">Generated JSON</div>
+                <pre id="output"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для настроек глифа -->
+    <div class="modal-overlay" id="objectPropertiesModal">
+        <div class="modal">
+            <div class="section-title">
+                Configure Object
+                <button class="close-button" onclick="cancelObjectSetup()">&times;</button>
+            </div>
+            
+            <div class="preview">
+                <canvas id="previewCanvas" width="64" height="64"></canvas>
+                <div class="preview-info">
+                    <h3 id="previewGlyphName">Glyph Name</h3>
+                </div>
+            </div>
+
+            <div class="property-group">
+                <label for="objectType">Type:</label>
+                <select id="objectType" onchange="updatePropertiesVisibility()">
+                    <option value="wall">Wall</option>
+                    <option value="floor">Floor</option>
+                    <option value="player">Player</option>
+                    <option value="decoration">Decoration</option>
+                    <option value="door">Door</option>
+                </select>
+            </div>
+
+            <div class="property-group">
+                <label for="objectSymbol">Symbol:</label>
+                <input type="text" id="objectSymbol" maxlength="1" style="
+                    width: 40px;
+                    text-align: center;
+                    padding: 8px;
+                    background: var(--bg-transparent);
+                    border: 1px solid var(--border-color);
+                    color: var(--text-color);
+                    border-radius: 4px;
+                    font-family: monospace;
+                    font-size: 16px;
+                ">
+            </div>
+
+            <div class="property-group">
+                <label for="zIndex">Z-Index:</label>
+                <input type="number" id="zIndex" value="0" style="
+                    width: 60px;
+                    text-align: center;
+                    padding: 8px;
+                    background: var(--bg-transparent);
+                    border: 1px solid var(--border-color);
+                    color: var(--text-color);
+                    border-radius: 4px;
+                    font-family: monospace;
+                    font-size: 14px;
+                ">
+            </div>
+
+            <div class="property-group" id="movementGroup">
+                <label>
+                    <input type="checkbox" id="blocksMovement">
+                    Blocks Movement
+                </label>
+            </div>
+
+            <div class="property-group" id="lightGroup">
+                <label>
+                    <input type="checkbox" id="blocksLight">
+                    Blocks Light
+                </label>
+            </div>
+
+            <div class="property-group" id="doorGroup" style="display: none;">
+                <label>
+                    <input type="checkbox" id="isOpened">
+                    Is Opened
+                </label>
+            </div>
+
+            <div class="controls">
+                <button onclick="confirmObjectSetup()">OK</button>
+                <button onclick="cancelObjectSetup()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let glyphs = {};
+        let selectedSymbol = '.';
+        let mapWidth = 40;
+        let mapHeight = 30;
+        let grid = [];
+        let objectDefinitions = {};
+        let nextSymbol = 65; // ASCII код для 'A'
+        let tempGlyphName = null;
+        let actionHistory = [];
+        let currentHistoryIndex = -1;
+        const MAX_HISTORY = 100;
+
+        // Функция для сохранения состояния в историю
+        function saveToHistory() {
+            // Обрезаем историю если мы делаем новое действие после отмены
+            if (currentHistoryIndex < actionHistory.length - 1) {
+                actionHistory = actionHistory.slice(0, currentHistoryIndex + 1);
+            }
+            
+            // Проверяем, отличается ли новое состояние от последнего сохраненного
+            const lastState = actionHistory[currentHistoryIndex];
+            const currentState = {
+                grid: grid.map(row => [...row]),
+                selectedSymbol: selectedSymbol,
+                mapWidth: mapWidth,
+                mapHeight: mapHeight
+            };
+            
+            // Если состояния идентичны, не сохраняем
+            if (lastState && JSON.stringify(lastState) === JSON.stringify(currentState)) {
+                return;
+            }
+            
+            actionHistory.push(currentState);
+            currentHistoryIndex++;
+            
+            // Ограничиваем размер истории
+            if (actionHistory.length > MAX_HISTORY) {
+                actionHistory.shift();
+                currentHistoryIndex--;
+            }
+        }
+
+        // Функция отмены действия
+        function undo() {
+            if (currentHistoryIndex <= 0) return;
+            
+            currentHistoryIndex--;
+            const state = actionHistory[currentHistoryIndex];
+            
+            // Восстанавливаем состояние
+            grid = state.grid.map(row => [...row]);
+            selectedSymbol = state.selectedSymbol;
+            mapWidth = state.mapWidth;
+            mapHeight = state.mapHeight;
+            
+            // Обновляем размеры в полях ввода
+            document.getElementById('mapWidth').value = mapWidth;
+            document.getElementById('mapHeight').value = mapHeight;
+            
+            // Обновляем интерфейс
+            updateEditor();
+        }
+
+        // Добавляем обработчик клавиш для Ctrl+Z
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'z') {
+                e.preventDefault();
+                undo();
+            }
+        });
+
+        // Загрузка глифов
+        async function loadGlyphs() {
+            try {
+                const response = await fetch('../src/data/glyphs.json');
+                glyphs = await response.json();
+                initializePalette();
+                updateGlyphSelect();
+            } catch (error) {
+                console.error('Failed to load glyphs:', error);
+            }
+        }
+
+        // Отрисовка превью глифа
+        function drawGlyphPreview(ctx, glyph, size = 24) {
+            const pixelSize = size / 16; // Размер одного пикселя глифа
+
+            // Очищаем canvas
+            ctx.clearRect(0, 0, size, size);
+
+            // Отрисовываем каждый пиксель глифа
+            glyph.pixels.forEach((row, y) => {
+                [...row].forEach((pixel, x) => {
+                    if (pixel === '-') return; // Пропускаем прозрачные пиксели
+                    const color = glyph.colors[pixel];
+                    if (!color) return;
+
+                    ctx.fillStyle = color;
+                    ctx.fillRect(
+                        Math.floor(x * pixelSize),
+                        Math.floor(y * pixelSize),
+                        Math.ceil(pixelSize),
+                        Math.ceil(pixelSize)
+                    );
+                });
+            });
+        }
+
+        // Инициализация палитры
+        function initializePalette() {
+            const palette = document.getElementById('palette');
+            palette.innerHTML = '';
+
+            // Создаем превью для каждого глифа
+            Object.entries(glyphs).forEach(([name, glyph]) => {
+                const button = document.createElement('div');
+                button.className = 'glyph-button';
+                button.title = name;
+                
+                // Создаем canvas для отрисовки глифа
+                const canvas = document.createElement('canvas');
+                canvas.width = 64;
+                canvas.height = 64;
+                const ctx = canvas.getContext('2d');
+                
+                // Отрисовываем глиф
+                drawGlyphPreview(ctx, glyph, 64);
+                
+                button.appendChild(canvas);
+                button.addEventListener('click', () => showObjectProperties(name));
+                palette.appendChild(button);
+            });
+        }
+
+        function updatePropertiesVisibility() {
+            const type = document.getElementById('objectType').value;
+            const movementGroup = document.getElementById('movementGroup');
+            const lightGroup = document.getElementById('lightGroup');
+            const doorGroup = document.getElementById('doorGroup');
+
+            if (type === 'door') {
+                movementGroup.style.display = 'none';
+                lightGroup.style.display = 'none';
+                doorGroup.style.display = 'block';
+            } else {
+                movementGroup.style.display = 'block';
+                lightGroup.style.display = 'block';
+                doorGroup.style.display = 'none';
+            }
+        }
+
+        function showObjectProperties(glyphName) {
+            tempGlyphName = glyphName;
+            
+            // Показываем модальное окно
+            const modal = document.getElementById('objectPropertiesModal');
+            modal.style.display = 'flex';
+            
+            // Обновляем превью глифа
+            const canvas = document.getElementById('previewCanvas');
+            const ctx = canvas.getContext('2d');
+            drawGlyphPreview(ctx, glyphs[glyphName], 64);
+            
+            // Обновляем название глифа
+            document.getElementById('previewGlyphName').textContent = glyphName;
+            
+            // Генерируем следующий доступный символ
+            let symbol = String.fromCharCode(nextSymbol);
+            while (objectDefinitions[symbol]) {
+                nextSymbol = nextSymbol >= 90 ? 65 : nextSymbol + 1;
+                symbol = String.fromCharCode(nextSymbol);
+            }
+            document.getElementById('objectSymbol').value = symbol;
+            
+            // Устанавливаем дефолтные значения в зависимости от типа глифа
+            if (glyphName === 'wall') {
+                document.getElementById('objectType').value = 'wall';
+                document.getElementById('blocksMovement').checked = true;
+                document.getElementById('blocksLight').checked = true;
+                document.getElementById('zIndex').value = '1';
+            } else if (glyphName === 'floor') {
+                document.getElementById('objectType').value = 'floor';
+                document.getElementById('blocksMovement').checked = false;
+                document.getElementById('blocksLight').checked = false;
+                document.getElementById('zIndex').value = '0';
+            } else if (glyphName === 'player') {
+                document.getElementById('objectType').value = 'player';
+                document.getElementById('blocksMovement').checked = true;
+                document.getElementById('blocksLight').checked = false;
+                document.getElementById('zIndex').value = '2';
+            } else if (glyphName === 'door') {
+                document.getElementById('objectType').value = 'door';
+                document.getElementById('isOpened').checked = false;
+                document.getElementById('zIndex').value = '1';
+            } else {
+                document.getElementById('objectType').value = 'decoration';
+                document.getElementById('blocksMovement').checked = false;
+                document.getElementById('blocksLight').checked = false;
+                document.getElementById('zIndex').value = '1';
+            }
+
+            updatePropertiesVisibility();
+        }
+
+        function createConfiguredObjectButton(symbol, objectDef) {
+            const button = document.createElement('div');
+            button.className = 'glyph-button';
+            button.title = `${objectDef.glyph} (${symbol})`;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            
+            drawGlyphPreview(ctx, glyphs[objectDef.glyph], 64);
+            
+            // Добавляем символ поверх глифа
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 48, 64, 16);
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(symbol, 32, 56);
+            
+            button.appendChild(canvas);
+            button.addEventListener('click', () => selectConfiguredObject(symbol));
+            return button;
+        }
+
+        function selectConfiguredObject(symbol) {
+            selectedSymbol = symbol;
+            
+            // Обновляем выделение в палитре глифов
+            document.querySelectorAll('.glyph-button').forEach(button => {
+                button.classList.remove('selected');
+            });
+            
+            // Находим и выделяем кнопку с этим глифом
+            const objectDef = objectDefinitions[symbol];
+            const buttons = document.querySelectorAll('.glyph-button');
+            for (let i = 0; i < buttons.length; i++) {
+                if (buttons[i].title === `${objectDef.glyph} (${symbol})`) {
+                    buttons[i].classList.add('selected');
+                    break;
+                }
+            }
+        }
+
+        function updateConfiguredObjects() {
+            const container = document.getElementById('configuredObjects');
+            container.innerHTML = '';
+            
+            Object.entries(objectDefinitions).forEach(([symbol, objectDef]) => {
+                const button = createConfiguredObjectButton(symbol, objectDef);
+                container.appendChild(button);
+            });
+        }
+
+        function confirmObjectSetup() {
+            if (!tempGlyphName) return;
+
+            const symbol = document.getElementById('objectSymbol').value;
+            if (!symbol) {
+                alert('Please enter a symbol');
+                return;
+            }
+
+            selectedSymbol = symbol;
+
+            // Сохраняем определение объекта
+            const type = document.getElementById('objectType').value;
+            if (type === 'door') {
+                objectDefinitions[symbol] = {
+                    glyph: tempGlyphName,
+                    type: 'door',
+                    isOpened: document.getElementById('isOpened').checked,
+                    z_index: parseInt(document.getElementById('zIndex').value) || 0
+                };
+            } else {
+                objectDefinitions[symbol] = {
+                    glyph: tempGlyphName,
+                    type: type,
+                    blocks_movement: document.getElementById('blocksMovement').checked,
+                    blocks_light: document.getElementById('blocksLight').checked,
+                    z_index: parseInt(document.getElementById('zIndex').value) || 0
+                };
+            }
+
+            // Обновляем выделение в палитре
+            document.querySelectorAll('.glyph-button').forEach(button => {
+                button.classList.remove('selected');
+            });
+            
+            // Находим и выделяем кнопку с этим глифом
+            const buttons = document.querySelectorAll('.glyph-button');
+            for (let i = 0; i < buttons.length; i++) {
+                if (i === Object.keys(glyphs).indexOf(tempGlyphName)) {
+                    buttons[i].classList.add('selected');
+                    break;
+                }
+            }
+
+            // Обновляем панель настроенных объектов
+            updateConfiguredObjects();
+
+            // Скрываем модальное окно
+            document.getElementById('objectPropertiesModal').style.display = 'none';
+            tempGlyphName = null;
+        }
+
+        function cancelObjectSetup() {
+            document.getElementById('objectPropertiesModal').style.display = 'none';
+            tempGlyphName = null;
+        }
+
+        // Закрытие модального окна при клике вне его
+        document.getElementById('objectPropertiesModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cancelObjectSetup();
+            }
+        });
+
+        // Закрытие модального окна при нажатии Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('objectPropertiesModal').style.display === 'flex') {
+                cancelObjectSetup();
+            }
+        });
+
+        // Обновление списка глифов в селекте
+        function updateGlyphSelect() {
+            const select = document.getElementById('objectGlyph');
+            select.innerHTML = '';
+            
+            Object.keys(glyphs).forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                select.appendChild(option);
+            });
+        }
+
+        // Получение символа для глифа
+        function getSymbolForGlyph(glyphName) {
+            // Ищем существующий символ для этого глифа
+            const existing = Object.entries(objectDefinitions)
+                .find(([_, def]) => def.glyph === glyphName);
+            
+            if (existing) return existing[0];
+
+            // Создаем новый символ
+            const symbol = String.fromCharCode(nextSymbol++);
+            if (nextSymbol > 90) nextSymbol = 65; // Зацикливаем обратно на 'A'
+            
+            return symbol;
+        }
+
+        // Инициализация сетки
+        function initializeGrid() {
+            grid = Array(mapHeight).fill().map(() => Array(mapWidth).fill(' '));
+            updateEditor();
+            // Сохраняем начальное состояние
+            saveToHistory();
+        }
+
+        // Обновление редактора
+        function updateEditor() {
+            const editor = document.getElementById('editor');
+            editor.innerHTML = '';
+            editor.style.gridTemplateColumns = `repeat(${mapWidth}, 24px)`;
+
+            for (let y = 0; y < mapHeight; y++) {
+                for (let x = 0; x < mapWidth; x++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    tile.dataset.x = x;
+                    tile.dataset.y = y;
+
+                    // Создаем canvas для тайла
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 24;
+                    canvas.height = 24;
+                    const ctx = canvas.getContext('2d', { alpha: true });
+                    ctx.imageSmoothingEnabled = false;
+
+                    // Отрисовываем глиф
+                    const symbol = grid[y][x];
+                    const objectDef = objectDefinitions[symbol];
+                    if (objectDef) {
+                        const glyph = glyphs[objectDef.glyph];
+                        if (glyph) {
+                            drawGlyphPreview(ctx, glyph);
+                        }
+                    }
+
+                    tile.appendChild(canvas);
+                    tile.addEventListener('mousedown', startDrawing);
+                    tile.addEventListener('mouseover', continueDraw);
+                    editor.appendChild(tile);
+                }
+            }
+
+            updateOutput();
+        }
+
+        let isDrawing = false;
+
+        function startDrawing(e) {
+            if (e.button !== 0) return;
+            isDrawing = true;
+            saveToHistory(); // Сохраняем состояние в начале рисования
+            draw(e);
+            window.addEventListener('mouseup', stopDrawing);
+        }
+
+        function continueDraw(e) {
+            if (!isDrawing) return;
+            draw(e);
+        }
+
+        function stopDrawing() {
+            if (!isDrawing) return;
+            isDrawing = false;
+            saveToHistory(); // Сохраняем состояние в конце рисования
+            window.removeEventListener('mouseup', stopDrawing);
+        }
+
+        function draw(e) {
+            const tile = e.target.closest('.tile');
+            if (!tile) return;
+            
+            const x = parseInt(tile.dataset.x);
+            const y = parseInt(tile.dataset.y);
+            
+            if (isNaN(x) || isNaN(y)) return;
+            
+            // Проверяем, изменилось ли значение
+            if (grid[y][x] !== selectedSymbol) {
+                grid[y][x] = selectedSymbol;
+                
+                // Обновляем тайл
+                const canvas = tile.querySelector('canvas');
+                const ctx = canvas.getContext('2d', { alpha: true });
+                ctx.imageSmoothingEnabled = false;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const objectDef = objectDefinitions[selectedSymbol];
+                if (objectDef) {
+                    const glyph = glyphs[objectDef.glyph];
+                    if (glyph) {
+                        drawGlyphPreview(ctx, glyph);
+                    }
+                }
+                
+                updateOutput();
+            }
+        }
+
+        function resizeMap() {
+            const newWidth = parseInt(document.getElementById('mapWidth').value);
+            const newHeight = parseInt(document.getElementById('mapHeight').value);
+            
+            if (isNaN(newWidth) || isNaN(newHeight)) return;
+            if (newWidth < 10 || newHeight < 10) return;
+            if (newWidth > 100 || newHeight > 100) return;
+            
+            saveToHistory();
+            
+            mapWidth = newWidth;
+            mapHeight = newHeight;
+            
+            // Создаем новую сетку с сохранением существующих данных
+            const newGrid = Array(mapHeight).fill().map((_, y) => 
+                Array(mapWidth).fill().map((_, x) => 
+                    y < grid.length && x < grid[0].length ? grid[y][x] : ' '
+                )
+            );
+            
+            grid = newGrid;
+            updateEditor();
+        }
+
+        function fillMap() {
+            if (!selectedSymbol || selectedSymbol === ' ') return;
+            saveToHistory();
+            grid = Array(mapHeight).fill().map(() => Array(mapWidth).fill(selectedSymbol));
+            updateEditor();
+        }
+
+        function clearMap() {
+            saveToHistory();
+            grid = Array(mapHeight).fill().map(() => Array(mapWidth).fill(' '));
+            updateEditor();
+        }
+
+        function updateOutput() {
+            const mapName = document.getElementById('mapName').value;
+            
+            const output = {
+                [mapName]: {
+                    objects: objectDefinitions,
+                    layout: grid.map(row => row.join(''))
+                }
+            };
+            
+            document.getElementById('output').textContent = JSON.stringify(output, null, 4);
+        }
+
+        function copyToClipboard() {
+            const output = document.getElementById('output');
+            navigator.clipboard.writeText(output.textContent)
+                .then(() => alert('Copied to clipboard!'))
+                .catch(err => console.error('Failed to copy:', err));
+        }
+
+        // Инициализация при загрузке
+        loadGlyphs().then(() => {
+            initializeGrid();
+            updateConfiguredObjects();
+            updateOutput();
+        });
+    </script>
+</body>
+</html> 

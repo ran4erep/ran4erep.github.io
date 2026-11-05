@@ -1,0 +1,313 @@
+/* ============================================================
+   Cradle of Death — книга (PDF-читалка с переворотом страниц)
+   ============================================================ */
+
+:root {
+    --line: #232a3a;
+    --ink: #e8e6e0;
+    --mut: #8b91a0;
+    --acc: #8b5cf6;
+    --acc2: #c084fc;
+    --paper: #fbf7ee;
+    --dur: 0.8s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#app {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---------------- Сцена ---------------- */
+
+.stage {
+    flex: 1 1 auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 2600px;
+    overflow: hidden;
+    background: transparent;
+    touch-action: none;
+}
+
+/* ---------------- Книга ---------------- */
+
+.book {
+    position: relative;
+    transform-style: preserve-3d;
+    filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.3));
+    transition: opacity 0.4s ease;
+}
+
+.book.double {
+    width: calc(var(--pw) * 2);
+    height: var(--ph);
+}
+
+.book.single {
+    width: var(--pw);
+    height: var(--ph);
+}
+
+/* След от сгиба в середине книги (без чёрного промежутка) */
+.book.double::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    left: calc(var(--pw) - 9px);
+    width: 18px;
+    background: linear-gradient(to right,
+        transparent 0%,
+        rgba(0, 0, 0, 0.22) 38%,
+        rgba(0, 0, 0, 0.42) 50%,
+        rgba(0, 0, 0, 0.22) 62%,
+        transparent 100%);
+    z-index: 4;
+    pointer-events: none;
+}
+
+.slot {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: var(--pw);
+    background: var(--paper);
+    overflow: hidden;
+}
+
+.book.double .slot.left {
+    left: 0;
+    border-radius: 6px 2px 2px 6px;
+    box-shadow: inset -18px 0 24px -16px rgba(0, 0, 0, 0.28),
+                inset 2px 0 0 rgba(255, 255, 255, 0.5);
+}
+
+.book.double .slot.right {
+    left: var(--pw);
+    border-radius: 2px 6px 6px 2px;
+    box-shadow: inset 18px 0 24px -16px rgba(0, 0, 0, 0.28),
+                inset -2px 0 0 rgba(255, 255, 255, 0.5);
+}
+
+.book.single .slot.single {
+    left: 0;
+    border-radius: 8px;
+    box-shadow: inset 0 0 44px rgba(0, 0, 0, 0.08);
+}
+
+.book.double .slot.single { display: none; }
+.book.single .slot.left,
+.book.single .slot.right { display: none; }
+
+.slot canvas,
+.flip .face canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.blank,
+.paper-ph {
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+}
+
+/* ---------------- Переворот страницы ---------------- */
+
+.flip {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: var(--pw);
+    transform-style: preserve-3d;
+    z-index: 8;
+    will-change: transform;
+}
+
+.flip .face {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--paper);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.flip .face.back {
+    transform: rotateY(180deg);
+}
+
+.flip.fwd { transform-origin: left center; }
+.flip.bwd { transform-origin: right center; }
+
+.flip.go.fwd {
+    animation: flipFwd var(--dur) cubic-bezier(0.32, 0.78, 0.32, 1) forwards;
+}
+
+.flip.go.bwd {
+    animation: flipBwd var(--dur) cubic-bezier(0.32, 0.78, 0.32, 1) forwards;
+}
+
+@keyframes flipFwd {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(-180deg); }
+}
+
+@keyframes flipBwd {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(180deg); }
+}
+
+/* Тень-“бугор” у сгибаемой кромки */
+.flip .curl {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+    mix-blend-mode: multiply;
+}
+
+.flip.fwd .curl {
+    background: linear-gradient(to left,
+        transparent 0%,
+        rgba(0, 0, 0, 0.06) 40%,
+        rgba(0, 0, 0, 0.22) 80%,
+        rgba(0, 0, 0, 0.42) 100%);
+    animation: curlFade var(--dur) ease forwards;
+}
+
+.flip.bwd .curl {
+    background: linear-gradient(to right,
+        transparent 0%,
+        rgba(0, 0, 0, 0.06) 40%,
+        rgba(0, 0, 0, 0.22) 80%,
+        rgba(0, 0, 0, 0.42) 100%);
+    animation: curlFade var(--dur) ease forwards;
+}
+
+@keyframes curlFade {
+    0%   { opacity: 0; }
+    40%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* ---------------- Загрузчик ---------------- */
+
+.loader {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: transparent;
+    z-index: 50;
+    transition: opacity 0.4s;
+}
+
+.loader.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.spinner {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 3px solid #232a3a;
+    border-top-color: var(--acc);
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loadmsg {
+    color: var(--mut);
+    font-size: 13px;
+    max-width: 80vw;
+    text-align: center;
+}
+
+.pbar {
+    width: 240px;
+    max-width: 70vw;
+    height: 4px;
+    border-radius: 999px;
+    background: #1b2130;
+    overflow: hidden;
+}
+
+.pbar i {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--acc), var(--acc2));
+    transition: width 0.2s;
+}
+
+/* ---------------- Мобильный читатель (вертикальный скролл) ---------------- */
+
+#app.single .book { display: none; }
+
+.mobile-reader {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    background: transparent;
+    display: none;
+    padding: 12px 0;
+    transition: opacity 0.4s ease;
+}
+
+#app.single .mobile-reader {
+    display: block;
+}
+
+.m-page {
+    width: 100%;
+    aspect-ratio: var(--ar);
+    position: relative;
+    background: var(--paper);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.04);
+}
+
+.m-page .paper-ph {
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+}
+
+.m-page canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ---------------- Адаптив ---------------- */

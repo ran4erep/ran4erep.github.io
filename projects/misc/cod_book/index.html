@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Cradle of Death — Колыбель смерти</title>
+    <link rel="icon" type="image/jpeg" href="cover.jpg">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <main class="stage" id="stage">
+            <div class="book" id="book"></div>
+            <div class="mobile-reader" id="mobileReader"></div>
+        </main>
+    </div>
+
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <div class="loadmsg" id="loadMsg">Загрузка книги…</div>
+        <div class="pbar"><i id="pbarFill"></i></div>
+    </div>
+
+    <noscript>Для чтения книги нужен включённый JavaScript.</noscript>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>

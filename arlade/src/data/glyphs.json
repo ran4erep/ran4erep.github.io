@@ -1,0 +1,70 @@
+{
+    "wall": {
+        "file": "tiles",
+        "name": "wall"
+    },
+    "floor": {
+        "file": "tiles",
+        "name": "floor"
+    },
+    "player": {
+        "file": "actors",
+        "name": "player"
+    },
+    "door": {
+        "file": "tiles",
+        "name": "door"
+    },
+    "openedDoor": {
+        "file": "tiles",
+        "name": "openedDoor"
+    },
+    "barrel": {
+        "file": "tiles",
+        "name": "barrel"
+    },
+    "zombie": {
+        "file": "actors",
+        "name": "zombie"
+    },
+    "bat": {
+        "file": "actors",
+        "name": "bat"
+    },
+    "alert": {
+        "file": "ui",
+        "name": "alert"
+    },
+    "question": {
+        "file": "ui",
+        "name": "question"
+    },
+    "frame": {
+        "file": "ui",
+        "name": "frame"
+    },
+    "heart": {
+        "file": "ui",
+        "name": "heart"
+    },
+    "corpse": {
+        "file": "actors",
+        "name": "corpse"
+    },
+    "loot": {
+        "file": "ui",
+        "name": "loot"
+    },
+    "brazier": {
+        "file": "tiles",
+        "name": "brazier"
+    },
+    "vase": {
+        "file": "tiles",
+        "name": "vase"
+    },
+    "magic": {
+        "file": "ui",
+        "name": "magic"
+    }
+} 

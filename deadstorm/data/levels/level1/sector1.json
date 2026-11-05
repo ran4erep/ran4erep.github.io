@@ -1,0 +1,192 @@
+
+{
+  "locationName": "Склад ГСМ/Fuel Depot",
+  "locationDescription": "Заброшенный склад горюче-смазочных материалов. В воздухе висит тяжёлый запах бензина. Повсюду разбросаны пустые бочки и строительный мусор./An abandoned fuel and lubricant warehouse. The air hangs heavy with the smell of gasoline. Empty barrels and construction debris are scattered everywhere.",
+  "objective": "Найти синюю ключ-карту и добраться до грузового лифта./Find the blue keycard and reach the cargo elevator.",
+  "soundtrack": "AMBIENT",
+  "globalLight": 0.3,
+  "ceilingType": "OUTDOOR",
+  "weather": "rain",
+  "playerStart": {
+    "dir": "E"
+  },
+  "grids": [
+    [
+      "#######################",
+      "#,,T,,,,D,,,,,,D,,T,,,#",
+      "####,TD,,,,,T,,,,,,,T,#",
+      "#$,3,,,,T,,,,,,,,T,,,,#",
+      "#############5#########",
+      "#S..........BBB#.ZZZ..#",
+      "#.##.ZZO.#.#####ZZ.ZZ.#",
+      "#.#0...K...3........Z.#",
+      "#.##...R...###.##...Z.#",
+      "#....Z.....2.W.#..9...#",
+      "####..###1######..G...#",
+      "#BN4.##L.......#..O...#",
+      "####X##......M.########",
+      "#########@#############"
+    ],
+    [
+      "#######################",
+      "#.....................#",
+      "####..................#",
+      "####..................#",
+      "#######################",
+      "####...........#......#",
+      "####.....#######......#",
+      "####.....###..........#",
+      "####.....#####.##.....#",
+      "####.....###...#......#",
+      "####..##########......#",
+      "####.##........#......#",
+      "#######################",
+      "#######################"
+    ]
+  ],
+  "gridLight": [
+    ".......................",
+    "...6.............6.....",
+    "..........6............",
+    ".......................",
+    ".......................",
+    ".......................",
+    "...7........7.....5....",
+    ".......................",
+    ".......................",
+    ".......................",
+    "...7........7.....5....",
+    ".......................",
+    ".......................",
+    "......................."
+  ],
+  "doorDefinitions": {
+    "1": { "type": "HINGE", "dir": "LEFT", "textureId": "DOOR" },
+    "2": { "type": "HINGE", "dir": "RIGHT", "textureId": "DOOR" },
+    "3": { "type": "SLIDE", "textureId": "DOOR" },
+    "4": { "type": "LIFT", "textureId": "DOOR", "keyId": "BLUE_CARD" },
+    "5": { "type": "SLIDE", "textureId": "GLASS_DOOR", "maskId": "GLASS_DOOR_MASK" }
+  },
+  "exits": [
+    {
+      "symbol": "X",
+      "destination": "./data/levels/level1/sector2.json",
+      "assetId": "EXIT"
+    }
+  ],
+  "legend": [
+    { "char": "#", "description": "Бетонная стена/Concrete Wall" },
+    { "char": ".", "description": "Грязный бетонный пол/Dirty Concrete Floor" },
+    { "char": ",", "description": "Трава/Grass" },
+    { "char": "S", "description": "Точка входа/Entry Point" },
+    { "char": "X", "description": "Двери лифта (Выход)/Elevator Doors (Exit)" },
+    { "char": "1", "description": "Дверь (Петли Лев)/Door (Hinge Left)" },
+    { "char": "2", "description": "Дверь (Петли Прав)/Door (Hinge Right)" },
+    { "char": "3", "description": "Дверь (Слайд)/Door (Slide)" },
+    { "char": "4", "description": "Дверь (Лифт)/Door (Lift)" },
+    { "char": "5", "description": "Дверь (Слайд)/Door (Slide)" }
+  ],
+  "NPCs": [
+    {
+      "symbol": "L",
+      "id": "lana"
+    },
+    {
+      "symbol": "$",
+      "id": "merchant"
+    }
+  ],
+  "enemies": [
+    {
+      "symbol": "Z",
+      "id": "zombie_tech"
+    },
+    {
+      "symbol": "O",
+      "id": "soldier_guard"
+    },
+    {
+      "symbol": "D",
+      "id": "zombie_dog"
+    }
+  ],
+  "items": [
+    {
+      "symbol": "N",
+      "id": "grenade"
+    },
+    {
+      "symbol": "M",
+      "id": "map"
+    },
+    {
+      "symbol": "B",
+      "id": "bandage"
+    },
+    {
+      "symbol": "K",
+      "id": "keycard",
+      "description": "Синяя карта доступа./Blue access card.",
+      "keyId": "BLUE_CARD"
+    },
+    {
+      "symbol": "W",
+      "id": "shotgun"
+    },
+    {
+      "symbol": "9",
+      "id": "ammo_9mm"
+    },
+    {
+      "symbol": "G",
+      "id": "ammo_12g"
+    }
+  ],
+  "decorations": [
+    {
+      "symbol": "0",
+      "id": "barrel"
+    },
+    {
+      "symbol": "R",
+      "id": "debris"
+    },
+    {
+      "symbol": "T",
+      "id": "tree"
+    }
+  ],
+  "construction": [
+    {
+      "symbol": ".",
+      "type": "floor",
+      "assetId": "FLOOR",
+      "footstepSound": "CONCRETE"
+    },
+    {
+      "symbol": ",",
+      "type": "floor",
+      "assetId": "GRASS",
+      "footstepSound": "CONCRETE"
+    },
+    {
+      "symbol": "S",
+      "type": "floor",
+      "assetId": "FLOOR",
+      "footstepSound": "CONCRETE"
+    },
+    {
+      "symbol": "#",
+      "type": "wall",
+      "assetId": "WALL",
+      "bottomTextureId": "CEILING"
+    },
+    {
+      "symbol": "@",
+      "type": "wall",
+      "assetId": "WALL_MIRROR",
+      "maskId": "WALL_MIRROR_MASK",
+      "bottomTextureId": "CEILING"
+    }
+  ]
+}

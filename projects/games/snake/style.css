@@ -1,0 +1,63 @@
+#grass {
+  background-image: url(grass.png);
+}
+#snake canvas {
+	border: 5px outset black;
+}
+
+.d-pad {
+  position: relative;
+  width: 250px;
+  height: 250px;
+  right: 240px;
+  margin-right: 30px;
+}
+
+.pauseButton {
+  position: relative;
+  top: -145px;
+  right: -100px;
+}
+
+
+#buttonUp, #buttonDown {
+	width: 100px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#buttonUp {
+  top: 0;
+}
+
+#buttonDown {
+  bottom: 0;
+}
+
+#buttonLeft, #buttonRight {
+	width: 100px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#buttonLeft {
+  left: 0;
+}
+
+#buttonRight {
+  right: 0;
+}
+
+.gamezone {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: center;
+}
+
+.empty {
+
+}
+
+

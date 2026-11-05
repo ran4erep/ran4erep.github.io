@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+<style>
+    canvas {position: absolute; left: 0px; top: 0px;
+        border: 1px solid red;
+    }
+    
+    /*Place CSS code here*/
+</style>
+</head>
+<body>
+	
+    <img src="test.png" alt="" id="cat" style="display: none;" />
+    <!--Place HTML code here-->
+<script>
+    // Create canvas
+cat.addEventListener("load", () => {
+var canvas = document.createElement('canvas');
+var ctx = canvas.getContext('2d');
+canvas.width = 1024;
+canvas.height = 600;
+document.body.appendChild(canvas);
+
+// Draw background
+var img = document.getElementById("cat");
+ctx.globalCompositeOperation = "source-atop";
+ctx.drawImage(img, 0, 0);
+ctx.globalCompositeOperation = "destination-over";
+
+// Create shadow canvas
+var shadowCanvas = document.createElement('canvas');
+var shadowCtx = shadowCanvas.getContext('2d');
+shadowCanvas.width = canvas.width;
+shadowCanvas.height = canvas.height;
+document.body.appendChild(shadowCanvas);
+
+// Make it black
+shadowCtx.fillStyle = 'rgb(0,0,0,1)';
+shadowCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Turn canvas into mask
+shadowCtx.globalCompositeOperation = "destination-out";
+
+
+
+let getRadians = (degrees) => Math.PI / 180 * degrees;
+
+
+let x =500, y=500, radius = 50, beamLength = 200;
+shadowCtx.fillStyle = "white"
+shadowCtx.beginPath();
+shadowCtx.moveTo(x-beamLength, y-2.5);
+shadowCtx.lineTo(x, y-radius);
+shadowCtx.arc(x,y,radius,getRadians(270),getRadians(90));
+shadowCtx.lineTo(x-beamLength,y+2.5);
+shadowCtx.closePath();
+
+
+line = shadowCtx.createRadialGradient(350,500, 0, 350,500, 150);
+line.addColorStop(0, "rgba(255, 255, 255, 1)");
+line.addColorStop(1, "rgba(0, 0, 0, 0.1)");
+shadowCtx.fillStyle = line;
+shadowCtx.fill();
+
+let createBeam = (x,y,radius,length,side) => {
+	let grd;
+	if (side === "right") {
+		shadowCtx.beginPath();
+		shadowCtx.moveTo(x, y-2.5);
+		shadowCtx.lineTo(x+length, y-radius);
+		shadowCtx.arc(x+length,y,radius,getRadians(270),getRadians(90));
+		shadowCtx.lineTo(x,y+2.5);
+		shadowCtx.closePath();
+		grd = shadowCtx.createRadialGradient( x,y, 0, x,y, radius+length );
+	}
+	if (side === "left") {
+		shadowCtx.beginPath();
+		shadowCtx.moveTo(x, y+2.5);
+		shadowCtx.lineTo(x-length, y);
+		shadowCtx.arc(x-length,y-radius,radius,getRadians(90),getRadians(270));
+		shadowCtx.lineTo(x,y-2.5);
+		shadowCtx.closePath();
+		grd = shadowCtx.createRadialGradient( x,y, 0, x,y, radius+length );
+	}
+
+	grd.addColorStop(0, "rgba(0, 0, 255, 1)");
+	grd.addColorStop(1, "rgba(0, 0, 0, 0.1)");
+	shadowCtx.fillStyle = grd;
+	shadowCtx.fill();
+}
+
+createBeam(600,400,30,300, "left")
+// RadialGradient as light source #2
+gradient = shadowCtx.createRadialGradient(200, 150, 0, 220, 150, 20);
+gradient.addColorStop(0, "rgba(255, 255, 255, 1.0)");
+gradient.addColorStop(1, "rgba(0, 0, 0, 0.1)");
+shadowCtx.fillStyle = gradient;
+shadowCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+});
+
+</script>
+</body>
+</html>

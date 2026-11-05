@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>CSV to array</title>
+</head>
+<body>
+	<textarea id="input" cols="30" rows="10"></textarea>
+	<textarea id="output" cols="30" rows="10"></textarea>
+	<button id="start">Start</button>
+	<script type="text/javascript">
+		start.addEventListener("click", (e) => {
+			let lines = document.getElementById("input").value.split("\n");
+			for (let i=0; i<lines.length; i++) {
+				if (i === 0)
+					lines[i] = "[\n[" + lines[i] + "],\n";
+				else if (i < lines.length-1 && i>0)
+					lines[i] = "[" + lines[i] + "],\n";
+				else if (i === lines.length-1)
+					lines[i] = "[" + lines[i] + "]\n]";
+			}
+			document.getElementById("output").value = lines.join('');
+		});
+	</script>
+</body>
+</html>

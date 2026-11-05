@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprite Sheet Slicer</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- JSZip for exporting ZIP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Custom scrollbars for a sleek look */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #1e1e2e;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #45475a;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #585b70;
+    }
+
+    /* Grid background pattern for transparency */
+    .bg-transparency {
+      background-color: #11111b;
+      background-image:
+        linear-gradient(45deg, #181825 25%, transparent 25%),
+        linear-gradient(-45deg, #181825 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #181825 75%),
+        linear-gradient(-45deg, transparent 75%, #181825 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    }
+  </style>
+</head>
+
+<body class="bg-[#11111b] text-[#cdd6f4] font-sans h-screen flex flex-col overflow-hidden">
+
+  <!-- Header -->
+  <header class="bg-[#181825] border-b border-[#313244] px-6 py-3 flex items-center justify-between shrink-0">
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-[#cba6f7] p-2 rounded-lg text-[#11111b]">
+          <i data-lucide="scissors" class="w-5 h-5"></i>
+        </div>
+        <h1 class="text-lg font-bold tracking-tight text-[#f5c2e7] whitespace-nowrap">Sprite Slicer</h1>
+      </div>
+      <!-- Tabs (moved from main workspace bar) -->
+      <div class="flex space-x-1.5 border-l border-[#313244] pl-4">
+        <button id="tabCanvasBtn"
+          class="bg-[#313244] text-[#f5c2e7] text-xs font-bold px-3 py-1.5 rounded-lg transition">Редактор</button>
+        <button id="tabSlicesBtn"
+          class="hover:bg-[#313244] text-[#a6adc8] hover:text-[#cdd6f4] text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+          Результаты
+          <span id="slicesCountBadge"
+            class="bg-[#45475a] text-[#cdd6f4] text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Grid Columns & Rows (moved from sidebar) -->
+    <div class="flex items-center space-x-3 bg-[#1e1e2e] border border-[#313244] rounded-xl px-3 py-1">
+      <div class="flex items-center space-x-1.5">
+        <label class="text-[11px] text-[#bac2de] font-semibold">Колонки:</label>
+        <input type="number" id="cols" value="4" min="1"
+          class="w-12 bg-[#11111b] border border-[#313244] rounded-md px-1.5 py-0.5 text-xs text-center focus:outline-none text-[#cdd6f4]">
+      </div>
+      <div class="flex items-center space-x-1.5">
+        <label class="text-[11px] text-[#bac2de] font-semibold">Строки:</label>
+        <input type="number" id="rows" value="4" min="1"
+          class="w-12 bg-[#11111b] border border-[#313244] rounded-md px-1.5 py-0.5 text-xs text-center focus:outline-none text-[#cdd6f4]">
+      </div>
+      <div class="flex items-center space-x-1.5 border-l border-[#313244] pl-3">
+        <input type="checkbox" id="autoDetect"
+          class="rounded bg-[#11111b] border-[#313244] text-[#cba6f7] focus:ring-0 cursor-pointer">
+        <label for="autoDetect" class="text-[11px] text-[#bac2de] select-none cursor-pointer">Авто</label>
+      </div>
+    </div>
+
+    <!-- Zoom Controls (moved from main workspace bar) -->
+    <div class="flex items-center space-x-1.5 bg-[#1e1e2e] border border-[#313244] rounded-xl px-2.5 py-1">
+      <button id="zoomOut" class="text-[#a6adc8] hover:text-[#cdd6f4] p-0.5"><i data-lucide="zoom-out"
+          class="w-3.5 h-3.5"></i></button>
+      <span id="zoomVal" class="text-[11px] font-mono text-[#cdd6f4] min-w-[36px] text-center">100%</span>
+      <button id="zoomIn" class="text-[#a6adc8] hover:text-[#cdd6f4] p-0.5"><i data-lucide="zoom-in"
+          class="w-3.5 h-3.5"></i></button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex flex-1 overflow-hidden">
+
+    <!-- Sidebar Controls -->
+    <aside class="w-80 bg-[#181825] border-r border-[#313244] flex flex-col overflow-y-auto shrink-0">
+
+      <!-- Upload Section -->
+      <div class="p-4 border-b border-[#313244]">
+        <label class="block text-xs font-semibold text-[#a6adc8] uppercase tracking-wider mb-2">Спрайт-шит</label>
+        <div class="relative group">
+          <input type="file" id="imageInput" accept="image/*" class="hidden">
+          <label for="imageInput"
+            class="flex flex-col items-center justify-center border-2 border-dashed border-[#45475a] hover:border-[#cba6f7] rounded-xl p-4 cursor-pointer transition bg-[#1e1e2e] hover:bg-[#181825]">
+            <i data-lucide="upload" class="w-8 h-8 text-[#a6adc8] group-hover:text-[#cba6f7] mb-2 transition"></i>
+            <span class="text-sm font-medium text-[#cdd6f4]">Загрузить файл</span>
+            <span class="text-xs text-[#a6adc8] mt-1">PNG, JPG, WebP</span>
+          </label>
+        </div>
+        <div id="fileInfo" class="hidden mt-2 text-xs text-[#a6adc8] bg-[#1e1e2e] p-2 rounded border border-[#313244]">
+          <div class="truncate font-semibold text-[#f5c2e7]" id="fileName">sprite.png</div>
+          <div id="fileDim">0 × 0 px</div>
+        </div>
+      </div>
+
+      <!-- Slicing Settings -->
+      <div class="p-4 border-b border-[#313244] space-y-4">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-semibold text-[#a6adc8] uppercase tracking-wider">Точка старта (Смещение)</label>
+          <button id="btnPickStart"
+            class="text-xs bg-[#313244] hover:bg-[#cba6f7] hover:text-[#11111b] text-[#cdd6f4] px-2 py-1 rounded transition flex items-center gap-1">
+            <i data-lucide="mouse-pointer" class="w-3.5 h-3.5"></i>
+            Выбрать кликом
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-[#bac2de] block mb-1">X (px)</label>
+            <div class="flex rounded-lg bg-[#1e1e2e] border border-[#313244]">
+              <input type="number" id="startX" value="0" min="0"
+                class="w-full bg-transparent px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+              <div class="flex flex-col border-l border-[#313244]">
+                <button onclick="adjustVal('startX', 1)"
+                  class="px-1.5 hover:bg-[#313244] text-[#a6adc8] text-[8px] flex-1">▲</button>
+                <button onclick="adjustVal('startX', -1)"
+                  class="px-1.5 hover:bg-[#313244] text-[#a6adc8] text-[8px] flex-1 border-t border-[#313244]">▼</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-[#bac2de] block mb-1">Y (px)</label>
+            <div class="flex rounded-lg bg-[#1e1e2e] border border-[#313244]">
+              <input type="number" id="startY" value="0" min="0"
+                class="w-full bg-transparent px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+              <div class="flex flex-col border-l border-[#313244]">
+                <button onclick="adjustVal('startY', 1)"
+                  class="px-1.5 hover:bg-[#313244] text-[#a6adc8] text-[8px] flex-1">▲</button>
+                <button onclick="adjustVal('startY', -1)"
+                  class="px-1.5 hover:bg-[#313244] text-[#a6adc8] text-[8px] flex-1 border-t border-[#313244]">▼</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <label class="block text-xs font-semibold text-[#a6adc8] uppercase tracking-wider pt-2">Размер кадра</label>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-[#bac2de] block mb-1">Ширина (W)</label>
+            <input type="number" id="frameW" value="32" min="1"
+              class="w-full bg-[#1e1e2e] border border-[#313244] rounded-lg px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+          </div>
+          <div>
+            <label class="text-xs text-[#bac2de] block mb-1">Высота (H)</label>
+            <input type="number" id="frameH" value="32" min="1"
+              class="w-full bg-[#1e1e2e] border border-[#313244] rounded-lg px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+          </div>
+        </div>
+
+        <label class="block text-xs font-semibold text-[#a6adc8] uppercase tracking-wider pt-2">Зазоры (Отступы)</label>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-[#bac2de] block mb-1">По гориз. (X)</label>
+            <input type="number" id="gapX" value="0" min="0"
+              class="w-full bg-[#1e1e2e] border border-[#313244] rounded-lg px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+          </div>
+          <div>
+            <label class="text-xs text-[#bac2de] block mb-1">По вертик. (Y)</label>
+            <input type="number" id="gapY" value="0" min="0"
+              class="w-full bg-[#1e1e2e] border border-[#313244] rounded-lg px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+          </div>
+        </div>
+
+        <!-- Grid Settings moved to header -->
+      </div>
+
+      <!-- Normalization Section -->
+      <div class="p-4 border-b border-[#313244] space-y-4 bg-[#11111b]/20">
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" id="normalizeToFirst"
+            class="rounded bg-[#1e1e2e] border-[#313244] text-[#cba6f7] focus:ring-0 cursor-pointer">
+          <label for="normalizeToFirst"
+            class="text-xs font-semibold text-[#f5c2e7] uppercase tracking-wider select-none cursor-pointer">Подогнать
+            под 1-й кадр</label>
+        </div>
+
+        <div id="normalizationOptions" class="space-y-3 opacity-50 pointer-events-none transition-opacity duration-200">
+          <div>
+            <label class="text-xs text-[#bac2de] block mb-1">Заполнение холста</label>
+            <select id="normBgType"
+              class="w-full bg-[#1e1e2e] border border-[#313244] rounded-lg px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+              <option value="transparent">Прозрачность</option>
+              <option value="color">Выбранный цвет</option>
+            </select>
+          </div>
+
+          <div id="normColorPickerContainer" class="hidden">
+            <label class="text-xs text-[#bac2de] block mb-1">Цвет заполнения</label>
+            <div class="flex items-center space-x-2">
+              <input type="color" id="normColor" value="#000000"
+                class="bg-transparent border-0 cursor-pointer w-8 h-8 p-0">
+              <input type="text" id="normColorHex" value="#000000"
+                class="w-full bg-[#1e1e2e] border border-[#313244] rounded-lg px-2 py-1 text-xs focus:outline-none text-[#cdd6f4] font-mono">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs text-[#bac2de] block mb-1">Выравнивание оригинального кадра</label>
+            <select id="normAlignment"
+              class="w-full bg-[#1e1e2e] border border-[#313244] rounded-lg px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+              <option value="center">По центру</option>
+              <option value="topleft">Сверху-слева</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Individual Adjustments -->
+      <div class="p-4 border-b border-[#313244] space-y-4 bg-[#11111b]/40">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-semibold text-[#f5c2e7] uppercase tracking-wider">Индивидуальная подгонка</label>
+          <button id="btnResetAdjustments" class="text-[10px] text-[#a6adc8] hover:text-[#f38ba8] transition">Сбросить
+            всё</button>
+        </div>
+
+        <div>
+          <label class="text-xs text-[#bac2de] block mb-1">Выберите кадр</label>
+          <select id="selectFrame"
+            class="w-full bg-[#1e1e2e] border border-[#313244] rounded-lg px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+            <option value="none">— Выберите кадр для смещения —</option>
+          </select>
+        </div>
+
+        <div id="individualControls" class="space-y-3 opacity-50 pointer-events-none transition-opacity duration-200">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-[#bac2de] block mb-1">Смещение X (px)</label>
+              <input type="number" id="indX" value="0"
+                class="w-full bg-[#1e1e2e] border border-[#313244] rounded-lg px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+            </div>
+            <div>
+              <label class="text-xs text-[#bac2de] block mb-1">Смещение Y (px)</label>
+              <input type="number" id="indY" value="0"
+                class="w-full bg-[#1e1e2e] border border-[#313244] rounded-lg px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-[#bac2de] block mb-1 font-semibold text-[#cba6f7]">Ширина (px)</label>
+              <input type="number" id="indW" value="32" min="1"
+                class="w-full bg-[#1e1e2e] border border-[#313244] rounded-lg px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+            </div>
+            <div>
+              <label class="text-xs text-[#bac2de] block mb-1 font-semibold text-[#cba6f7]">Высота (px)</label>
+              <input type="number" id="indH" value="32" min="1"
+                class="w-full bg-[#1e1e2e] border border-[#313244] rounded-lg px-2.5 py-1.5 text-sm focus:outline-none text-[#cdd6f4]">
+            </div>
+          </div>
+          <p class="text-[10px] text-[#a6adc8] italic">Предыдущие кадры жестко фиксируются. Изменение текущего кадра
+            расширяет его вправо/вниз и сдвигает только последующие кадры.</p>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="p-4 mt-auto">
+        <button id="btnSlice"
+          class="w-full bg-[#cba6f7] hover:bg-[#b4befe] text-[#11111b] font-bold py-3 px-4 rounded-xl transition flex items-center justify-center space-x-2 shadow-lg shadow-[#cba6f7]/10">
+          <i data-lucide="scissors" class="w-5 h-5"></i>
+          <span>Нарезать кадры</span>
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- Center Canvas Workspace & Slices View -->
+    <section class="flex-1 flex flex-col bg-[#11111b] overflow-hidden">
+
+      <!-- Navigation & Zoom controls moved to header -->
+
+      <!-- Main Canvas Container -->
+      <div id="tabCanvas"
+        class="flex-1 relative overflow-auto p-6 bg-transparency flex items-start justify-start select-none">
+
+        <!-- Crosshair Cursor Overlay Instruction -->
+        <div id="pickingIndicator"
+          class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-[#f5e0dc] text-[#11111b] font-bold text-xs px-4 py-2 rounded-full shadow-lg pointer-events-none hidden items-center gap-2 animate-bounce">
+          <i data-lucide="mouse-pointer-click" class="w-4 h-4"></i>
+          Кликните по изображению, чтобы задать точку старта
+        </div>
+
+        <!-- Canvas Wrapper for Zooming -->
+        <div id="canvasWrapper" class="relative origin-top-left transition-transform duration-100 ease-out"
+          style="transform: scale(1);">
+          <canvas id="spriteCanvas" class="cursor-crosshair shadow-2xl border border-transparent"></canvas>
+        </div>
+
+        <!-- No Image Placeholder -->
+        <div id="placeholder"
+          class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-[#11111b]/95 pointer-events-none transition-opacity duration-300">
+          <div class="bg-[#1e1e2e] p-6 rounded-2xl border border-[#313244] max-w-sm">
+            <i data-lucide="image" class="w-16 h-16 text-[#cba6f7] mx-auto mb-4 animate-pulse"></i>
+            <h3 class="text-lg font-semibold text-[#cdd6f4] mb-2">Ожидание Спрайт-шита</h3>
+            <p class="text-xs text-[#a6adc8]">Загрузите файл слева или перетащите его прямо сюда для начала работы.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slices Grid Preview & Animation Preview -->
+      <div id="tabSlices" class="flex-1 overflow-y-auto p-6 hidden space-y-6">
+
+        <!-- Slices Header & Global Export -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#313244] pb-4">
+          <div>
+            <h2 class="text-xl font-bold text-[#f5c2e7]">Нарезанные кадры</h2>
+            <p class="text-xs text-[#a6adc8]">Проверьте анимацию и скачайте кадры архивом или по отдельности.</p>
+          </div>
+          <button id="btnDownloadAll"
+            class="bg-[#a6e3a1] hover:bg-[#94e2d5] text-[#11111b] font-bold py-2.5 px-5 rounded-xl transition flex items-center space-x-2 self-start md:self-auto">
+            <i data-lucide="download-cloud" class="w-5 h-5"></i>
+            <span>Скачать все кадры (ZIP)</span>
+          </button>
+        </div>
+
+        <!-- Animation Preview Player -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 bg-[#181825] border border-[#313244] rounded-2xl p-5 flex flex-col">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold text-[#f5c2e7] uppercase tracking-wider flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+                Превью анимации
+              </span>
+              <span id="animFrameIndicator" class="text-xs font-mono text-[#a6adc8]">Кадр: 0/0</span>
+            </div>
+
+            <!-- Animated Sprite Stage -->
+            <div
+              class="flex-1 min-h-[160px] bg-transparency rounded-xl border border-[#313244] flex items-center justify-center p-4 relative overflow-auto">
+              <img id="animPreviewImg" class="max-w-full max-h-[140px] object-contain"
+                style="image-rendering: pixelated;" src="" alt="Animation Frame">
+            </div>
+
+            <!-- Player Controls -->
+            <div class="mt-4 flex flex-col gap-4">
+              <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center space-x-2">
+                  <button id="btnPlayPause"
+                    class="bg-[#cba6f7] hover:bg-[#b4befe] text-[#11111b] p-2.5 rounded-lg transition">
+                    <i id="playPauseIcon" data-lucide="pause" class="w-4 h-4"></i>
+                  </button>
+                  <button id="btnPrevFrame"
+                    class="bg-[#313244] hover:bg-[#45475a] text-[#cdd6f4] p-2.5 rounded-lg transition">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                  </button>
+                  <button id="btnNextFrame"
+                    class="bg-[#313244] hover:bg-[#45475a] text-[#cdd6f4] p-2.5 rounded-lg transition">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                  </button>
+                </div>
+
+                <!-- FPS Controller -->
+                <div class="flex-1 flex items-center space-x-3 max-w-[160px]">
+                  <span class="text-xs text-[#bac2de] font-semibold whitespace-nowrap">FPS: <span
+                      id="fpsVal">10</span></span>
+                  <input type="range" id="animFps" min="1" max="60" value="10"
+                    class="w-full accent-[#cba6f7] cursor-pointer">
+                </div>
+              </div>
+
+              <!-- Scale Controller -->
+              <div class="flex items-center space-x-3 bg-[#1e1e2e] border border-[#313244] rounded-lg p-2.5">
+                <span class="text-xs text-[#bac2de] font-semibold whitespace-nowrap">Масштаб: <span id="scaleVal"
+                    class="text-[#cba6f7] font-mono">1x</span></span>
+                <input type="range" id="animScale" min="0.1" max="10" step="0.1" value="1"
+                  class="w-full accent-[#cba6f7] cursor-pointer">
+              </div>
+            </div>
+          </div>
+
+          <!-- Information & Tips -->
+          <div class="lg:col-span-7 bg-[#181825] border border-[#313244] rounded-2xl p-5 flex flex-col justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-[#f5c2e7] mb-2 flex items-center gap-1.5">
+                <i data-lucide="info" class="w-4 h-4"></i> Опция приведения размеров к первому кадру
+              </h3>
+              <p class="text-xs text-[#a6adc8] leading-relaxed mb-3">
+                Если спрайты в анимации имеют различные физические габариты (из-за разницы в размерах рамок), они могут
+                дергаться при проигрывании.
+              </p>
+              <p class="text-xs text-[#a6adc8] leading-relaxed mb-3">
+                Активируйте опцию <strong class="text-[#cba6f7]">"Подогнать под 1-й кадр"</strong> в боковой панели. Все
+                последующие кадры будут упакованы в холст такого же размера, как и самый первый кадр. Недостающее
+                пространство аккуратно заполнится прозрачностью либо выбранным вами фоновым цветом.
+              </p>
+            </div>
+            <div class="text-[11px] text-[#bac2de] bg-[#11111b] p-3 rounded-lg border border-[#313244] font-mono">
+              <div class="flex justify-between border-b border-[#313244] pb-1.5 mb-1.5">
+                <span>Базовый размер:</span>
+                <span id="statBaseDim" class="text-[#a6e3a1] font-bold">32 × 32 px</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Всего кадров:</span>
+                <span id="statTotalFrames" class="text-[#f9e2af] font-bold">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slices Grid Preview -->
+        <div>
+          <h3 class="text-sm font-bold text-[#bac2de] uppercase tracking-wider mb-4">Сетка сгенерированных кадров</h3>
+          <div id="slicesGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Modal for Grid Settings on Image Upload -->
+  <div id="gridModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-[#181825] border border-[#313244] w-full max-w-sm rounded-2xl p-6 shadow-2xl scale-95 transform transition-transform duration-300">
+      <div class="flex items-center space-x-3 mb-4">
+        <div class="bg-[#cba6f7] p-2 rounded-lg text-[#11111b]">
+          <i data-lucide="grid" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-[#cdd6f4]">Параметры сетки</h3>
+          <p class="text-[11px] text-[#a6adc8]">Настройте сетку кадров для спрайт-шита</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Option 1: Manual columns and rows -->
+        <div class="bg-[#1e1e2e] border border-[#313244] rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-[#f5c2e7] uppercase tracking-wider">Ручная настройка</span>
+            <div class="flex items-center space-x-1.5">
+              <input type="radio" id="modalModeManual" name="modalMode" value="manual" checked class="text-[#cba6f7] focus:ring-0 cursor-pointer">
+              <label for="modalModeManual" class="text-xs text-[#bac2de] cursor-pointer">Выбрать</label>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3" id="modalManualInputs">
+            <div>
+              <label class="text-[11px] text-[#bac2de] block mb-1">Колонки</label>
+              <input type="number" id="modalCols" value="4" min="1" class="w-full bg-[#11111b] border border-[#313244] rounded-lg px-2.5 py-1.5 text-xs focus:outline-none text-[#cdd6f4] text-center">
+            </div>
+            <div>
+              <label class="text-[11px] text-[#bac2de] block mb-1">Строки</label>
+              <input type="number" id="modalRows" value="4" min="1" class="w-full bg-[#11111b] border border-[#313244] rounded-lg px-2.5 py-1.5 text-xs focus:outline-none text-[#cdd6f4] text-center">
+            </div>
+          </div>
+        </div>
+
+        <!-- Option 2: Auto Detect -->
+        <div class="bg-[#1e1e2e] border border-[#313244] rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-semibold text-[#a6e3a1] uppercase tracking-wider block">Авторасчет</span>
+            <span class="text-[10px] text-[#a6adc8]">Рассчитать автоматически по размеру</span>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <input type="radio" id="modalModeAuto" name="modalMode" value="auto" class="text-[#cba6f7] focus:ring-0 cursor-pointer">
+            <label for="modalModeAuto" class="text-xs text-[#bac2de] cursor-pointer">Выбрать</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex space-x-3">
+        <button id="btnModalCancel" class="flex-1 bg-[#313244] hover:bg-[#45475a] text-[#cdd6f4] py-2 px-4 rounded-xl text-xs font-semibold transition">
+          Отмена
+        </button>
+        <button id="btnModalApply" class="flex-1 bg-[#cba6f7] hover:bg-[#b4befe] text-[#11111b] py-2 px-4 rounded-xl text-xs font-bold transition">
+          Применить
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast"
+    class="fixed bottom-6 right-6 bg-[#313244] border border-[#cba6f7] text-[#cdd6f4] py-3 px-5 rounded-xl shadow-2xl translate-y-20 opacity-0 transition duration-300 flex items-center space-x-3 z-50 pointer-events-none">
+    <div class="bg-[#cba6f7]/20 p-1.5 rounded-lg text-[#cba6f7]">
+      <i data-lucide="info" class="w-5 h-5"></i>
+    </div>
+    <span id="toastMsg" class="text-sm font-medium">Готово!</span>
+  </div>
+
+  <script>
+    // App State
+    let originalImage = null;
+    let scale = 1.0;
+    let isPickingStart = false;
+    let slicedFrames = []; // Base64 images array
+
+    // Custom individual frame offset storage: { frameIndex: { dx: 0, dy: 0, dw: 0, dh: 0 } }
+    let frameAdjustments = {};
+
+    // Animation Player State
+    let animPlay = true;
+    let animIndex = 0;
+    let animTimer = null;
+    let animLastTime = 0;
+    let animScale = 1.0;
+
+    // DOM Elements
+    const imageInput = document.getElementById('imageInput');
+    const spriteCanvas = document.getElementById('spriteCanvas');
+    const ctx = spriteCanvas.getContext('2d');
+    const canvasWrapper = document.getElementById('canvasWrapper');
+    const pickingIndicator = document.getElementById('pickingIndicator');
+    const placeholder = document.getElementById('placeholder');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileNameEl = document.getElementById('fileName');
+    const fileDimEl = document.getElementById('fileDim');
+
+    // Controls
+    const startXInput = document.getElementById('startX');
+    const startYInput = document.getElementById('startY');
+    const frameWInput = document.getElementById('frameW');
+    const frameHInput = document.getElementById('frameH');
+    const gapXInput = document.getElementById('gapX');
+    const gapYInput = document.getElementById('gapY');
+    const colsInput = document.getElementById('cols');
+    const rowsInput = document.getElementById('rows');
+    const autoDetectCheck = document.getElementById('autoDetect');
+
+    // Normalization Controls
+    const normalizeToFirst = document.getElementById('normalizeToFirst');
+    const normalizationOptions = document.getElementById('normalizationOptions');
+    const normBgType = document.getElementById('normBgType');
+    const normColorPickerContainer = document.getElementById('normColorPickerContainer');
+    const normColor = document.getElementById('normColor');
+    const normColorHex = document.getElementById('normColorHex');
+    const normAlignment = document.getElementById('normAlignment');
+
+    // Individual Adjustment Controls
+    const selectFrame = document.getElementById('selectFrame');
+    const individualControls = document.getElementById('individualControls');
+    const indX = document.getElementById('indX');
+    const indY = document.getElementById('indY');
+    const indW = document.getElementById('indW');
+    const indH = document.getElementById('indH');
+    const btnResetAdjustments = document.getElementById('btnResetAdjustments');
+
+    // Navigation and Actions
+    const tabCanvasBtn = document.getElementById('tabCanvasBtn');
+    const tabSlicesBtn = document.getElementById('tabSlicesBtn');
+    const tabCanvas = document.getElementById('tabCanvas');
+    const tabSlices = document.getElementById('tabSlices');
+    const slicesCountBadge = document.getElementById('slicesCountBadge');
+    const slicesGrid = document.getElementById('slicesGrid');
+    const btnPickStart = document.getElementById('btnPickStart');
+    const btnSlice = document.getElementById('btnSlice');
+    const btnDownloadAll = document.getElementById('btnDownloadAll');
+
+    // Animation Player UI Elements
+    const animPreviewImg = document.getElementById('animPreviewImg');
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+    const btnPrevFrame = document.getElementById('btnPrevFrame');
+    const btnNextFrame = document.getElementById('btnNextFrame');
+    const animFps = document.getElementById('animFps');
+    const fpsVal = document.getElementById('fpsVal');
+    const animFrameIndicator = document.getElementById('animFrameIndicator');
+    const statBaseDim = document.getElementById('statBaseDim');
+    const statTotalFrames = document.getElementById('statTotalFrames');
+    const animScaleInput = document.getElementById('animScale');
+    const scaleVal = document.getElementById('scaleVal');
+
+    const zoomIn = document.getElementById('zoomIn');
+    const zoomOut = document.getElementById('zoomOut');
+    const zoomVal = document.getElementById('zoomVal');
+
+    // Initialize Icons
+    lucide.createIcons();
+
+    // Event Listeners
+    imageInput.addEventListener('change', handleImageUpload);
+
+    // Drag & Drop
+    const dropArea = document.getElementById('tabCanvas');
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropArea.classList.add('bg-[#1e1e2e]/80');
+      }, false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropArea.classList.remove('bg-[#1e1e2e]/80');
+      }, false);
+    });
+    dropArea.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length > 0 && files[0].type.startsWith('image/')) {
+        imageInput.files = files;
+        handleImageUpload({ target: { files } });
+      }
+    });
+
+    // Inputs value limits and auto-update
+    const inputs = [startXInput, startYInput, frameWInput, frameHInput, gapXInput, gapYInput, colsInput, rowsInput];
+    inputs.forEach(input => {
+      input.addEventListener('input', () => {
+        if (autoDetectCheck.checked && (input === frameWInput || input === frameHInput || input === gapXInput || input === gapYInput || input === startXInput || input === startYInput)) {
+          calculateGridDimensions();
+        }
+        updateFrameSelectors();
+        drawWorkspace();
+      });
+    });
+
+    autoDetectCheck.addEventListener('change', () => {
+      if (autoDetectCheck.checked) {
+        colsInput.disabled = true;
+        rowsInput.disabled = true;
+        colsInput.classList.add('opacity-50');
+        rowsInput.classList.add('opacity-50');
+        calculateGridDimensions();
+      } else {
+        colsInput.disabled = false;
+        rowsInput.disabled = false;
+        colsInput.classList.remove('opacity-50');
+        rowsInput.classList.remove('opacity-50');
+      }
+      updateFrameSelectors();
+      drawWorkspace();
+    });
+
+    // Normalization UI events
+    normalizeToFirst.addEventListener('change', () => {
+      if (normalizeToFirst.checked) {
+        normalizationOptions.classList.remove('opacity-50', 'pointer-events-none');
+      } else {
+        normalizationOptions.classList.add('opacity-50', 'pointer-events-none');
+      }
+    });
+
+    normBgType.addEventListener('change', () => {
+      if (normBgType.value === 'color') {
+        normColorPickerContainer.classList.remove('hidden');
+      } else {
+        normColorPickerContainer.classList.add('hidden');
+      }
+    });
+
+    normColor.addEventListener('input', () => {
+      normColorHex.value = normColor.value.toUpperCase();
+    });
+
+    normColorHex.addEventListener('input', () => {
+      const val = normColorHex.value;
+      if (/^#[0-9A-F]{6}$/i.test(val)) {
+        normColor.value = val;
+      }
+    });
+
+    // Dropdown Selection for Frame Tuning
+    selectFrame.addEventListener('change', () => {
+      const selected = selectFrame.value;
+      if (selected === 'none') {
+        individualControls.classList.add('opacity-50', 'pointer-events-none');
+      } else {
+        individualControls.classList.remove('opacity-50', 'pointer-events-none');
+        loadIndividualAdjustmentValues(parseInt(selected));
+      }
+      drawWorkspace();
+    });
+
+    // Listeners for Individual inputs
+    [indX, indY, indW, indH].forEach(input => {
+      input.addEventListener('input', () => {
+        const frameIdx = parseInt(selectFrame.value);
+        if (isNaN(frameIdx)) return;
+
+        if (!frameAdjustments[frameIdx]) {
+          frameAdjustments[frameIdx] = { dx: 0, dy: 0, dw: 0, dh: 0 };
+        }
+
+        frameAdjustments[frameIdx].dx = parseInt(indX.value) || 0;
+        frameAdjustments[frameIdx].dy = parseInt(indY.value) || 0;
+        frameAdjustments[frameIdx].dw = parseInt(indW.value) - (parseInt(frameWInput.value) || 32);
+        frameAdjustments[frameIdx].dh = parseInt(indH.value) - (parseInt(frameHInput.value) || 32);
+
+        drawWorkspace();
+      });
+    });
+
+    btnResetAdjustments.addEventListener('click', () => {
+      frameAdjustments = {};
+      const selected = selectFrame.value;
+      if (selected !== 'none') {
+        loadIndividualAdjustmentValues(parseInt(selected));
+      }
+      drawWorkspace();
+      showToast('Индивидуальные настройки сброшены');
+    });
+
+    // Button interactions
+    btnPickStart.addEventListener('click', () => {
+      if (!originalImage) {
+        showToast('Пожалуйста, сначала загрузите спрайт-шит', 'warning');
+        return;
+      }
+      isPickingStart = !isPickingStart;
+      if (isPickingStart) {
+        btnPickStart.classList.add('bg-[#cba6f7]', 'text-[#11111b]');
+        pickingIndicator.classList.remove('hidden');
+        pickingIndicator.classList.add('flex');
+        spriteCanvas.style.cursor = 'crosshair';
+      } else {
+        resetPickingState();
+      }
+    });
+
+    spriteCanvas.addEventListener('click', (e) => {
+      if (!originalImage || !isPickingStart) return;
+
+      const rect = spriteCanvas.getBoundingClientRect();
+      // Calculate true coordinate in image space
+      const clickX = Math.floor((e.clientX - rect.left) * (spriteCanvas.width / rect.width));
+      const clickY = Math.floor((e.clientY - rect.top) * (spriteCanvas.height / rect.height));
+
+      startXInput.value = clickX;
+      startYInput.value = clickY;
+
+      if (autoDetectCheck.checked) {
+        calculateGridDimensions();
+      }
+
+      updateFrameSelectors();
+      showToast(`Начальная точка установлена: X=${clickX}, Y=${clickY}`);
+      resetPickingState();
+      drawWorkspace();
+    });
+
+    btnSlice.addEventListener('click', sliceSpriteSheet);
+    btnDownloadAll.addEventListener('click', downloadAllAsZip);
+
+    // Zooming logic
+    zoomIn.addEventListener('click', () => adjustZoom(0.2));
+    zoomOut.addEventListener('click', () => adjustZoom(-0.2));
+
+    tabCanvas.addEventListener('wheel', (e) => {
+      if (!originalImage) return;
+      if (e.ctrlKey) {
+        e.preventDefault();
+        const delta = -e.deltaY * 0.01;
+        adjustZoom(delta);
+      }
+    }, { passive: false });
+
+    // Tab switcher
+    tabCanvasBtn.addEventListener('click', () => switchTab('canvas'));
+    tabSlicesBtn.addEventListener('click', () => switchTab('slices'));
+
+    // Animation Player Actions
+    btnPlayPause.addEventListener('click', () => {
+      animPlay = !animPlay;
+      updatePlayPauseButton();
+    });
+
+    btnPrevFrame.addEventListener('click', () => {
+      animPlay = false;
+      updatePlayPauseButton();
+      if (slicedFrames.length > 0) {
+        animIndex = (animIndex - 1 + slicedFrames.length) % slicedFrames.length;
+        renderAnimFrame();
+      }
+    });
+
+    btnNextFrame.addEventListener('click', () => {
+      animPlay = false;
+      updatePlayPauseButton();
+      if (slicedFrames.length > 0) {
+        animIndex = (animIndex + 1) % slicedFrames.length;
+        renderAnimFrame();
+      }
+    });
+
+    animFps.addEventListener('input', () => {
+      fpsVal.textContent = animFps.value;
+    });
+
+    animScaleInput.addEventListener('input', () => {
+      animScale = parseFloat(animScaleInput.value) || 1.0;
+      scaleVal.textContent = `${animScale}x`;
+      renderAnimFrame();
+    });
+
+    // Adjusting input values with UI helpers
+    function adjustVal(id, delta) {
+      const el = document.getElementById(id);
+      let val = parseInt(el.value) || 0;
+      val = Math.max(0, val + delta);
+      el.value = val;
+      el.dispatchEvent(new Event('input'));
+    }
+
+    function resetPickingState() {
+      isPickingStart = false;
+      btnPickStart.classList.remove('bg-[#cba6f7]', 'text-[#11111b]');
+      pickingIndicator.classList.add('hidden');
+      pickingIndicator.classList.remove('flex');
+    }
+
+    function adjustZoom(delta) {
+      scale = Math.max(0.2, Math.min(8.0, scale + delta));
+      canvasWrapper.style.transform = `scale(${scale})`;
+      zoomVal.textContent = `${Math.round(scale * 100)}%`;
+    }
+
+    function switchTab(tab) {
+      if (tab === 'canvas') {
+        tabCanvas.classList.remove('hidden');
+        tabSlices.classList.add('hidden');
+        tabCanvasBtn.className = "bg-[#313244] text-[#f5c2e7] text-sm font-semibold px-4 py-2 rounded-lg transition";
+        tabSlicesBtn.className = "hover:bg-[#313244] text-[#a6adc8] hover:text-[#cdd6f4] text-sm font-semibold px-4 py-2 rounded-lg transition flex items-center gap-2";
+      } else {
+        tabCanvas.classList.add('hidden');
+        tabSlices.classList.remove('hidden');
+        tabCanvasBtn.className = "hover:bg-[#313244] text-[#a6adc8] hover:text-[#cdd6f4] text-sm font-semibold px-4 py-2 rounded-lg transition";
+        tabSlicesBtn.className = "bg-[#313244] text-[#f5c2e7] text-sm font-semibold px-4 py-2 rounded-lg transition flex items-center gap-2";
+      }
+    }
+
+    function checkImageTransparency(img) {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const imgData = ctx.getImageData(0, 0, img.width, img.height).data;
+        for (let i = 3; i < imgData.length; i += 4) {
+          if (imgData[i] < 255) {
+            return true;
+          }
+        }
+      } catch (err) {
+        console.error('Error checking transparency:', err);
+      }
+      return false;
+    }
+
+    // Process image file loading
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        originalImage = new Image();
+        originalImage.onload = function () {
+          // Adjust canvas size
+          spriteCanvas.width = originalImage.width;
+          spriteCanvas.height = originalImage.height;
+
+          // Update UI
+          placeholder.classList.add('opacity-0', 'pointer-events-none');
+          fileInfo.classList.remove('hidden');
+          fileNameEl.textContent = file.name;
+          fileDimEl.textContent = `${originalImage.width} × ${originalImage.height} px`;
+
+          // Check transparency and update editor background
+          const hasTransparency = checkImageTransparency(originalImage);
+          if (hasTransparency) {
+            tabCanvas.style.backgroundColor = 'magenta';
+            tabCanvas.style.backgroundImage = 'none';
+          } else {
+            tabCanvas.style.backgroundColor = '';
+            tabCanvas.style.backgroundImage = '';
+          }
+
+          // Reset parameters to fit image
+          if (autoDetectCheck.checked) {
+            calculateGridDimensions();
+          }
+
+          updateFrameSelectors();
+          scale = 1.0;
+          adjustZoom(0); // Updates scales correctly
+          drawWorkspace();
+          showToast('Изображение загружено успешно!');
+          openGridModal();
+        };
+        originalImage.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Auto calculate columns and rows based on image size, offsets and gap
+    function calculateGridDimensions() {
+      if (!originalImage) return;
+
+      const imgW = originalImage.width;
+      const imgH = originalImage.height;
+
+      const startX = parseInt(startXInput.value) || 0;
+      const startY = parseInt(startYInput.value) || 0;
+      const frameW = parseInt(frameWInput.value) || 32;
+      const frameH = parseInt(frameHInput.value) || 32;
+      const gapX = parseInt(gapXInput.value) || 0;
+      const gapY = parseInt(gapYInput.value) || 0;
+
+      // Available space
+      const availW = imgW - startX;
+      const availH = imgH - startY;
+
+      // Calculate how many frames can fit
+      let cols = 0;
+      if (availW >= frameW) {
+        cols = Math.floor((availW + gapX) / (frameW + gapX));
+      }
+      let rows = 0;
+      if (availH >= frameH) {
+        rows = Math.floor((availH + gapY) / (frameH + gapY));
+      }
+
+      colsInput.value = Math.max(1, cols);
+      rowsInput.value = Math.max(1, rows);
+    }
+
+    // Keep individual tuning dropdown select updated with correct indices
+    function updateFrameSelectors() {
+      const cols = parseInt(colsInput.value) || 1;
+      const rows = parseInt(rowsInput.value) || 1;
+      const totalFrames = cols * rows;
+
+      const currentSelected = selectFrame.value;
+      selectFrame.innerHTML = '<option value="none">— Выберите кадр для смещения —</option>';
+
+      for (let i = 1; i <= totalFrames; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Кадр #${i}`;
+        selectFrame.appendChild(option);
+      }
+
+      // Restore old select index if still valid
+      if (parseInt(currentSelected) <= totalFrames) {
+        selectFrame.value = currentSelected;
+      } else {
+        selectFrame.value = 'none';
+        individualControls.classList.add('opacity-50', 'pointer-events-none');
+      }
+    }
+
+    function loadIndividualAdjustmentValues(frameIdx) {
+      const baseW = parseInt(frameWInput.value) || 32;
+      const baseH = parseInt(frameHInput.value) || 32;
+
+      const adj = frameAdjustments[frameIdx] || { dx: 0, dy: 0, dw: 0, dh: 0 };
+
+      indX.value = adj.dx;
+      indY.value = adj.dy;
+      indW.value = baseW + adj.dw;
+      indH.value = baseH + adj.dh;
+    }
+
+    // Central function to calculate exact coordinates sequentially (preventing overlaps)
+    function getFrameRects() {
+      const startX = parseInt(startXInput.value) || 0;
+      const startY = parseInt(startYInput.value) || 0;
+      const frameW = parseInt(frameWInput.value) || 32;
+      const frameH = parseInt(frameHInput.value) || 32;
+      const gapX = parseInt(gapXInput.value) || 0;
+      const gapY = parseInt(gapYInput.value) || 0;
+      const cols = parseInt(colsInput.value) || 1;
+      const rows = parseInt(rowsInput.value) || 1;
+
+      let rects = [];
+      let prevRowMaxBottom = startY - gapY;
+
+      for (let r = 0; r < rows; r++) {
+        let rowMaxBottom = 0;
+        let prevFrameEndX = startX - gapX;
+
+        for (let c = 0; c < cols; c++) {
+          const frameIdx = (r * cols + c) + 1;
+          const adj = frameAdjustments[frameIdx] || { dx: 0, dy: 0, dw: 0, dh: 0 };
+
+          const w = Math.max(1, frameW + adj.dw);
+          const h = Math.max(1, frameH + adj.dh);
+
+          // X starts precisely after the previous frame's end (including the gap and only this frame's extra dx offset)
+          // The previous frames ending point is not affected by this frame's dx or dw at all.
+          const x = prevFrameEndX + gapX + adj.dx;
+
+          // Next row Y starts strictly after the maximum bottom of the previous row
+          let y;
+          if (r === 0) {
+            y = startY + adj.dy;
+          } else {
+            y = prevRowMaxBottom + gapY + adj.dy;
+          }
+
+          rects.push({
+            id: frameIdx,
+            x: x,
+            y: y,
+            w: w,
+            h: h
+          });
+
+          // Subsequent frames are pushed to the right based on this frame's actual rightmost edge
+          prevFrameEndX = x + w;
+
+          if (y + h > rowMaxBottom) {
+            rowMaxBottom = y + h;
+          }
+        }
+        prevRowMaxBottom = rowMaxBottom;
+      }
+      return rects;
+    }
+
+    // Drawing Canvas Editor with bounding boxes and custom sequential adjustments
+    function drawWorkspace() {
+      if (!originalImage) return;
+
+      // Clear Canvas
+      ctx.clearRect(0, 0, spriteCanvas.width, spriteCanvas.height);
+
+      // Draw original sprite sheet
+      ctx.drawImage(originalImage, 0, 0);
+
+      const rects = getFrameRects();
+      const activeFrameIdx = parseInt(selectFrame.value);
+
+      // Draw Grid Overlays
+      ctx.lineWidth = 1.5;
+
+      rects.forEach(rect => {
+        // Skip if drawing goes out of canvas bounds entirely
+        if (rect.x >= spriteCanvas.width || rect.y >= spriteCanvas.height) return;
+
+        // Setup style depending if it's the currently selected/edited frame
+        if (rect.id === activeFrameIdx) {
+          ctx.strokeStyle = '#f38ba8'; // Rose Red for active individual design frame
+          ctx.lineWidth = 2.5;
+
+          // Draw a subtle translucent overlay behind active frame
+          ctx.fillStyle = 'rgba(243, 139, 168, 0.15)';
+          ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+        } else {
+          ctx.strokeStyle = '#cba6f7'; // Standard Purple Accent
+          ctx.lineWidth = 1.5;
+        }
+
+        // Draw frame box
+        ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+
+        // Highlight the Index Tag
+        ctx.fillStyle = (rect.id === activeFrameIdx) ? '#f38ba8' : 'rgba(17, 17, 27, 0.8)';
+        ctx.fillRect(rect.x, rect.y, 18, 14);
+
+        ctx.fillStyle = (rect.id === activeFrameIdx) ? '#11111b' : '#f5c2e7';
+        ctx.font = 'bold 9px monospace';
+        ctx.fillText(`${rect.id}`, rect.x + 3, rect.y + 11);
+      });
+
+      // Draw Starting Point Anchor Indicator
+      const startX = parseInt(startXInput.value) || 0;
+      const startY = parseInt(startYInput.value) || 0;
+      ctx.beginPath();
+      ctx.arc(startX, startY, 6, 0, 2 * Math.PI);
+      ctx.fillStyle = '#a6e3a1'; // Clean green dot for the start node
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw crosshair lines around starting point
+      ctx.beginPath();
+      ctx.moveTo(startX - 15, startY);
+      ctx.lineTo(startX + 15, startY);
+      ctx.moveTo(startX, startY - 15);
+      ctx.lineTo(startX, startY + 15);
+      ctx.strokeStyle = '#a6e3a1';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    // Extracting & slicing the frames to result view with customized offsets and normalization
+    function sliceSpriteSheet() {
+      if (!originalImage) {
+        showToast('Пожалуйста, сначала загрузите спрайт-шит', 'warning');
+        return;
+      }
+
+      const rects = getFrameRects();
+      if (rects.length === 0) return;
+
+      slicedFrames = [];
+      slicesGrid.innerHTML = '';
+
+      // Find first frame size if normalization is active
+      const firstRect = rects[0];
+      const targetW = Math.max(1, firstRect.w);
+      const targetH = Math.max(1, firstRect.h);
+
+      const normActive = normalizeToFirst.checked;
+      const bgType = normBgType.value;
+      const padColor = normColor.value;
+      const alignType = normAlignment.value;
+
+      rects.forEach(rect => {
+        const safeW = Math.max(1, rect.w);
+        const safeH = Math.max(1, rect.h);
+
+        // Canvas for primary frame extraction
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = safeW;
+        tempCanvas.height = safeH;
+
+        // Draw extracted slice area
+        try {
+          tempCtx.drawImage(originalImage, rect.x, rect.y, safeW, safeH, 0, 0, safeW, safeH);
+        } catch (e) {
+          tempCtx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+          tempCtx.fillRect(0, 0, safeW, safeH);
+        }
+
+        let finalDataUrl = '';
+        let finalWidth = safeW;
+        let finalHeight = safeH;
+
+        if (normActive && (safeW !== targetW || safeH !== targetH)) {
+          // Normalization: Build uniform bounding box matching the first frame
+          const normCanvas = document.createElement('canvas');
+          const normCtx = normCanvas.getContext('2d');
+          normCanvas.width = targetW;
+          normCanvas.height = targetH;
+
+          // Background fill
+          if (bgType === 'color') {
+            normCtx.fillStyle = padColor;
+            normCtx.fillRect(0, 0, targetW, targetH);
+          } else {
+            normCtx.clearRect(0, 0, targetW, targetH);
+          }
+
+          // Positioning offsets
+          let posX = 0;
+          let posY = 0;
+          if (alignType === 'center') {
+            posX = Math.floor((targetW - safeW) / 2);
+            posY = Math.floor((targetH - safeH) / 2);
+          }
+
+          // Draw the original slice content centered or top-left in normalized canvas
+          normCtx.drawImage(tempCanvas, posX, posY);
+          finalDataUrl = normCanvas.toDataURL('image/png');
+          finalWidth = targetW;
+          finalHeight = targetH;
+        } else {
+          // If normalization matches size or is disabled
+          if (normActive) {
+            // Apply fill color for the first/matching frame if color is selected
+            const normCanvas = document.createElement('canvas');
+            const normCtx = normCanvas.getContext('2d');
+            normCanvas.width = targetW;
+            normCanvas.height = targetH;
+
+            if (bgType === 'color') {
+              normCtx.fillStyle = padColor;
+              normCtx.fillRect(0, 0, targetW, targetH);
+            }
+            normCtx.drawImage(tempCanvas, 0, 0);
+            finalDataUrl = normCanvas.toDataURL('image/png');
+          } else {
+            finalDataUrl = tempCanvas.toDataURL('image/png');
+          }
+          finalWidth = finalWidth;
+          finalHeight = finalHeight;
+        }
+
+        slicedFrames.push({
+          id: rect.id,
+          dataUrl: finalDataUrl,
+          w: finalWidth,
+          h: finalHeight
+        });
+
+        // Append frame block to DOM grid
+        const card = document.createElement('div');
+        card.className = "bg-[#181825] border border-[#313244] hover:border-[#cba6f7] rounded-xl p-3 flex flex-col items-center justify-between transition group relative";
+        card.innerHTML = `
+          <div class="w-full aspect-square bg-transparency flex items-center justify-center p-2 rounded-lg border border-[#313244]">
+            <img src="${finalDataUrl}" class="max-w-full max-h-full object-contain image-render-pixel" style="image-rendering: pixelated;" />
+          </div>
+          <div class="mt-3 flex items-center justify-between w-full">
+            <span class="text-xs text-[#a6adc8] font-mono">Кадр #${rect.id} <span class="text-[9px] block text-[#89b4fa]">${finalWidth}x${finalHeight}px</span></span>
+            <button onclick="downloadSingleFrame(${rect.id - 1})" class="bg-[#313244] hover:bg-[#cba6f7] hover:text-[#11111b] text-[#cdd6f4] p-1.5 rounded transition">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+        slicesGrid.appendChild(card);
+      });
+
+      // Re-create lucide icons for inside sliced items
+      lucide.createIcons();
+
+      // Update stat counters
+      statBaseDim.textContent = `${targetW} × ${targetH} px`;
+      statTotalFrames.textContent = slicedFrames.length;
+
+      // Reset animation state
+      animIndex = 0;
+      slicesCountBadge.textContent = slicedFrames.length;
+      slicesCountBadge.classList.remove('hidden');
+
+      switchTab('slices');
+      showToast(`Нарезано ${slicedFrames.length} кадров!`);
+
+      // Start the animated preview loop
+      animPlay = true;
+      updatePlayPauseButton();
+      renderAnimFrame();
+    }
+
+    // Playback loop for rendering animation
+    function updatePlayPauseButton() {
+      if (animPlay) {
+        playPauseIcon.setAttribute('data-lucide', 'pause');
+      } else {
+        playPauseIcon.setAttribute('data-lucide', 'play');
+      }
+      lucide.createIcons();
+    }
+
+    function renderAnimFrame() {
+      if (slicedFrames.length === 0) {
+        animPreviewImg.src = "";
+        animPreviewImg.style.width = "";
+        animPreviewImg.style.height = "";
+        animFrameIndicator.textContent = "Кадр: 0/0";
+        return;
+      }
+      if (animIndex >= slicedFrames.length) animIndex = 0;
+
+      const frame = slicedFrames[animIndex];
+      animPreviewImg.src = frame.dataUrl;
+      animFrameIndicator.textContent = `Кадр: ${animIndex + 1}/${slicedFrames.length} (${frame.w}x${frame.h}px)`;
+
+      // Apply scaling
+      animPreviewImg.style.width = `${frame.w * animScale}px`;
+      animPreviewImg.style.height = `${frame.h * animScale}px`;
+      animPreviewImg.style.maxWidth = 'none';
+      animPreviewImg.style.maxHeight = 'none';
+    }
+
+    function animationTick(timestamp) {
+      if (animPlay && slicedFrames.length > 0) {
+        const fps = parseInt(animFps.value) || 10;
+        const interval = 1000 / fps;
+
+        if (!animLastTime) animLastTime = timestamp;
+        const elapsed = timestamp - animLastTime;
+
+        if (elapsed >= interval) {
+          animIndex = (animIndex + 1) % slicedFrames.length;
+          renderAnimFrame();
+          animLastTime = timestamp - (elapsed % interval);
+        }
+      } else {
+        animLastTime = 0;
+      }
+      requestAnimationFrame(animationTick);
+    }
+
+    // Start requestAnimationFrame loop immediately
+    requestAnimationFrame(animationTick);
+
+    // Individual frame exporter
+    window.downloadSingleFrame = function (index) {
+      const item = slicedFrames[index];
+      if (!item) return;
+
+      const link = document.createElement('a');
+      link.download = `frame_${item.id}.png`;
+      link.href = item.dataUrl;
+      link.click();
+    };
+
+    // Bulk ZIP Exporter
+    function downloadAllAsZip() {
+      if (slicedFrames.length === 0) {
+        showToast('Нет кадров для экспорта!', 'warning');
+        return;
+      }
+
+      showToast('Генерация архива...', 'info');
+      const zip = new JSZip();
+
+      slicedFrames.forEach((frame) => {
+        // Extract base64 clean data representation
+        const base64Data = frame.dataUrl.split(',')[1];
+        zip.file(`frame_${frame.id}.png`, base64Data, { base64: true });
+      });
+
+      zip.generateAsync({ type: 'blob' }).then((content) => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = `sprite_frames.zip`;
+        link.click();
+        showToast('Архив успешно скачан!');
+      }).catch(err => {
+        showToast('Ошибка при создании ZIP-архива', 'error');
+      });
+    }
+
+    // Clean notifications
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+
+      toastMsg.textContent = msg;
+
+      // Update icon/accent color based on type
+      if (type === 'warning') {
+        toast.style.borderColor = '#f9e2af';
+      } else if (type === 'error') {
+        toast.style.borderColor = '#f38ba8';
+      } else {
+        toast.style.borderColor = '#cba6f7';
+      }
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3500);
+    }
+
+    // Grid modal helper functions and listeners
+    const gridModal = document.getElementById('gridModal');
+    const modalModeManual = document.getElementById('modalModeManual');
+    const modalModeAuto = document.getElementById('modalModeAuto');
+    const modalManualInputs = document.getElementById('modalManualInputs');
+    const btnModalCancel = document.getElementById('btnModalCancel');
+    const btnModalApply = document.getElementById('btnModalApply');
+    const modalCols = document.getElementById('modalCols');
+    const modalRows = document.getElementById('modalRows');
+
+    function openGridModal() {
+      // Sync values from header inputs to modal
+      modalCols.value = colsInput.value;
+      modalRows.value = rowsInput.value;
+      
+      if (autoDetectCheck.checked) {
+        modalModeAuto.checked = true;
+        modalManualInputs.classList.add('opacity-50', 'pointer-events-none');
+      } else {
+        modalModeManual.checked = true;
+        modalManualInputs.classList.remove('opacity-50', 'pointer-events-none');
+      }
+
+      gridModal.classList.remove('hidden');
+      setTimeout(() => {
+        gridModal.classList.remove('opacity-0');
+        gridModal.querySelector('.transform').classList.remove('scale-95');
+        gridModal.querySelector('.transform').classList.add('scale-100');
+      }, 10);
+    }
+
+    function closeGridModal() {
+      const content = gridModal.querySelector('.transform');
+      gridModal.classList.add('opacity-0');
+      content.classList.remove('scale-100');
+      content.classList.add('scale-95');
+      setTimeout(() => {
+        gridModal.classList.add('hidden');
+      }, 300);
+    }
+
+    modalModeManual.addEventListener('change', () => {
+      modalManualInputs.classList.remove('opacity-50', 'pointer-events-none');
+    });
+
+    modalModeAuto.addEventListener('change', () => {
+      modalManualInputs.classList.add('opacity-50', 'pointer-events-none');
+    });
+
+    btnModalCancel.addEventListener('click', closeGridModal);
+    
+    // Close on clicking backdrop
+    gridModal.addEventListener('click', (e) => {
+      if (e.target === gridModal) {
+        closeGridModal();
+      }
+    });
+
+    btnModalApply.addEventListener('click', () => {
+      const isAuto = modalModeAuto.checked;
+      autoDetectCheck.checked = isAuto;
+
+      // Manually trigger the autoDetect check listener
+      autoDetectCheck.dispatchEvent(new Event('change'));
+
+      if (!isAuto) {
+        colsInput.value = Math.max(1, parseInt(modalCols.value) || 1);
+        rowsInput.value = Math.max(1, parseInt(modalRows.value) || 1);
+        // Dispatch input events to update workspace and frames count
+        colsInput.dispatchEvent(new Event('input'));
+        rowsInput.dispatchEvent(new Event('input'));
+      }
+
+      closeGridModal();
+    });
+  </script>
+</body>
+
+</html>

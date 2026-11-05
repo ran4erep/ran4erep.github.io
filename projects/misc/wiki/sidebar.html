@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <base target="_parent">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    @import url("font/stylesheet.css");
+    body {
+      font-family: 'Segoe UI'; font-weight: 300; font-style: normal;
+    }
+
+    .article-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .article-list li {
+      margin-bottom:1px;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .loading-gif {
+      width: 80px;
+      height: 80px;
+    }
+
+    .logo {
+      margin-right: 5px;
+    }
+
+    .footer {
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 290px;
+      height: 20px;
+      font-size: 18px;
+      padding-bottom: 10px;
+    }
+
+    .footer p {
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay" id="loadingOverlay">
+    <div class="loading-container">
+      <img class="loading-gif" src="loading.gif" alt="Loading">
+      <p>Загрузка...</p>
+    </div>
+  </div>
+
+  <!-- Sidebar Toggle Button -->
+  <button class="sidebar-toggle" onclick="toggleSidebar()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Windows Tablet Wiki</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <ul class="article-list">
+        <li><a href="#" class="load-link" data-href="https://ran4erep.github.io">&#128128; Вернуться на главную</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="index.html">&#127968; Начальная страница</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="gwg.html">Сенсорное управление в играх при помощи программы GestureWorks Gameplay</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="comfort_keys.html">Сенсорное управление в играх при помощи программы Comfort Keys Pro</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="dgvoodoo.html">Улучшаем старые игры при помощи DgVoodoo 2</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="touchmousepointer.html">Вся площадь экрана в качестве тачпада при помощи программы Touch Mouse Pointer</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="start_menu.html">Делаем меню Пуск красивее</a></li>
+        <hr>
+        <li><a href="#" class="load-link" data-href="mem_reduct.html">Увеличиваем количество свободной оперативной памяти при помощи программы MemReduct</a></li>
+      </ul>
+    </nav>
+  </aside>
+  <script>
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadLinks = document.querySelectorAll('.load-link');
+
+    loadLinks.forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetHref = this.getAttribute('data-href');
+        loadingOverlay.style.display = 'flex';
+        window.open(targetHref, "_parent");
+        //window.location.href = targetHref;
+      });
+    });
+
+  </script>
+</body>
+
+</html>
