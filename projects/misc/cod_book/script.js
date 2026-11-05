@@ -341,18 +341,16 @@ async function loadMobPage(i) {
 
 function scrollToPage(i) {
     const r = els.mobileReader;
-    const slot = r.querySelector(`[data-i="${i}"]`);
-    if (!slot || !r) return;
-    // Точная прокрутка: считаем смещение слота относительно контейнера.
-    const place = () => {
-        const sRect = slot.getBoundingClientRect();
-        const cRect = r.getBoundingClientRect();
-        r.scrollTop += (sRect.top - cRect.top);
-    };
-    place();
-    // Повторяем после двух кадров: к этому моменту лениво подгруженные
-    // страницы финализировали layout, и позиция уже точная.
-    requestAnimationFrame(() => requestAnimationFrame(place));
+    if (!r) return;
+    // Геометрический расчёт: позиция = (номер страницы) × (высота одной страницы).
+    // Высота страницы = ширина (с учётом текущего масштаба) × пропорция.
+    const first = r.querySelector('.m-page');
+    const w = first ? first.getBoundingClientRect().width : r.clientWidth;
+    const pageH = w * state.aspect;
+    const cs = window.getComputedStyle(r);
+    const padTop = parseFloat(cs.paddingTop) || 0;
+    const target = padTop + i * pageH;
+    r.scrollTop = Math.max(0, Math.min(target, r.scrollHeight - r.clientHeight));
 }
 
 function scrollToStep(dir) {
