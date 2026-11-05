@@ -19,6 +19,9 @@
 
     function toRemoteUrl(p) {
         p = String(p).replace(/^\.+\//, '').replace(/^\//, '');
+        // На pages.dev содержимое папки roms/ лежит прямо в корне:
+        // снимаем префикс "roms/" (и для index.json, и для самих ромов).
+        p = p.replace(/^roms\//, '');
         return REMOTE + '/' + p;
     }
 
