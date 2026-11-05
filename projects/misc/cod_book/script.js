@@ -39,6 +39,7 @@ const state = {
 };
 
 const cache = new Map();     // индекс страницы -> canvas
+const inflight = new Set();  // рендеры в фоне (апгрейд чёткости)
 
 /* ================= Разметка книги ================= */
 
@@ -90,25 +91,59 @@ function makeBlank() {
     return d;
 }
 
-async function getCanvas(idx) {
-    if (cache.has(idx)) return cache.get(idx);
+async function renderPage(idx, targetPx) {
     const page = await state.doc.getPage(idx + 1);
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const vpBase = page.getViewport({ scale: 1 });
-    const scale = Math.min(3, Math.max(0.5, (state.pw * dpr) / vpBase.width));
+    const scale = Math.min(3, Math.max(0.5, targetPx / vpBase.width));
     const vp = page.getViewport({ scale });
     const canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.round(vp.width));
     canvas.height = Math.max(1, Math.round(vp.height));
+    canvas.className = 'page-canvas';
+    canvas.dataset.page = String(idx);
     const ctx = canvas.getContext('2d');
     await page.render({ canvasContext: ctx, viewport: vp }).promise;
-    canvas.className = 'page-canvas';
+    return canvas;
+}
+
+// Быстрый рендер (1:1 к размеру на экране) — страница видна сразу.
+async function getCanvas(idx) {
+    if (cache.has(idx)) return cache.get(idx);
+    const canvas = await renderPage(idx, state.pw);
     cache.set(idx, canvas);
     while (cache.size > CACHE_MAX) {
         const k = cache.keys().next().value;
         cache.delete(k);
     }
     return canvas;
+}
+
+// Апгрейд до чёткого (ретина) рендера в фоне, когда есть время.
+async function upgradePage(idx) {
+    if (idx == null || idx < 0 || idx >= state.numPages) return;
+    if (inflight.has(idx) || !cache.has(idx)) return;
+    inflight.add(idx);
+    try {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const hi = await renderPage(idx, state.pw * dpr);
+        cache.set(idx, hi);
+        const holder = els.book.querySelector(`canvas[data-page="${idx}"]`);
+        if (holder && holder !== hi) holder.replaceWith(hi);
+    } catch (err) {
+        console.error(err);
+    } finally {
+        inflight.delete(idx);
+    }
+}
+
+function upgradeSoon(idxs) {
+    const valid = idxs.filter(i => i != null && i >= 0 && i < state.numPages);
+    let p = Promise.resolve();
+    valid.forEach((idx, k) => {
+        p = p.then(
+            () => new Promise(r => setTimeout(r, 150 + k * 120))
+        ).then(() => upgradePage(idx));
+    });
 }
 
 function faceCanvasSync(face, idx) {
@@ -146,11 +181,8 @@ function preload(idxs) {
 
 function buildSpreads(n) {
     const s = [];
-    if (n >= 1) s.push({ l: null, r: 0 });   // передняя обложка одна
-    let i = 1;
-    while (i < n) {
+    for (let i = 0; i < n; i += 2) {
         s.push({ l: i, r: (i + 1 < n) ? i + 1 : null });
-        i += 2;
     }
     return s;
 }
@@ -251,6 +283,7 @@ function afterNav() {
     saveMark();
     updateUI();
     prefetchNear();
+    upgradeSoon(currentIdxs());
     const d = state.pending;
     state.pending = null;
     if (d) setTimeout(() => nav(d), 20);
@@ -291,6 +324,7 @@ function goSpreadInstant(target) {
     saveMark();
     updateUI();
     prefetchNear();
+    upgradeSoon(currentIdxs());
 }
 
 function goPageInstant(target) {
@@ -301,12 +335,21 @@ function goPageInstant(target) {
     saveMark();
     updateUI();
     prefetchNear();
+    upgradeSoon(currentIdxs());
 }
 
 /* ================= UI ================= */
 
 function updateUI() {
     // Верхняя панель управления убрана — обновлять нечего.
+}
+
+function currentIdxs() {
+    if (state.mode === 'double') {
+        const s = state.spreads[state.spread];
+        return [s.l, s.r];
+    }
+    return [state.page];
 }
 
 function prefetchNear() {
@@ -384,6 +427,7 @@ function onResize() {
         paintSlot(els.slots.single, state.page);
     }
     updateUI();
+    upgradeSoon(currentIdxs());
 }
 
 function debounce(fn, ms) {
@@ -476,6 +520,7 @@ async function init() {
         updateUI();
         showLoader(false);
         prefetchNear();
+        upgradeSoon(currentIdxs());
 
         setTimeout(() => els.hint.classList.add('show'), 500);
         setTimeout(() => els.hint.classList.remove('show'), 7000);
