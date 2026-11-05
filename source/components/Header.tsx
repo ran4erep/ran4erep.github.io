@@ -35,7 +35,16 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
         });
 
         if (!best) return;
-        best.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const rootScroller = document.getElementById('root');
+        if (rootScroller) {
+            const rootRect = rootScroller.getBoundingClientRect();
+            const cardRect = best.getBoundingClientRect();
+            const top = rootScroller.scrollTop + cardRect.top - rootRect.top
+                - rootScroller.clientHeight / 2 + cardRect.height / 2;
+            rootScroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        } else {
+            best.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         best.classList.add('hub-flash');
         setTimeout(() => best?.classList.remove('hub-flash'), 2600);
     };

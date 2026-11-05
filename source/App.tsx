@@ -200,6 +200,16 @@ const App: React.FC = () => {
             
             {/* Layer 3: Content */}
             <div className="relative min-h-screen text-gray-200">
+                <style>{`
+                    .project-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                        gap: 1.5rem;
+                    }
+                    .project-card {
+                        aspect-ratio: 3 / 4;
+                    }
+                `}</style>
                  <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="fixed top-4 left-4 p-2 rounded-xl bg-slate-900/70 backdrop-blur-lg border border-slate-700 shadow-2xl hover:bg-slate-800/70 transition-all z-50 active:scale-95" aria-label="Toggle sidebar">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                         <g stroke="#000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
@@ -226,25 +236,25 @@ const App: React.FC = () => {
                                 {renderSection('gallery', 'nav_gallery', <Gallery />)}
                                 
                                 {renderSection('ai-projects', 'nav_ai_projects', (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    <div className="project-grid">
                                         {projects.ai.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} />)}
                                     </div>
                                 ))}
 
                                 {renderSection('info', 'nav_misc', (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    <div className="project-grid">
                                         {projects.misc.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} />)}
                                     </div>
                                 ))}
 
                                 {renderSection('games', 'nav_games', (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    <div className="project-grid">
                                         {projects.games.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} />)}
                                     </div>
                                 ))}
 
                                 {renderSection('tools', 'nav_tools', (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    <div className="project-grid">
                                         {projects.tools.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} />)}
                                     </div>
                                 ))}
