@@ -125,9 +125,14 @@ const App: React.FC = () => {
         window.history.pushState({}, '', url.toString());
     }, []);
 
-    // Обработчик кликов по пунктам моста. Пункты вида "cod_book:page=N"
-    // не открывают приложение, а передают команду внутрь книги (iframe).
+    // Обработчик кликов по пунктам моста. Внешние ссылки (http/https)
+    // открываются в новой вкладке. Пункты вида "cod_book:page=N" не
+    // открывают приложение, а передают команду внутрь книги (iframe).
     const handleOpenApp = useCallback((path: string) => {
+        if (/^https?:/i.test(path)) {
+            window.open(path, '_blank', 'noopener');
+            return;
+        }
         const m = path.match(/^cod_book:page=(\d+)$/);
         if (m) {
             const frame = document.querySelector('#root main iframe') as HTMLIFrameElement | null;

@@ -666,7 +666,11 @@ let pendingGoto = null; // страница, запрошенная до гот�
 // Отправляем в боковое меню сайта список глав (через мост app-nav).
 function sendChapterNav() {
     try {
-        const items = CHAPTERS.map(c => ({ label: c.label, path: 'cod_book:page=' + c.page }));
+        const pdfUrl = new URL('Cradle_of_Death.pdf', window.location.href).href;
+        const items = [
+            { label: 'Загрузить PDF', path: pdfUrl },
+            ...CHAPTERS.map(c => ({ label: c.label, path: 'cod_book:page=' + c.page })),
+        ];
         window.parent.postMessage({ type: 'app-nav', items }, window.location.origin);
     } catch (e) {
         console.error(e);
