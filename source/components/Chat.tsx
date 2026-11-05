@@ -165,7 +165,7 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
                     </div>
                     <div className="chat-input p-4 border-t border-slate-700 grid grid-cols-[1fr_auto_auto] gap-2 items-center relative">
                         <div className="relative col-span-1">
-                          <input type="text" id="message" placeholder={t('chat_message_placeholder')} value={message} disabled={!user} onChange={e => setMessage(e.target.value)} onKeyPress={e => e.key === 'Enter' && user && sendMessage()} className="w-full bg-slate-800 border border-slate-600 rounded-md pl-3 pr-12 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:opacity-40 disabled:cursor-not-allowed" />
+                          <input type="text" id="message" placeholder={t('chat_message_placeholder')} value={message} disabled={!user} onChange={e => setMessage(e.target.value)} onKeyPress={e => e.key === 'Enter' && user && sendMessage()} className="w-full bg-slate-800 border border-slate-600 rounded-md pl-3 pr-16 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:opacity-40 disabled:cursor-not-allowed" />
                           <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">{message.length}/{MAX_MESSAGE_LENGTH}</span>
                         </div>
                         <input type="file" id="image-upload" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleImageUpload} />

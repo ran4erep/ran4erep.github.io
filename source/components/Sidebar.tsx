@@ -31,12 +31,23 @@ const NavLink: React.FC<{ id: string; label: string; onClick: () => void; }> = (
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, onCloseApp, openPath, appNavItems = [], onOpenApp }) => {
-    const { t } = useContext(LanguageContext) as LanguageContextType;
+    const { t, lang } = useContext(LanguageContext) as LanguageContextType;
     const { user, openLogin, openAccount } = useAuth();
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+    const [userCount, setUserCount] = useState<number | null>(null);
 
     useEffect(() => {
         setCurrentYear(new Date().getFullYear());
+    }, []);
+
+    // Читаем количество зарегистрированных пользователей (users-count.json).
+    useEffect(() => {
+        fetch('/users-count.json')
+            .then(r => (r.ok ? r.json() : null))
+            .then(d => {
+                if (d && typeof d.count === 'number') setUserCount(d.count);
+            })
+            .catch(() => {});
     }, []);
 
     const handleNavLinkClick = (id: string) => {
@@ -145,6 +156,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                         ))}
                     </div>
                     <div className="text-center text-xs text-gray-500">
+                        {userCount !== null && (
+                            <div className="mb-1">👥 {userCount} {lang === 'en' ? 'users' : 'пользователей'}</div>
+                        )}
                         &#169; by ran4erep, 2023-{currentYear}
                     </div>
                 </div>
