@@ -214,6 +214,13 @@ const App: React.FC = () => {
                            по самой высокой карточке (CSS Grid stretch). */
                         height: auto;
                     }
+                    @media (max-width: 640px) {
+                        /* На телефонах одна карточка в ряду — растягиваем
+                           на всю ширину экрана. */
+                        .project-grid {
+                            grid-template-columns: minmax(0, 1fr);
+                        }
+                    }
                 `}</style>
                  <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="fixed top-4 left-4 p-2 rounded-xl bg-slate-900/70 backdrop-blur-lg border border-slate-700 shadow-2xl hover:bg-slate-800/70 transition-all z-50 active:scale-95" aria-label="Toggle sidebar">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">

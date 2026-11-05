@@ -378,7 +378,7 @@ function restoreMobile() {
 /* ================= Масштабирование (пинч-зум) ================= */
 
 const ZOOM_KEY = 'cod_book_zoom';
-const ZOOM_MIN = 0.8;
+const ZOOM_MIN = 1;   // нельзя уменьшить меньше исходного размера
 const ZOOM_MAX = 4;
 
 function loadZoom() {

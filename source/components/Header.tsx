@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { LanguageContext } from '../App';
 import { useAuth } from '../auth';
 import { UserAvatar } from './UserAvatar';
@@ -22,7 +22,6 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<SearchResult[]>([]);
     const [open, setOpen] = useState(false);
-    const wrapRef = useRef<HTMLDivElement>(null);
 
     // Сбор релевантных карточек по названию/описанию.
     const collectMatches = (q: string): SearchResult[] => {
@@ -50,8 +49,6 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
         } catch (e) {
             card.scrollIntoView(true);
         }
-        // Если карточка всё ещё вне видимой области — докручиваем плавно
-        // через реальный скролл-контейнер.
         requestAnimationFrame(() => {
             let node = card.parentElement;
             let scroller: Element | null = null;
@@ -116,10 +113,10 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
         }
     };
 
-    // Закрытие дропдауна при клике вне.
+    // Закрытие дропдауна при клике вне (любая обёртка .search-wrap).
     useEffect(() => {
         const onDocClick = (e: MouseEvent) => {
-            if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+            if (!(e.target as Element).closest('.search-wrap')) {
                 setOpen(false);
             }
         };
@@ -127,84 +124,104 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
         return () => document.removeEventListener('mousedown', onDocClick);
     }, []);
 
+    // Общие блоки, переиспользуемые в desktop- и mobile-раскладках.
+    const searchBox = (
+        <div className="search-wrap relative w-full min-w-0">
+            <div className="flex items-center gap-1 bg-black/20 border border-white/10 rounded-full pl-4 pr-1 h-9 transition-colors hover:bg-white/5 focus-within:border-violet-500/70">
+                <input
+                    type="text"
+                    value={query}
+                    placeholder={lang === 'en' ? 'Search projects…' : 'Поиск проектов…'}
+                    aria-label={lang === 'en' ? 'Search projects' : 'Поиск проектов'}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    className="w-full min-w-0 bg-transparent outline-none text-sm text-gray-100 placeholder-gray-500"
+                />
+                <button
+                    onClick={runSearch}
+                    aria-label={lang === 'en' ? 'Search' : 'Найти'}
+                    className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 active:scale-95 transition"
+                >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                </button>
+            </div>
+
+            {open && results.length > 0 && (
+                <ul className="absolute top-full mt-2 left-0 right-0 bg-[#121722]/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-2xl z-40 max-h-[60vh] overflow-y-auto p-1">
+                    {results.map(r => (
+                        <li key={r.title}>
+                            <button
+                                onMouseDown={(e) => { e.preventDefault(); goToCard(r.card); }}
+                                className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-white/5 hover:text-white transition truncate"
+                            >
+                                {r.title}
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+
+    const langBlock = (
+        <div className="flex gap-1 h-[30px] items-center bg-black/20 border border-white/10 rounded-full p-1 shrink-0">
+            <button onClick={() => setLang('ru')} title="Русский" className={`px-2 h-6 rounded-full flex items-center transition-all ${lang === 'ru' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
+                <img src="/flags/ru.svg" alt="RU" className="w-[18px] h-[12px] rounded-[2px] shadow-sm" />
+            </button>
+            <button onClick={() => setLang('en')} title="English" className={`px-2 h-6 rounded-full flex items-center transition-all ${lang === 'en' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
+                <img src="/flags/us.svg" alt="US" className="w-[18px] h-[12px] rounded-[2px] shadow-sm" />
+            </button>
+        </div>
+    );
+
+    const authButton = user ? (
+        <button
+            onClick={openAccount}
+            className="flex items-center gap-2 pl-1.5 pr-3 h-[30px] bg-black/20 border border-white/10 rounded-full transition-all hover:bg-white/10 active:scale-95 shrink-0"
+            aria-label={t('auth_account')}
+        >
+            <UserAvatar avatar={user.avatar} className="w-6 h-6" ring="border border-violet-500/40" />
+            <span className="text-sm font-medium text-gray-100 break-words max-w-[55vw]">{user.username}</span>
+        </button>
+    ) : (
+        <button
+            onClick={openLogin}
+            className="px-3 h-[30px] inline-flex items-center gap-1.5 bg-violet-600/90 hover:bg-violet-500 text-white text-sm font-medium rounded-full border border-violet-400/30 transition-all active:scale-95 shrink-0"
+            aria-label={t('auth_login_submit')}
+        >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            {t('auth_login_submit')}
+        </button>
+    );
+
     return (
         <header className="relative mb-6 md:mb-10">
-            {/* Верхняя строка: слева поиск, справа язык рядом с входом */}
-            <div className="flex items-center justify-between gap-2 z-10 pb-3">
-                <div
-                    ref={wrapRef}
-                    className={`relative w-full max-w-[240px] sm:max-w-[300px] min-w-0 ${sidebarOpen ? '' : 'ml-14'}`}
-                >
-                    <div className="flex items-center gap-1 bg-black/20 border border-white/10 rounded-full pl-4 pr-1 h-9 transition-colors hover:bg-white/5 focus-within:border-violet-500/70">
-                        <input
-                            type="text"
-                            value={query}
-                            placeholder={lang === 'en' ? 'Search projects…' : 'Поиск проектов…'}
-                            aria-label={lang === 'en' ? 'Search projects' : 'Поиск проектов'}
-                            onChange={handleChange}
-                            onKeyDown={handleKeyDown}
-                            className="w-full min-w-0 bg-transparent outline-none text-sm text-gray-100 placeholder-gray-500"
-                        />
-                        <button
-                            onClick={runSearch}
-                            aria-label={lang === 'en' ? 'Search' : 'Найти'}
-                            className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 active:scale-95 transition"
-                        >
-                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="11" cy="11" r="8" />
-                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    {open && results.length > 0 && (
-                        <ul className="absolute top-full mt-2 left-0 right-0 bg-[#121722]/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-2xl z-40 max-h-[60vh] overflow-y-auto p-1">
-                            {results.map(r => (
-                                <li key={r.title}>
-                                    <button
-                                        onMouseDown={(e) => { e.preventDefault(); goToCard(r.card); }}
-                                        className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-white/5 hover:text-white transition truncate"
-                                    >
-                                        {r.title}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+            {/* Desktop-раскладка (md+): как и было */}
+            <div className="hidden md:flex items-center justify-between gap-2 z-10 pb-3">
+                <div className={`w-full max-w-[240px] sm:max-w-[300px] min-w-0 ${sidebarOpen ? '' : 'ml-14'}`}>
+                    {searchBox}
                 </div>
-
                 <div className="flex items-center gap-2 shrink-0">
-                    <div className="flex gap-1 h-[30px] items-center bg-black/20 border border-white/10 rounded-full p-1">
-                        <button onClick={() => setLang('ru')} title="Русский" className={`px-2 h-6 rounded-full flex items-center transition-all ${lang === 'ru' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
-                            <img src="/flags/ru.svg" alt="RU" className="w-[18px] h-[12px] rounded-[2px] shadow-sm" />
-                        </button>
-                        <button onClick={() => setLang('en')} title="English" className={`px-2 h-6 rounded-full flex items-center transition-all ${lang === 'en' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
-                            <img src="/flags/us.svg" alt="US" className="w-[18px] h-[12px] rounded-[2px] shadow-sm" />
-                        </button>
-                    </div>
-
+                    {langBlock}
                     <div className="flex flex-col items-end gap-1 shrink-0">
-                        {user ? (
-                            <button
-                                onClick={openAccount}
-                                className="flex items-center gap-2 pl-1.5 pr-3 h-[30px] bg-black/20 border border-white/10 rounded-full transition-all hover:bg-white/10 active:scale-95"
-                                aria-label={t('auth_account')}
-                            >
-                                <UserAvatar avatar={user.avatar} className="w-6 h-6" ring="border border-violet-500/40" />
-                                <span className="text-sm font-medium text-gray-100 break-words max-w-[55vw]">{user.username}</span>
-                            </button>
-                        ) : (
-                            <button
-                                onClick={openLogin}
-                                className="px-3 h-[30px] inline-flex items-center gap-1.5 bg-violet-600/90 hover:bg-violet-500 text-white text-sm font-medium rounded-full border border-violet-400/30 transition-all active:scale-95"
-                                aria-label={t('auth_login_submit')}
-                            >
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                                {t('auth_login_submit')}
-                            </button>
-                        )}
-                        <UserCountBadge />
+                        {authButton}
+                        <UserCountBadge className="hidden md:inline-flex" />
                     </div>
+                </div>
+            </div>
+
+            {/* Mobile-раскладка (ниже md): два ряда */}
+            <div className="md:hidden z-10 pb-3 pt-1">
+                <div className="flex items-center gap-2 ml-11">
+                    {searchBox}
+                    {authButton}
+                </div>
+                <div className="flex items-center justify-between mt-2 pl-1 pr-1">
+                    {langBlock}
+                    <UserCountBadge className="md:hidden" />
                 </div>
             </div>
 
