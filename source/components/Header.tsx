@@ -281,14 +281,12 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
 
             {/* Mobile-раскладка: счётчика в шапке НЕТ (он в сайдбаре) */}
             <div className="md:hidden z-10 pb-3 pt-1">
-                <div className="flex items-center gap-2 ml-11">
-                    <div ref={mobileSearchRef} className="relative flex-1 min-w-0">
-                        {renderSearchBox({ dropdownFixed: ddFixed })}
-                    </div>
-                    {authButton}
+                <div ref={mobileSearchRef} className="ml-14">
+                    {renderSearchBox({ dropdownFixed: ddFixed })}
                 </div>
-                <div className="flex items-center justify-end mt-2 pr-1">
+                <div className="flex items-center justify-end gap-2 mt-2 pr-1">
                     {langBlock}
+                    {authButton}
                 </div>
             </div>
 
