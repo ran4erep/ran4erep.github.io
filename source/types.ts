@@ -20,7 +20,7 @@ export interface Project {
     tech?: string;
     image?: string;
     secondaryLink?: string;
-    secondaryLinkTypeKey?: 'btn_play';
+    secondaryLinkTypeKey?: 'btn_play' | 'btn_open';
 }
 
 export interface NavLink {

@@ -34,7 +34,7 @@ export const projects: { [key: string]: Project[] } = {
         { titleKey: 'snake_ai_title', descriptionKey: 'snake_ai_desc', link: '/projects/ai/snake/', linkTypeKey: 'btn_go', tech: 'javascript' },
     ],
     misc: [
-        { titleKey: 'r4ezka_title', descriptionKey: 'r4ezka_desc', link: 'https://github.com/ran4erep/R4ezka', linkTypeKey: 'btn_github', tech: 'android' },
+        { titleKey: 'r4ezka_title', descriptionKey: 'r4ezka_desc', link: 'https://github.com/ran4erep/R4ezka', linkTypeKey: 'btn_github', secondaryLink: '/r4ezka/', secondaryLinkTypeKey: 'btn_open', tech: 'android' },
         { titleKey: 'tilecuti_title', descriptionKey: 'tilecut_desc', link: '/projects/misc/tilecut/', linkTypeKey: 'btn_go', tech: 'react' },
         { titleKey: 'wiki_title', descriptionKey: 'wiki_desc', link: '/projects/misc/wiki/', linkTypeKey: 'btn_go', tech: 'windows' },
         { titleKey: 'switch_theme_title', descriptionKey: 'switch_theme_desc', link: 'https://themezer.net/packs/Skulls-8be', linkTypeKey: 'btn_go', tech: 'gimp' },

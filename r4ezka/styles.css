@@ -1,0 +1,212 @@
+/* R4ezka — домашняя страница приложения */
+
+:root {
+    --bg: #0f1116;
+    --bg2: #131724;
+    --card: #1a2030;
+    --line: #2a3144;
+    --ink: #e8e6e0;
+    --mut: #8b91a0;
+    --acc: #8b5cf6;
+    --acc2: #c084fc;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    background: transparent;
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#app { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+
+/* ---------- Hero ---------- */
+
+.hero {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    margin-bottom: 40px;
+}
+
+.hero-banner {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15,17,22,0.55) 0%, rgba(15,17,22,0.92) 75%);
+}
+
+.hero-content {
+    position: relative;
+    padding: 44px 28px 34px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-icon {
+    width: 96px;
+    height: 96px;
+    border-radius: 22px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+    margin-bottom: 16px;
+}
+
+.hero h1 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    background: linear-gradient(90deg, var(--acc), var(--acc2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.hero-sub { color: #c7cbd6; font-size: 16px; margin-top: 6px; }
+.hero-desc { color: var(--mut); font-size: 14px; max-width: 640px; margin-top: 12px; line-height: 1.55; }
+
+.hero-actions { display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; justify-content: center; }
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.12s, background 0.2s, border-color 0.2s;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+    background: linear-gradient(90deg, var(--acc), var(--acc2));
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+}
+
+.btn-primary:hover { filter: brightness(1.08); }
+
+.btn-ghost {
+    border: 1px solid var(--line);
+    color: var(--ink);
+    background: rgba(255,255,255,0.04);
+}
+
+.btn-ghost:hover { border-color: #3a4a6a; background: rgba(255,255,255,0.08); }
+
+/* ---------- Секции ---------- */
+
+.section { margin-bottom: 36px; }
+
+.section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--acc);
+    display: inline-block;
+}
+
+/* Скриншоты — вертикальная галерея */
+
+.shots {
+    columns: 2;
+    column-gap: 14px;
+}
+
+@media (min-width: 720px) { .shots { columns: 3; } }
+
+.shot {
+    display: block;
+    width: 100%;
+    margin-bottom: 14px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--card);
+    cursor: zoom-in;
+    transition: transform 0.25s, box-shadow 0.25s;
+    break-inside: avoid;
+}
+
+.shot:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.45); }
+
+.shot img { display: block; width: 100%; height: auto; }
+
+/* Чейнджлог */
+
+.changelog { display: flex; flex-direction: column; gap: 14px; }
+
+.release {
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+}
+
+.release-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.release-title { font-size: 16px; font-weight: 700; color: var(--acc2); }
+
+.release-date { font-size: 13px; color: var(--mut); }
+
+.release-body { margin-top: 10px; font-size: 14px; line-height: 1.6; color: #c6cad4; }
+
+.release-body ul { margin: 6px 0 0 18px; }
+.release-body li { margin: 3px 0; }
+.release-body h1, .release-body h2, .release-body h3 { font-size: 14px; margin-top: 8px; color: #e9e7f0; }
+.release-body code { background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+.release-body a { color: var(--acc2); }
+
+.placeholder { color: var(--mut); font-size: 14px; }
+
+/* ---------- Просмотр скриншота ---------- */
+
+.viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(8, 10, 14, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.viewer img { max-width: 94vw; max-height: 92vh; border-radius: 12px; box-shadow: 0 30px 80px rgba(0,0,0,0.7); }
+
+.viewer-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.footer { text-align: center; color: var(--mut); font-size: 13px; margin-top: 40px; }
