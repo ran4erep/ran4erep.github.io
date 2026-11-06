@@ -11,9 +11,11 @@
     const REPO = 'ran4erep/R4ezka';
     const API = `https://api.github.com/repos/${REPO}/releases`;
 
-    /* ---------- Скриншоты ---------- */
+    /* ---------- Скриншоты (по порядку имён) ---------- */
     const shotsContainer = document.getElementById('shots');
-    const shotNames = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg'];
+    const shotNames = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg']
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
     shotNames.forEach(name => {
         const a = document.createElement('a');
         a.className = 'shot';
@@ -29,6 +31,12 @@
         a.appendChild(img);
         shotsContainer.appendChild(a);
     });
+
+    // Прокрутка ленты
+    const shotsPrev = document.getElementById('shotsPrev');
+    const shotsNext = document.getElementById('shotsNext');
+    shotsPrev.addEventListener('click', () => shotsContainer.scrollBy({ left: -480, behavior: 'smooth' }));
+    shotsNext.addEventListener('click', () => shotsContainer.scrollBy({ left: 480, behavior: 'smooth' }));
 
     /* ---------- Просмотр ---------- */
     const viewer = document.getElementById('viewer');
@@ -89,12 +97,25 @@
         downloadBtn.setAttribute('download', 'r4ezka.apk');
     }
 
+    async function fetchAllReleases() {
+        const all = [];
+        let page = 1;
+        for (;;) {
+            const res = await fetch(`${API}?per_page=100&page=${page}`, { headers: { Accept: 'application/vnd.github+json' } });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const batch = await res.json();
+            if (!Array.isArray(batch) || batch.length === 0) break;
+            all.push(...batch);
+            if (batch.length < 100) break;
+            page++;
+        }
+        return all;
+    }
+
     async function loadReleases() {
         try {
-            const res = await fetch(`${API}?per_page=10`, { headers: { Accept: 'application/vnd.github+json' } });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const releases = await res.json();
-            if (!Array.isArray(releases) || releases.length === 0) throw new Error('empty');
+            const releases = await fetchAllReleases();
+            if (!releases.length) throw new Error('empty');
 
             // Самая свежая версия → кнопка скачивания
             const latest = releases[0];

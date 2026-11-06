@@ -30,11 +30,31 @@
             </div>
         </header>
 
-        <!-- Скриншоты -->
+        <!-- Описание -->
+        <section class="section">
+            <h2>Описание</h2>
+            <div class="about">
+                <p><b>R4ezka</b> — неофициальный Android-клиент для сайта Rezka TV. Приложение предоставляет удобный мобильный интерфейс для просмотра каталога, поиска фильмов и сериалов, управления избранным и историей просмотра, а также воспроизведения контента во встроенном плеере.</p>
+                <ul class="features">
+                    <li>🎬 Каталог фильмов и сериалов</li>
+                    <li>🔎 Поиск по каталогу</li>
+                    <li>📺 Просмотр информации о фильмах и сериалах</li>
+                    <li>▶️ Встроенный видеоплеер</li>
+                    <li>⭐ Избранное</li>
+                    <li>🕘 История просмотра</li>
+                    <li>📱 Интерфейс, адаптированный для Android</li>
+                    <li>🌙 Современный интерфейс на Jetpack Compose</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Скриншоты (горизонтальная прокрутка, как на главной) -->
         <section class="section">
             <h2>Скриншоты</h2>
-            <div class="shots" id="shots">
-                <!-- наполняется из images/screenshots/*.jpg -->
+            <div class="shots-wrap group">
+                <div class="shots" id="shots"></div>
+                <button class="shot-btn shot-prev" id="shotsPrev" aria-label="Назад">&#8249;</button>
+                <button class="shot-btn shot-next" id="shotsNext" aria-label="Вперёд">&#8250;</button>
             </div>
         </section>
 

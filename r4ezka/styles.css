@@ -121,31 +121,77 @@ html, body {
     display: inline-block;
 }
 
-/* Скриншоты — вертикальная галерея */
+/* Описание */
 
-.shots {
-    columns: 2;
-    column-gap: 14px;
+.about {
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #c6cad4;
 }
 
-@media (min-width: 720px) { .shots { columns: 3; } }
+.features { margin: 12px 0 0 18px; }
+.features li { margin: 4px 0; }
+
+/* Скриншоты — горизонтальная лента как на главной */
+
+.shots-wrap { position: relative; }
+
+.shots {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+}
 
 .shot {
-    display: block;
-    width: 100%;
-    margin-bottom: 14px;
+    flex: none;
+    scroll-snap-align: start;
+    width: 236px;
+    height: 420px;
     border-radius: 14px;
     overflow: hidden;
     border: 1px solid var(--line);
     background: var(--card);
     cursor: zoom-in;
     transition: transform 0.25s, box-shadow 0.25s;
-    break-inside: avoid;
 }
 
 .shot:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.45); }
 
-.shot img { display: block; width: 100%; height: auto; }
+.shot img { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+.shot-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: rgba(15,17,22,0.85);
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.25s;
+    z-index: 5;
+}
+
+.shots-wrap:hover .shot-btn { opacity: 1; }
+
+.shot-prev { left: 8px; }
+.shot-next { right: 8px; }
+
+@media (max-width: 640px) {
+    .shot-btn { opacity: 1; }
+    .shot { width: 200px; height: 356px; }
+}
 
 /* Чейнджлог */
 
