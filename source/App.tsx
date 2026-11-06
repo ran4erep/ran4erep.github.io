@@ -206,7 +206,10 @@ const App: React.FC = () => {
                            меню (больше места) добавляются новые колонки того же
                            размера, а сами карточки не растягиваются. */
                         display: grid;
-                        grid-template-columns: repeat(auto-fill, minmax(200px, 260px));
+                        /* auto-fit: пустые треки схлопываются, justify-content
+                           центрирует реальные карточки в ряду. */
+                        grid-template-columns: repeat(auto-fit, minmax(200px, 260px));
+                        justify-content: center;
                         gap: 1.5rem;
                     }
                     .project-card {

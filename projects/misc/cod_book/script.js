@@ -346,7 +346,8 @@ function scrollToPage(i) {
     // Высота страницы = ширина (с учётом текущего масштаба) × пропорция.
     const first = r.querySelector('.m-page');
     const w = first ? first.getBoundingClientRect().width : r.clientWidth;
-    const pageH = w * state.aspect;
+    // Высота страницы = ширина / пропорция (aspect-ratio = width/height).
+    const pageH = w / state.aspect;
     const cs = window.getComputedStyle(r);
     const padTop = parseFloat(cs.paddingTop) || 0;
     const target = padTop + i * pageH;

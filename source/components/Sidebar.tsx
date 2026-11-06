@@ -32,7 +32,7 @@ const NavLink: React.FC<{ id: string; label: string; onClick: () => void; }> = (
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, onCloseApp, openPath, appNavItems = [], onOpenApp }) => {
-    const { t } = useContext(LanguageContext) as LanguageContextType;
+    const { t, lang, setLang } = useContext(LanguageContext) as LanguageContextType;
     const { user, openLogin, openAccount } = useAuth();
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
@@ -144,6 +144,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                 </nav>
 
                 <div className="mt-auto">
+                    {/* Выбор языка — только на мобильных, над ссылками на соцсети */}
+                    <div className="md:hidden flex justify-center mb-4">
+                        <div className="flex gap-1 h-[30px] items-center bg-black/20 border border-white/10 rounded-full p-1">
+                            <button onClick={() => setLang('ru')} title="Русский" className={`px-2 h-6 rounded-full flex items-center transition-all ${lang === 'ru' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
+                                <img src="/flags/ru.svg" alt="RU" className="w-[18px] h-[12px] rounded-[2px] shadow-sm" />
+                            </button>
+                            <button onClick={() => setLang('en')} title="English" className={`px-2 h-6 rounded-full flex items-center transition-all ${lang === 'en' ? 'bg-violet-500 text-white' : 'text-gray-400 hover:bg-white/10'} active:scale-95`}>
+                                <img src="/flags/us.svg" alt="US" className="w-[18px] h-[12px] rounded-[2px] shadow-sm" />
+                            </button>
+                        </div>
+                    </div>
                     <div className="flex justify-center gap-4 my-4">
                         {socialLinks.map(link => (
                             <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-transform duration-200 hover:scale-110 relative group">
