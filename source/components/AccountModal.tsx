@@ -212,9 +212,9 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
     ];
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 md:p-10">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-[1vw]">
             <div className="absolute inset-0 bg-black/15" onClick={onClose} />
-            <div className="relative w-full max-w-sm md:max-w-6xl md:w-[94vw] max-h-[92vh] overflow-y-auto custom-scrollbar bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4">
+            <div className="relative w-full max-w-sm md:w-[98vw] md:h-[98vh] md:max-w-none max-h-[92vh] md:max-h-none overflow-y-auto md:overflow-hidden custom-scrollbar bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4 flex flex-col">
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-white">{t('auth_account')}</h3>
                     <button
@@ -227,10 +227,10 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                     </button>
                 </div>
 
-                <div className="md:flex md:gap-4 space-y-4 md:space-y-0">
+                <div className="md:flex md:gap-4 space-y-4 md:space-y-0 flex-1 min-h-0">
                     {/* Колонка информации */}
                     <div className="md:w-64 shrink-0">
-                        <div className="rounded-2xl bg-white/5 border border-white/10 p-4 flex md:flex-col items-center md:items-start gap-4">
+                        <div className="rounded-2xl bg-white/5 border border-white/10 p-4 flex flex-col items-center gap-4 text-center">
                             <button
                                 type="button"
                                 onClick={handleAvatarClick}
@@ -285,7 +285,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                     </div>
 
                     {/* Колонка вкладок */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 flex flex-col">
                         <div className="flex gap-1.5 mb-3 bg-white/5 border border-white/10 rounded-xl p-1">
                             {tabs.map(tb => (
                                 <button
@@ -299,7 +299,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                             ))}
                         </div>
 
-                        <div className="md:max-h-[70vh] md:overflow-y-auto custom-scrollbar pr-1 space-y-3">
+                        <div className="md:flex-1 md:min-h-0 md:overflow-y-auto custom-scrollbar pr-1 space-y-3">
                             {tab === 'favorites' && (
                                 <div className="rounded-2xl bg-white/5 border border-white/10 p-5 text-center text-sm text-slate-400">
                                     {t('auth_coming_soon')}
