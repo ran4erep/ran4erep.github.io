@@ -55,6 +55,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
     const [stats, setStats] = useState<AccountStats>({ favorites: null, watched: null, subscriptions: null });
     const [favoritesList, setFavoritesList] = useState<any[] | null>(null);
     const [historyList, setHistoryList] = useState<any[] | null>(null);
+    const [devices, setDevices] = useState<string[] | null>(null);
 
     const [tab, setTab] = useState<Tab>('history');
     const [newPass, setNewPass] = useState('');
@@ -71,6 +72,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
             setStats({ favorites: null, watched: null, subscriptions: null });
             setFavoritesList(null);
             setHistoryList(null);
+            setDevices(null);
             setToast(null);
             setNewPass(''); setConfirmPass('');
             setTab('history');
@@ -125,7 +127,24 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                 return Object.values(value).sort((a: any, b: any) => (b?.timestamp || 0) - (a?.timestamp || 0));
             };
 
-            const [favValue, histValue] = await Promise.all([readValue('favorites'), readValue('history')]);
+            const [favValue, histValue, settingsValue] = await Promise.all([
+                readValue('favorites'), readValue('history'), readValue('settings'),
+            ]);
+
+            // Устройства: уникальные deviceId из токенов в valueках + firstDeviceId.
+            const deviceIds = new Set<string>();
+            const DEVICE_RE = /deviceId=([^()]*)\(/g;
+            const scan = (raw: string) => {
+                if (typeof raw !== 'string') return;
+                let m;
+                DEVICE_RE.lastIndex = 0;
+                while ((m = DEVICE_RE.exec(raw)) !== null) {
+                    if (m[1].trim()) deviceIds.add(m[1].trim());
+                }
+            };
+            if (settingsValue && typeof settingsValue === 'object') {
+                Object.values(settingsValue).forEach((v: any) => scan(String(v)));
+            }
 
             const entries = await Promise.all(keys.map(k => read(k.path).then(n => [k.field, n] as const)));
             if (!cancelled) {
@@ -136,6 +155,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                 });
                 setFavoritesList(toItems(favValue));
                 setHistoryList(toItems(histValue));
+                setDevices(Array.from(deviceIds));
             }
         };
 
@@ -278,7 +298,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
     );
 
     const EmptyState = ({ text }: { text: string }) => (
-        <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-center text-sm text-slate-400">
+        <div className="rounded-2xl bg-slate-900/95 border border-white/10 p-6 text-center text-sm text-slate-400">
             {text}
         </div>
     );
@@ -353,6 +373,13 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                                 <span className="text-xs text-slate-400 leading-tight whitespace-nowrap">{t('auth_stat_subscriptions')}</span>
                             </div>
                         </div>
+                        <button
+                            type="button"
+                            onClick={logout}
+                            className="mt-3 w-full bg-red-500/80 hover:bg-red-500 text-white font-medium rounded-lg py-2.5 transition-all active:scale-[0.98]"
+                        >
+                            {t('auth_logout')}
+                        </button>
                         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarFile} />
                     </div>
 
@@ -378,10 +405,12 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                                 ) : favoritesList.length === 0 ? (
                                     <EmptyState text={t('auth_no_favorites')} />
                                 ) : (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                        {favoritesList.map(it => (
-                                            <MovieCard key={it.id || it.url || it.title} item={it} />
-                                        ))}
+                                    <div className="rounded-2xl bg-slate-900/95 border border-white/10 p-3">
+                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                            {favoritesList.map(it => (
+                                                <MovieCard key={it.id || it.url || it.title} item={it} />
+                                            ))}
+                                        </div>
                                     </div>
                                 )
                             )}
@@ -392,16 +421,18 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                                 ) : historyList.length === 0 ? (
                                     <EmptyState text={t('auth_no_history')} />
                                 ) : (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                        {historyList.map(it => (
-                                            <MovieCard key={it.id || it.url || it.title} item={it} footnote={it.subtitle || undefined} />
-                                        ))}
+                                    <div className="rounded-2xl bg-slate-900/95 border border-white/10 p-3">
+                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                            {historyList.map(it => (
+                                                <MovieCard key={it.id || it.url || it.title} item={it} footnote={it.subtitle || undefined} />
+                                            ))}
+                                        </div>
                                     </div>
                                 )
                             )}
 
                             {tab === 'account' && (
-                                <div className="w-full md:w-1/2 mx-auto space-y-3">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
                                     {/* Смена пароля */}
                                     <div className="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-2">
                                         <div className="text-sm font-medium text-slate-300">{t('auth_change_password')}</div>
@@ -455,13 +486,28 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                                         </button>
                                     </div>
 
-                                    <button
-                                        type="button"
-                                        onClick={logout}
-                                        className="w-full bg-red-500/80 hover:bg-red-500 text-white font-medium rounded-lg py-2.5 transition-all active:scale-[0.98]"
-                                    >
-                                        {t('auth_logout')}
-                                    </button>
+                                    {/* Список устройств */}
+                                    <div className="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-2 self-start">
+                                        <div className="text-sm font-medium text-slate-300">{t('auth_devices')}</div>
+                                        {devices === null ? (
+                                            <div className="text-sm text-slate-400">…</div>
+                                        ) : devices.length === 0 ? (
+                                            <div className="text-sm text-slate-400">{t('auth_no_devices')}</div>
+                                        ) : (
+                                            <ul className="space-y-1.5 max-h-[200px] overflow-y-auto custom-scrollbar pr-1">
+                                                {devices.map(id => (
+                                                    <li key={id} className="flex items-center gap-2 text-sm text-gray-200">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-400 shrink-0">
+                                                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                                            <line x1="8" y1="21" x2="16" y2="21" />
+                                                            <line x1="12" y1="17" x2="12" y2="21" />
+                                                        </svg>
+                                                        <span className="truncate font-mono text-[12px]">{id}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>
