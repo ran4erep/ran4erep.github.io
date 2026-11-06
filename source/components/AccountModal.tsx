@@ -41,7 +41,7 @@ async function thumbFetch(src: string): Promise<string> {
     try {
         if (!('createImageBitmap' in window)) return src;
         const blob = await (await fetch(src)).blob();
-        const bmp = await createImageBitmap(blob, { resizeWidth: 320 });
+        const bmp = await createImageBitmap(blob, { resizeWidth: 256 });
         const canvas = document.createElement('canvas');
         canvas.width = bmp.width;
         canvas.height = bmp.height;
@@ -72,25 +72,34 @@ const Thumb = ({ src, alt }: { src: string; alt?: string }) => {
         if (!el) return;
         let live = true;
         let started = false;
+        let timer = 0;
         const start = () => {
-            if (started) return;
+            if (started || !live) return;
             started = true;
             loadThumb(src).then(r => { if (live) setRes(r); });
+        };
+        const schedule = () => {
+            if (timer) return;
+            // Небольшая задержка, чтобы не грузить посреди резкого скролла.
+            timer = window.setTimeout(() => { timer = 0; start(); }, 150);
         };
         if ('IntersectionObserver' in window) {
             const io = new IntersectionObserver(
                 entries => {
                     entries.forEach(entry => {
-                        if (entry.isIntersecting) { start(); io.disconnect(); }
+                        if (entry.isIntersecting) {
+                            schedule();
+                            io.disconnect();
+                        }
                     });
                 },
-                { rootMargin: '300px 0px' }
+                { rootMargin: '200px 0px' }
             );
             io.observe(el);
-            return () => { io.disconnect(); live = false; };
+            return () => { io.disconnect(); window.clearTimeout(timer); live = false; };
         }
-        start();
-        return () => { live = false; };
+        schedule();
+        return () => { window.clearTimeout(timer); live = false; };
     }, [src]);
 
     return (
@@ -144,8 +153,8 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
     const [favoritesList, setFavoritesList] = useState<any[] | null>(null);
     const [historyList, setHistoryList] = useState<any[] | null>(null);
     const [devices, setDevices] = useState<string[] | null>(null);
-    const [favLimit, setFavLimit] = useState(30);
-    const [histLimit, setHistLimit] = useState(30);
+    const [favLimit, setFavLimit] = useState(12);
+    const [histLimit, setHistLimit] = useState(12);
     const cardScrollRef = useRef<HTMLDivElement>(null);
     const tabScrollRef = useRef<HTMLDivElement>(null);
 
@@ -165,8 +174,8 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
             setFavoritesList(null);
             setHistoryList(null);
             setDevices(null);
-            setFavLimit(30);
-            setHistLimit(30);
+            setFavLimit(12);
+            setHistLimit(12);
             setToast(null);
             setNewPass(''); setConfirmPass('');
             setTab('history');
@@ -447,7 +456,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
             <div
                 ref={cardScrollRef}
                 onScroll={handleScrollLoad}
-                className="relative w-full max-w-sm md:w-[85vw] md:h-[85vh] md:max-w-none max-h-[96dvh] md:max-h-none overflow-y-auto md:overflow-hidden custom-scrollbar bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4 flex flex-col"
+                className="relative w-full max-w-sm md:w-[85vw] md:h-[85vh] md:max-w-none max-h-[96dvh] md:max-h-none overflow-y-auto md:overflow-hidden custom-scrollbar bg-slate-900/85 border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4 flex flex-col"
             >
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-white">{t('auth_account')}</h3>
@@ -544,7 +553,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                             ref={tabScrollRef}
                             onScroll={handleScrollLoad}
                             className="md:flex-1 md:min-h-0 md:overflow-y-auto custom-scrollbar pr-1 space-y-3 [transform:translateZ(0)]"
-                            style={{ overscrollBehavior: 'contain' }}
+                            style={{ overscrollBehavior: 'contain', contain: 'layout paint' }}
                         >
                             {tab === 'favorites' && (
                                 favoritesList === null ? (
