@@ -279,12 +279,12 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
                 </div>
             </div>
 
-            {/* Mobile-раскладка: счётчика и языка в шапке НЕТ (они в сайдбаре) */}
+            {/* Mobile-раскладка: поиск и кнопка входа — на одной строке */}
             <div className="md:hidden z-10 pb-3 pt-1">
-                <div ref={mobileSearchRef} className="ml-14">
-                    {renderSearchBox({ dropdownFixed: ddFixed })}
-                </div>
-                <div className="flex items-center justify-end mt-2 pr-1">
+                <div className="flex items-center gap-2 ml-11">
+                    <div ref={mobileSearchRef} className="relative flex-1 min-w-0">
+                        {renderSearchBox({ dropdownFixed: ddFixed })}
+                    </div>
                     {authButton}
                 </div>
             </div>

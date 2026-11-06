@@ -208,7 +208,7 @@ const App: React.FC = () => {
                         display: grid;
                         /* auto-fit: пустые треки схлопываются, justify-content
                            центрирует реальные карточки в ряду. */
-                        grid-template-columns: repeat(auto-fit, minmax(200px, 260px));
+                        grid-template-columns: repeat(auto-fit, minmax(240px, 300px));
                         justify-content: center;
                         gap: 1.5rem;
                     }
