@@ -229,7 +229,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
 
                 <div className="md:flex md:gap-4 space-y-4 md:space-y-0 flex-1 min-h-0">
                     {/* Колонка информации */}
-                    <div className="md:w-64 shrink-0">
+                    <div className="md:w-80 shrink-0">
                         <div className="rounded-2xl bg-white/5 border border-white/10 p-4 flex flex-col items-center gap-4 text-center">
                             <button
                                 type="button"
@@ -264,21 +264,21 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-5 7 5V5c0-1.1-.9-2-2-2z" /></svg>
                                 </span>
                                 <span className="text-xl font-bold text-white">{stats.favorites === null ? '…' : stats.favorites}</span>
-                                <span className="text-xs text-slate-400 leading-tight">{t('auth_stat_favorites')}</span>
+                                <span className="text-xs text-slate-400 leading-tight whitespace-nowrap">{t('auth_stat_favorites')}</span>
                             </div>
                             <div className="flex flex-col items-center gap-1.5 text-center">
                                 <span className="text-violet-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" /></svg>
                                 </span>
                                 <span className="text-xl font-bold text-white">{stats.watched === null ? '…' : stats.watched}</span>
-                                <span className="text-xs text-slate-400 leading-tight">{t('auth_stat_watched')}</span>
+                                <span className="text-xs text-slate-400 leading-tight whitespace-nowrap">{t('auth_stat_watched')}</span>
                             </div>
                             <div className="flex flex-col items-center gap-1.5 text-center">
                                 <span className="text-violet-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8H4V6h16v2zm-2-6H6v2h12V2zm4 10v8c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2zm-6 4 6-3.27v6.53L16 16z" /></svg>
                                 </span>
                                 <span className="text-xl font-bold text-white">{stats.subscriptions === null ? '…' : stats.subscriptions}</span>
-                                <span className="text-xs text-slate-400 leading-tight">{t('auth_stat_subscriptions')}</span>
+                                <span className="text-xs text-slate-400 leading-tight whitespace-nowrap">{t('auth_stat_subscriptions')}</span>
                             </div>
                         </div>
                         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarFile} />
@@ -313,7 +313,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                             )}
 
                             {tab === 'account' && (
-                                <>
+                                <div className="w-full md:w-1/2 mx-auto space-y-3">
                                     {/* Смена пароля */}
                                     <div className="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-2">
                                         <div className="text-sm font-medium text-slate-300">{t('auth_change_password')}</div>
@@ -374,7 +374,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                                     >
                                         {t('auth_logout')}
                                     </button>
-                                </>
+                                </div>
                             )}
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 
-import React, { useContext } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import type { Project, LanguageContextType, SitePage } from '../types';
 import { LanguageContext } from '../App';
 import { languageIcons } from '../constants';
@@ -13,6 +13,20 @@ interface ProjectCardProps {
 export const ProjectCard: React.FC<ProjectCardProps> = ({ project, pages, onOpenApp }) => {
     const { t } = useContext(LanguageContext) as LanguageContextType;
     const iconClass = project.tech ? languageIcons[project.tech.toLowerCase()] || 'devicon-devicon-plain' : '';
+    const cardRef = useRef<HTMLDivElement>(null);
+    const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+    // Лёгкий 3D-наклон карточки от положения курсора (работает на мыши).
+    const handleMouseMove = (e: React.MouseEvent) => {
+        const el = cardRef.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width - 0.5;
+        const py = (e.clientY - rect.top) / rect.height - 0.5;
+        setTilt({ x: -py * 10, y: px * 10 });
+    };
+
+    const resetTilt = () => setTilt({ x: 0, y: 0 });
 
     const pageForLink = (link?: string) => {
         if (!link || !pages || /^https?:/i.test(link)) return undefined;
@@ -21,7 +35,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, pages, onOpen
     };
 
     return (
-        <div className="project-card relative isolate group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 flex flex-col transition-colors duration-300 hover:border-violet-500 hover:-translate-y-1 overflow-hidden">
+        <div
+            ref={cardRef}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={resetTilt}
+            className="project-card relative isolate group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 flex flex-col transition-colors duration-300 hover:border-violet-500 overflow-hidden"
+            style={{
+                transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+                transition: 'transform 120ms ease-out',
+            }}
+        >
             <div className="relative z-0 flex flex-col flex-grow">
                 {project.image && <img src={project.image} alt={t(project.titleKey)} className="rounded-md mb-4 w-full object-cover aspect-[16/9]" />}
                 <h3 className="text-xl font-bold text-gray-100 mb-2">{t(project.titleKey)}</h3>
