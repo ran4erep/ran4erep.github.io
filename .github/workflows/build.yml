@@ -4,11 +4,6 @@ on:
   push:
     branches: [master]
   workflow_dispatch:
-    inputs:
-      optimize_all_media:
-        description: 'Прогнать все картинки галереи (--all)'
-        type: boolean
-        default: false
 
 permissions:
   contents: write
@@ -57,20 +52,23 @@ jobs:
         run: node scripts/generate-pages.mjs
 
       - name: Update media indexes
+        timeout-minutes: 10
         run: |
-          sudo apt-get update -qq >/dev/null 2>&1 || true
-          sudo apt-get install -y -qq imagemagick >/dev/null 2>&1 || true
-          node scripts/update-media.mjs ${{ github.event.inputs.optimize_all_media == 'true' && '--all' || '' }}
+          if ! command -v magick >/dev/null 2>&1 && ! command -v convert >/dev/null 2>&1; then
+            sudo apt-get update -qq >/dev/null 2>&1 || true
+            sudo apt-get install -y -qq imagemagick >/dev/null 2>&1 || true
+          fi
+          node scripts/update-media.mjs
 
       - name: Commit media index changes
         run: |
-          if git diff --quiet -- gallery/gallery.json music/playlist.json gallery music; then
+          if git diff --quiet -- gallery/gallery.json gallery music/playlist.json music; then
             echo "Изменений нет"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add gallery/gallery.json music/playlist.json gallery music
+          git add gallery/gallery.json gallery music/playlist.json music
           git commit -m "chore: update media indexes"
           git push
 

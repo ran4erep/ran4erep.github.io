@@ -22,10 +22,21 @@ type Tab = 'favorites' | 'history' | 'account';
 const countEntries = (value: any): number =>
     value && typeof value === 'object' ? Object.keys(value).length : 0;
 
-// --- Миниатюры/остёров (как в приложении: пережим + кэш) ---
+// --- Миниатюры постеров (как в приложении: пережим + кэш) ---
 const thumbCache = new Map<string, string>();
+const thumbQueue: (() => Promise<void>)[] = [];
+let thumbActive = 0;
+const THUMB_PARALLEL = 3;
 
-async function loadThumb(src: string): Promise<string> {
+function pumpThumbs() {
+    while (thumbActive < THUMB_PARALLEL && thumbQueue.length) {
+        thumbActive++;
+        const job = thumbQueue.shift()!;
+        job().finally(() => { thumbActive--; pumpThumbs(); });
+    }
+}
+
+async function thumbFetch(src: string): Promise<string> {
     if (thumbCache.has(src)) return thumbCache.get(src)!;
     try {
         if (!('createImageBitmap' in window)) return src;
@@ -40,30 +51,62 @@ async function loadThumb(src: string): Promise<string> {
         const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
         thumbCache.set(src, dataUrl);
         return dataUrl;
-    } catch {
+    } catch (e) {
         return src;
     }
 }
 
+function loadThumb(src: string): Promise<string> {
+    return new Promise(resolve => {
+        thumbQueue.push(() => thumbFetch(src).then(resolve, () => resolve(src)));
+        pumpThumbs();
+    });
+}
+
 const Thumb = ({ src, alt }: { src: string; alt?: string }) => {
     const [res, setRes] = useState<string | null>(null);
+    const boxRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
+        const el = boxRef.current;
+        if (!el) return;
         let live = true;
-        loadThumb(src).then(r => { if (live) setRes(r); });
+        let started = false;
+        const start = () => {
+            if (started) return;
+            started = true;
+            loadThumb(src).then(r => { if (live) setRes(r); });
+        };
+        if ('IntersectionObserver' in window) {
+            const io = new IntersectionObserver(
+                entries => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) { start(); io.disconnect(); }
+                    });
+                },
+                { rootMargin: '300px 0px' }
+            );
+            io.observe(el);
+            return () => { io.disconnect(); live = false; };
+        }
+        start();
         return () => { live = false; };
     }, [src]);
-    if (!res) {
-        return <div className="absolute inset-0 bg-white/5 animate-pulse" />;
-    }
+
     return (
-        <img
-            src={res}
-            alt={alt || ''}
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 w-full h-full object-cover group-hover:opacity-90 transition-opacity"
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-        />
+        <div ref={boxRef} className="absolute inset-0 bg-white/5">
+            {!res && <div className="absolute inset-0 animate-pulse bg-white/5" />}
+            {res && (
+                <img
+                    src={res}
+                    alt={alt || ''}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+            )}
+        </div>
     );
 };
 
@@ -399,12 +442,12 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
     };
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-3 md:p-8">
             <div className="absolute inset-0 bg-black/15" onClick={onClose} />
             <div
                 ref={cardScrollRef}
                 onScroll={handleScrollLoad}
-                className="relative w-full max-w-sm md:w-[85vw] md:h-[85vh] md:max-w-none max-h-[92vh] md:max-h-none overflow-y-auto md:overflow-hidden custom-scrollbar bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4 flex flex-col"
+                className="relative w-full max-w-sm md:w-[85vw] md:h-[85vh] md:max-w-none max-h-[96dvh] md:max-h-none overflow-y-auto md:overflow-hidden custom-scrollbar bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4 flex flex-col"
             >
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-white">{t('auth_account')}</h3>
