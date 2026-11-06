@@ -4,9 +4,14 @@ on:
   push:
     branches: [master]
   workflow_dispatch:
+    inputs:
+      optimize_all_media:
+        description: 'Прогнать все картинки галереи (--all)'
+        type: boolean
+        default: false
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -50,6 +55,24 @@ jobs:
 
       - name: Generate pages manifest
         run: node scripts/generate-pages.mjs
+
+      - name: Update media indexes
+        run: |
+          sudo apt-get update -qq >/dev/null 2>&1 || true
+          sudo apt-get install -y -qq imagemagick >/dev/null 2>&1 || true
+          node scripts/update-media.mjs ${{ github.event.inputs.optimize_all_media == 'true' && '--all' || '' }}
+
+      - name: Commit media index changes
+        run: |
+          if git diff --quiet -- gallery/gallery.json music/playlist.json gallery music; then
+            echo "Изменений нет"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gallery/gallery.json music/playlist.json gallery music
+          git commit -m "chore: update media indexes"
+          git push
 
       - name: Stage site for Pages
         run: |
