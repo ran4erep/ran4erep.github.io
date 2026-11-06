@@ -79,7 +79,7 @@ export interface AuthContextType {
     login: (username: string, password: string) => Promise<void>;
     register: (username: string, password: string) => Promise<void>;
     logout: () => void;
-    changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+    changePassword: (newPassword: string) => Promise<void>;
     setAvatar: (avatar: string) => Promise<void>;
     accountOpen: boolean;
     openAccount: () => void;

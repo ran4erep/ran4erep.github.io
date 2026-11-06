@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { AuthUser, AuthContextType } from './types';
-import { ensureFirebaseAuthUser, logoutFirebase, changeFirebasePassword } from './firebaseChat';
+import { ensureFirebaseAuthUser, logoutFirebase } from './firebaseChat';
 
 const DATABASE_URL = 'https://r4ezka-default-rtdb.europe-west1.firebasedatabase.app';
 const SESSION_KEY = 'r4ezka_session';
@@ -347,21 +347,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     /**
-     * Смена пароля. Пароль участвует в формировании секретного ключа
-     * (SHA-256(логин:пароль)), поэтому при смене:
-     *   1) сверяем текущий пароль (ключ должен совпасть с сессией);
-     *   2) переносим все данные из private старого ключа в новый;
-     *   3) обновляем сессию и (по возможности) пароль Firebase Auth.
+     * Смена пароля. Пользователь уже авторизован, текущий пароль не нужен.
+     * Пароль участвует в формировании секретного ключа
+     * (SHA-256(логин:пароль)), поэтому при смене переносим все данные
+     * из private старого ключа в новый и затираем старый.
      */
-    const changePassword = useCallback(async (currentPassword: string, newPassword: string): Promise<void> => {
+    const changePassword = useCallback(async (newPassword: string): Promise<void> => {
         if (!user) throw new Error(AUTH_ERR.FILL);
-        if (!currentPassword || !newPassword) throw new Error(AUTH_ERR.FILL);
+        if (!newPassword) throw new Error(AUTH_ERR.FILL);
         const cleanName = user.username;
 
-        const candidateKey = await generateSecretKey(cleanName, currentPassword);
-        if (candidateKey !== user.key) {
-            throw new Error(AUTH_ERR.WRONG_PASSWORD);
-        }
         if (newPassword.length < 4) {
             throw new Error('auth_err_password_short');
         }
@@ -413,10 +408,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.warn('old key cleanup skipped');
         }
 
-        // 4) Firebase Auth (чат) — если аккаунт там существует.
-        await changeFirebasePassword(cleanName, currentPassword, newPassword);
-
-        // 5) Обновляем сессию.
+        // 4) Обновляем сессию.
         const session: ParsedSession = { ...user, key: newKey };
         try {
             localStorage.setItem(SESSION_KEY, JSON.stringify(session));
