@@ -22,103 +22,6 @@ type Tab = 'favorites' | 'history' | 'account';
 const countEntries = (value: any): number =>
     value && typeof value === 'object' ? Object.keys(value).length : 0;
 
-// --- Миниатюры постеров (как в приложении: пережим + кэш) ---
-const thumbCache = new Map<string, string>();
-const thumbQueue: (() => Promise<void>)[] = [];
-let thumbActive = 0;
-const THUMB_PARALLEL = 3;
-
-function pumpThumbs() {
-    while (thumbActive < THUMB_PARALLEL && thumbQueue.length) {
-        thumbActive++;
-        const job = thumbQueue.shift()!;
-        job().finally(() => { thumbActive--; pumpThumbs(); });
-    }
-}
-
-async function thumbFetch(src: string): Promise<string> {
-    if (thumbCache.has(src)) return thumbCache.get(src)!;
-    try {
-        if (!('createImageBitmap' in window)) return src;
-        const blob = await (await fetch(src)).blob();
-        const bmp = await createImageBitmap(blob, { resizeWidth: 256 });
-        const canvas = document.createElement('canvas');
-        canvas.width = bmp.width;
-        canvas.height = bmp.height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) ctx.drawImage(bmp, 0, 0);
-        bmp.close();
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-        thumbCache.set(src, dataUrl);
-        return dataUrl;
-    } catch (e) {
-        return src;
-    }
-}
-
-function loadThumb(src: string): Promise<string> {
-    return new Promise(resolve => {
-        thumbQueue.push(() => thumbFetch(src).then(resolve, () => resolve(src)));
-        pumpThumbs();
-    });
-}
-
-const Thumb = ({ src, alt }: { src: string; alt?: string }) => {
-    const [res, setRes] = useState<string | null>(null);
-    const boxRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const el = boxRef.current;
-        if (!el) return;
-        let live = true;
-        let started = false;
-        let timer = 0;
-        const start = () => {
-            if (started || !live) return;
-            started = true;
-            loadThumb(src).then(r => { if (live) setRes(r); });
-        };
-        const schedule = () => {
-            if (timer) return;
-            // Небольшая задержка, чтобы не грузить посреди резкого скролла.
-            timer = window.setTimeout(() => { timer = 0; start(); }, 150);
-        };
-        if ('IntersectionObserver' in window) {
-            const io = new IntersectionObserver(
-                entries => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            schedule();
-                            io.disconnect();
-                        }
-                    });
-                },
-                { rootMargin: '200px 0px' }
-            );
-            io.observe(el);
-            return () => { io.disconnect(); window.clearTimeout(timer); live = false; };
-        }
-        schedule();
-        return () => { window.clearTimeout(timer); live = false; };
-    }, [src]);
-
-    return (
-        <div ref={boxRef} className="absolute inset-0 bg-white/5">
-            {!res && <div className="absolute inset-0 animate-pulse bg-white/5" />}
-            {res && (
-                <img
-                    src={res}
-                    alt={alt || ''}
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute inset-0 w-full h-full object-cover group-hover:opacity-90 transition-opacity"
-                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                />
-            )}
-        </div>
-    );
-};
-
 const resizeImage = (file: File, maxSize = 256): Promise<string> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -388,7 +291,14 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
         >
             <div className="relative aspect-[2/3] w-full bg-white/5">
                 {item.imageUrl ? (
-                    <Thumb src={item.imageUrl} alt={item.title || ''} />
+                    <img
+                        src={item.imageUrl}
+                        alt={item.title || ''}
+                        loading="lazy"
+                        decoding="async"
+                        className="absolute inset-0 w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
                 ) : null}
                 {item.rating ? (
                     <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[11px] font-semibold bg-black/70 text-amber-300 rounded-md">
@@ -456,7 +366,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
             <div
                 ref={cardScrollRef}
                 onScroll={handleScrollLoad}
-                className="relative w-full max-w-sm md:w-[85vw] md:h-[85vh] md:max-w-none max-h-[96dvh] md:max-h-none overflow-y-auto md:overflow-hidden custom-scrollbar bg-slate-900/85 border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4 flex flex-col"
+                className="relative w-full max-w-sm md:w-[85vw] md:h-[85vh] md:max-w-none max-h-[96dvh] md:max-h-none overflow-y-auto md:overflow-hidden custom-scrollbar bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4 flex flex-col"
             >
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-white">{t('auth_account')}</h3>
@@ -473,7 +383,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                 <div className="md:flex md:gap-4 space-y-4 md:space-y-0 flex-1 min-h-0">
                     {/* Колонка информации */}
                     <div className="md:w-80 shrink-0">
-                        <div className="rounded-2xl bg-white/5 border border-white/10 p-4 flex flex-col items-center gap-4 text-center">
+                        <div className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-4 flex flex-col items-center gap-4 text-center">
                             <button
                                 type="button"
                                 onClick={handleAvatarClick}
@@ -501,7 +411,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                             </div>
                         </div>
                         {/* Статистика — под информацией аккаунта (и на ПК, и на телефоне) */}
-                        <div className="mt-3 rounded-2xl bg-white/5 border border-white/10 p-4 flex justify-around items-center gap-2">
+                        <div className="mt-3 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-4 flex justify-around items-center gap-2">
                             <div className="flex flex-col items-center gap-1.5 text-center">
                                 <span className="text-violet-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-5 7 5V5c0-1.1-.9-2-2-2z" /></svg>
