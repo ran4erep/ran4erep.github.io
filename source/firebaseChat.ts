@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, fetchSignInMethodsForEmail, updatePassword } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
 import { getDatabase, ref } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
 
 const firebaseConfig = {
@@ -62,5 +62,20 @@ export async function logoutFirebase(): Promise<void> {
         await signOut(chatAuth);
     } catch {
         // ignore
+    }
+}
+
+/**
+ * Смена пароля в Firebase Auth (чат). Если аккаунта в Firebase Auth нет
+ * (ещё не мигрировал) — молча пропускаем: база r4ezka уже обновлена.
+ */
+export async function changeFirebasePassword(username: string, currentPassword: string, newPassword: string): Promise<void> {
+    const email = chatEmailFor(username);
+    try {
+        const cred = await signInWithEmailAndPassword(chatAuth, email, currentPassword);
+        await updatePassword(cred.user, newPassword);
+    } catch (e: any) {
+        if (e?.code === 'auth/user-not-found') return; // ещё не мигрировал — пропускаем
+        console.warn('FirebaseAuth password change failed (ignored):', e?.code || e?.message || '');
     }
 }

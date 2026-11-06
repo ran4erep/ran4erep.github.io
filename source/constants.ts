@@ -307,5 +307,18 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "auth_hide_password": { "ru": "Скрыть пароль", "en": "Hide password" },
     "auth_stat_favorites": { "ru": "В избранном", "en": "Favorites" },
     "auth_stat_watched": { "ru": "Просмотрено", "en": "Watched" },
-    "auth_stat_subscriptions": { "ru": "Подписки", "en": "Subscriptions" }
+    "auth_stat_subscriptions": { "ru": "Подписки", "en": "Subscriptions" },
+    "auth_change_avatar": { "ru": "Сменить аватар", "en": "Change avatar" },
+    "auth_avatar_uploading": { "ru": "Загрузка…", "en": "Uploading…" },
+    "auth_change_password": { "ru": "Смена пароля", "en": "Change password" },
+    "auth_current_password": { "ru": "Текущий пароль", "en": "Current password" },
+    "auth_new_password": { "ru": "Новый пароль", "en": "New password" },
+    "auth_confirm_password": { "ru": "Повторите новый пароль", "en": "Repeat new password" },
+    "auth_save": { "ru": "Сохранить", "en": "Save" },
+    "auth_password_changed": { "ru": "Пароль изменён", "en": "Password changed" },
+    "auth_avatar_changed": { "ru": "Аватар обновлён", "en": "Avatar updated" },
+    "auth_err_password_short": { "ru": "Пароль должен быть минимум 4 символа", "en": "Password must be at least 4 characters" },
+    "auth_err_password_mismatch": { "ru": "Пароли не совпадают", "en": "Passwords do not match" },
+    "auth_err_avatar": { "ru": "Некорректный аватар", "en": "Invalid avatar" },
+    "auth_err_failed": { "ru": "Не удалось выполнить операцию", "en": "Operation failed" }
 };

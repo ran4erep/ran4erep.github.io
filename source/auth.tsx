@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { AuthUser, AuthContextType } from './types';
-import { ensureFirebaseAuthUser, logoutFirebase } from './firebaseChat';
+import { ensureFirebaseAuthUser, logoutFirebase, changeFirebasePassword } from './firebaseChat';
 
 const DATABASE_URL = 'https://r4ezka-default-rtdb.europe-west1.firebasedatabase.app';
 const SESSION_KEY = 'r4ezka_session';
@@ -91,6 +91,23 @@ export async function getJson(url: string): Promise<any> {
     try {
         return JSON.parse(text);
     } catch {
+        throw new Error(AUTH_ERR.NETWORK);
+    }
+}
+
+async function putJson(url: string, value: any): Promise<void> {
+    let res: Response;
+    try {
+        res = await fetch(url, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(value),
+            cache: 'no-store',
+        });
+    } catch {
+        throw new Error(AUTH_ERR.NETWORK);
+    }
+    if (!res.ok) {
         throw new Error(AUTH_ERR.NETWORK);
     }
 }
@@ -329,9 +346,104 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, []);
 
+    /**
+     * Смена пароля. Пароль участвует в формировании секретного ключа
+     * (SHA-256(логин:пароль)), поэтому при смене:
+     *   1) сверяем текущий пароль (ключ должен совпасть с сессией);
+     *   2) переносим все данные из private старого ключа в новый;
+     *   3) обновляем сессию и (по возможности) пароль Firebase Auth.
+     */
+    const changePassword = useCallback(async (currentPassword: string, newPassword: string): Promise<void> => {
+        if (!user) throw new Error(AUTH_ERR.FILL);
+        if (!currentPassword || !newPassword) throw new Error(AUTH_ERR.FILL);
+        const cleanName = user.username;
+
+        const candidateKey = await generateSecretKey(cleanName, currentPassword);
+        if (candidateKey !== user.key) {
+            throw new Error(AUTH_ERR.WRONG_PASSWORD);
+        }
+        if (newPassword.length < 4) {
+            throw new Error('auth_err_password_short');
+        }
+
+        const newKey = await generateSecretKey(cleanName, newPassword);
+
+        // 1) Читаем все приватные ветки старого ключа.
+        const leaves = [
+            'profile', 'avatar', 'settings', 'favorites', 'history',
+            'subscriptions', 'searchHistory', 'voice_commands', 'voiceCommands',
+            'itemResizeModes', 'updatedAt',
+        ];
+        const data: Record<string, any> = {};
+        for (const leaf of leaves) {
+            try {
+                data[leaf] = await getJson(`${DATABASE_URL}/users/${user.key}/private/${leaf}.json`);
+            } catch {
+                data[leaf] = null;
+            }
+        }
+
+        // 2) Пересобираем профиль: новая соль + новый хэш.
+        const oldProfile = data.profile && typeof data.profile === 'object' ? data.profile : {};
+        const saltBytes = new Uint8Array(16);
+        crypto.getRandomValues(saltBytes);
+        const salt = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+        const passwordHash = await hashPassword(newPassword, salt);
+        data.profile = {
+            username: typeof oldProfile.username === 'string' && oldProfile.username.trim() ? oldProfile.username : cleanName,
+            passwordHash,
+            salt,
+            registeredAt: typeof oldProfile.registeredAt === 'number' ? oldProfile.registeredAt : Date.now(),
+        };
+
+        // 3) Пишем всё в private нового ключа.
+        for (const leaf of leaves) {
+            if (data[leaf] == null) continue;
+            await putJson(`${DATABASE_URL}/users/${newKey}/private/${leaf}.json`, data[leaf]);
+        }
+
+        // 3.1) Затираем старый ключ: PUT null удаляет каждый лист.
+        //       (родительский узел удалить нельзя — правила запрещают).
+        try {
+            for (const leaf of leaves) {
+                await putJson(`${DATABASE_URL}/users/${user.key}/private/${leaf}.json`, null);
+            }
+        } catch {
+            // best-effort: если не вышло — данные уже перенесены, не критично.
+            console.warn('old key cleanup skipped');
+        }
+
+        // 4) Firebase Auth (чат) — если аккаунт там существует.
+        await changeFirebasePassword(cleanName, currentPassword, newPassword);
+
+        // 5) Обновляем сессию.
+        const session: ParsedSession = { ...user, key: newKey };
+        try {
+            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        } catch {
+            // ignore
+        }
+        setUser(session);
+    }, [user]);
+
+    /** Смена аватара (пишется в private/avatar текущего ключа). */
+    const setAvatar = useCallback(async (avatar: string): Promise<void> => {
+        if (!user) throw new Error(AUTH_ERR.FILL);
+        const safe = safeAvatar(avatar);
+        if (!safe) throw new Error('auth_err_avatar');
+        await putJson(`${DATABASE_URL}/users/${user.key}/private/avatar.json`, safe);
+        const session: ParsedSession = { ...user, avatar: safe };
+        try {
+            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        } catch {
+            // ignore
+        }
+        setUser(session);
+    }, [user]);
+
     const value = useMemo(
-        () => ({ user, loginOpen, openLogin, closeLogin, login, register, logout, accountOpen, openAccount, closeAccount }),
-        [user, loginOpen, openLogin, closeLogin, login, register, logout, accountOpen, openAccount, closeAccount]
+        () => ({ user, loginOpen, openLogin, closeLogin, login, register, logout, changePassword, setAvatar, accountOpen, openAccount, closeAccount }),
+        [user, loginOpen, openLogin, closeLogin, login, register, logout, changePassword, setAvatar, accountOpen, openAccount, closeAccount]
     );
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
