@@ -25,8 +25,7 @@ async function syncFirebaseAuth(username: string, password: string): Promise<voi
     try {
         await ensureFirebaseAuthUser(username, password);
     } catch (e: any) {
-        console.warn('FirebaseAuth sync failed:', e);
-        alert(`FirebaseAuth: ${e?.code || e?.message || ''}`);
+        console.warn('FirebaseAuth sync failed (ignored):', e?.code || e?.message || '');
     }
 }
 

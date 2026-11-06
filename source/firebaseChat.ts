@@ -28,6 +28,9 @@ export function chatEmailFor(username: string): string {
  * Вызывается ТОЛЬКО после успешной проверки пароля в r4ezka,
  * поэтому создать аккаунт в Firebase Auth от чужого имени нельзя:
  * без верного пароля сюда не попасть.
+ *
+ * Если аккаунт чата уже существует (например, пароль менялся на сайте,
+ * а в Firebase Auth остался старый) — молча пропускаем: это не ошибка.
  */
 export async function ensureFirebaseAuthUser(username: string, password: string): Promise<void> {
     const email = chatEmailFor(username);
@@ -35,8 +38,7 @@ export async function ensureFirebaseAuthUser(username: string, password: string)
         await signInWithEmailAndPassword(chatAuth, email, password);
         return;
     } catch {
-        // Скорее всего, аккаунта в Firebase Auth ещё нет
-        // (миграция с r4ezka). Разбираемся ниже.
+        // вероятно, пароль не совпал (старый в Firebase Auth) или нет аккаунта
     }
 
     // Проверяем, существует ли аккаунт с таким email.
@@ -44,17 +46,23 @@ export async function ensureFirebaseAuthUser(username: string, password: string)
     try {
         methods = await fetchSignInMethodsForEmail(chatAuth, email);
     } catch {
-        methods = [];
+        // не можем проверить — не мешаем входу
+        return;
     }
 
-    if (methods.includes('password')) {
-        // Аккаунт есть, но войти не удалось. Пароль уже подтверждён
-        // в r4ezka, поэтому это аномалия — не создаём дубликат.
-        throw new Error('auth/wrong-password');
+    if (methods.length > 0) {
+        // Аккаунт есть, но пароль не совпал. Обновить без старого пароля
+        // нельзя — просто оставляем как есть (чат продолжит работать со старым).
+        return;
     }
 
     // Аккаунта нет — создаём (createUser сам выполняет вход).
-    await createUserWithEmailAndPassword(chatAuth, email, password);
+    try {
+        await createUserWithEmailAndPassword(chatAuth, email, password);
+    } catch (e: any) {
+        if (e?.code === 'auth/email-already-in-use') return; // гонка — ок
+        throw e;
+    }
 }
 
 export async function logoutFirebase(): Promise<void> {
