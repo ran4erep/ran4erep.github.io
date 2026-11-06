@@ -324,5 +324,7 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "auth_tab_favorites": { "ru": "Избранное", "en": "Favorites" },
     "auth_tab_history": { "ru": "История", "en": "History" },
     "auth_tab_account": { "ru": "Аккаунт", "en": "Account" },
-    "auth_coming_soon": { "ru": "Раздел пока в разработке", "en": "Section coming soon" }
+    "auth_coming_soon": { "ru": "Раздел пока в разработке", "en": "Section coming soon" },
+    "auth_no_favorites": { "ru": "Избранное пусто", "en": "No favorites yet" },
+    "auth_no_history": { "ru": "История пуста", "en": "No watch history yet" }
 };

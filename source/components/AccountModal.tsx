@@ -53,6 +53,8 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
     const { user, logout, changePassword, setAvatar } = useAuth();
     const { t } = useContext(LanguageContext) as LanguageContextType;
     const [stats, setStats] = useState<AccountStats>({ favorites: null, watched: null, subscriptions: null });
+    const [favoritesList, setFavoritesList] = useState<any[] | null>(null);
+    const [historyList, setHistoryList] = useState<any[] | null>(null);
 
     const [tab, setTab] = useState<Tab>('history');
     const [newPass, setNewPass] = useState('');
@@ -67,6 +69,8 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
     useEffect(() => {
         if (!open || !user) {
             setStats({ favorites: null, watched: null, subscriptions: null });
+            setFavoritesList(null);
+            setHistoryList(null);
             setToast(null);
             setNewPass(''); setConfirmPass('');
             setTab('history');
@@ -99,6 +103,30 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                 return foundEmpty ? 0 : null;
             };
 
+            // Чтение полного объекта ветки (для карточек избранного/истории).
+            const readValue = async (leaf: string): Promise<any | null> => {
+                const candidates = [
+                    `${DATABASE_URL}/users/${user.key}/private/${leaf}.json`,
+                    user.legacyKey ? `${DATABASE_URL}/users/${user.legacyKey}/${leaf}.json` : null,
+                ].filter(Boolean) as string[];
+                let foundEmpty = false;
+                for (const url of candidates) {
+                    try {
+                        const value = await getJson(url);
+                        if (value !== null) return value;
+                        foundEmpty = true;
+                    } catch { }
+                }
+                return foundEmpty ? {} : null;
+            };
+
+            const toItems = (value: any): any[] => {
+                if (!value || typeof value !== 'object') return [];
+                return Object.values(value).sort((a: any, b: any) => (b?.timestamp || 0) - (a?.timestamp || 0));
+            };
+
+            const [favValue, histValue] = await Promise.all([readValue('favorites'), readValue('history')]);
+
             const entries = await Promise.all(keys.map(k => read(k.path).then(n => [k.field, n] as const)));
             if (!cancelled) {
                 setStats({
@@ -106,6 +134,8 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                     watched: entries[1][1],
                     subscriptions: entries[2][1],
                 });
+                setFavoritesList(toItems(favValue));
+                setHistoryList(toItems(histValue));
             }
         };
 
@@ -211,6 +241,48 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
         { id: 'account', label: t('auth_tab_account') },
     ];
 
+    // Карточка фильма/сериала — как в приложении (постер, название, рейтинг).
+    const MovieCard = ({ item, footnote }: { item: any; footnote?: string }) => (
+        <a
+            href={item.url || '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-violet-500/60 transition-colors"
+        >
+            <div className="relative aspect-[2/3] w-full bg-white/5">
+                {item.imageUrl ? (
+                    <img
+                        src={item.imageUrl}
+                        alt={item.title || ''}
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
+                ) : null}
+                {item.rating ? (
+                    <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[11px] font-semibold bg-black/70 text-amber-300 rounded-md">
+                        {item.rating}
+                    </span>
+                ) : null}
+            </div>
+            <div className="p-2">
+                <div
+                    className="text-[13px] font-medium text-gray-100 leading-tight"
+                    style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                >
+                    {item.title || '—'}
+                </div>
+                {footnote && <div className="text-[11px] text-slate-400 mt-0.5 truncate">{footnote}</div>}
+            </div>
+        </a>
+    );
+
+    const EmptyState = ({ text }: { text: string }) => (
+        <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-center text-sm text-slate-400">
+            {text}
+        </div>
+    );
+
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8">
             <div className="absolute inset-0 bg-black/15" onClick={onClose} />
@@ -301,15 +373,31 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
 
                         <div className="md:flex-1 md:min-h-0 md:overflow-y-auto custom-scrollbar pr-1 space-y-3">
                             {tab === 'favorites' && (
-                                <div className="rounded-2xl bg-white/5 border border-white/10 p-5 text-center text-sm text-slate-400">
-                                    {t('auth_coming_soon')}
-                                </div>
+                                favoritesList === null ? (
+                                    <EmptyState text="…" />
+                                ) : favoritesList.length === 0 ? (
+                                    <EmptyState text={t('auth_no_favorites')} />
+                                ) : (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                        {favoritesList.map(it => (
+                                            <MovieCard key={it.id || it.url || it.title} item={it} />
+                                        ))}
+                                    </div>
+                                )
                             )}
 
                             {tab === 'history' && (
-                                <div className="rounded-2xl bg-white/5 border border-white/10 p-5 text-center text-sm text-slate-400">
-                                    {t('auth_coming_soon')}
-                                </div>
+                                historyList === null ? (
+                                    <EmptyState text="…" />
+                                ) : historyList.length === 0 ? (
+                                    <EmptyState text={t('auth_no_history')} />
+                                ) : (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                        {historyList.map(it => (
+                                            <MovieCard key={it.id || it.url || it.title} item={it} footnote={it.subtitle || undefined} />
+                                        ))}
+                                    </div>
+                                )
                             )}
 
                             {tab === 'account' && (
