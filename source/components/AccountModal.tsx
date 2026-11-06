@@ -127,6 +127,19 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                 return Object.values(value).sort((a: any, b: any) => (b?.timestamp || 0) - (a?.timestamp || 0));
             };
 
+            // История агрегируется по фильму/сериалу (как в приложении):
+            // одна карточка на itemId, без дублей по сериям/эпизодам.
+            const aggregateHistory = (value: any): any[] => {
+                const map = new Map<string, any>();
+                for (const it of toItems(value)) {
+                    const key = it.itemId || it.url || it.title || String(it.timestamp);
+                    const prev = map.get(key);
+                    if (!prev || (it.timestamp || 0) > (prev.timestamp || 0)) map.set(key, it);
+                }
+                return Array.from(map.values())
+                    .sort((a: any, b: any) => (b?.timestamp || 0) - (a?.timestamp || 0));
+            };
+
             const [favValue, histValue, settingsValue] = await Promise.all([
                 readValue('favorites'), readValue('history'), readValue('settings'),
             ]);
@@ -154,7 +167,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                     subscriptions: entries[2][1],
                 });
                 setFavoritesList(toItems(favValue));
-                setHistoryList(toItems(histValue));
+                setHistoryList(aggregateHistory(histValue));
                 setDevices(Array.from(deviceIds));
             }
         };
@@ -262,12 +275,13 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
     ];
 
     // Карточка фильма/сериала — как в приложении (постер, название, рейтинг).
-    const MovieCard = ({ item, footnote }: { item: any; footnote?: string }) => (
+    const MovieCard = ({ item, footnote, progress }: { item: any; footnote?: string; progress?: number | null }) => (
         <a
             href={item.url || '#'}
             target="_blank"
             rel="noopener noreferrer"
             className="group block rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-violet-500/60 transition-colors"
+            style={{ contentVisibility: 'auto', containIntrinsicSize: '112px 168px' }}
         >
             <div className="relative aspect-[2/3] w-full bg-white/5">
                 {item.imageUrl ? (
@@ -275,6 +289,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                         src={item.imageUrl}
                         alt={item.title || ''}
                         loading="lazy"
+                        decoding="async"
                         className="absolute inset-0 w-full h-full object-cover group-hover:opacity-90 transition-opacity"
                         onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
@@ -284,6 +299,11 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                         {item.rating}
                     </span>
                 ) : null}
+                {progress != null && (
+                    <span className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
+                        <span className="block h-full bg-violet-500" style={{ width: `${Math.max(0, Math.min(100, progress))}%` }} />
+                    </span>
+                )}
             </div>
             <div className="p-2">
                 <div
@@ -298,10 +318,28 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
     );
 
     const EmptyState = ({ text }: { text: string }) => (
-        <div className="rounded-2xl bg-slate-900/95 border border-white/10 p-6 text-center text-sm text-slate-400">
+        <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-center text-sm text-slate-400">
             {text}
         </div>
     );
+
+    // Прогресс просмотра для карточки истории (0–100).
+    const historyProgress = (it: any): number | null => {
+        if (typeof it.progress === 'number') return it.progress;
+        const pm = Number(it.progressMs);
+        const dm = Number(it.durationMs);
+        if (dm > 0 && Number.isFinite(pm) && Number.isFinite(dm)) return (pm / dm) * 100;
+        if (it.isFullyWatched) return 100;
+        return null;
+    };
+
+    const historyFootnote = (it: any): string | undefined => {
+        if (it.subtitle) return String(it.subtitle);
+        if (it.season != null) {
+            return `Сезон ${it.season}${it.episode != null ? ' • Серия ' + it.episode : ''}`;
+        }
+        return undefined;
+    };
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8">
@@ -405,8 +443,8 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                                 ) : favoritesList.length === 0 ? (
                                     <EmptyState text={t('auth_no_favorites')} />
                                 ) : (
-                                    <div className="rounded-2xl bg-slate-900/95 border border-white/10 p-3">
-                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                    <div className="rounded-2xl bg-white/5 border border-white/10 p-3">
+                                        <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]">
                                             {favoritesList.map(it => (
                                                 <MovieCard key={it.id || it.url || it.title} item={it} />
                                             ))}
@@ -421,10 +459,15 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                                 ) : historyList.length === 0 ? (
                                     <EmptyState text={t('auth_no_history')} />
                                 ) : (
-                                    <div className="rounded-2xl bg-slate-900/95 border border-white/10 p-3">
-                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                    <div className="rounded-2xl bg-white/5 border border-white/10 p-3">
+                                        <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]">
                                             {historyList.map(it => (
-                                                <MovieCard key={it.id || it.url || it.title} item={it} footnote={it.subtitle || undefined} />
+                                                <MovieCard
+                                                    key={it.itemId || it.url || it.title}
+                                                    item={it}
+                                                    footnote={historyFootnote(it)}
+                                                    progress={historyProgress(it)}
+                                                />
                                             ))}
                                         </div>
                                     </div>

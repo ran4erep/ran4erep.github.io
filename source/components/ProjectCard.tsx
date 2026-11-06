@@ -73,7 +73,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, pages, onOpen
                 </div>
             </div>
             {project.tech && (
-                <i className={`${iconClass} absolute -bottom-6 -right-6 text-[160px] text-violet-500/10 group-hover:text-violet-400/25 transition-opacity duration-300 -z-10`}></i>
+                <i className={`${iconClass} absolute -bottom-6 -right-6 text-[160px] text-violet-500/10 group-hover:text-violet-400/25 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-6 -z-10`}></i>
             )}
         </div>
     );
