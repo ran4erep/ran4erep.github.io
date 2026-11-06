@@ -381,9 +381,11 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                 </div>
 
                 <div className="md:flex md:gap-4 space-y-4 md:space-y-0 flex-1 min-h-0">
+                    {/* Свечение за левой панелью — чтобы стекло слева было видно */}
+                    <div aria-hidden="true" className="absolute -top-8 -left-6 w-80 h-80 rounded-full bg-violet-600/25 blur-3xl pointer-events-none hidden md:block" />
                     {/* Колонка информации */}
                     <div className="md:w-80 shrink-0">
-                        <div className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-4 flex flex-col items-center gap-4 text-center">
+                        <div className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-4 flex flex-col items-center gap-4 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]">
                             <button
                                 type="button"
                                 onClick={handleAvatarClick}
@@ -411,7 +413,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                             </div>
                         </div>
                         {/* Статистика — под информацией аккаунта (и на ПК, и на телефоне) */}
-                        <div className="mt-3 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-4 flex justify-around items-center gap-2">
+                        <div className="mt-3 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-4 flex justify-around items-center gap-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]">
                             <div className="flex flex-col items-center gap-1.5 text-center">
                                 <span className="text-violet-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-5 7 5V5c0-1.1-.9-2-2-2z" /></svg>
