@@ -140,12 +140,12 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
         chat-modal fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] h-[80vh]
         md:top-auto md:left-auto md:translate-x-0 md:translate-y-0 md:bottom-24 md:right-5 md:w-[30vw] md:h-[min(40vw,70vh)]
         bg-slate-900/70 backdrop-blur-lg border border-slate-700 
-        rounded-xl shadow-2xl z-[150] flex flex-col transition-all duration-300
+        rounded-xl shadow-2xl z-[300] flex flex-col transition-all duration-300
     `;
 
     return (
         <>
-            <button onClick={() => setIsOpen(!isOpen)} id="new-chat-button" className="group fixed bottom-5 right-5 w-14 h-14 bg-slate-900/35 backdrop-blur-xl border border-slate-700/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/45 hover:scale-110 active:scale-95 z-[100]">
+            <button onClick={() => setIsOpen(!isOpen)} id="new-chat-button" className="group fixed bottom-5 right-5 w-14 h-14 bg-slate-900/35 backdrop-blur-xl border border-slate-700/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/45 hover:scale-110 active:scale-95 z-[300]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <g stroke="#000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></g>
                     <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></g>
@@ -154,7 +154,7 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
             </button>
             {isOpen && (
                 <>
-                <div className="fixed inset-0 bg-black/15 z-[140] pointer-events-none" />
+                <div className="fixed inset-0 bg-black/15 z-[290] pointer-events-none" />
                 <div className={modalClasses}>
                     <div className="chat-header p-4 border-b border-slate-700 flex justify-between items-center">
                         <h3 className="text-white font-semibold">{t('chat_title')}</h3>
