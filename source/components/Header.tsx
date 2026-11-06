@@ -272,9 +272,9 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = true }) => {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                     {langBlock}
-                    <div className="flex flex-col items-end gap-1 shrink-0">
+                    <div className="relative">
                         {authButton}
-                        <UserCountBadge className="hidden md:inline-flex" />
+                        <UserCountBadge className="absolute right-0 top-full mt-1 hidden md:inline-flex" />
                     </div>
                 </div>
             </div>

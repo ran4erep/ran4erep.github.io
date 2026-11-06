@@ -21,7 +21,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, pages, onOpen
     };
 
     return (
-        <div className="project-card relative isolate group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 flex flex-col transition-all duration-300 hover:border-violet-500 hover:-translate-y-1 overflow-hidden">
+        <div className="project-card relative isolate group bg-slate-800/80 border border-slate-700 rounded-lg p-6 flex flex-col transition-colors duration-300 hover:border-violet-500 hover:-translate-y-1 overflow-hidden">
             <div className="relative z-0 flex flex-col flex-grow">
                 {project.image && <img src={project.image} alt={t(project.titleKey)} className="rounded-md mb-4 w-full object-cover aspect-[16/9]" />}
                 <h3 className="text-xl font-bold text-gray-100 mb-2">{t(project.titleKey)}</h3>
@@ -50,7 +50,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, pages, onOpen
                 </div>
             </div>
             {project.tech && (
-                <i className={`${iconClass} absolute -bottom-6 -right-6 text-[160px] text-violet-500/10 group-hover:text-violet-400/25 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-6 -z-10`}></i>
+                <i className={`${iconClass} absolute -bottom-6 -right-6 text-[160px] text-violet-500/10 group-hover:text-violet-400/25 transition-opacity duration-300 -z-10`}></i>
             )}
         </div>
     );
