@@ -104,6 +104,17 @@
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: none;
       }
+      /* Автозаполнение браузера не должно перекрашивать поля:
+         сохраняем наш фон и цвет текста. */
+      input:-webkit-autofill,
+      input:-webkit-autofill:hover,
+      input:-webkit-autofill:focus {
+        -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+        box-shadow: 0 0 0 1000px #1e293b inset !important;
+        -webkit-text-fill-color: #fff !important;
+        caret-color: #fff;
+        transition: background-color 9999s ease-in-out 0s;
+      }
     </style>
   <script type="importmap">
 {

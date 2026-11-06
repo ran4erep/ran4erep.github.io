@@ -214,7 +214,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 md:p-10">
             <div className="absolute inset-0 bg-black/15" onClick={onClose} />
-            <div className="relative w-full max-w-sm md:max-w-3xl max-h-[92vh] overflow-y-auto custom-scrollbar bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4">
+            <div className="relative w-full max-w-sm md:max-w-6xl md:w-[94vw] max-h-[92vh] overflow-y-auto custom-scrollbar bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4">
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-white">{t('auth_account')}</h3>
                     <button
@@ -235,7 +235,6 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                                 type="button"
                                 onClick={handleAvatarClick}
                                 disabled={avatarBusy}
-                                title={t('auth_change_avatar')}
                                 className="relative shrink-0 group rounded-full transition-shadow hover:shadow-[0_0_0_3px_rgba(139,92,246,0.55)]"
                             >
                                 <UserAvatar avatar={user.avatar} className="w-16 h-16" ring="border border-violet-500/40" />
@@ -300,7 +299,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                             ))}
                         </div>
 
-                        <div className="md:max-h-[55vh] md:overflow-y-auto custom-scrollbar pr-1 space-y-3">
+                        <div className="md:max-h-[70vh] md:overflow-y-auto custom-scrollbar pr-1 space-y-3">
                             {tab === 'favorites' && (
                                 <div className="rounded-2xl bg-white/5 border border-white/10 p-5 text-center text-sm text-slate-400">
                                     {t('auth_coming_soon')}
