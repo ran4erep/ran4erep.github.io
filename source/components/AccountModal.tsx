@@ -22,6 +22,51 @@ type Tab = 'favorites' | 'history' | 'account';
 const countEntries = (value: any): number =>
     value && typeof value === 'object' ? Object.keys(value).length : 0;
 
+// --- Миниатюры/остёров (как в приложении: пережим + кэш) ---
+const thumbCache = new Map<string, string>();
+
+async function loadThumb(src: string): Promise<string> {
+    if (thumbCache.has(src)) return thumbCache.get(src)!;
+    try {
+        if (!('createImageBitmap' in window)) return src;
+        const blob = await (await fetch(src)).blob();
+        const bmp = await createImageBitmap(blob, { resizeWidth: 320 });
+        const canvas = document.createElement('canvas');
+        canvas.width = bmp.width;
+        canvas.height = bmp.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.drawImage(bmp, 0, 0);
+        bmp.close();
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+        thumbCache.set(src, dataUrl);
+        return dataUrl;
+    } catch {
+        return src;
+    }
+}
+
+const Thumb = ({ src, alt }: { src: string; alt?: string }) => {
+    const [res, setRes] = useState<string | null>(null);
+    useEffect(() => {
+        let live = true;
+        loadThumb(src).then(r => { if (live) setRes(r); });
+        return () => { live = false; };
+    }, [src]);
+    if (!res) {
+        return <div className="absolute inset-0 bg-white/5 animate-pulse" />;
+    }
+    return (
+        <img
+            src={res}
+            alt={alt || ''}
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+        />
+    );
+};
+
 const resizeImage = (file: File, maxSize = 256): Promise<string> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -56,6 +101,10 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
     const [favoritesList, setFavoritesList] = useState<any[] | null>(null);
     const [historyList, setHistoryList] = useState<any[] | null>(null);
     const [devices, setDevices] = useState<string[] | null>(null);
+    const [favLimit, setFavLimit] = useState(30);
+    const [histLimit, setHistLimit] = useState(30);
+    const cardScrollRef = useRef<HTMLDivElement>(null);
+    const tabScrollRef = useRef<HTMLDivElement>(null);
 
     const [tab, setTab] = useState<Tab>('history');
     const [newPass, setNewPass] = useState('');
@@ -73,6 +122,8 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
             setFavoritesList(null);
             setHistoryList(null);
             setDevices(null);
+            setFavLimit(30);
+            setHistLimit(30);
             setToast(null);
             setNewPass(''); setConfirmPass('');
             setTab('history');
@@ -281,18 +332,11 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
             target="_blank"
             rel="noopener noreferrer"
             className="group block rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-violet-500/60 transition-colors"
-            style={{ contentVisibility: 'auto', containIntrinsicSize: '112px 168px' }}
+            style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 260px' }}
         >
             <div className="relative aspect-[2/3] w-full bg-white/5">
                 {item.imageUrl ? (
-                    <img
-                        src={item.imageUrl}
-                        alt={item.title || ''}
-                        loading="lazy"
-                        decoding="async"
-                        className="absolute inset-0 w-full h-full object-cover group-hover:opacity-90 transition-opacity"
-                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                    />
+                    <Thumb src={item.imageUrl} alt={item.title || ''} />
                 ) : null}
                 {item.rating ? (
                     <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[11px] font-semibold bg-black/70 text-amber-300 rounded-md">
@@ -341,10 +385,27 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
         return undefined;
     };
 
+    // Инкрементальная подгрузка: при приближении к низу списка добавляем
+    // следующую порцию, чтобы не держать в DOM все карточки разом.
+    const handleScrollLoad = (e: React.UIEvent<HTMLDivElement>) => {
+        const el = e.currentTarget;
+        if (el.scrollTop + el.clientHeight < el.scrollHeight - 600) return;
+        if (tab === 'favorites' && favoritesList) {
+            setFavLimit(l => Math.min(favoritesList.length, l + 30));
+        }
+        if (tab === 'history' && historyList) {
+            setHistLimit(l => Math.min(historyList.length, l + 30));
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8">
             <div className="absolute inset-0 bg-black/15" onClick={onClose} />
-            <div className="relative w-full max-w-sm md:w-[85vw] md:h-[85vh] md:max-w-none max-h-[92vh] md:max-h-none overflow-y-auto md:overflow-hidden custom-scrollbar bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4 flex flex-col">
+            <div
+                ref={cardScrollRef}
+                onScroll={handleScrollLoad}
+                className="relative w-full max-w-sm md:w-[85vw] md:h-[85vh] md:max-w-none max-h-[92vh] md:max-h-none overflow-y-auto md:overflow-hidden custom-scrollbar bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4 flex flex-col"
+            >
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-white">{t('auth_account')}</h3>
                     <button
@@ -436,7 +497,12 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                             ))}
                         </div>
 
-                        <div className="md:flex-1 md:min-h-0 md:overflow-y-auto custom-scrollbar pr-1 space-y-3">
+                        <div
+                            ref={tabScrollRef}
+                            onScroll={handleScrollLoad}
+                            className="md:flex-1 md:min-h-0 md:overflow-y-auto custom-scrollbar pr-1 space-y-3 [transform:translateZ(0)]"
+                            style={{ overscrollBehavior: 'contain' }}
+                        >
                             {tab === 'favorites' && (
                                 favoritesList === null ? (
                                     <EmptyState text="…" />
@@ -445,7 +511,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                                 ) : (
                                     <div className="rounded-2xl bg-white/5 border border-white/10 p-3">
                                         <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]">
-                                            {favoritesList.map(it => (
+                                            {favoritesList.slice(0, favLimit).map(it => (
                                                 <MovieCard key={it.id || it.url || it.title} item={it} />
                                             ))}
                                         </div>
@@ -461,7 +527,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
                                 ) : (
                                     <div className="rounded-2xl bg-white/5 border border-white/10 p-3">
                                         <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]">
-                                            {historyList.map(it => (
+                                            {historyList.slice(0, histLimit).map(it => (
                                                 <MovieCard
                                                     key={it.itemId || it.url || it.title}
                                                     item={it}
