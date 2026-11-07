@@ -86,27 +86,43 @@ function main() {
         processed.set(file, final);
     }
 
+    // Новые картинки — ПЕРВЫМИ в списке (сайт показывает их в начале галереи),
+    // старые сохраняют свой порядок.
+    const newItems = [];
     const out = [];
+    const seen = new Set();
+
     for (const entry of gallery) {
         const orig = String(entry);
         const mapped = processed.get(orig);
-        out.push(mapped !== undefined ? mapped : orig);
-    }
-    for (const file of galleryFiles) {
-        const final = processed.get(file);
-        if (final && final !== file && !out.includes(final)) out.push(final);
+        const val = mapped !== undefined ? mapped : orig;
+        if (!seen.has(val)) {
+            seen.add(val);
+            out.push(val);
+        }
     }
 
+    for (const file of galleryFiles) {
+        if (gallerySet.has(file)) continue; // это не новая картинка
+        const final = processed.get(file);
+        if (final && !seen.has(final)) {
+            seen.add(final);
+            newItems.push(final);
+        }
+    }
+
+    const result = [...newItems, ...out];
+
     let changed = false;
-    if (out.length !== gallery.length) changed = true;
+    if (result.length !== gallery.length) changed = true;
     else {
-        for (let i = 0; i < out.length; i++) {
-            if (out[i] !== String(gallery[i])) { changed = true; break; }
+        for (let i = 0; i < result.length; i++) {
+            if (result[i] !== String(gallery[i])) { changed = true; break; }
         }
     }
 
     if (changed) {
-        writeFileSync(GALLERY_JSON, JSON.stringify(out, null, 2) + '\n');
+        writeFileSync(GALLERY_JSON, JSON.stringify(result, null, 2) + '\n');
     }
 
     // --- Музыка (только music/) ---
@@ -130,7 +146,7 @@ function main() {
         writeFileSync(PLAYLIST_JSON, JSON.stringify(playlist, null, 2) + '\n');
     }
 
-    console.log(`update-media: gallery ${gallery.length} -> ${out.length}${force ? ' (--all)' : ''}, music +${musicChanged}`);
+    console.log(`update-media: gallery ${gallery.length} -> ${result.length}${force ? ' (--all)' : ''}, music +${musicChanged}`);
 }
 
 main();
