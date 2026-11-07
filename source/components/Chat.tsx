@@ -163,23 +163,21 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen, isCommentsOpen }) => 
 
     return (
         <>
-            <div
-                className={`relative z-[300] ${isCommentsOpen ? 'hidden md:block' : ''}`}
-                style={{ position: 'fixed', bottom: 20, right: 20 }}
-            >
-            <button onClick={() => setIsOpen(!isOpen)} id="new-chat-button" className="group w-14 h-14 bg-slate-900/35 backdrop-blur-xl border border-slate-700/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/45 hover:scale-110 active:scale-95">
-                {unread > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center animate-bubble shadow-lg">
-                        {unread > 99 ? '99+' : unread}
-                    </span>
-                )}
+            <button onClick={() => setIsOpen(!isOpen)} id="new-chat-button" className={`group fixed bottom-5 right-5 w-14 h-14 bg-slate-900/35 backdrop-blur-xl border border-slate-700/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/45 hover:scale-110 active:scale-95 z-[300] ${isCommentsOpen ? 'hidden md:flex' : ''}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <g stroke="#000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></g>
                     <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></g>
                 </svg>
                 <span className="tooltip">{t('chat_tooltip')}</span>
             </button>
-            </div>
+            {unread > 0 && (
+                <span
+                    className="fixed pointer-events-none z-[310] flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[11px] font-bold animate-bubble shadow-lg"
+                    style={{ bottom: 62, right: 14 }}
+                >
+                    {unread > 99 ? '99+' : unread}
+                </span>
+            )}
             {isOpen && (
                 <>
                 <div className="fixed inset-0 bg-black/15 z-[290] pointer-events-none" />
