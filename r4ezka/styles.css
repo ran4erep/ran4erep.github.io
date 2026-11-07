@@ -159,9 +159,19 @@ html, body {
 
 .about {
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.65;
     color: #c6cad4;
 }
+
+.about h3 {
+    margin-top: 16px;
+    margin-bottom: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #e9e7f0;
+}
+
+.about p { margin-bottom: 10px; }
 
 .features { margin: 12px 0 0 18px; }
 .features li { margin: 4px 0; }
