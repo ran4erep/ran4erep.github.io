@@ -52,8 +52,15 @@ export async function ensureFirebaseAuthUser(username: string, password: string)
     }
 
     if (methods.length > 0) {
-        // Аккаунт есть, но пароль не совпал. Обновить без старого пароля
-        // нельзя — просто оставляем как есть (чат продолжит работать со старым).
+        // Аккаунт есть, но пароль не совпал. Если у нас уже есть живая
+        // Firebase-сессия этого пользователя — синхронизируем пароль.
+        try {
+            if (chatAuth.currentUser && chatAuth.currentUser.email === email) {
+                await updatePassword(chatAuth.currentUser, password);
+            }
+        } catch (e: any) {
+            console.warn('FirebaseAuth re-sync failed (ignored):', e?.code || e?.message || '');
+        }
         return;
     }
 
@@ -86,5 +93,22 @@ export async function changeFirebasePassword(username: string, currentPassword: 
     } catch (e: any) {
         if (e?.code === 'auth/user-not-found') return; // ещё не мигрировал — пропускаем
         console.warn('FirebaseAuth password change failed (ignored):', e?.code || e?.message || '');
+    }
+}
+
+/**
+ * Синхронизация нового пароля с Firebase Auth чата.
+ * Работает по ТЕКУЩЕЙ сессии (без знания старого пароля): если юзер
+ * залогинен в Firebase — просто обновляем пароль. Если сессии нет —
+ * молча пропускаем (при следующем входе попытается исправить
+ * ensureFirebaseAuthUser).
+ */
+export async function syncFirebasePassword(newPassword: string): Promise<void> {
+    try {
+        if (chatAuth.currentUser) {
+            await updatePassword(chatAuth.currentUser, newPassword);
+        }
+    } catch (e: any) {
+        console.warn('FirebaseAuth password sync failed (ignored):', e?.code || e?.message || '');
     }
 }

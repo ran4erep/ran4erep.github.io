@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { AuthUser, AuthContextType } from './types';
-import { ensureFirebaseAuthUser, logoutFirebase } from './firebaseChat';
+import { ensureFirebaseAuthUser, logoutFirebase, syncFirebasePassword } from './firebaseChat';
 
 const DATABASE_URL = 'https://r4ezka-default-rtdb.europe-west1.firebasedatabase.app';
 const SESSION_KEY = 'r4ezka_session';
@@ -407,7 +407,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.warn('old key cleanup skipped');
         }
 
-        // 4) Обновляем сессию.
+        // 4) Синхронизируем пароль c Firebase Auth чата (если есть сессия).
+        await syncFirebasePassword(newPassword);
+
+        // 5) Обновляем сессию.
         const session: ParsedSession = { ...user, key: newKey };
         try {
             localStorage.setItem(SESSION_KEY, JSON.stringify(session));
