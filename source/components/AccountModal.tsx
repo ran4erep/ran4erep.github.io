@@ -362,11 +362,11 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-3 md:p-8">
-            <div className="absolute inset-0 bg-black/15" onClick={onClose} />
+            <div className="absolute inset-0 bg-black/45" onClick={onClose} />
             <div
                 ref={cardScrollRef}
                 onScroll={handleScrollLoad}
-                className="relative w-full max-w-sm md:w-[85vw] md:h-[85vh] md:max-w-none max-h-[96dvh] md:max-h-none overflow-y-auto md:overflow-hidden custom-scrollbar bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4 flex flex-col"
+                className="relative w-full max-w-sm md:w-[85vw] md:h-[85vh] md:max-w-none max-h-[96dvh] md:max-h-none overflow-y-auto md:overflow-hidden custom-scrollbar bg-slate-900/55 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-5 md:p-6 space-y-4 flex flex-col"
             >
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-white">{t('auth_account')}</h3>

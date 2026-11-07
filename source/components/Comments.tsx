@@ -190,8 +190,8 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ projectKey, title,
     return (
         <>
         <div className="fixed inset-0 z-[220] flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-            <div className="relative w-full sm:max-w-lg max-h-[90vh] sm:max-h-[80vh] bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col">
+            <div className="absolute inset-0 bg-black/45 backdrop-blur-sm" onClick={onClose} />
+            <div className="relative w-full sm:max-w-lg max-h-[90vh] sm:max-h-[80vh] bg-slate-900/55 backdrop-blur-lg border border-slate-700 rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col">
                 <div className="chat-header p-4 border-b border-slate-700 flex justify-between items-center">
                     <h3 className="text-white font-semibold truncate">{title}</h3>
                     <button onClick={onClose} className="text-slate-400 hover:text-white text-2xl transition-transform active:scale-90">&times;</button>

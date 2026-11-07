@@ -243,11 +243,18 @@ html, body {
 .changelog { display: flex; flex-direction: column; gap: 14px; }
 
 .release {
-    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 18px 20px;
+    /* Как карточки на главной: полупрозрачное «стекло», рамка slate-700,
+       скругление rounded-lg, внутренние отступы p-6. Без наклонов/иконок. */
+    background: rgba(30, 41, 59, 0.5);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 24px;
+    transition: border-color 0.3s;
 }
+
+.release:hover { border-color: #8b5cf6; }
 
 .release-head {
     display: flex;
