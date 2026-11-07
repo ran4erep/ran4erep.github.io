@@ -1,6 +1,6 @@
 
 
-import React, { useState, useEffect, createContext, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, createContext, useCallback, useMemo } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { ProjectCard } from './components/ProjectCard';
@@ -35,9 +35,6 @@ const App: React.FC = () => {
     });
     // Комментарии: глобальная модалка поверх сайта.
     const [commentsProject, setCommentsProject] = useState<{ key: string; title: string } | null>(null);
-    // Сохранение позиции скролла главной при переходе в приложение.
-    const savedScrollRef = useRef(0);
-    const prevOpenPathRef = useRef<string | null>(null);
     const [pages, setPages] = useState<SitePage[]>([]);
     const [openPath, setOpenPath] = useState<string | null>(() => {
         const params = new URLSearchParams(window.location.search);
@@ -77,38 +74,15 @@ const App: React.FC = () => {
         localStorage.setItem('language', lang);
     }, [lang]);
 
-    // Сохраняем позицию скролла главной при открытии приложения и
-    // восстанавливаем её при возврате (кнопка назад, крестик и т.п.).
     useEffect(() => {
-        // Отключаем встроенное восстановление скролла браузера — управляем сами.
-        if ('scrollRestoration' in window.history) {
-            window.history.scrollRestoration = 'manual';
-        }
-    }, []);
-
-    useEffect(() => {
-        const wasOpen = prevOpenPathRef.current != null;
-        const isOpen = openPath != null;
-        if (isOpen && !wasOpen) {
+        if (openPath) {
             const rootEl = document.getElementById('root');
-            savedScrollRef.current = rootEl ? rootEl.scrollTop : (window.scrollY || 0);
-        } else if (!isOpen && wasOpen) {
-            const pos = savedScrollRef.current;
-            const apply = () => {
-                const rootEl = document.getElementById('root');
-                if (rootEl) {
-                    const prev = rootEl.style.scrollBehavior;
-                    rootEl.style.scrollBehavior = 'auto';
-                    rootEl.scrollTop = pos;
-                    rootEl.style.scrollBehavior = prev;
-                } else {
-                    window.scrollTo(0, pos);
-                }
-            };
-            requestAnimationFrame(apply);
-            setTimeout(apply, 60); // повтор на случай позднего layout
+            if (rootEl) {
+                rootEl.scrollTo({ top: 0 });
+            } else {
+                window.scrollTo(0, 0);
+            }
         }
-        prevOpenPathRef.current = openPath;
     }, [openPath]);
 
     useEffect(() => {
