@@ -16,6 +16,7 @@ export const chatApp = initializeApp(firebaseConfig);
 export const chatAuth = getAuth(chatApp);
 export const chatDatabase = getDatabase(chatApp);
 export const messagesRef = ref(chatDatabase, 'messages');
+export const commentsRefFor = (projectKey: string) => ref(chatDatabase, `comments/${projectKey}`);
 
 const EMAIL_DOMAIN = 'chat.local';
 

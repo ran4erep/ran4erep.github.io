@@ -3,6 +3,7 @@ import React, { useContext, useRef, useState } from 'react';
 import type { Project, LanguageContextType, SitePage } from '../types';
 import { LanguageContext } from '../App';
 import { languageIcons } from '../constants';
+import { Comments } from './Comments';
 
 interface ProjectCardProps {
     project: Project;
@@ -75,6 +76,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, pages, onOpen
             {project.tech && (
                 <i className={`${iconClass} absolute -bottom-6 -right-6 text-[160px] text-violet-500/10 group-hover:text-violet-400/25 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-6 -z-10`}></i>
             )}
+            <Comments projectKey={project.titleKey} title={t(project.titleKey)} />
         </div>
     );
 };

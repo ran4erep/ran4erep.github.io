@@ -328,5 +328,10 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "auth_no_favorites": { "ru": "Избранное пусто", "en": "No favorites yet" },
     "auth_no_history": { "ru": "История пуста", "en": "No watch history yet" },
     "auth_devices": { "ru": "Устройства", "en": "Devices" },
-    "auth_no_devices": { "ru": "Устройств не найдено", "en": "No devices found" }
+    "auth_no_devices": { "ru": "Устройств не найдено", "en": "No devices found" },
+    "comments_button": { "ru": "Комментарии", "en": "Comments" },
+    "comments_placeholder": { "ru": "Написать комментарий…", "en": "Write a comment…" },
+    "comments_send": { "ru": "Отправить", "en": "Send" },
+    "comments_login_to_write": { "ru": "Войдите, чтобы оставить комментарий", "en": "Sign in to leave a comment" },
+    "comments_empty": { "ru": "Комментариев пока нет. Будьте первым!", "en": "No comments yet. Be the first!" }
 };
