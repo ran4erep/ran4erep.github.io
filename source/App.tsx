@@ -286,7 +286,7 @@ const App: React.FC = () => {
                         )}
                     </main>
                 </div>
-                <Chat isSidebarOpen={isSidebarOpen} />
+                <Chat isSidebarOpen={isSidebarOpen} isCommentsOpen={!!commentsProject} />
                 <FloatingButtons />
                 <AuthModals />
                 {commentsProject && (
