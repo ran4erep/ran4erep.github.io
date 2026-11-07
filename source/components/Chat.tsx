@@ -163,7 +163,8 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen, isCommentsOpen }) => 
 
     return (
         <>
-            <button onClick={() => setIsOpen(!isOpen)} id="new-chat-button" className={`group fixed bottom-5 right-5 w-14 h-14 bg-slate-900/35 backdrop-blur-xl border border-slate-700/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/45 hover:scale-110 active:scale-95 z-[300] relative ${isCommentsOpen ? 'hidden md:flex' : ''}`}>
+            <div className={`fixed bottom-5 right-5 z-[300] ${isCommentsOpen ? 'hidden md:block' : ''}`}>
+            <button onClick={() => setIsOpen(!isOpen)} id="new-chat-button" className="group relative w-14 h-14 bg-slate-900/35 backdrop-blur-xl border border-slate-700/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/45 hover:scale-110 active:scale-95">
                 {unread > 0 && (
                     <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center animate-bubble shadow-lg">
                         {unread > 99 ? '99+' : unread}
@@ -175,6 +176,7 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen, isCommentsOpen }) => 
                 </svg>
                 <span className="tooltip">{t('chat_tooltip')}</span>
             </button>
+            </div>
             {isOpen && (
                 <>
                 <div className="fixed inset-0 bg-black/15 z-[290] pointer-events-none" />
