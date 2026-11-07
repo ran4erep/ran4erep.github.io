@@ -31,31 +31,45 @@ html, body {
     border: 1px solid var(--line);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
     margin-bottom: 40px;
+    min-height: 360px;
+    display: flex;
+}
+
+.hero-banner {
+    position: absolute;
+    inset: 0;
+    background-image: url('images/banner.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(15,17,22,0.82) 0%, rgba(15,17,22,0.55) 55%, rgba(15,17,22,0.25) 100%);
 }
 
 .hero-content {
-    padding: 28px;
+    position: relative;
+    padding: 36px 28px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-}
-
-.hero-main {
-    display: flex;
     align-items: center;
-    gap: 18px;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
 }
 
 .hero-icon {
-    width: 120px;
-    height: 120px;
-    border-radius: 28px;
+    width: 96px;
+    height: 96px;
+    border-radius: 22px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
-    flex: none;
+    margin-bottom: 14px;
 }
 
-.hero-text h1 {
-    font-size: 40px;
+.hero h1 {
+    font-size: 36px;
     font-weight: 800;
     letter-spacing: 0.5px;
     background: linear-gradient(90deg, var(--acc), var(--acc2));
@@ -64,27 +78,17 @@ html, body {
     color: transparent;
 }
 
-.hero-sub { color: #c7cbd6; font-size: 16px; margin-top: 4px; }
+.hero-sub { color: #c7cbd6; font-size: 16px; margin-top: 6px; }
 
-.hero-banner-box {
-    width: 100%;
-}
-
-.hero-banner-img {
-    display: block;
-    width: 100%;
-    max-height: 340px;
-    object-fit: cover;
-    border-radius: 16px;
-    border: 1px solid var(--line);
-}
-
-.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
 
 @media (min-width: 760px) {
-    .hero-content { flex-direction: row; flex-wrap: wrap; align-items: center; }
-    .hero-main { flex: 1 1 300px; }
-    .hero-banner-box { flex: 1 1 360px; max-width: 460px; }
+    .hero-content {
+        align-items: flex-start;
+        text-align: left;
+        max-width: 54%;
+    }
+    .hero-actions { justify-content: flex-start; }
 }
 
 .btn {
