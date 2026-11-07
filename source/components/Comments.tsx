@@ -4,6 +4,7 @@ import { LanguageContext } from '../App';
 import { useAuth } from '../auth';
 import { chatDatabase } from '../firebaseChat';
 import { UserAvatar } from './UserAvatar';
+import { useToasts } from './Toasts';
 import type { LanguageContextType } from '../types';
 
 const MAX_LEN = 300;
@@ -83,6 +84,7 @@ const MessageItem: React.FC<{ msg: Comment }> = ({ msg }) => {
 export const CommentsModal: React.FC<CommentsModalProps> = ({ projectKey, title, onClose }) => {
     const { t } = useContext(LanguageContext) as LanguageContextType;
     const { user, openLogin } = useAuth();
+    const { notify, toasts } = useToasts();
     const commentsRef = ref(chatDatabase, `comments/${projectKey}`);
 
     const [messages, setMessages] = useState<Comment[]>([]);
@@ -147,12 +149,12 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ projectKey, title,
     const send = async () => {
         if (!user) { openLogin(); return; }
         const trimmed = text.trim();
-        if (!trimmed) { alert(t('chat_error_message')); return; }
-        if (trimmed.length > MAX_LEN) { alert(t('chat_error_too_long')); return; }
+        if (!trimmed) { notify(t('chat_error_message'), 'error'); return; }
+        if (trimmed.length > MAX_LEN) { notify(t('chat_error_too_long'), 'error'); return; }
 
         const urlRegex = /(?:https?:\/\/)?(?!(?:(?:www\.)?youtube\.com|(?:www\.)?yt\.be|(?:www\.)?ran4erep\.github\.io))[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+(?:\/[^\s<>[\]"']*)?/i;
         if (urlRegex.test(trimmed)) {
-            alert(t('chat_error_forbidden_links'));
+            notify(t('chat_error_forbidden_links'), 'error');
             return;
         }
 
@@ -162,7 +164,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ projectKey, title,
             setText('');
         } catch (e: any) {
             console.error(e);
-            alert(`${t('chat_error_send')} (${e?.code || e?.message || ''})`);
+            notify(`${t('chat_error_send')} (${e?.code || e?.message || ''})`, 'error');
         } finally {
             setBusy(false);
         }
@@ -179,7 +181,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ projectKey, title,
             if (fileInputRef.current) fileInputRef.current.value = '';
         } catch (err: any) {
             console.error(err);
-            alert(`${t('chat_error_send')} (${err?.code || err?.message || ''})`);
+            notify(`${t('chat_error_send')} (${err?.code || err?.message || ''})`, 'error');
         } finally {
             setBusy(false);
         }
@@ -187,9 +189,9 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ projectKey, title,
 
     return (
         <>
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/15" onClick={onClose} />
-            <div className="relative w-full sm:max-w-lg max-h-[90vh] sm:max-h-[80vh] bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl z-[300] flex flex-col">
+        <div className="fixed inset-0 z-[220] flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+            <div className="relative w-full sm:max-w-lg max-h-[90vh] sm:max-h-[80vh] bg-slate-900/70 backdrop-blur-lg border border-slate-700 rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col">
                 <div className="chat-header p-4 border-b border-slate-700 flex justify-between items-center">
                     <h3 className="text-white font-semibold truncate">{title}</h3>
                     <button onClick={onClose} className="text-slate-400 hover:text-white text-2xl transition-transform active:scale-90">&times;</button>
@@ -270,6 +272,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ projectKey, title,
                 }
             }
         `}</style>
+        {toasts}
         </>
     );
 };

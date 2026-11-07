@@ -4,6 +4,7 @@ import { LanguageContext } from '../App';
 import { useAuth } from '../auth';
 import { messagesRef } from '../firebaseChat';
 import { UserAvatar } from './UserAvatar';
+import { useToasts } from './Toasts';
 import type { ChatMessage, LanguageContextType } from '../types';
 
 const MAX_MESSAGE_LENGTH = 300;
@@ -61,6 +62,7 @@ interface ChatProps {
 export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
     const { t } = useContext(LanguageContext) as LanguageContextType;
     const { user, openLogin } = useAuth();
+    const { notify, toasts } = useToasts();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [message, setMessage] = useState('');
@@ -103,13 +105,13 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
     const sendMessage = async () => {
         if (!user) return;
         const trimmedMessage = message.trim();
-        if (!trimmedMessage) { alert(t('chat_error_message')); return; }
-        if (trimmedMessage.length > MAX_MESSAGE_LENGTH) { alert(t('chat_error_too_long')); return; }
+        if (!trimmedMessage) { notify(t('chat_error_message'), 'error'); return; }
+        if (trimmedMessage.length > MAX_MESSAGE_LENGTH) { notify(t('chat_error_too_long'), 'error'); return; }
 
         const urlRegex = /(?:https?:\/\/)?(?!(?:(?:www\.)?youtube\.com|(?:www\.)?yt\.be|(?:www\.)?ran4erep\.github\.io))[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+(?:\/[^\s<>[\]"']*)?/i;
-        if(urlRegex.test(trimmedMessage)) {
-             alert(t('chat_error_forbidden_links'));
-             return;
+        if (urlRegex.test(trimmedMessage)) {
+            notify(t('chat_error_forbidden_links'), 'error');
+            return;
         }
 
         try {
@@ -117,7 +119,7 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
             setMessage('');
         } catch (error: any) {
             console.error(error);
-            alert(`${t('chat_error_send')} (${error?.code || error?.message || ''})`);
+            notify(`${t('chat_error_send')} (${error?.code || error?.message || ''})`, 'error');
         }
     };
     
@@ -131,8 +133,8 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
             await push(messagesRef, { nickname: user.username, message: '', image: imageData, timestamp: Date.now(), avatar: user.avatar || null });
             if (fileInputRef.current) fileInputRef.current.value = "";
         } catch (error: any) {
-             console.error(error);
-             alert(`${t('chat_error_send')} (${error?.code || error?.message || ''})`);
+            console.error(error);
+            notify(`${t('chat_error_send')} (${error?.code || error?.message || ''})`, 'error');
         }
     };
     
@@ -214,6 +216,7 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen }) => {
                     }
                 }
             `}</style>
+            {toasts}
         </>
     );
 };
