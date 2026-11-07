@@ -13,6 +13,7 @@ import { AppView } from './components/AppView';
 import { LoginModal } from './components/LoginModal';
 import { AccountModal } from './components/AccountModal';
 import { AuthProvider, useAuth } from './auth';
+import { CommentsModal } from './components/Comments';
 import type { Language, LanguageContextType, SitePage } from './types';
 
 export const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -32,6 +33,8 @@ const App: React.FC = () => {
         const savedLang = localStorage.getItem('language');
         return (savedLang === 'en' || savedLang === 'ru') ? savedLang : 'ru';
     });
+    // Комментарии: глобальная модалка поверх сайта.
+    const [commentsProject, setCommentsProject] = useState<{ key: string; title: string } | null>(null);
     const [pages, setPages] = useState<SitePage[]>([]);
     const [openPath, setOpenPath] = useState<string | null>(() => {
         const params = new URLSearchParams(window.location.search);
@@ -252,25 +255,25 @@ const App: React.FC = () => {
                                 
                                 {renderSection('ai-projects', 'nav_ai_projects', (
                                     <div className="project-grid">
-                                        {projects.ai.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} />)}
+                                        {projects.ai.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} onOpenComments={(key, title) => setCommentsProject({ key, title })} />)}
                                     </div>
                                 ))}
 
                                 {renderSection('info', 'nav_misc', (
                                     <div className="project-grid">
-                                        {projects.misc.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} />)}
+                                        {projects.misc.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} onOpenComments={(key, title) => setCommentsProject({ key, title })} />)}
                                     </div>
                                 ))}
 
                                 {renderSection('games', 'nav_games', (
                                     <div className="project-grid">
-                                        {projects.games.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} />)}
+                                        {projects.games.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} onOpenComments={(key, title) => setCommentsProject({ key, title })} />)}
                                     </div>
                                 ))}
 
                                 {renderSection('tools', 'nav_tools', (
                                     <div className="project-grid">
-                                        {projects.tools.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} />)}
+                                        {projects.tools.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} onOpenComments={(key, title) => setCommentsProject({ key, title })} />)}
                                     </div>
                                 ))}
 
@@ -286,6 +289,13 @@ const App: React.FC = () => {
                 <Chat isSidebarOpen={isSidebarOpen} />
                 <FloatingButtons />
                 <AuthModals />
+                {commentsProject && (
+                    <CommentsModal
+                        projectKey={commentsProject.key}
+                        title={commentsProject.title}
+                        onClose={() => setCommentsProject(null)}
+                    />
+                )}
             </div>
             </AuthProvider>
         </LanguageContext.Provider>

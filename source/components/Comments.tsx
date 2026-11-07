@@ -6,11 +6,6 @@ import { chatDatabase } from '../firebaseChat';
 import { UserAvatar } from './UserAvatar';
 import type { LanguageContextType } from '../types';
 
-interface CommentsProps {
-    projectKey: string;
-    title: string;
-}
-
 interface Comment {
     key: string;
     nickname: string;
@@ -38,32 +33,38 @@ const formatTs = (ts: number) => {
     return `${date} ${time}`;
 };
 
-export const Comments: React.FC<CommentsProps> = ({ projectKey, title }) => {
-    const { t } = useContext(LanguageContext) as LanguageContextType;
-    const { user, openLogin } = useAuth();
-    const commentsRef = ref(chatDatabase, `comments/${projectKey}`);
-
-    const [open, setOpen] = useState(false);
-    const [messages, setMessages] = useState<Comment[]>([]);
+/** Счётчик комментариев для проекта. */
+export function useCommentsCount(projectKey: string): number {
     const [count, setCount] = useState(0);
-    const [text, setText] = useState('');
-    const [busy, setBusy] = useState(false);
-    const listRef = useRef<HTMLDivElement>(null);
-
-    // Счётчик
+    const commentsRef = ref(chatDatabase, `comments/${projectKey}`);
     useEffect(() => {
         const un = onValue(commentsRef, snap => {
             setCount(snap.exists() ? Object.keys(snap.val()).length : 0);
         });
         return () => un();
     }, [commentsRef]);
+    return count;
+}
 
-    // Загрузка при открытии
+/** Глобальная модалка комментариев (поверх сайта). */
+interface CommentsModalProps {
+    projectKey: string;
+    title: string;
+    onClose: () => void;
+}
+
+export const CommentsModal: React.FC<CommentsModalProps> = ({ projectKey, title, onClose }) => {
+    const { t } = useContext(LanguageContext) as LanguageContextType;
+    const { user, openLogin } = useAuth();
+    const commentsRef = ref(chatDatabase, `comments/${projectKey}`);
+
+    const [messages, setMessages] = useState<Comment[]>([]);
+    const [text, setText] = useState('');
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const listRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
-        if (!open) {
-            setMessages([]);
-            return;
-        }
         const un = onChildAdded(commentsRef, snap => {
             const v = snap.val();
             if (!v || !v.nickname) return;
@@ -72,111 +73,110 @@ export const Comments: React.FC<CommentsProps> = ({ projectKey, title }) => {
                 : [...prev, { key: snap.key as string, ...v }]);
         });
         return () => un();
-    }, [open, commentsRef]);
+    }, [commentsRef]);
 
-    // Скролл вниз при новых
     useEffect(() => {
-        if (open && listRef.current) {
+        if (listRef.current) {
             listRef.current.scrollTop = listRef.current.scrollHeight;
         }
-    }, [messages, open]);
+    }, [messages]);
 
     const send = async () => {
         if (!user) { openLogin(); return; }
         const msg = text.trim();
         if (!msg) return;
         setBusy(true);
+        setError(null);
         try {
-            await push(commentsRef, { nickname: user.username, message: msg, timestamp: Date.now(), avatar: user.avatar || null });
+            // Правила RTDB требуют, чтобы avatar был строкой или отсутствовал.
+            // null отправлять нельзя — иначе сервер отклонит запись.
+            const payload: Record<string, unknown> = {
+                nickname: user.username,
+                message: msg,
+                timestamp: Date.now(),
+            };
+            if (user.avatar) payload.avatar = user.avatar;
+            await push(commentsRef, payload);
             setText('');
-        } catch (e) {
+        } catch (e: any) {
             console.error('comment send failed', e);
+            setError(e?.code || e?.message || 'Ошибка отправки');
         } finally {
             setBusy(false);
         }
     };
 
     return (
-        <>
-            <button
-                type="button"
-                onClick={() => setOpen(v => !v)}
-                className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-sm font-medium border border-white/5 transition-colors"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-                {t('comments_button')} {count > 0 && <span className="text-violet-400 font-semibold">({count})</span>}
-            </button>
+        <div className="fixed inset-0 z-[220] flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+            <div className="relative w-full sm:max-w-lg max-h-[90vh] sm:max-h-[80vh] bg-slate-900/90 backdrop-blur-lg border border-slate-700 rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col">
+                {/* Шапка */}
+                <div className="flex items-center justify-between p-4 border-b border-slate-700">
+                    <h3 className="text-white font-semibold truncate">{title}</h3>
+                    <button
+                        onClick={onClose}
+                        className="text-slate-400 hover:text-white text-2xl leading-none transition-transform active:scale-90"
+                        aria-label={t('close_tooltip')}
+                    >
+                        &times;
+                    </button>
+                </div>
 
-            {open && (
-                <div className="fixed inset-0 z-[220] flex items-end sm:items-center justify-center p-0 sm:p-4">
-                    <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
-                    <div className="relative w-full sm:max-w-lg max-h-[88vh] sm:max-h-[78vh] bg-slate-900/95 backdrop-blur-lg border border-slate-700 rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col">
-                        {/* Шапка */}
-                        <div className="flex items-center justify-between p-4 border-b border-slate-700">
-                            <h3 className="text-white font-semibold truncate">{title}</h3>
+                {/* Список */}
+                <div ref={listRef} className="flex-grow overflow-y-auto p-4 space-y-3 custom-scrollbar overscroll-contain">
+                    {messages.length === 0 && (
+                        <div className="text-center text-slate-500 text-sm py-8">
+                            {t('comments_empty')}
+                        </div>
+                    )}
+                    {messages.map(m => (
+                        <div key={m.key} className="bg-white/5 p-3 rounded-lg">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <UserAvatar avatar={m.avatar || null} className="w-6 h-6" />
+                                <span className="text-violet-400 font-bold text-sm">{escapeHtml(m.nickname)}</span>
+                                <span className="text-gray-500 text-xs ml-auto">{formatTs(m.timestamp)}</span>
+                            </div>
+                            <p className="text-gray-200 text-sm break-words">{escapeHtml(m.message)}</p>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Ввод */}
+                <div className="p-3 border-t border-slate-700">
+                    {error && (
+                        <div className="mb-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md px-3 py-2">
+                            {error}
+                        </div>
+                    )}
+                    {user ? (
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="text"
+                                value={text}
+                                onChange={e => setText(e.target.value)}
+                                onKeyPress={e => e.key === 'Enter' && !busy && send()}
+                                placeholder={t('comments_placeholder')}
+                                maxLength={MAX_LEN}
+                                className="flex-1 bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                            />
                             <button
-                                onClick={() => setOpen(false)}
-                                className="text-slate-400 hover:text-white text-2xl leading-none transition-transform active:scale-90"
-                                aria-label={t('close_tooltip')}
+                                onClick={send}
+                                disabled={busy || !text.trim()}
+                                className="shrink-0 px-3 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-sm font-medium rounded-md transition-colors"
                             >
-                                &times;
+                                {t('comments_send')}
                             </button>
                         </div>
-
-                        {/* Список */}
-                        <div ref={listRef} className="flex-grow overflow-y-auto p-4 space-y-3 custom-scrollbar overscroll-contain">
-                            {messages.length === 0 && (
-                                <div className="text-center text-slate-500 text-sm py-8">
-                                    {t('comments_empty')}
-                                </div>
-                            )}
-                            {messages.map(m => (
-                                <div key={m.key} className="bg-white/5 p-3 rounded-lg">
-                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                        <UserAvatar avatar={m.avatar || null} className="w-6 h-6" />
-                                        <span className="text-violet-400 font-bold text-sm">{escapeHtml(m.nickname)}</span>
-                                        <span className="text-gray-500 text-xs ml-auto">{formatTs(m.timestamp)}</span>
-                                    </div>
-                                    <p className="text-gray-200 text-sm break-words">{escapeHtml(m.message)}</p>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Ввод */}
-                        <div className="p-3 border-t border-slate-700">
-                            {user ? (
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="text"
-                                        value={text}
-                                        onChange={e => setText(e.target.value)}
-                                        onKeyPress={e => e.key === 'Enter' && !busy && send()}
-                                        placeholder={t('comments_placeholder')}
-                                        maxLength={MAX_LEN}
-                                        className="flex-1 bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                                    />
-                                    <button
-                                        onClick={send}
-                                        disabled={busy || !text.trim()}
-                                        className="shrink-0 px-3 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-sm font-medium rounded-md transition-colors"
-                                    >
-                                        {t('comments_send')}
-                                    </button>
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={openLogin}
-                                    className="w-full py-2.5 bg-violet-600/90 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors"
-                                >
-                                    {t('comments_login_to_write')}
-                                </button>
-                            )}
-                        </div>
-                    </div>
+                    ) : (
+                        <button
+                            onClick={openLogin}
+                            className="w-full py-2.5 bg-violet-600/90 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors"
+                        >
+                            {t('comments_login_to_write')}
+                        </button>
+                    )}
                 </div>
-            )}
-        </>
+            </div>
+        </div>
     );
 };
