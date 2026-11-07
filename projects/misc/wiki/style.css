@@ -65,6 +65,10 @@
     cursor: var(--cursor-default);
 }
 
+html {
+    overflow-x: hidden;
+}
+
 body {
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background: var(--background);
@@ -211,6 +215,34 @@ body::before {
     min-width: 0;
     overflow-wrap: break-word;
     word-break: break-word;
+}
+
+/* Видео (YouTube) — занимает всю ширину без вылезания */
+.article-content iframe {
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    display: block;
+}
+
+/* Блоки кода/конфига (выглядят как таблицы) — внутренняя прокрутка */
+.article-content pre {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+.article-content code {
+    word-break: break-word;
+}
+
+/* Настоящие таблицы — тоже не должны вылезать */
+.article-content table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
 }
 
 /* Images */
