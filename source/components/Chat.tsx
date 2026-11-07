@@ -67,12 +67,27 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen, isCommentsOpen }) => 
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [message, setMessage] = useState('');
+    const [unread, setUnread] = useState(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const isOpenRef = useRef(false);
+    const mountTimeRef = useRef(Date.now());
+
+    // Синхронизация рефа и сброс непрочитанных при открытии.
+    useEffect(() => {
+        isOpenRef.current = isOpen;
+        if (isOpen) setUnread(0);
+    }, [isOpen]);
 
     useEffect(() => {
         const recentMessagesQuery = query(messagesRef, limitToLast(50));
         const unsubscribe = onChildAdded(recentMessagesQuery, (snapshot) => {
-            setMessages(prev => [...prev, snapshot.val() as ChatMessage]);
+            const v = snapshot.val() as ChatMessage | null;
+            if (!v || !v.nickname) return;
+            setMessages(prev => [...prev, v]);
+            // Новые сообщения (после монтирования + буфер 3с), когда чат закрыт.
+            if (!isOpenRef.current && v.timestamp > mountTimeRef.current + 3000) {
+                setUnread(u => u + 1);
+            }
         });
         return () => unsubscribe();
     }, []);
@@ -148,7 +163,12 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen, isCommentsOpen }) => 
 
     return (
         <>
-            <button onClick={() => setIsOpen(!isOpen)} id="new-chat-button" className={`group fixed bottom-5 right-5 w-14 h-14 bg-slate-900/35 backdrop-blur-xl border border-slate-700/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/45 hover:scale-110 active:scale-95 z-[300] ${isCommentsOpen ? 'hidden md:flex' : ''}`}>
+            <button onClick={() => setIsOpen(!isOpen)} id="new-chat-button" className={`group fixed bottom-5 right-5 w-14 h-14 bg-slate-900/35 backdrop-blur-xl border border-slate-700/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/45 hover:scale-110 active:scale-95 z-[300] relative ${isCommentsOpen ? 'hidden md:flex' : ''}`}>
+                {unread > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center animate-bubble shadow-lg">
+                        {unread > 99 ? '99+' : unread}
+                    </span>
+                )}
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <g stroke="#000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></g>
                     <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></g>
@@ -194,6 +214,14 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen, isCommentsOpen }) => 
                 </>
             )}
             <style>{`
+                @keyframes bubbleIn {
+                    0% { transform: scale(0.3); opacity: 0; }
+                    60% { transform: scale(1.25); opacity: 1; }
+                    100% { transform: scale(1); }
+                }
+                .animate-bubble {
+                    animation: bubbleIn 0.4s ease-out;
+                }
                 .tooltip {
                     position: absolute;
                     bottom: 125%;
