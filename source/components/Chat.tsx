@@ -163,8 +163,11 @@ export const Chat: React.FC<ChatProps> = ({ isSidebarOpen, isCommentsOpen }) => 
 
     return (
         <>
-            <div className={`fixed bottom-5 right-5 z-[300] ${isCommentsOpen ? 'hidden md:block' : ''}`}>
-            <button onClick={() => setIsOpen(!isOpen)} id="new-chat-button" className="group relative w-14 h-14 bg-slate-900/35 backdrop-blur-xl border border-slate-700/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/45 hover:scale-110 active:scale-95">
+            <div
+                className={`relative z-[300] ${isCommentsOpen ? 'hidden md:block' : ''}`}
+                style={{ position: 'fixed', bottom: 20, right: 20 }}
+            >
+            <button onClick={() => setIsOpen(!isOpen)} id="new-chat-button" className="group w-14 h-14 bg-slate-900/35 backdrop-blur-xl border border-slate-700/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:bg-slate-800/45 hover:scale-110 active:scale-95">
                 {unread > 0 && (
                     <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center animate-bubble shadow-lg">
                         {unread > 99 ? '99+' : unread}

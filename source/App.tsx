@@ -80,6 +80,13 @@ const App: React.FC = () => {
     // Сохраняем позицию скролла главной при открытии приложения и
     // восстанавливаем её при возврате (кнопка назад, крестик и т.п.).
     useEffect(() => {
+        // Отключаем встроенное восстановление скролла браузера — управляем сами.
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
+    }, []);
+
+    useEffect(() => {
         const wasOpen = prevOpenPathRef.current != null;
         const isOpen = openPath != null;
         if (isOpen && !wasOpen) {
@@ -87,10 +94,9 @@ const App: React.FC = () => {
             savedScrollRef.current = rootEl ? rootEl.scrollTop : (window.scrollY || 0);
         } else if (!isOpen && wasOpen) {
             const pos = savedScrollRef.current;
-            requestAnimationFrame(() => {
+            const apply = () => {
                 const rootEl = document.getElementById('root');
                 if (rootEl) {
-                    // Мгновенно, без плавной прокрутки.
                     const prev = rootEl.style.scrollBehavior;
                     rootEl.style.scrollBehavior = 'auto';
                     rootEl.scrollTop = pos;
@@ -98,7 +104,9 @@ const App: React.FC = () => {
                 } else {
                     window.scrollTo(0, pos);
                 }
-            });
+            };
+            requestAnimationFrame(apply);
+            setTimeout(apply, 60); // повтор на случай позднего layout
         }
         prevOpenPathRef.current = openPath;
     }, [openPath]);
