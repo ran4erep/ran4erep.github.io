@@ -92,9 +92,6 @@ html, body {
 }
 
 
-    .hero-actions { justify-content: flex-start; }
-}
-
 .btn {
     display: inline-flex;
     align-items: center;
