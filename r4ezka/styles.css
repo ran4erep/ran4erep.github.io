@@ -171,6 +171,10 @@ html, body {
     color: #e9e7f0;
 }
 
+.about h3 + p {
+    margin-left: 14px;
+}
+
 .about p { margin-bottom: 10px; }
 
 .features { margin: 12px 0 0 18px; }
