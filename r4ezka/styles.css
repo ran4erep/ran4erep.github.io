@@ -136,6 +136,27 @@ html, body {
 
 /* Описание */
 
+.about-links { margin-bottom: 12px; }
+
+.link-4pda {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.04);
+    color: var(--acc2);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.link-4pda:hover { background: rgba(255,255,255,0.08); border-color: #3a4a6a; }
+
+.link-4pda-icon { width: 16px; height: 16px; border-radius: 3px; }
+
 .about {
     font-size: 14px;
     line-height: 1.6;
