@@ -159,6 +159,13 @@ html, body {
 .link-4pda-icon { width: 16px; height: 16px; border-radius: 3px; }
 
 .about {
+    /* Как карточки чейнджлога: полупрозрачное стекло, рамка, p-6 */
+    background: rgba(30, 41, 59, 0.5);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 24px;
     font-size: 14px;
     line-height: 1.65;
     color: #c6cad4;

@@ -362,7 +362,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ open, onClose }) => 
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-3 md:p-8">
-            <div className="absolute inset-0 bg-black/45" onClick={onClose} />
+            <div className="absolute inset-0 bg-black/45 backdrop-blur-sm" onClick={onClose} />
             <div
                 ref={cardScrollRef}
                 onScroll={handleScrollLoad}
