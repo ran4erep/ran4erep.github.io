@@ -28,6 +28,14 @@
         img.src = `images/screenshots/${name}`;
         img.alt = `Скриншот ${name}`;
         img.loading = 'lazy';
+        // Подгонка ширины под реальные пропорции — без боковых зазоров.
+        img.addEventListener('load', () => {
+            if (img.naturalWidth && img.naturalHeight) {
+                const h = 420;
+                const w = Math.round(h * img.naturalWidth / img.naturalHeight);
+                a.style.width = Math.max(150, Math.min(270, w)) + 'px';
+            }
+        });
         a.appendChild(img);
         shotsContainer.appendChild(a);
     });
