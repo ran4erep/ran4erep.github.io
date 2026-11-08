@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — Страница не найдена</title>
+    <style>
+        :root {
+            --bg: #0f1116;
+            --card: #1a2030;
+            --line: #2a3144;
+            --ink: #e8e6e0;
+            --mut: #8b91a0;
+            --acc: #8b5cf6;
+            --acc2: #c084fc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .wrap { text-align: center; max-width: 480px; }
+        .code {
+            font-size: 96px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            line-height: 1.1;
+            background: linear-gradient(90deg, var(--acc), var(--acc2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .title { font-size: 22px; font-weight: 700; margin-top: 8px; }
+        .text {
+            color: var(--mut);
+            margin-top: 12px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 24px;
+            padding: 12px 24px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--acc), var(--acc2));
+            color: #fff;
+            font-weight: 600;
+            font-size: 15px;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+            transition: filter 0.2s, transform 0.12s;
+        }
+        .btn:hover { filter: brightness(1.08); }
+        .btn:active { transform: scale(0.97); }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="code">404</div>
+        <div class="title">Страница не найдена</div>
+        <p class="text">Похоже, такой страницы не существует или она была перемещена.<br>Page not found.</p>
+        <a class="btn" href="/">Вернуться на главную</a>
+    </div>
+</body>
+</html>

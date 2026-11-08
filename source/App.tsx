@@ -40,7 +40,11 @@ const App: React.FC = () => {
         const params = new URLSearchParams(window.location.search);
         const app = params.get('app');
         if (!app) return null;
-        return '/' + app.replace(/^\/+|\/+$/g, '') + '/';
+        // Сохраняем путь как есть (без ведущих слэшей): хвостовой слэш
+        // важен — для каталогов он нужен, а для файлов (например,
+        // /projects/misc/wiki/gwg.html) добавить его нельзя, иначе GitHub
+        // Pages отдаст 404.
+        return '/' + app.replace(/^\/+/, '');
     });
     const [isSidebarOpen, setSidebarOpen] = useState(() => {
         // Check user agent for mobile keywords. This is more reliable than just touch detection,
@@ -118,7 +122,7 @@ const App: React.FC = () => {
 
     const openApp = useCallback((path: string) => {
         setOpenPath(path);
-        const clean = path.replace(/^\/+|\/+$/g, '');
+        const clean = path.replace(/^\/+/, '');
         const url = new URL(window.location.href);
         if (clean) {
             url.search = '?app=' + encodeURIComponent(clean).replace(/%2F/g, '/');
@@ -162,7 +166,7 @@ const App: React.FC = () => {
             const params = new URLSearchParams(window.location.search);
             const app = params.get('app');
             if (app) {
-                setOpenPath('/' + app.replace(/^\/+|\/+$/g, '') + '/');
+                setOpenPath('/' + app.replace(/^\/+/, ''));
             } else {
                 setOpenPath(null);
             }
