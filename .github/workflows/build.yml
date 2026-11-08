@@ -83,6 +83,15 @@ jobs:
           rm -f _site/assets/index-*.js
           rsync -a source/dist/ _site/
 
+      - name: Restore media indexes into staged site
+        run: |
+          # source/public/ содержит собственные копии gallery.json и playlist.json
+          # (они нужны Vite в dev-режиме), и при наложении source/dist/ они
+          # перекрывают свежие корневые версии, которые обновил update-media.
+          # Возвращаем в собранный сайт корневые (актуальные) индексы.
+          cp gallery/gallery.json _site/gallery/gallery.json
+          cp music/playlist.json _site/music/playlist.json
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
