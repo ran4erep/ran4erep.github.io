@@ -164,7 +164,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAppOpen, 
                         ))}
                     </div>
                     <div className="text-center text-xs text-gray-500">
-                        &#169; by ran4erep, 2023-{currentYear}
+                        &#169; by ran4erep, 2020-{currentYear}
                     </div>
                 </div>
             </div>
