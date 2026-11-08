@@ -17,7 +17,10 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; }
         body {
-            background: var(--bg);
+            /* Тот же фон, что на главной: bg.webp + тёмное затемнение. */
+            background:
+                linear-gradient(rgba(15, 17, 22, 0.9), rgba(15, 17, 22, 0.9)),
+                url('/bg.webp') center / cover no-repeat fixed;
             color: var(--ink);
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
             display: flex;
@@ -27,6 +30,13 @@
             -webkit-tap-highlight-color: transparent;
         }
         .wrap { text-align: center; max-width: 480px; }
+        .img404 {
+            display: block;
+            width: 220px;
+            max-width: 70vw;
+            height: auto;
+            margin: 0 auto 8px;
+        }
         .code {
             font-size: 96px;
             font-weight: 800;
@@ -63,6 +73,7 @@
 </head>
 <body>
     <div class="wrap">
+        <img class="img404" src="/404.png" alt="404">
         <div class="code">404</div>
         <div class="title">Страница не найдена</div>
         <p class="text">Похоже, такой страницы не существует или она была перемещена.<br>Page not found.</p>
