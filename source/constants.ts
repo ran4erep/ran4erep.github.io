@@ -41,7 +41,7 @@ export const projects: { [key: string]: Project[] } = {
         { titleKey: 'cod_book_title', descriptionKey: 'cod_book_desc', link: '/projects/misc/cod_book/', linkTypeKey: 'btn_read' },
     ],
     games: [
-        { titleKey: 'dead_storm_title', descriptionKey: 'dead_storm_desc', link: 'https://dstorm.netlify.app', linkTypeKey: 'btn_play' },
+        { titleKey: 'dead_storm_title', descriptionKey: 'dead_storm_desc', link: 'https://dstorm.netlify.app', linkTypeKey: 'btn_play', tech: 'typescript' },
         { titleKey: 'nethack3ds_title', descriptionKey: 'nethack3ds_desc', link: 'https://github.com/ran4erep/Nethack-for-Nintendo-3DS', linkTypeKey: 'btn_github', tech: 'c' },
         { titleKey: 'r4boy_title', descriptionKey: 'r4boy_desc', link: '/gb', linkTypeKey: 'btn_play', tech: 'typescript' },
 		{ titleKey: 'nethack3d_title', descriptionKey: 'nethack3d_desc', link: '/nethack3d', linkTypeKey: 'btn_play', tech: 'html' },
