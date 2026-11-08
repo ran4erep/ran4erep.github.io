@@ -83,6 +83,10 @@ html, body {
 .hero-actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
 
 @media (min-width: 760px) {
+    #app {
+        max-width: none;
+        padding: 24px 40px 48px;
+    }
     .hero-content {
         align-items: flex-start;
         text-align: left;
