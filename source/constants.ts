@@ -41,6 +41,7 @@ export const projects: { [key: string]: Project[] } = {
         { titleKey: 'cod_book_title', descriptionKey: 'cod_book_desc', link: '/projects/misc/cod_book/', linkTypeKey: 'btn_read' },
     ],
     games: [
+        { titleKey: 'dead_storm_title', descriptionKey: 'dead_storm_desc', link: 'https://dstorm.netlify.app', linkTypeKey: 'btn_play' },
         { titleKey: 'nethack3ds_title', descriptionKey: 'nethack3ds_desc', link: 'https://github.com/ran4erep/Nethack-for-Nintendo-3DS', linkTypeKey: 'btn_github', tech: 'c' },
         { titleKey: 'r4boy_title', descriptionKey: 'r4boy_desc', link: '/gb', linkTypeKey: 'btn_play', tech: 'typescript' },
 		{ titleKey: 'nethack3d_title', descriptionKey: 'nethack3d_desc', link: '/nethack3d', linkTypeKey: 'btn_play', tech: 'html' },
@@ -212,6 +213,8 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "game_snake_desc": { "ru": "Классическая Змейка на JavaScript, но отрисовка графики происходит не через canvas, а через стороннюю библиотеку для реализации консоли.", "en": "Classic Snake in JavaScript, but the graphics are rendered not through canvas, but through a third-party library for implementing a console." },
     "game_sokoban_title": { "ru": "Сокобан", "en": "Sokoban" },
     "game_sokoban_desc": { "ru": "Классический Сокобан. В этой логической игре вы выступите в роли грузчика, которому нужно расставить ящики на складе в определённые места. Уровни для игры устроены в виде двумерных массивов, что делает их создание очень простым.", "en": "Classic Sokoban. In this logic game, you will act as a loader who needs to arrange boxes in a warehouse in certain places. The levels for the game are arranged in the form of two-dimensional arrays, which makes their creation very simple." },
+    "dead_storm_title": { "ru": "Dead Storm", "en": "Dead Storm" },
+    "dead_storm_desc": { "ru": "Мой последний масштабный проект, в данный момент разработка приостановлена по техническим причинам. Это игра вдохновлённая Resident Evil Gaiden и Doom RPG. Пошаговый dungeon crawler с пушками. В принципе игра в близком к релизу состоянии, но есть технические проблемы с движком. Как решу их - продолжу разработку.", "en": "My latest large-scale project, currently paused due to technical reasons. A game inspired by Resident Evil Gaiden and Doom RPG. A turn-based dungeon crawler with guns. The game is basically close to release, but there are technical issues with the engine. Once I fix them, I will continue development." },
     
     // Tools
 	"frame_animator_title": { "ru": "Аниматор кадров", "en": "Frame animator" },
