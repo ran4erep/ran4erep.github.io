@@ -123,6 +123,58 @@ export const MusicPlayer: React.FC = () => {
         const newIndex = (currentTrackIndex + direction + playlist.length) % playlist.length;
         setCurrentTrackIndex(newIndex);
     };
+
+    // --- Локальные аудиофайлы (MP3) ---
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const dirInputRef = useRef<HTMLInputElement>(null);
+    const [pickerOpen, setPickerOpen] = useState(false);
+    const localUrlsRef = useRef<string[]>([]);
+
+    // Выбор папки (webkitdirectory) поддерживают только Chromium-браузеры.
+    const supportsDirectoryUpload =
+        typeof document !== 'undefined' && 'webkitdirectory' in document.createElement('input');
+
+    const isAudioFile = (file: File): boolean =>
+        /\.mp3$/i.test(file.name) || file.type === 'audio/mpeg' || file.type === 'audio/mp3';
+
+    const handleLocalFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const list = e.target.files;
+        const files = list
+            ? Array.from({ length: list.length }, (_, i) => list.item(i)!).filter(isAudioFile)
+            : [];
+        e.target.value = '';
+        if (files.length === 0) return;
+
+        // Освобождаем старые object URL, если раньше уже выбирали файлы.
+        localUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+
+        const tracks: Track[] = files.map(file => ({
+            title: file.name.replace(/\.[^.]+$/, ''),
+            artist: t('local_track_artist'),
+            path: URL.createObjectURL(file),
+        }));
+        localUrlsRef.current = tracks.map(tr => tr.path);
+
+        setPlaylist(tracks);
+        setCurrentTrackIndex(0);
+        if (!audioContextRef.current) setupAudioContext();
+        if (audioContextRef.current?.state === 'suspended') audioContextRef.current.resume();
+        setIsPlaying(true);
+        setPickerOpen(false);
+    };
+
+    // Закрываем меню выбора по клику вне него.
+    useEffect(() => {
+        if (!pickerOpen) return;
+        const onDocClick = () => setPickerOpen(false);
+        document.addEventListener('click', onDocClick);
+        return () => document.removeEventListener('click', onDocClick);
+    }, [pickerOpen]);
+
+    // Чистим object URL при размонтировании плеера.
+    useEffect(() => () => {
+        localUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+    }, []);
     
     useEffect(() => {
         const audio = audioRef.current;
@@ -191,6 +243,10 @@ export const MusicPlayer: React.FC = () => {
         <div className="bg-[#1a1a1a] rounded-[15px] p-4 relative overflow-hidden">
             <audio ref={audioRef} onTimeUpdate={onTimeUpdate} onEnded={onTrackEnd} crossOrigin="anonymous" />
 
+            {/* Скрытые input-ы для выбора локальных аудиофайлов */}
+            <input ref={fileInputRef} type="file" accept="audio/mpeg,audio/mp3,audio/*" multiple className="hidden" onChange={handleLocalFilesSelected} />
+            <input ref={dirInputRef} type="file" {...({ webkitdirectory: '' } as any)} accept="audio/*" className="hidden" onChange={handleLocalFilesSelected} />
+
             <div className="visualizer-container absolute inset-0 pointer-events-none z-0">
                 <div ref={glowRef} className="visualizer-glow absolute inset-0 mix-blend-screen opacity-90 transition-all duration-100"></div>
                 <canvas ref={canvasRef} id="stripes" className="absolute inset-0 w-full h-full"></canvas>
@@ -211,23 +267,58 @@ export const MusicPlayer: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="player-controls flex justify-center items-center gap-4">
-                    <button onClick={() => changeTrack(-1)} className="control-btn text-gray-300 hover:text-white group relative transition-transform active:scale-90">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-                        <span className="tooltip">{t('prev_track_tooltip')}</span>
-                    </button>
-                    <button onClick={togglePlay} className="control-btn text-violet-400 hover:text-violet-300 w-10 h-10 flex items-center justify-center bg-violet-500/20 rounded-full group relative transition-transform active:scale-90">
-                        {isPlaying ? (
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                        ) : (
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <div className="player-controls relative">
+                    <div className="flex justify-center items-center gap-4">
+                        <button onClick={() => changeTrack(-1)} className="control-btn text-gray-300 hover:text-white group relative transition-transform active:scale-90">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                            <span className="tooltip">{t('prev_track_tooltip')}</span>
+                        </button>
+                        <button onClick={togglePlay} className="control-btn text-violet-400 hover:text-violet-300 w-10 h-10 flex items-center justify-center bg-violet-500/20 rounded-full group relative transition-transform active:scale-90">
+                            {isPlaying ? (
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            ) : (
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            )}
+                            <span className="tooltip">{t(isPlaying ? 'pause_tooltip' : 'play_tooltip')}</span>
+                        </button>
+                        <button onClick={() => changeTrack(1)} className="control-btn text-gray-300 hover:text-white group relative transition-transform active:scale-90">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                            <span className="tooltip">{t('next_track_tooltip')}</span>
+                        </button>
+                    </div>
+
+                    {/* Кнопка выбора локальных аудиофайлов — слева, на уровне кнопок управления */}
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 z-20">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setPickerOpen(o => !o); }}
+                            className="control-btn text-gray-300 hover:text-white group relative transition-transform active:scale-90"
+                            aria-label={t('local_open_button_tooltip')}
+                        >
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+                            <span className="tooltip">{t('local_open_button_tooltip')}</span>
+                        </button>
+
+                        {pickerOpen && (
+                            <div className="absolute bottom-full left-0 mb-2 min-w-[190px] bg-slate-800 border border-slate-600 rounded-lg shadow-2xl p-1">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setPickerOpen(false); fileInputRef.current?.click(); }}
+                                    className="w-full text-left px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-white/10 flex items-center gap-2"
+                                >
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                                    {t('local_pick_files')}
+                                </button>
+                                {supportsDirectoryUpload && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setPickerOpen(false); dirInputRef.current?.click(); }}
+                                        className="w-full text-left px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-white/10 flex items-center gap-2"
+                                    >
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                                        {t('local_pick_folder')}
+                                    </button>
+                                )}
+                            </div>
                         )}
-                        <span className="tooltip">{t(isPlaying ? 'pause_tooltip' : 'play_tooltip')}</span>
-                    </button>
-                    <button onClick={() => changeTrack(1)} className="control-btn text-gray-300 hover:text-white group relative transition-transform active:scale-90">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-                        <span className="tooltip">{t('next_track_tooltip')}</span>
-                    </button>
+                    </div>
                 </div>
             </div>
              <style>{`

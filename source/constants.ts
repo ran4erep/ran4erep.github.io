@@ -275,6 +275,12 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "rec_huggingface_desc": { "ru": "Бесплатный каталог нейросетей на все случаи жизни.", "en": "A free catalog of neural networks for all occasions." },
     "rec_adobepodcast_desc": { "ru": "Улучшает качество речи в аудио до студийного уровня.", "en": "Improves speech quality in audio to studio level." },
     "rec_tempmail_desc": { "ru": "Бесплатный сервис, который даёт временный E-Mail адрес для регистрации на сайтах.", "en": "A free service that provides a temporary E-Mail address for registration on sites." },
+
+    // Music player — локальные файлы
+    "local_open_button_tooltip": { "ru": "Открыть аудиофайлы", "en": "Open audio files" },
+    "local_pick_files": { "ru": "Выбрать файлы", "en": "Pick files" },
+    "local_pick_folder": { "ru": "Выбрать папку", "en": "Pick folder" },
+    "local_track_artist": { "ru": "Локальный файл", "en": "Local file" },
     
     // Chat
     "chat_title": { "ru": "Чилл-зона. Побеседуем?", "en": "Chill Zone. Shall we talk?" },
