@@ -129,6 +129,8 @@ export const MusicPlayer: React.FC = () => {
     const dirInputRef = useRef<HTMLInputElement>(null);
     const [pickerOpen, setPickerOpen] = useState(false);
     const localUrlsRef = useRef<string[]>([]);
+    const titleRef = useRef<HTMLSpanElement>(null);
+    const [mq, setMq] = useState({ dist: 0, dur: 0 });
 
     // Выбор папки (webkitdirectory) поддерживают только Chromium-браузеры.
     const supportsDirectoryUpload =
@@ -150,7 +152,7 @@ export const MusicPlayer: React.FC = () => {
 
         const tracks: Track[] = files.map(file => ({
             title: file.name.replace(/\.[^.]+$/, ''),
-            artist: t('local_track_artist'),
+            artist: '',
             path: URL.createObjectURL(file),
         }));
         localUrlsRef.current = tracks.map(tr => tr.path);
@@ -239,6 +241,33 @@ export const MusicPlayer: React.FC = () => {
     
     const currentTrack = playlist[currentTrackIndex];
 
+    // Прокрутка названия туда-сюда (bounce), если оно не влезает в строку.
+    useEffect(() => {
+        const el = titleRef.current;
+        const container = el?.parentElement;
+        if (!el || !container) {
+            setMq({ dist: 0, dur: 0 });
+            return;
+        }
+        const measure = () => {
+            const dist = Math.max(0, el.clientWidth - container.clientWidth);
+            setMq({ dist, dur: dist > 0 ? Math.max(6, Math.round(dist / 40)) : 0 });
+        };
+        measure();
+        const ro = new ResizeObserver(measure);
+        ro.observe(container);
+        ro.observe(el);
+        return () => ro.disconnect();
+    }, [currentTrack]);
+
+    const marqueeStyle: React.CSSProperties & { [key: string]: string | number } =
+        mq.dist > 0
+            ? {
+                  '--mq-distance': `-${mq.dist}px`,
+                  animation: `marquee-bounce ${mq.dur}s ease-in-out infinite`,
+              }
+            : {};
+
     return (
         <div className="bg-[#1a1a1a] rounded-[15px] p-4 relative">
             <audio ref={audioRef} onTimeUpdate={onTimeUpdate} onEnded={onTrackEnd} crossOrigin="anonymous" />
@@ -253,8 +282,14 @@ export const MusicPlayer: React.FC = () => {
             </div>
             
             <div className="relative z-10">
-                <div className="current-track text-white mb-2 text-sm text-center truncate">
-                    {currentTrack ? `${currentTrack.artist} - ${currentTrack.title}` : 'Нет воспроизведения'}
+                <div className="current-track text-white mb-2 text-sm text-center overflow-hidden">
+                    <span
+                        ref={titleRef}
+                        className="inline-block align-middle whitespace-nowrap will-change-transform"
+                        style={marqueeStyle}
+                    >
+                        {currentTrack ? (currentTrack.artist ? `${currentTrack.artist} - ${currentTrack.title}` : currentTrack.title) : 'Нет воспроизведения'}
+                    </span>
                 </div>
                 
                 <div className="player-info mb-2">
@@ -295,7 +330,6 @@ export const MusicPlayer: React.FC = () => {
                             aria-label={t('local_open_button_tooltip')}
                         >
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-                            <span className="tooltip tooltip-right">{t('local_open_button_tooltip')}</span>
                         </button>
 
                         {pickerOpen && (
@@ -322,6 +356,12 @@ export const MusicPlayer: React.FC = () => {
                 </div>
             </div>
              <style>{`
+                /* Bounce-прокрутка длинных названий треков */
+                @keyframes marquee-bounce {
+                    0%, 100% { transform: translateX(0); }
+                    50% { transform: translateX(var(--mq-distance)); }
+                }
+
                 .tooltip {
                     position: absolute;
                     bottom: 125%;
@@ -337,14 +377,6 @@ export const MusicPlayer: React.FC = () => {
                     visibility: hidden;
                     transition: opacity 0.2s, visibility 0.2s;
                     pointer-events: none;
-                }
-                /* Тултип у левой кнопки: справа от кнопки, чтобы не вылезать
-                   за левый край экрана. */
-                .tooltip-right {
-                    left: calc(100% + 8px);
-                    top: 50%;
-                    bottom: auto;
-                    transform: translateY(-50%);
                 }
                 @media (hover: hover) {
                     .group:hover .tooltip {

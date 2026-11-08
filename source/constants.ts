@@ -280,7 +280,6 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "local_open_button_tooltip": { "ru": "Открыть аудиофайлы", "en": "Open audio files" },
     "local_pick_files": { "ru": "Выбрать файлы", "en": "Pick files" },
     "local_pick_folder": { "ru": "Выбрать папку", "en": "Pick folder" },
-    "local_track_artist": { "ru": "Локальный файл", "en": "Local file" },
     
     // Chat
     "chat_title": { "ru": "Чилл-зона. Побеседуем?", "en": "Chill Zone. Shall we talk?" },
