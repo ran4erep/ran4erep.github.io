@@ -60,7 +60,7 @@ export const AppView: React.FC<AppViewProps> = ({ path, title }) => {
     }, [path]);
 
     return (
-        <div className="h-screen overflow-hidden transform-gpu" style={{ height: '100dvh', overflowAnchor: 'none', contain: 'paint' }}>
+        <div className="h-screen overflow-hidden transform-gpu" style={{ height: '100dvh', overflowAnchor: 'none', contain: 'paint', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}>
             <iframe ref={iframeRef} src={path} title={title} className="w-full h-full border-0 block" style={{ verticalAlign: 'top' }} />
         </div>
     );

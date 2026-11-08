@@ -54,7 +54,16 @@ export const MusicPlayer: React.FC = () => {
             visualizerAnimationRef.current = requestAnimationFrame(animateVisualizer);
             return;
         }
-        
+
+        // Ограничиваем перерисовку ~30 fps: меньше нагрузка на композитор,
+        // а значит меньше «тряски» соседних слоёв (iframe приложений).
+        const now = performance.now();
+        if (now - lastDrawRef.current < 33) {
+            visualizerAnimationRef.current = requestAnimationFrame(animateVisualizer);
+            return;
+        }
+        lastDrawRef.current = now;
+
         const analyser = analyserRef.current;
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -118,6 +127,27 @@ export const MusicPlayer: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isPlaying]);
 
+    // Размер canvas приводим к реальному размеру блока (с учётом DPR),
+    // чтобы отрисовка шла 1:1 без постоянного масштабирования.
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const resize = () => {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = Math.max(1, Math.round(rect.width * dpr));
+            const h = Math.max(1, Math.round(rect.height * dpr));
+            if (canvas.width !== w || canvas.height !== h) {
+                canvas.width = w;
+                canvas.height = h;
+            }
+        };
+        resize();
+        const ro = new ResizeObserver(resize);
+        ro.observe(canvas);
+        return () => ro.disconnect();
+    }, []);
+
     const changeTrack = (direction: number) => {
         if (playlist.length === 0) return;
         const newIndex = (currentTrackIndex + direction + playlist.length) % playlist.length;
@@ -131,6 +161,7 @@ export const MusicPlayer: React.FC = () => {
     const localUrlsRef = useRef<string[]>([]);
     const titleRef = useRef<HTMLSpanElement>(null);
     const [mq, setMq] = useState({ dist: 0, dur: 0 });
+    const lastDrawRef = useRef(0);
 
     // Выбор папки (webkitdirectory) поддерживают только Chromium-браузеры.
     const supportsDirectoryUpload =
@@ -277,7 +308,7 @@ export const MusicPlayer: React.FC = () => {
             <input ref={dirInputRef} type="file" {...({ webkitdirectory: '' } as any)} accept="audio/*" className="hidden" onChange={handleLocalFilesSelected} />
 
             <div className="visualizer-container absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-[15px]">
-                <div ref={glowRef} className="visualizer-glow absolute inset-0 mix-blend-screen opacity-90 transition-all duration-100"></div>
+                <div ref={glowRef} className="visualizer-glow absolute inset-0 opacity-90"></div>
                 <canvas ref={canvasRef} id="stripes" className="absolute inset-0 w-full h-full"></canvas>
             </div>
             
