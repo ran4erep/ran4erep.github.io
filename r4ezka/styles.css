@@ -164,6 +164,8 @@ html, body {
 
 .link-4pda-icon { width: 16px; height: 16px; border-radius: 3px; }
 
+.github-icon { filter: invert(1); }
+
 .about {
     /* Как карточки чейнджлога: полупрозрачное стекло, рамка, p-6 */
     background: rgba(30, 41, 59, 0.5);
