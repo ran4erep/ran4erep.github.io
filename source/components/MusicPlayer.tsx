@@ -240,14 +240,14 @@ export const MusicPlayer: React.FC = () => {
     const currentTrack = playlist[currentTrackIndex];
 
     return (
-        <div className="bg-[#1a1a1a] rounded-[15px] p-4 relative overflow-hidden">
+        <div className="bg-[#1a1a1a] rounded-[15px] p-4 relative">
             <audio ref={audioRef} onTimeUpdate={onTimeUpdate} onEnded={onTrackEnd} crossOrigin="anonymous" />
 
             {/* Скрытые input-ы для выбора локальных аудиофайлов */}
             <input ref={fileInputRef} type="file" accept="audio/mpeg,audio/mp3,audio/*" multiple className="hidden" onChange={handleLocalFilesSelected} />
             <input ref={dirInputRef} type="file" {...({ webkitdirectory: '' } as any)} accept="audio/*" className="hidden" onChange={handleLocalFilesSelected} />
 
-            <div className="visualizer-container absolute inset-0 pointer-events-none z-0">
+            <div className="visualizer-container absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-[15px]">
                 <div ref={glowRef} className="visualizer-glow absolute inset-0 mix-blend-screen opacity-90 transition-all duration-100"></div>
                 <canvas ref={canvasRef} id="stripes" className="absolute inset-0 w-full h-full"></canvas>
             </div>
@@ -295,11 +295,11 @@ export const MusicPlayer: React.FC = () => {
                             aria-label={t('local_open_button_tooltip')}
                         >
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-                            <span className="tooltip">{t('local_open_button_tooltip')}</span>
+                            <span className="tooltip tooltip-right">{t('local_open_button_tooltip')}</span>
                         </button>
 
                         {pickerOpen && (
-                            <div className="absolute bottom-full left-0 mb-2 min-w-[190px] bg-slate-800 border border-slate-600 rounded-lg shadow-2xl p-1">
+                            <div className="absolute top-full left-0 mt-2 min-w-[190px] bg-slate-800 border border-slate-600 rounded-lg shadow-2xl p-1">
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setPickerOpen(false); fileInputRef.current?.click(); }}
                                     className="w-full text-left px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-white/10 flex items-center gap-2"
@@ -337,6 +337,14 @@ export const MusicPlayer: React.FC = () => {
                     visibility: hidden;
                     transition: opacity 0.2s, visibility 0.2s;
                     pointer-events: none;
+                }
+                /* Тултип у левой кнопки: справа от кнопки, чтобы не вылезать
+                   за левый край экрана. */
+                .tooltip-right {
+                    left: calc(100% + 8px);
+                    top: 50%;
+                    bottom: auto;
+                    transform: translateY(-50%);
                 }
                 @media (hover: hover) {
                     .group:hover .tooltip {
