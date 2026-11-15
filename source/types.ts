@@ -1,11 +1,6 @@
 
 export type Language = 'ru' | 'en';
 
-export interface SitePage {
-    path: string;
-    title: string;
-}
-
 export interface LanguageContextType {
     lang: Language;
     setLang: React.Dispatch<React.SetStateAction<Language>>;

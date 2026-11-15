@@ -48,9 +48,6 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
-      - name: Generate pages manifest
-        run: node scripts/generate-pages.mjs
-
       - name: Update media indexes
         timeout-minutes: 10
         run: |

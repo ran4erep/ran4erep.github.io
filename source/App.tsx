@@ -14,7 +14,7 @@ import { LoginModal } from './components/LoginModal';
 import { AccountModal } from './components/AccountModal';
 import { AuthProvider, useAuth } from './auth';
 import { CommentsModal } from './components/Comments';
-import type { Language, LanguageContextType, SitePage } from './types';
+import type { Language, LanguageContextType } from './types';
 
 export const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
@@ -35,7 +35,6 @@ const App: React.FC = () => {
     });
     // Комментарии: глобальная модалка поверх сайта.
     const [commentsProject, setCommentsProject] = useState<{ key: string; title: string } | null>(null);
-    const [pages, setPages] = useState<SitePage[]>([]);
     const [openPath, setOpenPath] = useState<string | null>(() => {
         const params = new URLSearchParams(window.location.search);
         const app = params.get('app');
@@ -88,16 +87,6 @@ const App: React.FC = () => {
             }
         }
     }, [openPath]);
-
-    useEffect(() => {
-        fetch('/pages.json')
-            .then(res => {
-                if (!res.ok) throw new Error('pages manifest not found');
-                return res.json();
-            })
-            .then((data: SitePage[]) => setPages(Array.isArray(data) ? data : []))
-            .catch(() => setPages([]));
-    }, []);
 
     useEffect(() => {
         const faviconFrames = [
@@ -250,7 +239,7 @@ const App: React.FC = () => {
                     <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} isAppOpen={!!openPath} onCloseApp={closeApp} openPath={openPath} appNavItems={appNavItems} onOpenApp={handleOpenApp} />
                     <main className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-[45%] lg:ml-[22%]' : 'ml-0'} w-full md:w-auto`}>
                         {openPath ? (
-                            <AppView path={openPath} title={pages.find(p => p.path === openPath)?.title || openPath} />
+                            <AppView path={openPath} title={openPath} />
                         ) : (
                             <div className="px-4 sm:px-8 pt-3 sm:pt-5 pb-4 sm:pb-8">
                                 <Header sidebarOpen={isSidebarOpen} />
@@ -259,25 +248,25 @@ const App: React.FC = () => {
                                 
                                 {renderSection('ai-projects', 'nav_ai_projects', (
                                     <div className="project-grid">
-                                        {projects.ai.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} onOpenComments={(key, title) => setCommentsProject({ key, title })} />)}
+                                        {projects.ai.map(p => <ProjectCard key={p.titleKey} project={p} onOpenApp={openApp} onOpenComments={(key, title) => setCommentsProject({ key, title })} />)}
                                     </div>
                                 ))}
 
                                 {renderSection('info', 'nav_misc', (
                                     <div className="project-grid">
-                                        {projects.misc.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} onOpenComments={(key, title) => setCommentsProject({ key, title })} />)}
+                                        {projects.misc.map(p => <ProjectCard key={p.titleKey} project={p} onOpenApp={openApp} onOpenComments={(key, title) => setCommentsProject({ key, title })} />)}
                                     </div>
                                 ))}
 
                                 {renderSection('games', 'nav_games', (
                                     <div className="project-grid">
-                                        {projects.games.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} onOpenComments={(key, title) => setCommentsProject({ key, title })} />)}
+                                        {projects.games.map(p => <ProjectCard key={p.titleKey} project={p} onOpenApp={openApp} onOpenComments={(key, title) => setCommentsProject({ key, title })} />)}
                                     </div>
                                 ))}
 
                                 {renderSection('tools', 'nav_tools', (
                                     <div className="project-grid">
-                                        {projects.tools.map(p => <ProjectCard key={p.titleKey} project={p} pages={pages} onOpenApp={openApp} onOpenComments={(key, title) => setCommentsProject({ key, title })} />)}
+                                        {projects.tools.map(p => <ProjectCard key={p.titleKey} project={p} onOpenApp={openApp} onOpenComments={(key, title) => setCommentsProject({ key, title })} />)}
                                     </div>
                                 ))}
 

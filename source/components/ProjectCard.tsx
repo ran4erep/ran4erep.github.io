@@ -1,18 +1,17 @@
 
 import React, { useContext, useRef, useState } from 'react';
-import type { Project, LanguageContextType, SitePage } from '../types';
+import type { Project, LanguageContextType } from '../types';
 import { LanguageContext } from '../App';
 import { languageIcons } from '../constants';
 import { useCommentsCount } from './Comments';
 
 interface ProjectCardProps {
     project: Project;
-    pages?: SitePage[];
     onOpenApp?: (path: string) => void;
     onOpenComments?: (projectKey: string, title: string) => void;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project, pages, onOpenApp, onOpenComments }) => {
+export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpenApp, onOpenComments }) => {
     const { t } = useContext(LanguageContext) as LanguageContextType;
     const iconClass = project.tech ? languageIcons[project.tech.toLowerCase()] || 'devicon-devicon-plain' : '';
     const cardRef = useRef<HTMLDivElement>(null);
@@ -31,11 +30,28 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, pages, onOpen
 
     const resetTilt = () => setTilt({ x: 0, y: 0 });
 
-    const pageForLink = (link?: string) => {
-        if (!link || !pages || /^https?:/i.test(link)) return undefined;
-        const norm = link.endsWith('/') ? link : link + '/';
-        return pages.find(p => p.path === norm);
+    // Ссылки на наш же сайт (ran4erep.github.io) открываем как приложение
+    // внутри сайта, а не в новой вкладке.
+    const linkToAppPath = (link?: string): string | undefined => {
+        if (!link) return undefined;
+        try {
+            const url = new URL(link);
+            const host = url.host.toLowerCase();
+            if (host === 'ran4erep.github.io' || host === 'www.ran4erep.github.io') {
+                // Файлы (например, .apk) приложением не открываем.
+                if (/\.[a-z0-9]+$/i.test(url.pathname)) return undefined;
+                let path = url.pathname;
+                if (!path.endsWith('/')) path += '/';
+                return path;
+            }
+            return undefined;
+        } catch {
+            return undefined;
+        }
     };
+
+    const appPath = linkToAppPath(project.link);
+    const secondaryAppPath = linkToAppPath(project.secondaryLink);
 
     return (
         <div className="flex flex-col gap-2 h-full">
@@ -54,8 +70,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, pages, onOpen
                     <h3 className="text-xl font-bold text-gray-100 mb-2">{t(project.titleKey)}</h3>
                     <p className="text-gray-400 text-sm flex-grow mb-4">{t(project.descriptionKey)}</p>
                     <div className="mt-auto flex flex-col gap-2">
-                        {pageForLink(project.link) ? (
-                            <button onClick={() => onOpenApp?.(pageForLink(project.link)!.path)} className="inline-block bg-violet-600 text-white text-center font-semibold px-4 py-2 rounded-md transition-all duration-200 hover:bg-violet-500 active:bg-violet-700 active:scale-[0.98]">
+                        {appPath ? (
+                            <button onClick={() => onOpenApp?.(appPath)} className="inline-block bg-violet-600 text-white text-center font-semibold px-4 py-2 rounded-md transition-all duration-200 hover:bg-violet-500 active:bg-violet-700 active:scale-[0.98]">
                                 {t(project.linkTypeKey)}
                             </button>
                         ) : (
@@ -64,8 +80,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, pages, onOpen
                             </a>
                         )}
                         {project.secondaryLink && project.secondaryLinkTypeKey && (
-                            pageForLink(project.secondaryLink) ? (
-                                <button onClick={() => onOpenApp?.(pageForLink(project.secondaryLink)!.path)} className="inline-block bg-gray-600 text-white text-center font-semibold px-4 py-2 rounded-md transition-all duration-200 hover:bg-gray-500 active:bg-gray-700 active:scale-[0.98]">
+                            secondaryAppPath ? (
+                                <button onClick={() => onOpenApp?.(secondaryAppPath)} className="inline-block bg-gray-600 text-white text-center font-semibold px-4 py-2 rounded-md transition-all duration-200 hover:bg-gray-500 active:bg-gray-700 active:scale-[0.98]">
                                     {t(project.secondaryLinkTypeKey)}
                                 </button>
                             ) : (
