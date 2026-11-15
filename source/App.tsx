@@ -238,9 +238,7 @@ const App: React.FC = () => {
                 <div className="flex">
                     <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} isAppOpen={!!openPath} onCloseApp={closeApp} openPath={openPath} appNavItems={appNavItems} onOpenApp={handleOpenApp} />
                     <main className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-[45%] lg:ml-[22%]' : 'ml-0'} w-full md:w-auto`}>
-                        {openPath ? (
-                            <AppView path={openPath} title={openPath} />
-                        ) : (
+                        {!openPath && (
                             <div className="px-4 sm:px-8 pt-3 sm:pt-5 pb-4 sm:pb-8">
                                 <Header sidebarOpen={isSidebarOpen} />
 
@@ -279,6 +277,15 @@ const App: React.FC = () => {
                         )}
                     </main>
                 </div>
+
+                {/* Приложение открывается на весь экран отдельным слоем поверх
+                    сайта. Сайдбар и плавающие кнопки остаются поверх и
+                    не влияют на раскладку приложения. */}
+                {openPath && (
+                    <div className="fixed inset-0 z-30">
+                        <AppView path={openPath} title={openPath} />
+                    </div>
+                )}
                 <Chat isSidebarOpen={isSidebarOpen} isCommentsOpen={!!commentsProject} />
                 <FloatingButtons />
                 <AuthModals />
