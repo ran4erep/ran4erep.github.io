@@ -41,10 +41,10 @@ export const projects: { [key: string]: Project[] } = {
         { titleKey: 'cod_book_title', descriptionKey: 'cod_book_desc', link: 'https://ran4erep.github.io/projects/misc/cod_book/', linkTypeKey: 'btn_read' },
     ],
     games: [
+        { titleKey: 'r_zxe_title', descriptionKey: 'r_zxe_desc', link: 'https://ran4erep.github.io/projects/games/rzxe/', linkTypeKey: 'btn_play', tech: 'typescript' },
         { titleKey: 'dead_storm_title', descriptionKey: 'dead_storm_desc', link: 'https://ran4erep.github.io/Dead-Storm/', linkTypeKey: 'btn_play', tech: 'typescript' },
         { titleKey: 'nethack3ds_title', descriptionKey: 'nethack3ds_desc', link: 'https://github.com/ran4erep/Nethack-for-Nintendo-3DS', linkTypeKey: 'btn_github', tech: 'c' },
         { titleKey: 'r4boy_title', descriptionKey: 'r4boy_desc', link: 'https://ran4erep.github.io/gb', linkTypeKey: 'btn_play', tech: 'typescript' },
-        { titleKey: 'r_zxe_title', descriptionKey: 'r_zxe_desc', link: 'https://ran4erep.github.io/projects/games/rzxe/', linkTypeKey: 'btn_play', tech: 'typescript' },
 		{ titleKey: 'nethack3d_title', descriptionKey: 'nethack3d_desc', link: 'https://ran4erep.github.io/nethack3d', linkTypeKey: 'btn_play', tech: 'html' },
 		{ titleKey: 'scraper_title', descriptionKey: 'scraper_desc', link: 'https://ran4erep.github.io/projects/games/scraper/', linkTypeKey: 'btn_go', tech: 'react' },
         { titleKey: 'dos_title', descriptionKey: 'dos_desc', link: 'https://r4dos.pages.dev', linkTypeKey: 'btn_go', tech: 'msdos' },
