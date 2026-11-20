@@ -41,6 +41,7 @@ export const projects: { [key: string]: Project[] } = {
         { titleKey: 'cod_book_title', descriptionKey: 'cod_book_desc', link: 'https://ran4erep.github.io/projects/misc/cod_book/', linkTypeKey: 'btn_read' },
     ],
     games: [
+        { titleKey: 'r_ae_title', descriptionKey: 'r_ae_desc', link: 'https://ran4erep.github.io/projects/games/rae/', linkTypeKey: 'btn_play', tech: 'typescript' },
         { titleKey: 'r_zxe_title', descriptionKey: 'r_zxe_desc', link: 'https://ran4erep.github.io/projects/games/rzxe/', linkTypeKey: 'btn_play', tech: 'typescript' },
         { titleKey: 'dead_storm_title', descriptionKey: 'dead_storm_desc', link: 'https://ran4erep.github.io/Dead-Storm/', linkTypeKey: 'btn_play', tech: 'typescript' },
         { titleKey: 'nethack3ds_title', descriptionKey: 'nethack3ds_desc', link: 'https://github.com/ran4erep/Nethack-for-Nintendo-3DS', linkTypeKey: 'btn_github', tech: 'c' },
@@ -192,6 +193,8 @@ export const translations: { [key: string]: { ru: string, en: string } } = {
     "dos_desc": { "ru": "Каталог DOS игр с возможностью играть в них прямо в браузере. Используется эмулятор JS-DOS, который поддерживает мультиплеер через IPX. Крутится это всё на другом хостинге, так как там дают 20 гигов.", "en": "A catalog of DOS games with the ability to play them directly in the browser. It uses the JS-DOS emulator, which supports multiplayer via IPX. This is all running on another hosting, as they provide 20 gigs of space." },
     "r4boy_title": { "ru": "r4Boy - эмулятор GB&GBC", "en": "r4Boy - GB&GBC emulator" },
     "r4boy_desc": { "ru": "Написал эмулятор Game Boy, можно загружать как свои ромы, так и просто играть в огромную уже загруженную библиотеку игр.", "en": "I wrote a Game Boy emulator where you can load your own ROMs or simply play from a huge library of games that is already included." },
+    "r_ae_title": { "ru": "rAe", "en": "rAe" },
+    "r_ae_desc": { "ru": "Очередной эмулятор, на этот раз эмулирует Amiga 500. Всё так же с поддержкой телефонов и сенсорным управлением.", "en": "Another emulator, this time emulating the Amiga 500. Still with phone support and touch controls." },
     "r_zxe_title": { "ru": "rZXe", "en": "rZXe" },
     "r_zxe_desc": { "ru": "Сделал эмулятор ZX Spectrum, с нормальным мобильным управлением и каталогом игр с сайта zxart.ee. Каких-то адекватных браузерных эмуляторов для телефонов не нашёл.", "en": "I made a ZX Spectrum emulator with proper mobile controls and a game catalog from zxart.ee. I couldn't find any decent browser-based emulators for phones." },
     "nethack3ds_title": { "ru": "Порт Nethack 5.0 для Nintendo 3DS", "en": "Nethack 5.0 port for Nintendo 3DS" },
